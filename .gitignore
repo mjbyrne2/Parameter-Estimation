@@ -7,13 +7,16 @@
 *.out
 *.toc
 
+## .DS_Store:
+*.DS_Store
+
 ## Intermediate documents:
 *.dvi
 *-converted-to.*
 # these rules might exclude image files for figures etc.
 # *.ps
-# *.eps
-# *.pdf
+*.eps
+*.pdf
 
 ## Bibliography auxiliary files (bibtex/biblatex/biber):
 *.bbl
