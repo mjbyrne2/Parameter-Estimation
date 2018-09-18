@@ -10,8 +10,9 @@
 ## .DS_Store:
 *.DS_Store
 
-## MATLAB autosave files:
+## MATLAB autosave files and workspaces:
 *.m~
+*.mat
 
 ## Intermediate documents:
 *.dvi
