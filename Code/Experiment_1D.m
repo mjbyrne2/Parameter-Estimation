@@ -58,17 +58,18 @@ testvar = var(noise,0,2);   % 0 specifies the default normalization N-1
 % calculated and saved. 
 
 % Things to do:
-% 1) trim any unused variables (checkmark)
+% 1) trim any unused variables (X)
 % 2) updated function call (like gaussian_blur_B) ( )
-% - gaussian_blur_B (checkmark)
+% - gaussian_blur_B (X)
 % - upre_functional_noise ( )
 % - tikh_reg_error ( )
 % - upre_parameter ( )
 % - optimal_parameter ( )
-% - filter_factors ( )
-% - replacezeros_B ( )
+% - filter_factors (X)
+% - replacezeros_B (X)
 % 3) place any plotting blocks in Plots_1D.m ( )
-% 4) compare outputs to that of UPRE_Test_B3. ( )
+% 4) compare outputs to that of UPRE_Test_B3.m ( )
+% 5) Move remaining plotting sections from UPRE_Test_B3.m to Plots_1D.m ( )
 
 
 for j = 1:R
@@ -159,12 +160,12 @@ for j = 1:R
 
     for i = 1:length(M)
         upre_regf_tilde(i,:) = N*real(ifft(ifftshift(...
-            filter_factors(h_tildesol,ones(size(h_tildesol)),...
-            upre_lambda(j,i)).*g_noise_tilde./replacezeros_B(h_tildesol,1))));
+            filterFactors(h_tildesol,upre_lambda(j,i)).*g_noise_tilde./...
+            replaceZeros(h_tildesol,1))));
        
         opt_regf_tilde(i,:) = N*real(ifft(ifftshift(...
-            filter_factors(h_tildesol,ones(size(h_tildesol)),...
-            best_lambda(j,i)).*g_noise_tilde./replacezeros_B(h_tildesol,1))));
+            filterFactors(h_tildesol,best_lambda(j,i)).*g_noise_tilde./...
+            replaceZeros(h_tildesol,1))));
 
         upre_error(i) = tikh_reg_error(g_noise_tilde,h_tildesol,...
             ones(1,length(g_noise_tilde)),upre_lambda(j,i),r,f_tilde);
@@ -178,8 +179,8 @@ for j = 1:R
     regf_tilde = zeros(length(lambda),length(tn));
     for i = 1:length(lambda)
         regf_tilde(i,:) = N*real(ifft(ifftshift(...
-            filter_factors(h_tildesol,ones(size(h_tildesol)),...
-            lambda(i)).*g_noise_tilde./replacezeros_B(h_tildesol,1))));
+            filterFactors(h_tildesol,lambda(i)).*g_noise_tilde./...
+            replaceZeros(h_tildesol,1))));
     end
 
     % Table of lambda errors:
