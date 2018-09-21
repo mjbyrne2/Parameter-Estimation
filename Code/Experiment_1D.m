@@ -61,6 +61,7 @@ testvar = var(noise,0,2);   % 0 specifies the default normalization N-1
 % 1) trim any unused variables (X)
 % 2) updated function call (like gaussian_blur_B) ( )
 % - gaussian_blur_B (X)
+% - relative error (X)
 % - upre_functional_noise ( )
 % - tikh_reg_error ( )
 % - upre_parameter ( )
@@ -192,15 +193,12 @@ for j = 1:R
     %     'VariableNames',{'N','upre_lambda','upresc_lambda',...
     %     'Optimal_lambda'})
 
-    % Relative solution errors:
-    upre_err = abs(upre_regf_tilde-repmat(f,length(M),1));
-    upre_err = sqrt(sum(upre_err.^2,2));    % 2-norm of each row
-    rel_upre_err(j,:) = upre_err./sqrt(sum(f.^2));    
+    % Relative solution errors: 
+    rel_upre_err(j,:) = err(upre_regf_tilde,f)';
 
     % disp('The following table displays the L2 relative errors of the solutions:')
     % rel_sol_err = table(M',rel_upre_err,rel_upresc_err,...
     %     'VariableNames',{'N','rel_upre_sol_error','rel_upresc_sol_err'})
 
 end
-
 
