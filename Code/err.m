@@ -20,7 +20,7 @@ elseif isequal(rowsD,rowsT)
     return
 else
     Tmat = repmat(T,rowsD,1);  % Tmat is reshaped T
-    e = sqrt(sum((D-Tmat).^2,2));    % Euclidean norm of each row
-    e = e/norm(T); % Relative error
+    e = sqrt(sum(abs(D-Tmat).^2,2));    % Euclidean norm of each row
+    e = e./norm(T); % Relative error
     return
 end

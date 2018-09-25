@@ -59,20 +59,19 @@ testvar = var(noise,0,2);   % 0 specifies the default normalization N-1
 
 % Things to do:
 % 1) trim any unused variables (X)
-% 2) updated function call (like gaussian_blur_B) ( )
+% 2) updated function call (like gaussian_blur_B) (X)
 % - gaussian_blur_B (X)
 % - relative error (X)
-% - upre_functional_noise ( ) (filt_fac_truncate.m will now be
+% - upre_functional_noise (X) (filt_fac_truncate.m will now be
 % internalized, see TikhRegErr.m)
-% - tikh_reg_error ( )
-% - upre_parameter ( )
+% - tikh_reg_error (X)
+% - upre_parameter (X)
 % - optimal_parameter (in progress)
 % - filter_factors (X)
 % - replacezeros_B (X)
 % 3) place any plotting blocks in Plots_1D.m (X)
 % 4) compare outputs to that of UPRE_Test_B3.m ( )
 % 5) Move remaining plotting sections from UPRE_Test_B3.m to Plots_1D.m ( )
-
 
 for j = 1:R
 
@@ -107,7 +106,7 @@ for j = 1:R
         normg = sum(gn.^2)/n;
 
         gn_noise = interp1(t,g_noise,tn);
-        res_noise(i,j) = var(gn_noise-gn);
+%         res_noise(i,j) = var(gn_noise-gn);
         f_tilde = fftshift(fft(fn)/n);
         gn_tilde = fftshift(fft(gn_noise)/n);
         h_tilde = fftshift(fft(hn));
@@ -115,20 +114,19 @@ for j = 1:R
         lambda = logspace(-5,1,100);
 
         for k = 1:100
-            upre(i,k) = upre_functional_noise(gn_tilde,h_tilde,...
+            upre(i,k) = UPREfunctional(gn_tilde,h_tilde,...
                 ones(1,length(gn)),eta,lambda(k),r);
-            best(i,k) = tikh_reg_error(gn_tilde,h_tilde,...
+            best(i,k) = TikhRegErr(gn_tilde,h_tilde,...
                 ones(1,length(gn)),lambda(k),r,f_tilde);
         end
         
         [~,mink] = min(upre(i,:));
         lambda_min = 0.005;
 %         lambda_min = lambda(mink);
-        upre_lambda(j,i) = upre_parameter(gn_tilde,h_tilde,...
+        upre_lambda(j,i) = UPREparameter(gn_tilde,h_tilde,...
             ones(1,length(gn)),eta,r,lambda_min)*sqrt(n/N);
-        [~,mink] = min(upresc(i,:));
 %         lambda_min = lambda(mink);
-        best_lambda(j,i) = optimal_parameter(gn_tilde,h_tilde,...
+        best_lambda(j,i) = optimalParameter(gn_tilde,h_tilde,...
             ones(1,length(gn)),r,f_tilde);
     end
 
@@ -144,10 +142,10 @@ for j = 1:R
             filterFactors(h_tildesol,best_lambda(j,i)).*g_noise_tilde./...
             replaceZeros(h_tildesol,1))));
 
-        upre_error(i) = tikh_reg_error(g_noise_tilde,h_tildesol,...
+        upre_error(i) = TikhRegErr(g_noise_tilde,h_tildesol,...
             ones(1,length(g_noise_tilde)),upre_lambda(j,i),r,f_tilde);
         
-        best_error(i) = tikh_reg_error(g_noise_tilde,h_tildesol,...
+        best_error(i) = TikhRegErr(g_noise_tilde,h_tildesol,...
             ones(1,length(g_noise_tilde)),best_lambda(j,i)*sqrt(n/N),r,f_tilde);
         
     end
@@ -160,21 +158,9 @@ for j = 1:R
             replaceZeros(h_tildesol,1))));
     end
 
-    % Table of lambda errors:
-
-    format short
-
-    % disp('The following table displays the different lambdas:')
-    % lambdas = table(M',upre_lambda',upresc_lambda',best_lambda',...
-    %     'VariableNames',{'N','upre_lambda','upresc_lambda',...
-    %     'Optimal_lambda'})
-
     % Relative solution errors: 
     rel_upre_err(j,:) = err(upre_regf_tilde,f)';
 
-    % disp('The following table displays the L2 relative errors of the solutions:')
-    % rel_sol_err = table(M',rel_upre_err,rel_upresc_err,...
-    %     'VariableNames',{'N','rel_upre_sol_error','rel_upresc_sol_err'})
-
 end
+
 
