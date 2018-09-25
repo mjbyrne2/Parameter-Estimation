@@ -47,10 +47,10 @@ f2 = testFunction('1D',2);
 f3 = testFunction('1D',3);
 
 % Construction of blurred functions g:
-radius = 50;
-[g1,h1] = GaussianBlur_1D(t,f1,radius);
-[g2,h2] = GaussianBlur_1D(t,f2,radius);
-[g3,h3] = GaussianBlur_1D(t,f3,radius);
+width = 50;
+[g1,h1] = GaussianBlur_1D(t,f1,width);
+[g2,h2] = GaussianBlur_1D(t,f2,width);
+[g3,h3] = GaussianBlur_1D(t,f3,width);
 
 SNR = 5;   % Signal-to-noise ratio (SNR)
 R = 100; % Number of noise realizations
@@ -110,5 +110,27 @@ set(gca,'Fontsize',20)
 
 % print('Figures\LLN_Plot','-depsc')
 
-%% 
+%% Plot functions/data for first noise realization
+% This section generates one plot showing the functions (f and g pertaining
+% to a given test function) and data (gtilde) for one noise realization.
+% The functions/data are loaded in from a workspace generated in
+% Experiment_1D.m. The filename of the resulting plot has the form 
+% TF(TFnum)wNoise_SNR(SNR)_width(width).eps.
+
+% load()
+
+y_scale = [-1.5 1.5];
+        
+figure('units','normalized','outerposition',[0 0 1 1])
+plot(t,g_noise,'k.','LineWidth',0.25)
+hold on
+plot(t, f,'b',t,g,'m','LineWidth',2)
+grid on
+xlabel('t')
+ylim(y_scale)
+set(gca,'Fontsize',12)
+legend({'g with noise','g',['Test function #' num2str(TFnum)]},...
+    'FontSize',12)
+% saveas(gcf,['TF' num2str(TFnum) 'wNoise_SNR' num2str(SNR)...
+%     '_width' num2str(width) '.eps'],'epsc') 
 

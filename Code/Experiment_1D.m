@@ -68,7 +68,7 @@ testvar = var(noise,0,2);   % 0 specifies the default normalization N-1
 % - optimal_parameter ( )
 % - filter_factors (X)
 % - replacezeros_B (X)
-% 3) place any plotting blocks in Plots_1D.m ( )
+% 3) place any plotting blocks in Plots_1D.m (X)
 % 4) compare outputs to that of UPRE_Test_B3.m ( )
 % 5) Move remaining plotting sections from UPRE_Test_B3.m to Plots_1D.m ( )
 
@@ -76,27 +76,6 @@ testvar = var(noise,0,2);   % 0 specifies the default normalization N-1
 for j = 1:R
 
     g_noise = g + noise(j,:);
-
-    % Plot functions/data for first noise realization:
-    if j == 1
-        
-        y_scale = [-1.5 1.5];
-        
-        figure('units','normalized','outerposition',[0 0 1 1])
-        plot(t,g_noise,'k.','LineWidth',0.25)
-        hold on
-        plot(t, f,'b',t,g,'m','LineWidth',2)
-        grid on
-        xlabel('t')
-        ylim(y_scale)
-        set(gca,'Fontsize',12)
-        legend({'g with noise','g',['Test function #' num2str(caseno)]},...
-            'FontSize',12)
-%         title(['Functions and data for noise realization #1 (radius = '...
-%             num2str(radius) ', SNR = ' num2str(SNR) ')'],'FontSize',20)
-        saveas(gcf,['TF' num2str(caseno) 'wNoise_SNR' num2str(SNR)...
-            '_radius' num2str(radius) '.eps'],'epsc')   % Save file
-    end
 
     % Initialization of arrays:
     upre = zeros(length(M),100);
@@ -118,7 +97,7 @@ for j = 1:R
         tn = linspace(0,1,n+1);
         tn = tn(1:end-1);
 
-        [~,hn] = GaussianBlur_1D(tn,tn,radius);
+        [~,hn] = GaussianBlur_1D(tn,tn,width);
         hn = fftshift(hn);
 
         gn = interp1(t,g,tn);
