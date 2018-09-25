@@ -117,20 +117,116 @@ set(gca,'Fontsize',20)
 % Experiment_1D.m. The filename of the resulting plot has the form 
 % TF(TFnum)wNoise_SNR(SNR)_width(width).eps.
 
-% load()
+% If the workspace is not loaded yet, load workspace:
+% load Experiment_1D.m
 
 y_scale = [-1.5 1.5];
         
 figure('units','normalized','outerposition',[0 0 1 1])
-plot(t,g_noise,'k.','LineWidth',0.25)
+plot(t,f,'b',t,g,'m','LineWidth',2)
 hold on
-plot(t, f,'b',t,g,'m','LineWidth',2)
+plot(t,g_noise,'k.','LineWidth',0.25)
 grid on
 xlabel('t')
 ylim(y_scale)
-set(gca,'Fontsize',12)
-legend({'g with noise','g',['Test function #' num2str(TFnum)]},...
-    'FontSize',12)
+set(gca,'Fontsize',14)
+legend({['Test function #' num2str(TFnum)],'g','g with noise'},...
+    'FontSize',18)
 % saveas(gcf,['TF' num2str(TFnum) 'wNoise_SNR' num2str(SNR)...
 %     '_width' num2str(width) '.eps'],'epsc') 
+
+%% Plot of Lambdas and Relative Errors
+% This section generates one plot consisting of two box plots. The first
+% box plot shows the lambdas obtained by applying the downsampling 
+% parameter selection method. The second box plot shows the relative errors
+% between the test function and the regularized solutions across 
+% downsampling resolutions. 
+
+% If the workspace is not loaded yet, load workspace:
+% load Experiment_1D.m
+
+figure('units','normalized','outerposition',[0 0 1 1])  % Full screen
+subplot(1,2,1)
+boxplot(upre_lambda,M)
+xlabel('n')
+ylabel('Lambda')
+set(gca, 'FontSize',12)
+subplot(1,2,2)
+boxplot(rel_upre_err,M)
+xlabel('n')
+ylabel('Relative error')
+set(gca,'FontSize',12)
+% saveas(gcf,['TF' num2str(caseno) '_BothBoxes_SNR' num2str(SNR) '_radius'...
+%     num2str(radius) '_R' num2str(R) '.eps'],'epsc')   % Save file
+
+%% Plot of Lambdas
+% This section generates one box plot of the lambdas obtained by applying 
+% the downsampling parameter selection method.
+
+% If the workspace is not loaded yet, load workspace:
+% load Experiment_1D.m
+
+figure('units','normalized','outerposition',[0 0 1 1])
+boxplot(upre_lambda,M)
+% title(['UPRE lambdas across resolutions (' num2str(R)...
+%     ' realizations)'],'Fontsize',24)
+xlabel('Downsampling resolutions (n)')
+ylabel('Lambda')
+set(gca, 'FontSize',12)
+% saveas(gcf,['TF' num2str(caseno) '_Lambdas_SNR' num2str(SNR) '_radius'...
+%     num2str(radius) '_R' num2str(R) '.eps'],'epsc')   % Save file
+
+%% Plot of Errors
+% This section generates one box plot of the relative errors between the
+% test function and the regularized solutions across downsampling
+% resolutions.
+
+% If the workspace is not loaded yet, load workspace:
+% load Experiment_1D.m
+
+figure('units','normalized','outerposition',[0 0 1 1])
+boxplot(rel_upre_err,M)
+% title(['Relative erros across resolutions (' num2str(R)...
+%     ' realizations)'],'Fontsize',24)
+xlabel('Downsampling resolutions (n)')
+ylabel('Relative error')
+set(gca,'FontSize',12)
+% saveas(gcf,['TF' num2str(caseno) '_RelErrors_SNR' num2str(SNR) '_radius'...
+%     num2str(radius) '_R' num2str(R) '.eps'],'epsc')   % Save file
+
+%% Plot of Regularized Solutions
+% This section generates one plot of the regularized solutions obtained by
+% applying the downsampling parameter selection method.
+
+% If the workspace is not loaded yet, load workspace:
+% load Experiment_1D.m
+
+figure('units','normalized','outerposition',[0 0 1 1])
+plot(repmat(t,length(M),1)',upre_regf_tilde','-')   % Transpose for the sake of plotting
+hold on
+plot(t,f,'k','Linewidth',1.5)   % Original function f
+% title(['Regularized solutions across resolutions using the UPRE method (radius = '...
+%             num2str(radius) ', SNR = ' num2str(SNR) ')'],'FontSize',24)
+legend({'N = 16','N = 32','N = 64','N = 128','N = 256','N = 512',...
+    'N = 1024','N = 2048','N = 4098','Original f'},'Location','South')
+ 
+%% Comparison of Gaussian PSF spectra
+% This section generates one plot illustrating the relationship between the
+% width of Gaussian PSF's and their spectra.
+
+width = [50, 100, 200];
+H = zeros(length(width),N);
+H_tilde = H;
+for j = 1:length(width)
+    [~,H(j,:)] = GaussianBlur_1D(t,f,width(j));
+    H_tilde(j,:) = sort(abs(fftshift(fft(H(j,:)))),'descend');
+end
+
+figure('units','normalized','outerposition',[0 0 1 1])
+subplot(1,2,1)
+plot(repmat(t,length(width),1)',H','Linewidth',1.5)
+subplot(1,2,2)
+semilogy(repmat(1:N,length(width),1)',(H_tilde(:,1:N))','--',...
+    'Linewidth',2)
+legend({'Width = 50','Width = 100','Width = 200'})
 

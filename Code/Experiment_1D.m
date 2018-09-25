@@ -71,7 +71,7 @@ testvar = var(noise,0,2);   % 0 specifies the default normalization N-1
 % - replacezeros_B (X)
 % 3) place any plotting blocks in Plots_1D.m (X)
 % 4) compare outputs to that of UPRE_Test_B3.m ( )
-% 5) Move remaining plotting sections from UPRE_Test_B3.m to Plots_1D.m ( )
+% 5) Move remaining plotting sections from UPRE_Test_B3.m to Plots_1D.m (X)
 
 for j = 1:R
 
@@ -162,5 +162,9 @@ for j = 1:R
     rel_upre_err(j,:) = err(upre_regf_tilde,f)';
 
 end
+
+% Save workspace:
+save Experiment_1D.mat
+
 
 
