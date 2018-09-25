@@ -62,7 +62,8 @@ testvar = var(noise,0,2);   % 0 specifies the default normalization N-1
 % 2) updated function call (like gaussian_blur_B) ( )
 % - gaussian_blur_B (X)
 % - relative error (X)
-% - upre_functional_noise ( )
+% - upre_functional_noise ( ) (filt_fac_truncate.m will now be
+% internalized, see TikhRegErr.m)
 % - tikh_reg_error ( )
 % - upre_parameter ( )
 % - optimal_parameter (in progress)
