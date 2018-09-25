@@ -65,7 +65,7 @@ testvar = var(noise,0,2);   % 0 specifies the default normalization N-1
 % - upre_functional_noise ( )
 % - tikh_reg_error ( )
 % - upre_parameter ( )
-% - optimal_parameter ( )
+% - optimal_parameter (in progress)
 % - filter_factors (X)
 % - replacezeros_B (X)
 % 3) place any plotting blocks in Plots_1D.m (X)
@@ -104,16 +104,12 @@ for j = 1:R
         fn = interp1(t,f,tn);
 
         normg = sum(gn.^2)/n;
-%         disp(['SNR for N = ' num2str(N) ' is ' num2str(normg/eta) '.'])
 
         gn_noise = interp1(t,g_noise,tn);
         res_noise(i,j) = var(gn_noise-gn);
         f_tilde = fftshift(fft(fn)/n);
         gn_tilde = fftshift(fft(gn_noise)/n);
         h_tilde = fftshift(fft(hn));
-
-        format long
-%         disp(['Variance in gntilde: ' num2str(var(gntilde)) '.'])
 
         lambda = logspace(-5,1,100);
 
