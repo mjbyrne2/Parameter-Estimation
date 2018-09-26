@@ -62,7 +62,7 @@ for j = 1:R
     g_noise = g + noise(j,:);
 
     % Initialization of arrays:
-    upre = zeros(length(M),100);
+    upre_vectors = zeros(length(M),100);
     best = zeros(length(M),100);
     best_lambda = zeros(size(M));
     upre_error = zeros(size(M));
@@ -92,19 +92,17 @@ for j = 1:R
         gn_tilde = fftshift(fft(gn_noise)/n);
         h_tilde = fftshift(fft(hn));
 
-        lambda = logspace(-5,1,100);
-
+        L = logspace(-5,1,100);
+        
         for k = 1:100
-            upre(i,k) = UPREfunctional(gn_tilde,h_tilde,...
-                ones(1,length(gn)),eta,lambda(k),r);
             best(i,k) = TikhRegErr(gn_tilde,h_tilde,...
-                ones(1,length(gn)),lambda(k),r,f_tilde);
+                ones(1,length(gn)),L(k),r,f_tilde);
         end
         
-        [~,mink] = min(upre(i,:));
-        lambda_min = 0.005;
-        upre_lambda(j,i) = UPREparameter(gn_tilde,h_tilde,...
-            ones(1,length(gn)),eta,r,lambda_min)*sqrt(n/N);
+        [upre_vectors(i,:),upre_lambda(j,i)] = UPREparameter(gn_tilde,...
+            h_tilde,ones(1,length(gn)),eta,L,r);
+        upre_lambda(j,i) = upre_lambda(j,i)*sqrt(n/N);  % Scale the lambda
+        
         best_lambda(j,i) = optimalParameter(gn_tilde,h_tilde,...
             ones(1,length(gn)),r,f_tilde);
     end
@@ -129,11 +127,11 @@ for j = 1:R
         
     end
 
-    lambda = [1e-3,1e-2,1e-1,1,10];
-    regf_tilde = zeros(length(lambda),length(tn));
-    for i = 1:length(lambda)
+    sL = [1e-3,1e-2,1e-1,1,10]; % Vector of some select lambdas
+    regf_tilde = zeros(length(sL),length(tn));
+    for i = 1:length(sL)
         regf_tilde(i,:) = N*real(ifft(ifftshift(...
-            filterFactors(h_tildesol,lambda(i)).*g_noise_tilde./...
+            filterFactors(h_tildesol,sL(i)).*g_noise_tilde./...
             replaceZeros(h_tildesol,1))));
     end
 

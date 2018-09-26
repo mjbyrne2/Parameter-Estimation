@@ -1,22 +1,23 @@
-function lambda = UPREparameter(dataSpec,operatorSpec,smoothingSpec,...
-    variance,trunc,lambda_min)
-% UPREparameter returns the regularization parameter lambda determined by
-% the UPRE method.
+function [u,lambda] = UPREparameter(dataSpec,operatorSpec,smoothingSpec,...
+    variance,L,trunc)
+% UPREparameter returns the vector U of UPRE values and the regularization 
+% parameter lambda that minimizes U. L is a vector of possible lambdas.
 %
 % Companion files: UPREfunctional.m
 
-% Set bound on the window for lambda:
-if nargin < 6
-    lambda_left = 1e-6;
-    lambda_right = 10;
-else
-    lambda_left = lambda_min/100;
-    lambda_right = lambda_min*100;
-end
+% Generate the UPRE vector:
+u = UPREfunctional(dataSpec,operatorSpec,smoothingSpec,...
+    variance,L,trunc);
 
-U = @(lambda) UPREfunctional(dataSpec,operatorSpec,...
-    smoothingSpec,variance,lambda,trunc);
+% Now find the (possibily) shallow minimum:
+step = 10;  % Step size for measuring relative increase
+tol = 0.01; % Percent relative increase required 
+v = (u(step:step:end)-u(1:step:end-(step-1)))./u(1:step:end-(step-1));
+lambda = L(step*find(v > tol,1));
 
-lambda = fminbnd(U,lambda_left,lambda_right);
+% Original:
+% U = @(lambda) UPREfunctional(dataSpec,operatorSpec,...
+%     smoothingSpec,variance,lambda,trunc);
+% lambda = fminbnd(U,1e-6,10);
 
 end
