@@ -133,7 +133,7 @@ set(gca,'Fontsize',14)
 legend({['Test function #' num2str(TFnum)],'g','g with noise'},...
     'FontSize',18)
 % saveas(gcf,['TF' num2str(TFnum) 'wNoise_SNR' num2str(SNR)...
-%     '_width' num2str(width) '.eps'],'epsc') 
+%     '_width' num2str(width) '.eps'],'epsc')
 
 %% Plot of Lambdas and Relative Errors
 % This section generates one plot consisting of two box plots. The first

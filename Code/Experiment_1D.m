@@ -27,14 +27,14 @@ SNR = 5;   % Signal-to-noise ratio
 R = 30; % Number of noise realizations
 width = 50; % Width parameter for Gaussian PSF; default = 200
 
-TFnum = 1; % Test function number (see testFunction.m)
+TFnum = 2; % Test function number (see testFunction.m)
 
 %% Generation of data
 % In this section, the data used in the downsampling experiment is
 % generated using the set-up above. If a workspace of data already exists,
 % uncomment and run the first line only.
 
-% Insert load line here -->
+% load Experiment_1D.m
 
 f = testFunction('1D',TFnum);
 
@@ -103,8 +103,6 @@ for j = 1:R
         gn = interp1(t,g,tn);
         fn = interp1(t,f,tn);
 
-        normg = sum(gn.^2)/n;
-
         gn_noise = interp1(t,g_noise,tn);
 %         res_noise(i,j) = var(gn_noise-gn);
         f_tilde = fftshift(fft(fn)/n);
@@ -164,7 +162,7 @@ for j = 1:R
 end
 
 % Save workspace:
-save Experiment_1D.mat
+% save Experiment_1D.mat
 
 
 
