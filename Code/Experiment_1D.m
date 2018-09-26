@@ -27,7 +27,7 @@ SNR = 5;   % Signal-to-noise ratio
 R = 30; % Number of noise realizations
 width = 50; % Width parameter for Gaussian PSF; default = 200
 
-TFnum = 2; % Test function number (see testFunction.m)
+TFnum = 1; % Test function number (see testFunction.m)
 
 %% Generation of data
 % In this section, the data used in the downsampling experiment is
@@ -56,22 +56,6 @@ testvar = var(noise,0,2);   % 0 specifies the default normalization N-1
 % This section is where the downsampling experiments occur. The process is
 % applied to each realization of noise, and various statistics are
 % calculated and saved. 
-
-% Things to do:
-% 1) trim any unused variables (X)
-% 2) updated function call (like gaussian_blur_B) (X)
-% - gaussian_blur_B (X)
-% - relative error (X)
-% - upre_functional_noise (X) (filt_fac_truncate.m will now be
-% internalized, see TikhRegErr.m)
-% - tikh_reg_error (X)
-% - upre_parameter (X)
-% - optimal_parameter (in progress)
-% - filter_factors (X)
-% - replacezeros_B (X)
-% 3) place any plotting blocks in Plots_1D.m (X)
-% 4) compare outputs to that of UPRE_Test_B3.m ( )
-% 5) Move remaining plotting sections from UPRE_Test_B3.m to Plots_1D.m (X)
 
 for j = 1:R
 
@@ -104,7 +88,6 @@ for j = 1:R
         fn = interp1(t,f,tn);
 
         gn_noise = interp1(t,g_noise,tn);
-%         res_noise(i,j) = var(gn_noise-gn);
         f_tilde = fftshift(fft(fn)/n);
         gn_tilde = fftshift(fft(gn_noise)/n);
         h_tilde = fftshift(fft(hn));
@@ -120,10 +103,8 @@ for j = 1:R
         
         [~,mink] = min(upre(i,:));
         lambda_min = 0.005;
-%         lambda_min = lambda(mink);
         upre_lambda(j,i) = UPREparameter(gn_tilde,h_tilde,...
             ones(1,length(gn)),eta,r,lambda_min)*sqrt(n/N);
-%         lambda_min = lambda(mink);
         best_lambda(j,i) = optimalParameter(gn_tilde,h_tilde,...
             ones(1,length(gn)),r,f_tilde);
     end
@@ -163,6 +144,3 @@ end
 
 % Save workspace:
 % save Experiment_1D.mat
-
-
-
