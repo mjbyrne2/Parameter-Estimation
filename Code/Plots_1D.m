@@ -27,6 +27,26 @@ ylabel('p(t)')
 set(gca,'Fontsize',20)
 % print('Figures\GaussianDistributions','-depsc')
 
+%% Comparison of Gaussian PSF spectra
+% This section generates one plot illustrating the relationship between the
+% width of Gaussian PSF's and their spectra.
+
+width = [50, 100, 200];
+H = zeros(length(width),N);
+H_tilde = H;
+for j = 1:length(width)
+    [~,H(j,:)] = GaussianBlur_1D(t,f,width(j));
+    H_tilde(j,:) = sort(abs(fftshift(fft(H(j,:)))),'descend');
+end
+
+figure('units','normalized','outerposition',[0 0 1 1])
+subplot(1,2,1)
+plot(repmat(t,length(width),1)',H','Linewidth',1.5)
+subplot(1,2,2)
+semilogy(repmat(1:N,length(width),1)',(H_tilde(:,1:N))','--',...
+    'Linewidth',2)
+legend({'Width = 50','Width = 100','Width = 200'})
+
 %% Law of Large Numbers
 % This sections generates one plot called LLN_Plot.eps showing the effect
 % of vector length on sample variance. This plot demonstrates the Law of
@@ -209,24 +229,3 @@ plot(t,f,'k','Linewidth',1.5)   % Original function f
 %             num2str(radius) ', SNR = ' num2str(SNR) ')'],'FontSize',24)
 legend({'N = 16','N = 32','N = 64','N = 128','N = 256','N = 512',...
     'N = 1024','N = 2048','N = 4098','Original f'},'Location','South')
- 
-%% Comparison of Gaussian PSF spectra
-% This section generates one plot illustrating the relationship between the
-% width of Gaussian PSF's and their spectra.
-
-width = [50, 100, 200];
-H = zeros(length(width),N);
-H_tilde = H;
-for j = 1:length(width)
-    [~,H(j,:)] = GaussianBlur_1D(t,f,width(j));
-    H_tilde(j,:) = sort(abs(fftshift(fft(H(j,:)))),'descend');
-end
-
-figure('units','normalized','outerposition',[0 0 1 1])
-subplot(1,2,1)
-plot(repmat(t,length(width),1)',H','Linewidth',1.5)
-subplot(1,2,2)
-semilogy(repmat(1:N,length(width),1)',(H_tilde(:,1:N))','--',...
-    'Linewidth',2)
-legend({'Width = 50','Width = 100','Width = 200'})
-
