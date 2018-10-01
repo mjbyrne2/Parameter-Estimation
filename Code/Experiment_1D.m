@@ -24,8 +24,8 @@ t = t(1:end-1); % Equispaced N-point discretization of the interval [0,1]
 
 % Variable set-up:
 SNR = 5;   % Signal-to-noise ratio
-R = 30; % Number of noise realizations
-width = 50; % Width parameter for Gaussian PSF; default = 200
+R = 20; % Number of noise realizations
+width = 200; % Width parameter for Gaussian PSF; default = 200
 
 TFnum = 1; % Test function number (see testFunction.m)
 
@@ -40,7 +40,7 @@ f = testFunction('1D',TFnum);
 
 % Initialization of storage arrays:
 upre_lambda = zeros(R,length(M));
-rel_upre_err = zeros(R,length(M));
+upre_err = zeros(R,length(M));
 
 % Construction of vector discretizations:
 [g,h] = GaussianBlur_1D(t,f,width);
@@ -67,6 +67,8 @@ for j = 1:R
     best_lambda = zeros(size(M));
     upre_error = zeros(size(M));
     best_error = zeros(size(M));
+    upre_regf = zeros(length(M),N);
+    opt_regf = zeros(length(M),N);
 
     % For computing representative solutions with the finest sampling:
     % Michael, look in UPRE_Test_B.m at this line for incorrect addition of noise?
@@ -107,15 +109,12 @@ for j = 1:R
             ones(1,length(gn)),r,f_tilde);
     end
 
-    upre_regf_tilde = zeros(length(M),N);
-    opt_regf_tilde = zeros(length(M),N);
-
     for i = 1:length(M)
-        upre_regf_tilde(i,:) = N*real(ifft(ifftshift(...
+        upre_regf(i,:) = N*real(ifft(ifftshift(...
             filterFactors(h_tildesol,upre_lambda(j,i)).*g_noise_tilde./...
             replaceZeros(h_tildesol,1))));
        
-        opt_regf_tilde(i,:) = N*real(ifft(ifftshift(...
+        opt_regf(i,:) = N*real(ifft(ifftshift(...
             filterFactors(h_tildesol,best_lambda(j,i)).*g_noise_tilde./...
             replaceZeros(h_tildesol,1))));
 
@@ -128,15 +127,15 @@ for j = 1:R
     end
 
     sL = [1e-3,1e-2,1e-1,1,10]; % Vector of some select lambdas
-    regf_tilde = zeros(length(sL),length(tn));
+    regf = zeros(length(sL),length(tn));
     for i = 1:length(sL)
-        regf_tilde(i,:) = N*real(ifft(ifftshift(...
+        regf(i,:) = N*real(ifft(ifftshift(...
             filterFactors(h_tildesol,sL(i)).*g_noise_tilde./...
             replaceZeros(h_tildesol,1))));
     end
 
     % Relative solution errors: 
-    rel_upre_err(j,:) = err(upre_regf_tilde,f)';
+    upre_err(j,:) = err(upre_regf,f)';
 
 end
 

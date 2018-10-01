@@ -10,8 +10,8 @@ u = UPREfunctional(dataSpec,operatorSpec,smoothingSpec,...
     variance,L,trunc);
 
 % Now find the (possibily) shallow minimum:
-step = 10;  % Step size for measuring relative increase
-tol = 0.02; % Percent relative increase required 
+step = 5;  % Step size for measuring relative increase
+tol = 0.2; % Percent relative increase required 
 v = (u(step:step:end)-u(1:step:end-(step-1)))./u(1:step:end-(step-1));
 l1 = L(step*find(v > tol,1));
 

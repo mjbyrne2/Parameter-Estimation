@@ -172,7 +172,7 @@ xlabel('n')
 ylabel('Lambda')
 set(gca, 'FontSize',12)
 subplot(1,2,2)
-boxplot(rel_upre_err,M)
+boxplot(upre_err,M)
 xlabel('n')
 ylabel('Relative error')
 set(gca,'FontSize',12)
@@ -205,7 +205,7 @@ set(gca, 'FontSize',12)
 % load Experiment_1D.m
 
 figure('units','normalized','outerposition',[0 0 1 1])
-boxplot(rel_upre_err,M)
+boxplot(upre_err,M)
 % title(['Relative erros across resolutions (' num2str(R)...
 %     ' realizations)'],'Fontsize',24)
 xlabel('Downsampling resolutions (n)')
@@ -222,10 +222,11 @@ set(gca,'FontSize',12)
 % load Experiment_1D.m
 
 figure('units','normalized','outerposition',[0 0 1 1])
-plot(repmat(t,length(M),1)',upre_regf_tilde','-')   % Transpose for the sake of plotting
+plot(repmat(t,length(M),1)',upre_regf','-')   % Transpose for the sake of plotting
 hold on
 plot(t,f,'k','Linewidth',1.5)   % Original function f
 % title(['Regularized solutions across resolutions using the UPRE method (radius = '...
 %             num2str(radius) ', SNR = ' num2str(SNR) ')'],'FontSize',24)
 legend({'N = 16','N = 32','N = 64','N = 128','N = 256','N = 512',...
-    'N = 1024','N = 2048','N = 4098','Original f'},'Location','South')
+    'N = 1024','N = 2048','N = 4098','Original f'},'Location',...
+    'Southwest','Fontsize',18)
