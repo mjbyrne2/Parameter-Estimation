@@ -90,20 +90,20 @@ for j = 1:R
         gn_noise = interp1(t,g_noise,tn);
         f_tilde = fftshift(fft(fn)/n);
         gn_tilde = fftshift(fft(gn_noise)/n);
-        h_tilde = fftshift(fft(hn));
+        hn_tilde = fftshift(fft(hn));
 
         L = logspace(-5,1,100);
         
         for k = 1:100
-            best(i,k) = TikhRegErr(gn_tilde,h_tilde,...
+            best(i,k) = TikhRegErr(gn_tilde,hn_tilde,...
                 ones(1,length(gn)),L(k),r,f_tilde);
         end
         
         [upre_vectors(i,:),upre_lambda(j,i)] = UPREparameter(gn_tilde,...
-            h_tilde,ones(1,length(gn)),eta,L,r);
+            hn_tilde,ones(1,length(gn)),eta,L,r);
         upre_lambda(j,i) = upre_lambda(j,i)*sqrt(n/N);  % Scale the lambda
         
-        best_lambda(j,i) = optimalParameter(gn_tilde,h_tilde,...
+        best_lambda(j,i) = optimalParameter(gn_tilde,hn_tilde,...
             ones(1,length(gn)),r,f_tilde);
     end
 
