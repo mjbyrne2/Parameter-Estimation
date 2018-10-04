@@ -1,6 +1,8 @@
 %% Plots_1D.m
 % This script generates and saves the plots used in the one-dimensional
-% experiments. The plots are saved as .eps files in the Figures folder.
+% experiments. The plots are saved as .fig files in the Figures folder,
+% though these are ultimately converted to .eps for use in the TeX file
+% Parameter-Estimation.tex.
 %
 % Companion files: testFunction.m, GaussianBlur_1D.m, convPeriodic_1D.m
 % 
@@ -15,7 +17,7 @@ t = linspace(-4,4,301);
 s2 = [1/5,1,2]; % Variances
 f = @(t,s2) (1/sqrt(2*pi*s2))*exp(-(t.^2)/(2*s2));   % Gaussian PDF
 
-figure('units','normalized','outerposition',[0 0 1 1])
+F = figure('units','normalized','outerposition',[0 0 1 1]);
 
 plot(t,f(t,s2(1)),t,f(t,s2(2)),t,f(t,s2(3)),'Linewidth',3)
 grid on
@@ -25,6 +27,7 @@ axis([t(1) t(end) 0 1])
 xlabel('t')
 ylabel('p(t)')
 set(gca,'Fontsize',20)
+savefig(F,'GaussianDistributions.fig','compact')
 % print('Figures\GaussianDistributions','-depsc')
 
 %% Comparison of Gaussian PSF spectra
@@ -51,6 +54,8 @@ legend({'Width = 50','Width = 100','Width = 200'})
 % This sections generates one plot called LLN_Plot.eps showing the effect
 % of vector length on sample variance. This plot demonstrates the Law of
 % Large Numbers.
+%
+% (Need to add a legend entry for the blue lines)
 
 clear
 
@@ -99,7 +104,7 @@ for j = 1:R
    means3(j) = mean(sv3(1:j)); 
 end
 
-figure('units','normalized','outerposition',[0 0 1 1])
+F = figure('units','normalized','outerposition',[0 0 1 1]);
 
 subplot(3,1,1)
 plot(1:R,means1,'Linewidth',2)
@@ -128,6 +133,7 @@ legend(line,['s^2 = ' num2str(v3)],'Location','East')
 title('Result for test function #3')
 set(gca,'Fontsize',20)
 
+savefig(F,'LLN_Plot.fig','compact')
 % print('Figures\LLN_Plot','-depsc')
 
 %% Plot functions/data for first noise realization
@@ -142,7 +148,7 @@ set(gca,'Fontsize',20)
 
 y_scale = [-1.5 1.5];
         
-figure('units','normalized','outerposition',[0 0 1 1])
+F = figure('units','normalized','outerposition',[0 0 1 1]);
 plot(t,f,'b',t,g,'m','LineWidth',2)
 hold on
 plot(t,g_noise,'k.','LineWidth',0.25)
@@ -152,6 +158,8 @@ ylim(y_scale)
 set(gca,'Fontsize',14)
 legend({['Test function #' num2str(TFnum)],'g','g with noise'},...
     'FontSize',18)
+savefig(F,['TF' num2str(TFnum) 'wNoise_SNR' num2str(SNR)...
+    '_width' num2str(width) '.fig'],'compact')
 % saveas(gcf,['TF' num2str(TFnum) 'wNoise_SNR' num2str(SNR)...
 %     '_width' num2str(width) '.eps'],'epsc')
 
@@ -165,7 +173,7 @@ legend({['Test function #' num2str(TFnum)],'g','g with noise'},...
 % If the workspace is not loaded yet, load workspace:
 % load Experiment_1D.m
 
-figure('units','normalized','outerposition',[0 0 1 1])  % Full screen
+F = figure('units','normalized','outerposition',[0 0 1 1]);  % Full screen
 subplot(1,2,1)
 boxplot(upre_lambda,M)
 xlabel('n')
@@ -176,6 +184,8 @@ boxplot(upre_err,M)
 xlabel('n')
 ylabel('Relative error')
 set(gca,'FontSize',12)
+savefig(F,['TF' num2str(caseno) '_BothBoxes_SNR' num2str(SNR) '_radius'...
+    num2str(radius) '_R' num2str(R) '.fig'],'compact')
 % saveas(gcf,['TF' num2str(caseno) '_BothBoxes_SNR' num2str(SNR) '_radius'...
 %     num2str(radius) '_R' num2str(R) '.eps'],'epsc')   % Save file
 
