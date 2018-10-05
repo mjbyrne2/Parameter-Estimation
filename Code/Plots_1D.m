@@ -57,6 +57,79 @@ figfold = ['/Users/mjbyrne/Documents/Arizona State University/' ...
     'Parameter-Estimation/Figures'];    % Specifies the Figures folder
 savefig(F,[figfold '/GaussianDistributions.fig'],'compact')
 
+%% Gaussian PSF and Extension
+% This section generates one plot showing a Gaussian PSF of width 100 on 
+% [-1/2,1/2] and its periodic extension on [0,1]. 
+
+width = 100;
+N = 4096;
+t = linspace(0,1,N+1);
+t = t(1:end-1); % Equispaced N-point discretization of the interval [0,1]
+f = testFunction('1D',1);   % Defined only for use in GaussianBlur_1D.m
+[~,h] = GaussianBlur_1D(t,f,width);
+
+F = figure('units','normalized','outerposition',[0 0 1 1]);
+
+subplot(1,2,1)
+plot(t-(1/2),h,'Linewidth',2)
+grid on
+xlim([-1 1])
+xlabel('t')
+set(gca,'Fontsize',18)
+
+subplot(1,2,2)
+plot(t,fftshift(h),'Linewidth',2) % fftshift flips the vector in the middle
+grid on
+xlim([-1 1])
+xlabel('t')
+set(gca,'Fontsize',18)
+
+figfold = ['/Users/mjbyrne/Documents/Arizona State University/' ...
+    'Parameter-Estimation/Figures'];    % Specifies the Figures folder
+savefig(F,[figfold '/RegAndTroughGaussian.fig'],'compact')
+
+%% Test function, Gaussian PSF, and blurred function
+% This section generates three plots: one of the second test function f(t) 
+% (testFunction('1D',2)), a Gaussian PSF k(t) of width 200 and centered at
+% 1/2, and one of the function g(t) that results from the convolution of 
+% f and k.
+
+width = 200;
+N = 4096;
+t = linspace(0,1,N+1);
+t = t(1:end-1); % Equispaced N-point discretization of the interval [0,1]
+Y = [-1,1]; % The limits of the y-axis
+f = testFunction('1D',2);
+k = @(t) exp(-200*((t-(1/2)).^2));
+[g,~] = GaussianBlur_1D(t,f,width);
+
+F = figure('units','normalized','outerposition',[0 0 1 1]);
+
+subplot(1,3,1)
+plot(t,f,'b','Linewidth',2)
+grid on
+ylim(Y)
+xlabel('t')
+set(gca,'Fontsize',16)
+
+subplot(1,3,2)
+plot(t,k(t),'r','Linewidth',2)
+grid on
+ylim(Y)
+xlabel('t')
+set(gca,'Fontsize',16)
+
+subplot(1,3,3)
+plot(t,g,'m','Linewidth',2)
+grid on
+ylim(Y)
+xlabel('t')
+set(gca,'Fontsize',16)
+
+figfold = ['/Users/mjbyrne/Documents/Arizona State University/' ...
+    'Parameter-Estimation/Figures'];    % Specifies the Figures folder
+savefig(F,[figfold '/FunctionKernelPlot.fig'],'compact')
+
 %% Comparison of Gaussian PSF spectra
 % This section generates one plot illustrating the relationship between the
 % width of Gaussian PSF's and their spectra.
@@ -163,7 +236,6 @@ set(gca,'Fontsize',18)
 figfold = ['/Users/mjbyrne/Documents/Arizona State University/' ...
     'Parameter-Estimation/Figures'];    % Specifies the Figures folder
 savefig(F,[figfold '/LLN_Plot.fig'],'compact')
-% print('Figures\LLN_Plot','-depsc')
 
 %% Plot functions/data for first noise realization
 % This section generates one plot showing the functions (f and g pertaining
