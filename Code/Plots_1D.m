@@ -6,6 +6,32 @@
 %
 % Companion files: testFunction.m, GaussianBlur_1D.m, convPeriodic_1D.m
 % 
+
+%% Test Functions:
+% This section generates one plot called TestFunctions showing the three
+% one-dimensional test functions available in testFunction.m.
+
+N = 4096;
+t = linspace(0,1,N+1);
+t = t(1:end-1); % Equispaced N-point discretization of the interval [0,1]
+f1 = testFunction('1D',1);
+f2 = testFunction('1D',2);
+f3 = testFunction('1D',3);
+
+F = figure('units','normalized','outerposition',[0 0 1 1]);
+hline(0,'k:')
+hold on
+plot(t,f1,t,f2,t,f3,'Linewidth',2)
+axis([0 1 -1.5 1.5])
+grid on
+xlabel('t')
+legend('Test Function 1','Test Function 2','Test Function 3','Location',...
+    'Northeast')
+set(gca,'Fontsize',18)
+figfold = ['/Users/mjbyrne/Documents/Arizona State University/' ...
+    'Parameter-Estimation/Figures'];    % Specifies the Figures folder
+savefig(F,[figfold '/TestFunctions.fig'],'compact')
+
 %% Gaussian Distributions
 % This section generates one plot called GaussianDistributions.eps showing
 % three Gaussian distributions centered at the origin for different 
@@ -26,9 +52,10 @@ legend({['s^2 = ' num2str(s2(1))],['s^2 = ' num2str(s2(2))],...
 axis([t(1) t(end) 0 1])
 xlabel('t')
 ylabel('p(t)')
-set(gca,'Fontsize',20)
-savefig(F,'GaussianDistributions.fig','compact')
-% print('Figures\GaussianDistributions','-depsc')
+set(gca,'Fontsize',18)
+figfold = ['/Users/mjbyrne/Documents/Arizona State University/' ...
+    'Parameter-Estimation/Figures'];    % Specifies the Figures folder
+savefig(F,[figfold '/GaussianDistributions.fig'],'compact')
 
 %% Comparison of Gaussian PSF spectra
 % This section generates one plot illustrating the relationship between the
@@ -113,7 +140,7 @@ axis manual
 line = plot(1:R,v1*ones(1,R),'r--','Linewidth',2);
 legend(line,['s^2 = ' num2str(v1)],'Location','East')
 title('Result for test function #1')
-set(gca,'Fontsize',20)
+set(gca,'Fontsize',18)
 
 subplot(3,1,2)
 plot(1:R,means2,'Linewidth',2)
@@ -122,7 +149,7 @@ axis manual
 line = plot(1:R,v2*ones(1,R),'r--','Linewidth',2);
 legend(line,['s^2 = ' num2str(v2)],'Location','East')
 title('Result for test function #2')
-set(gca,'Fontsize',20)
+set(gca,'Fontsize',18)
 
 subplot(3,1,3)
 plot(1:R,means3,'Linewidth',2)
@@ -131,9 +158,11 @@ axis manual
 line = plot(1:R,v3*ones(1,R),'r--','Linewidth',2);
 legend(line,['s^2 = ' num2str(v3)],'Location','East')
 title('Result for test function #3')
-set(gca,'Fontsize',20)
+set(gca,'Fontsize',18)
 
-savefig(F,'LLN_Plot.fig','compact')
+figfold = ['/Users/mjbyrne/Documents/Arizona State University/' ...
+    'Parameter-Estimation/Figures'];    % Specifies the Figures folder
+savefig(F,[figfold '/LLN_Plot.fig'],'compact')
 % print('Figures\LLN_Plot','-depsc')
 
 %% Plot functions/data for first noise realization
@@ -158,10 +187,10 @@ ylim(y_scale)
 set(gca,'Fontsize',14)
 legend({['Test function #' num2str(TFnum)],'g','g with noise'},...
     'FontSize',18)
-savefig(F,['TF' num2str(TFnum) 'wNoise_SNR' num2str(SNR)...
+figfold = ['/Users/mjbyrne/Documents/Arizona State University/' ...
+    'Parameter-Estimation/Figures'];    % Specifies the Figures folder
+savefig(F,[figfold 'TF' num2str(TFnum) 'wNoise_SNR' num2str(SNR)...
     '_width' num2str(width) '.fig'],'compact')
-% saveas(gcf,['TF' num2str(TFnum) 'wNoise_SNR' num2str(SNR)...
-%     '_width' num2str(width) '.eps'],'epsc')
 
 %% Plot of Lambdas and Relative Errors
 % This section generates one plot consisting of two box plots. The first
@@ -184,10 +213,11 @@ boxplot(upre_err,M)
 xlabel('n')
 ylabel('Relative error')
 set(gca,'FontSize',12)
-savefig(F,['TF' num2str(caseno) '_BothBoxes_SNR' num2str(SNR) '_radius'...
-    num2str(radius) '_R' num2str(R) '.fig'],'compact')
-% saveas(gcf,['TF' num2str(caseno) '_BothBoxes_SNR' num2str(SNR) '_radius'...
-%     num2str(radius) '_R' num2str(R) '.eps'],'epsc')   % Save file
+
+figfold = ['/Users/mjbyrne/Documents/Arizona State University/' ...
+    'Parameter-Estimation/Figures'];    % Specifies the Figures folder
+savefig(F,[figfold 'TF' num2str(caseno) '_BothBoxes_SNR' num2str(SNR) ...
+    '_radius' num2str(radius) '_R' num2str(R) '.fig'],'compact')
 
 %% Plot of Lambdas
 % This section generates one box plot of the lambdas obtained by applying 

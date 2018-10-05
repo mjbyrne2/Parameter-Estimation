@@ -1,9 +1,9 @@
 function f = testFunction(dim,num)
-% testFunction selects one of the test functions used in the numerical
-% experiments.  The string dim specifies the dimension of the test 
-% function ('1D', '2D', or '3D'), and the integer num specifies the test 
-% function (1, 2, or 3). testFunction returns a row vector, not a function 
-% handle.
+% testFunction(dim,num) selects one of the test functions used in the 
+% numerical experiments.  The string dim specifies the dimension of the 
+% test function ('1D', '2D', or '3D'), and the integer num specifies the 
+% test function (1, 2, or 3). testFunction returns a row vector, not a 
+% function handle.
 %
 % Companion files: periodicTestFunction_1D.m
 
