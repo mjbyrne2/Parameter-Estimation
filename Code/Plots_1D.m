@@ -155,7 +155,6 @@ legend({'Width = 50','Width = 100','Width = 200'})
 % of vector length on sample variance. This plot demonstrates the Law of
 % Large Numbers.
 %
-% (Need to add a legend entry for the blue lines)
 
 clear
 
@@ -210,8 +209,8 @@ subplot(3,1,1)
 plot(1:R,means1,'Linewidth',2)
 hold on
 axis manual
-line = plot(1:R,v1*ones(1,R),'r--','Linewidth',2);
-legend(line,['s^2 = ' num2str(v1)],'Location','East')
+plot(1:R,v1*ones(1,R),'r--','Linewidth',2)
+legend({'Sample variance',['s^2 = ' num2str(v1)]},'Location','East')
 title('Result for test function #1')
 set(gca,'Fontsize',18)
 
@@ -219,8 +218,8 @@ subplot(3,1,2)
 plot(1:R,means2,'Linewidth',2)
 hold on
 axis manual
-line = plot(1:R,v2*ones(1,R),'r--','Linewidth',2);
-legend(line,['s^2 = ' num2str(v2)],'Location','East')
+plot(1:R,v2*ones(1,R),'r--','Linewidth',2)
+legend({'Sample variance',['s^2 = ' num2str(v2)]},'Location','East')
 title('Result for test function #2')
 set(gca,'Fontsize',18)
 
@@ -228,9 +227,10 @@ subplot(3,1,3)
 plot(1:R,means3,'Linewidth',2)
 hold on
 axis manual
-line = plot(1:R,v3*ones(1,R),'r--','Linewidth',2);
-legend(line,['s^2 = ' num2str(v3)],'Location','East')
+plot(1:R,v3*ones(1,R),'r--','Linewidth',2)
+legend({'Sample variance',['s^2 = ' num2str(v3)]},'Location','East')
 title('Result for test function #3')
+xlabel('Number of data points')
 set(gca,'Fontsize',18)
 
 figfold = ['/Users/mjbyrne/Documents/Arizona State University/' ...
@@ -243,9 +243,8 @@ savefig(F,[figfold '/LLN_Plot.fig'],'compact')
 % The functions/data are loaded in from a workspace generated in
 % Experiment_1D.m. The filename of the resulting plot has the form 
 % TF(TFnum)wNoise_SNR(SNR)_width(width).eps.
-
-% If the workspace is not loaded yet, load workspace:
-% load Experiment_1D.m
+%
+% A workspace must be loaded before running this section.
 
 y_scale = [-1.5 1.5];
         
@@ -270,9 +269,8 @@ savefig(F,[figfold 'TF' num2str(TFnum) 'wNoise_SNR' num2str(SNR)...
 % parameter selection method. The second box plot shows the relative errors
 % between the test function and the regularized solutions across 
 % downsampling resolutions. 
-
-% If the workspace is not loaded yet, load workspace:
-% load Experiment_1D.m
+%
+% A workspace must be loaded before running this section.
 
 F = figure('units','normalized','outerposition',[0 0 1 1]);  % Full screen
 subplot(1,2,1)
@@ -294,9 +292,8 @@ savefig(F,[figfold 'TF' num2str(TFnum) '_BothBoxes_SNR' num2str(SNR) ...
 %% Plot of Lambdas
 % This section generates one box plot of the lambdas obtained by applying 
 % the downsampling parameter selection method.
-
-% If the workspace is not loaded yet, load workspace:
-% load Experiment_1D.m
+%
+% A workspace must be loaded before running this section.
 
 figure('units','normalized','outerposition',[0 0 1 1])
 boxplot(upre_lambda,M)
@@ -312,9 +309,8 @@ set(gca, 'FontSize',12)
 % This section generates one box plot of the relative errors between the
 % test function and the regularized solutions across downsampling
 % resolutions.
-
-% If the workspace is not loaded yet, load workspace:
-% load Experiment_1D.m
+%
+% A workspace must be loaded before running this section.
 
 figure('units','normalized','outerposition',[0 0 1 1])
 boxplot(upre_err,M)
@@ -329,9 +325,8 @@ set(gca,'FontSize',12)
 %% Plot of Regularized Solutions
 % This section generates one plot of the regularized solutions obtained by
 % applying the downsampling parameter selection method.
-
-% If the workspace is not loaded yet, load workspace:
-% load Experiment_1D.m
+%
+% A workspace must be loaded before running this section.
 
 figure('units','normalized','outerposition',[0 0 1 1])
 plot(repmat(t,length(M),1)',upre_regf','-')   % Transpose for the sake of plotting

@@ -140,4 +140,4 @@ for j = 1:R
 end
 
 % Save workspace:
-% save Experiment_1D.mat
+% save(['Data_1D_TF' num2str(TFnum) '.mat'])
