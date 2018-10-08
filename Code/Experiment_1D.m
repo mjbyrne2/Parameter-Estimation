@@ -44,8 +44,8 @@ upre_err = zeros(R,length(M));
 
 % Construction of vector discretizations:
 [g,h] = GaussianBlur_1D(t,f,width);
-g_tilde = fftshift(fft(g)/N);
-h_tilde = fftshift(fft(h)); % No scaling needed since h was already normalized by 1/N
+g_hat = fftshift(fft(g)/N);
+h_hat = fftshift(fft(h)); % No scaling needed since h was already normalized by 1/N
 
 % Creation of noise:
 eta = (norm(g)^2)/(N*10^(SNR/10));  % See Report for SNR definition
@@ -74,8 +74,8 @@ for j = 1:R
     % Michael, look in UPRE_Test_B.m at this line for incorrect addition of noise?
     % Something to do with adding noise to longest vector, which is
     % different that above?
-    g_noise_tilde = fftshift(fft(g_noise))/r;
-    h_tildesol = fftshift(fft(fftshift(h)));
+    g_noise_hat = fftshift(fft(g_noise))/r;
+    h_hatsol = fftshift(fft(fftshift(h)));
 
     % Loop over resolutions stored in M:
     for i = 1:length(M)
@@ -90,39 +90,39 @@ for j = 1:R
         fn = interp1(t,f,tn);
 
         gn_noise = interp1(t,g_noise,tn);
-        f_tilde = fftshift(fft(fn)/n);
-        gn_tilde = fftshift(fft(gn_noise)/n);
-        hn_tilde = fftshift(fft(hn));
+        f_hat = fftshift(fft(fn)/n);
+        gn_hat = fftshift(fft(gn_noise)/n);
+        hn_hat = fftshift(fft(hn));
 
         L = logspace(-5,1,100);
         
         for k = 1:100
-            best(i,k) = TikhRegErr(gn_tilde,hn_tilde,...
-                ones(1,length(gn)),L(k),r,f_tilde);
+            best(i,k) = TikhRegErr(gn_hat,hn_hat,...
+                ones(1,length(gn)),L(k),r,f_hat);
         end
         
-        [upre_vectors(i,:),upre_lambda(j,i)] = UPREparameter(gn_tilde,...
-            hn_tilde,ones(1,length(gn)),eta,L,r);
+        [upre_vectors(i,:),upre_lambda(j,i)] = UPREparameter(gn_hat,...
+            hn_hat,ones(1,length(gn)),eta,L,r);
         upre_lambda(j,i) = upre_lambda(j,i)*sqrt(n/N);  % Scale the lambda
         
-        best_lambda(j,i) = optimalParameter(gn_tilde,hn_tilde,...
-            ones(1,length(gn)),r,f_tilde);
+        best_lambda(j,i) = optimalParameter(gn_hat,hn_hat,...
+            ones(1,length(gn)),r,f_hat);
     end
 
     for i = 1:length(M)
         upre_regf(i,:) = N*real(ifft(ifftshift(...
-            filterFactors(h_tildesol,upre_lambda(j,i)).*g_noise_tilde./...
-            replaceZeros(h_tildesol,1))));
+            filterFactors(h_hatsol,upre_lambda(j,i)).*g_noise_hat./...
+            replaceZeros(h_hatsol,1))));
        
         opt_regf(i,:) = N*real(ifft(ifftshift(...
-            filterFactors(h_tildesol,best_lambda(j,i)).*g_noise_tilde./...
-            replaceZeros(h_tildesol,1))));
+            filterFactors(h_hatsol,best_lambda(j,i)).*g_noise_hat./...
+            replaceZeros(h_hatsol,1))));
 
-        upre_error(i) = TikhRegErr(g_noise_tilde,h_tildesol,...
-            ones(1,length(g_noise_tilde)),upre_lambda(j,i),r,f_tilde);
+        upre_error(i) = TikhRegErr(g_noise_hat,h_hatsol,...
+            ones(1,length(g_noise_hat)),upre_lambda(j,i),r,f_hat);
         
-        best_error(i) = TikhRegErr(g_noise_tilde,h_tildesol,...
-            ones(1,length(g_noise_tilde)),best_lambda(j,i)*sqrt(n/N),r,f_tilde);
+        best_error(i) = TikhRegErr(g_noise_hat,h_hatsol,...
+            ones(1,length(g_noise_hat)),best_lambda(j,i)*sqrt(n/N),r,f_hat);
         
     end
 
@@ -130,8 +130,8 @@ for j = 1:R
     regf = zeros(length(sL),length(tn));
     for i = 1:length(sL)
         regf(i,:) = N*real(ifft(ifftshift(...
-            filterFactors(h_tildesol,sL(i)).*g_noise_tilde./...
-            replaceZeros(h_tildesol,1))));
+            filterFactors(h_hatsol,sL(i)).*g_noise_hat./...
+            replaceZeros(h_hatsol,1))));
     end
 
     % Relative solution errors: 

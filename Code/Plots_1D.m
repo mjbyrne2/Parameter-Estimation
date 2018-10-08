@@ -136,17 +136,17 @@ savefig(F,[figfold '/FunctionKernelPlot.fig'],'compact')
 
 width = [50, 100, 200];
 H = zeros(length(width),N);
-H_tilde = H;
+H_hat = H;
 for j = 1:length(width)
     [~,H(j,:)] = GaussianBlur_1D(t,f,width(j));
-    H_tilde(j,:) = sort(abs(fftshift(fft(H(j,:)))),'descend');
+    H_hat(j,:) = sort(abs(fftshift(fft(H(j,:)))),'descend');
 end
 
 figure('units','normalized','outerposition',[0 0 1 1])
 subplot(1,2,1)
 plot(repmat(t,length(width),1)',H','Linewidth',1.5)
 subplot(1,2,2)
-semilogy(repmat(1:N,length(width),1)',(H_tilde(:,1:N))','--',...
+semilogy(repmat(1:N,length(width),1)',(H_hat(:,1:N))','--',...
     'Linewidth',2)
 legend({'Width = 50','Width = 100','Width = 200'})
 
@@ -239,7 +239,7 @@ savefig(F,[figfold '/LLN_Plot.fig'],'compact')
 
 %% Plot functions/data for first noise realization
 % This section generates one plot showing the functions (f and g pertaining
-% to a given test function) and data (gtilde) for one noise realization.
+% to a given test function) and data (g_hat) for one noise realization.
 % The functions/data are loaded in from a workspace generated in
 % Experiment_1D.m. The filename of the resulting plot has the form 
 % TF(TFnum)wNoise_SNR(SNR)_width(width).eps.
@@ -288,7 +288,7 @@ set(gca,'FontSize',12)
 
 figfold = ['/Users/mjbyrne/Documents/Arizona State University/' ...
     'Parameter-Estimation/Figures'];    % Specifies the Figures folder
-savefig(F,[figfold 'TF' num2str(caseno) '_BothBoxes_SNR' num2str(SNR) ...
+savefig(F,[figfold 'TF' num2str(TFnum) '_BothBoxes_SNR' num2str(SNR) ...
     '_radius' num2str(radius) '_R' num2str(R) '.fig'],'compact')
 
 %% Plot of Lambdas
@@ -305,7 +305,7 @@ boxplot(upre_lambda,M)
 xlabel('Downsampling resolutions (n)')
 ylabel('Lambda')
 set(gca, 'FontSize',12)
-% saveas(gcf,['TF' num2str(caseno) '_Lambdas_SNR' num2str(SNR) '_radius'...
+% saveas(gcf,['TF' num2str(TFnum) '_Lambdas_SNR' num2str(SNR) '_radius'...
 %     num2str(radius) '_R' num2str(R) '.eps'],'epsc')   % Save file
 
 %% Plot of Errors
@@ -323,7 +323,7 @@ boxplot(upre_err,M)
 xlabel('Downsampling resolutions (n)')
 ylabel('Relative error')
 set(gca,'FontSize',12)
-% saveas(gcf,['TF' num2str(caseno) '_RelErrors_SNR' num2str(SNR) '_radius'...
+% saveas(gcf,['TF' num2str(TFnum) '_RelErrors_SNR' num2str(SNR) '_radius'...
 %     num2str(radius) '_R' num2str(R) '.eps'],'epsc')   % Save file
 
 %% Plot of Regularized Solutions
@@ -339,6 +339,9 @@ hold on
 plot(t,f,'k','Linewidth',1.5)   % Original function f
 % title(['Regularized solutions across resolutions using the UPRE method (radius = '...
 %             num2str(radius) ', SNR = ' num2str(SNR) ')'],'FontSize',24)
+grid on
 legend({'N = 16','N = 32','N = 64','N = 128','N = 256','N = 512',...
     'N = 1024','N = 2048','N = 4098','Original f'},'Location',...
     'Southwest','Fontsize',18)
+xlabel('t')
+set(gca,'Fontsize',18)
