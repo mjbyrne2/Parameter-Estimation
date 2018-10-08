@@ -289,7 +289,7 @@ set(gca,'FontSize',12)
 figfold = ['/Users/mjbyrne/Documents/Arizona State University/' ...
     'Parameter-Estimation/Figures'];    % Specifies the Figures folder
 savefig(F,[figfold 'TF' num2str(TFnum) '_BothBoxes_SNR' num2str(SNR) ...
-    '_radius' num2str(radius) '_R' num2str(R) '.fig'],'compact')
+    '_width' num2str(width) '_R' num2str(R) '.fig'],'compact')
 
 %% Plot of Lambdas
 % This section generates one box plot of the lambdas obtained by applying 
@@ -305,8 +305,8 @@ boxplot(upre_lambda,M)
 xlabel('Downsampling resolutions (n)')
 ylabel('Lambda')
 set(gca, 'FontSize',12)
-% saveas(gcf,['TF' num2str(TFnum) '_Lambdas_SNR' num2str(SNR) '_radius'...
-%     num2str(radius) '_R' num2str(R) '.eps'],'epsc')   % Save file
+% saveas(gcf,['TF' num2str(TFnum) '_Lambdas_SNR' num2str(SNR) '_width'...
+%     num2str(width) '_R' num2str(R) '.eps'],'epsc')   % Save file
 
 %% Plot of Errors
 % This section generates one box plot of the relative errors between the
@@ -323,8 +323,8 @@ boxplot(upre_err,M)
 xlabel('Downsampling resolutions (n)')
 ylabel('Relative error')
 set(gca,'FontSize',12)
-% saveas(gcf,['TF' num2str(TFnum) '_RelErrors_SNR' num2str(SNR) '_radius'...
-%     num2str(radius) '_R' num2str(R) '.eps'],'epsc')   % Save file
+% saveas(gcf,['TF' num2str(TFnum) '_RelErrors_SNR' num2str(SNR) '_width'...
+%     num2str(width) '_R' num2str(R) '.eps'],'epsc')   % Save file
 
 %% Plot of Regularized Solutions
 % This section generates one plot of the regularized solutions obtained by
@@ -337,8 +337,8 @@ figure('units','normalized','outerposition',[0 0 1 1])
 plot(repmat(t,length(M),1)',upre_regf','-')   % Transpose for the sake of plotting
 hold on
 plot(t,f,'k','Linewidth',1.5)   % Original function f
-% title(['Regularized solutions across resolutions using the UPRE method (radius = '...
-%             num2str(radius) ', SNR = ' num2str(SNR) ')'],'FontSize',24)
+% title(['Regularized solutions across resolutions using the UPRE method (width = '...
+%             num2str(width) ', SNR = ' num2str(SNR) ')'],'FontSize',24)
 grid on
 legend({'N = 16','N = 32','N = 64','N = 128','N = 256','N = 512',...
     'N = 1024','N = 2048','N = 4098','Original f'},'Location',...
