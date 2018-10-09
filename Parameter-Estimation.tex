@@ -84,21 +84,15 @@ The kernel $\kcon(t) = \exp(-200(t-\frac{1}{2})^2)$ is an example of a Gaussian 
 where $\mu$ is the mean and $\SD^2$ is the variance. The mean is center of the Gaussian distribution, as well as the abscissa of the absolute maximum. The variance is a measure of dispersion of the distribution; as $\SD^2$ increases, the width of the graph of $p(t)$ increases. The standard deviation $\SD$ is also a measure of dispersion, though variance will be the measure of choice in this report. The scale factor $1/\sqrt{2\pi\SD^2}$ ensures that $\int_{\mathbb{R}} p(t) \: dt = 1$, an essential property of a continuous probability distribution defined on the entire real line. For Gaussian kernels, however, this scale factor may be dropped since having a unitary integral is not required of kernels in general.  For the Gaussian kernel example $\kcon(t) = \exp(-200(t-\frac{1}{2})^2)$, the mean is 1/2 and $-200 = -1/2\SD^2$ implies that $\SD^2 = 1/400$. Figure \ref{GaussianDistributions} illustrates the relationship between variance and width of the Gaussian distribution.
 
 \begin{figure}
-	\centerline{\includegraphics[scale=0.4]{FunctionKernelPlot.png}}
+	\centerline{\includegraphics[scale=0.4]{Figures/FunctionKernelPlot.eps}}
 \caption{Left: The graphs of the piecewise-smooth function $\fcon(t)$. Right: The Gaussian kernel $\kcon(t)$.}
 \label{FunctionKernelPlot}
 \end{figure}
 
 \begin{figure}
-	\centerline{\includegraphics[scale=0.4]{GaussianDistributions}}
+	\centerline{\includegraphics[scale=0.4]{Figures/GaussianDistributions.eps}}
 \caption{Gaussian distributions for difference values of variance $\SD^2$, all centered at the origin ($\mu = 0$). As $\SD^2$ increases, the width of the distribution increases.}
 \label{GaussianDistributions}
-\end{figure}
-
-\begin{figure}
-	\centerline{\includegraphics[scale=0.4]{SmoothPlot.png}}
-\caption{Visually, the effect of convolution using a Gaussian kernel is to smooth the corners of a graph.}
-\label{SmoothPlot}
 \end{figure}
 
 To find a solution to the forward problem, which is the evaluation of $\gcon = \kcon * \fcon$, a quadrature method can be used to find a numerical approximation to the convolution integral. In the discrete setting, (1) can be stated as
@@ -167,7 +161,7 @@ The first test function is $\fcon(x) = \cos(4\pi{t})\sin(6\pi{t})$, which is inf
 which is also infinitely differentiable on $\mathbb{R}$; the third function was selected to be more interesting than the first test function. Graphs of all three test functions are found in Figure \ref{TestFunctions}.  \par 
 
 \begin{figure}
-	\centerline{\includegraphics[scale = 0.45]{TestFunctions.eps}}
+	\centerline{\includegraphics[scale = 0.45]{Figures/TestFunctions1D.eps}}
 \caption{The three test functions considered in the numerical experiments. Note that the second test function is only piecewise-smooth, while the first and second functions are smooth. All three functions are 1-periodic.}
 \label{TestFunctions}
 \end{figure}
@@ -175,7 +169,7 @@ which is also infinitely differentiable on $\mathbb{R}$; the third function was 
 The interval $[0,1]$ is discretized as equispaced points $0, 1/N, 2/N, \ldots, (N-1)/N$ for $N = 4096$. In other words, the interval is discretized as the vector $\tdis = [t_1,t_2,\ldots,t_N]$ with $t_i = (i-1)/N$. The selected test function $\fcon$ is then sampled at these points so that the discrete version $\fdis = [\fcon_1,\fcon_2,\ldots,\fcon_N]$ has elements $\fcon_i = \fcon(t_i)$. For the discrete version of $\kcon$ to be used in the convolution with $\fdis$, the periodic extension of $\kcon$ is sampled in the same way that was used to construct $\fdis$. However, it is important to remember that unextended $\kcon(t)$ was assumed to be centered at the origin and compactly supported on the interval $[-1/2,1/2]$. As such, a plot of $\kdis$ will not resemble the traditional graph of a Gaussian bump but instead be a depiction of a trough between bumps in the periodic extension of $\kcon$; see Figure \ref{RegAndTroughGaussian}. In the experiments, the radii of the Gaussian kernels are chosen to be 50 and 100.  \par 
 
 \begin{figure}
-	\centerline{\includegraphics[scale = 0.45]{RegAndTroughGaussian.eps}}
+	\centerline{\includegraphics[scale = 0.45]{Figures/RegAndTroughGaussian.eps}}
 \caption{Plots of different discretizations of the kernel $\kcon(t)$. The discretization on the left reflects the compact support of $\kcon$ on the interval $[-1/2,1/2]$. The discretization on the right represents the periodic extension of $\kcon$ on the interval $[0,1]$.}
 \label{RegAndTroughGaussian}
 \end{figure}
@@ -201,18 +195,18 @@ Utilizing this change, the following equation for variance is obtained.
 \label{Eq_Var}
 \SD^2 = \frac{\|\gdis\|^2}{N \cdot 10^{(\text{SNR}/10)}} 
 \end{equation}
-This equation is used for the numerical construction of the noise vectors. SNR values of 5 and 25 are used to generate the white noise added to $\gdis$, and one such data realization is shown in Figure \ref{TF2wNoise_SNR5_radius50}. \par  
+This equation is used for the numerical construction of the noise vectors. SNR values of 5 and 25 are used to generate the white noise added to $\gdis$, and one such data realization is shown in Figure \ref{NoisePlot1D_F2_S05_W200}. \par  
 
 \begin{figure}
-	\centerline{\includegraphics[scale = 0.45]{TF2wNoise_SNR5_radius50.eps}}
+	\centerline{\includegraphics[scale = 0.45]{Figures/NoisePlot1D_F2_S05_W200.eps}}
 \caption{The plot shows one data realization of $\gdis$ with noise, where the original function $f$ was the second test function. The SNR value is 5 and the radius of the Gaussian PSF is 100.}
-\label{TF2wNoise_SNR5_radius50}
+\label{NoisePlot1D_F2_S05_W200}
 \end{figure}
  
 For an accurate evaluation of the numerical experiments and their results, multiple realizations of noise are used. A primary advantage of multiple noise realizations is that the sample variance of noise vectors approaches the desired variance as the number of realizations increases. More rigorously, the mean of the sample variances of the noise vectors converges almost surely to the expected value of the sample variance, which is the desired variance $\SD^2$; this is a direct consequence of the (strong) law of large numbers and the fact that the noise vectors are independent and identically distributed with standard normal distribution. Figure \ref{LLN_Plot} depicts the law of large numbers as applied to noise realizations.  \par 
 
 \begin{figure}
-\centerline{\includegraphics[scale=0.45]{LLN_Plot}}
+\centerline{\includegraphics[scale=0.45]{Figures/LLN_Plot.eps}}
 \caption{The three plots correspond to the noise vectors generated using each of the three test functions (the right hand side of equation \eqref{Eq_Var} depends upon $\gdis$, which depends upon the test function $\fdis$ and the width of the Gaussian kernel). Equation \eqref{Eq_Var} also depends upon SNR; a SNR of 5 and Gaussian kernel width of 50 was used in all three cases. The horizontal axis represents the number of noise realization and the vertical axis represents sample variance. All three plots show that as the number of realizations increases, the mean of the sample variances approaches the desired sample variance (the left hand side of equation \eqref{Eq_Var} and the red line in the plots).}
 \label{LLN_Plot}
 \end{figure}
@@ -333,22 +327,22 @@ In other words, implementation of the discepancy principle method is equivalent 
 Of the 12 experimental configurations, four are presented here, all of which pertain to the second test function. The UPRE method was used to select regularization parameters at each resolution. These parameters were used to construct regularized solutions of the full problem on $N = 4096$ points. 
 
 \begin{figure}
-	\centerline{\includegraphics[scale = 0.45]{TF2_BothBoxes_SNR5_radius50_R20.eps}}
+	\centerline{\includegraphics[scale = 0.45]{Figures/BothBoxes1D_F2_S05_W100_R20.eps}}
 \caption{Box plots for the regularization parameters $\regparam$ (left) and relative errors (right) across resolutions for 20 noise realizations. In this configuration, $\text{SNR = 5}$ and the width of the Gaussian kernel is 50.}
 \end{figure}
 
 \begin{figure}
-	\centerline{\includegraphics[scale = 0.45]{TF2_BothBoxes_SNR25_radius50_R20.eps}}
+	\centerline{\includegraphics[scale = 0.45]{Figures/BothBoxes1D_F2_S05_W200_R20.eps}}
 \caption{Box plots for the regularization parameters $\regparam$ (left) and relative errors (right) across resolutions for 20 noise realizations. In this configuration, $\text{SNR = 25}$ and the width of the Gaussian kernel is 50.}
 \end{figure}
 
 \begin{figure}
-	\centerline{\includegraphics[scale = 0.45]{TF2_BothBoxes_SNR5_radius100_R20.eps}}
+	\centerline{\includegraphics[scale = 0.45]{Figures/BothBoxes1D_F2_S25_W100_R20.eps}}
 \caption{Box plots for the regularization parameters $\regparam$ (left) and relative errors (right) across resolutions for 20 noise realizations. In this configuration, $\text{SNR = 5}$ and the width of the Gaussian kernel is 100.}
 \end{figure}
 
 \begin{figure}
-	\centerline{\includegraphics[scale = 0.45]{TF2_BothBoxes_SNR25_radius100_R20.eps}}
+	\centerline{\includegraphics[scale = 0.45]{Figures/BothBoxes1D_F2_S25_W200_R20.eps}}
 \caption{Box plots for the regularization parameters $\regparam$ (left) and relative errors (right) across resolutions for 20 noise realizations. In this configuration, $\text{SNR = 25}$ and the width of the Gaussian kernel is 100.}
 \end{figure}
 
@@ -363,36 +357,5 @@ It is interesting to note more pronounced increase in the regularization paramet
 	\item[4] Golub
 \end{itemize}
 
-%\begin{figure}
-%	\includegraphics[scale = 0.4]{UPREPlot_N16.png}
-%\end{figure}
-%\begin{figure}
-%	\includegraphics[scale = 0.4]{UPREPlot_N32.png}
-%\end{figure}
-%\begin{figure}
-%	\includegraphics[scale = 0.4]{UPREPlot_N64.png}
-%\end{figure}
-%\begin{figure}
-%	\includegraphics[scale = 0.4]{UPREPlot_N128.png}
-%\end{figure}
-%\begin{figure}
-%	\includegraphics[scale = 0.4]{UPREPlot_N256.png}
-%\end{figure}
-%\begin{figure}
-%	\includegraphics[scale = 0.4]{UPREPlot_N512.png}
-%\end{figure}
-%\begin{figure}
-%	\includegraphics[scale = 0.4]{UPREPlot_N1024.png}
-%\end{figure}
-%\begin{figure}
-%	\includegraphics[scale = 0.4]{UPREPlot_N2048.png}
-%\end{figure}
-%\begin{figure}
-%	\includegraphics[scale = 0.4]{UPREPlot_N4096.png}
-%\end{figure}
-%
-%\begin{figure}
-%	\includegraphics[scale = 0.4]{UPREPlot_Resolutions.png}
-%\end{figure}
 
 \end{document}
