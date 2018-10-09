@@ -148,6 +148,19 @@ The term $\|\fdis\|^2$ is commonly called the penalty function [3], and is actua
 
 The kernel $k$ and function $f$ considered in the introduction will be retained for the numerical examples included in this report. 
 
+\section{Analytical tools}
+
+\subsection{Convolution}
+As described in the Introduction, the operation of convolution arises in various settings pertaining to inverse problems. \par 
+Let $\mathbf{x}\in\mathbb{C}^m$ and $\mathbf{y}\in\mathbb{C}^n$ with both vectors having a initial index of 1. The \textit{discrete convolution} $\mathbf{x}*\mathbf{y}$ is defined by
+\begin{equation}
+(\mathbf{x}*\mathbf{y})_i = \sum_{i=0}
+\label{Eq_DC}
+\end{equation}
+
+
+\subsection{The Fourier transform}
+
 \section{Experiment design}
  
 For the numerical experiments, three test functions are considered. While these functions vary in the extent of smoothness, all three functions are selected to be 1-periodic and the interval selected is [0,1], though this interval can be mapped to any other interval using a linear transformation. In general, the transformation from $[a,b]$ to $[c,d]$ such that $a \mapsto c$ and $b \mapsto d$ has a point-slope representation
