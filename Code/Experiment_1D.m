@@ -23,11 +23,11 @@ t = linspace(0,1,N+1);
 t = t(1:end-1); % Equispaced N-point discretization of the interval [0,1]
 
 % Variable set-up:
-SNR = 5;   % Signal-to-noise ratio
-R = 20; % Number of noise realizations
-width = 200; % Width parameter for Gaussian PSF; default = 200
+SNR = 5;   % Signal-to-noise ratio; default = 5
+width = 100; % Width parameter for Gaussian PSF; default = 200
+R = 20; % Number of noise realizations; default = 20
 
-TFnum = 1; % Test function number (see testFunction.m)
+Fnum = 3; % Test function number (see testFunction.m); default = 1
 
 %% Generation of data
 % In this section, the data used in the downsampling experiment is
@@ -36,7 +36,7 @@ TFnum = 1; % Test function number (see testFunction.m)
 
 % load Experiment_1D.m
 
-f = testFunction('1D',TFnum);
+f = testFunction('1D',Fnum);
 
 % Initialization of storage arrays:
 upre_lambda = zeros(R,length(M));
@@ -139,5 +139,9 @@ for j = 1:R
 
 end
 
+% Clear variables that don't need to be saved:
+clear i j k n
+
 % Save workspace:
-% save(['Data_1D_TF' num2str(TFnum) '.mat'])
+save(['Data1D_F' num2str(Fnum) '_S' num2str(SNR,'%02.f') '_W'... 
+    num2str(width) '_R' num2str(R) '.mat'])

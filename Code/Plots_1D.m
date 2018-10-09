@@ -8,7 +8,7 @@
 % 
 
 %% Test Functions:
-% This section generates one plot called TestFunctions showing the three
+% This section generates one plot called TestFunctions1D showing the three
 % one-dimensional test functions available in testFunction.m.
 
 N = 4096;
@@ -29,8 +29,8 @@ legend('Test Function 1','Test Function 2','Test Function 3','Location',...
     'Northeast')
 set(gca,'Fontsize',18)
 figfold = ['/Users/mjbyrne/Documents/Arizona State University/' ...
-    'Parameter-Estimation/Figures'];    % Specifies the Figures folder
-savefig(F,[figfold '/TestFunctions.fig'],'compact')
+    'Parameter-Estimation/Figures/'];    % Specifies the Figures folder
+savefig(F,[figfold 'TestFunctions1D.fig'],'compact')
 
 %% Gaussian Distributions
 % This section generates one plot called GaussianDistributions.eps showing
@@ -54,8 +54,8 @@ xlabel('t')
 ylabel('p(t)')
 set(gca,'Fontsize',18)
 figfold = ['/Users/mjbyrne/Documents/Arizona State University/' ...
-    'Parameter-Estimation/Figures'];    % Specifies the Figures folder
-savefig(F,[figfold '/GaussianDistributions.fig'],'compact')
+    'Parameter-Estimation/Figures/'];    % Specifies the Figures folder
+savefig(F,[figfold 'GaussianDistributions.fig'],'compact')
 
 %% Gaussian PSF and Extension
 % This section generates one plot showing a Gaussian PSF of width 100 on 
@@ -85,8 +85,8 @@ xlabel('t')
 set(gca,'Fontsize',18)
 
 figfold = ['/Users/mjbyrne/Documents/Arizona State University/' ...
-    'Parameter-Estimation/Figures'];    % Specifies the Figures folder
-savefig(F,[figfold '/RegAndTroughGaussian.fig'],'compact')
+    'Parameter-Estimation/Figures/'];    % Specifies the Figures folder
+savefig(F,[figfold 'RegAndTroughGaussian.fig'],'compact')
 
 %% Test function, Gaussian PSF, and blurred function
 % This section generates three plots: one of the second test function f(t) 
@@ -127,8 +127,8 @@ xlabel('t')
 set(gca,'Fontsize',16)
 
 figfold = ['/Users/mjbyrne/Documents/Arizona State University/' ...
-    'Parameter-Estimation/Figures'];    % Specifies the Figures folder
-savefig(F,[figfold '/FunctionKernelPlot.fig'],'compact')
+    'Parameter-Estimation/Figures/'];    % Specifies the Figures folder
+savefig(F,[figfold 'FunctionKernelPlot.fig'],'compact')
 
 %% Comparison of Gaussian PSF spectra
 % This section generates one plot illustrating the relationship between the
@@ -234,15 +234,15 @@ xlabel('Number of data points')
 set(gca,'Fontsize',18)
 
 figfold = ['/Users/mjbyrne/Documents/Arizona State University/' ...
-    'Parameter-Estimation/Figures'];    % Specifies the Figures folder
-savefig(F,[figfold '/LLN_Plot.fig'],'compact')
+    'Parameter-Estimation/Figures/'];    % Specifies the Figures folder
+savefig(F,[figfold 'LLN_Plot.fig'],'compact')
 
 %% Plot functions/data for first noise realization
 % This section generates one plot showing the functions (f and g pertaining
 % to a given test function) and data (g_hat) for one noise realization.
 % The functions/data are loaded in from a workspace generated in
 % Experiment_1D.m. The filename of the resulting plot has the form 
-% TF(TFnum)wNoise_SNR(SNR)_width(width).eps.
+% TF(Fnum)wNoise_SNR(SNR)_width(width).eps.
 %
 % A workspace must be loaded before running this section.
 
@@ -256,12 +256,12 @@ grid on
 xlabel('t')
 ylim(y_scale)
 set(gca,'Fontsize',14)
-legend({['Test function #' num2str(TFnum)],'g','g with noise'},...
+legend({['Test function #' num2str(Fnum)],'g','g with noise'},...
     'FontSize',18)
 figfold = ['/Users/mjbyrne/Documents/Arizona State University/' ...
-    'Parameter-Estimation/Figures'];    % Specifies the Figures folder
-savefig(F,[figfold 'TF' num2str(TFnum) 'wNoise_SNR' num2str(SNR)...
-    '_width' num2str(width) '.fig'],'compact')
+    'Parameter-Estimation/Figures/'];    % Specifies the Figures folder
+savefig(F,[figfold 'NoisePlot1D_F' num2str(Fnum) '_S'...
+    num2str(SNR,'%02.f') '_W' num2str(width) '.fig'],'compact')
 
 %% Plot of Lambdas and Relative Errors
 % This section generates one plot consisting of two box plots. The first
@@ -273,21 +273,23 @@ savefig(F,[figfold 'TF' num2str(TFnum) 'wNoise_SNR' num2str(SNR)...
 % A workspace must be loaded before running this section.
 
 F = figure('units','normalized','outerposition',[0 0 1 1]);  % Full screen
+
 subplot(1,2,1)
 boxplot(upre_lambda,M)
 xlabel('n')
 ylabel('Lambda')
-set(gca, 'FontSize',12)
+set(gca,'FontSize',16)
+
 subplot(1,2,2)
 boxplot(upre_err,M)
 xlabel('n')
 ylabel('Relative error')
-set(gca,'FontSize',12)
+set(gca,'FontSize',16)
 
 figfold = ['/Users/mjbyrne/Documents/Arizona State University/' ...
-    'Parameter-Estimation/Figures'];    % Specifies the Figures folder
-savefig(F,[figfold 'TF' num2str(TFnum) '_BothBoxes_SNR' num2str(SNR) ...
-    '_width' num2str(width) '_R' num2str(R) '.fig'],'compact')
+    'Parameter-Estimation/Figures/'];    % Specifies the Figures folder
+savefig(F,[figfold 'BothBoxes1D_F' num2str(Fnum) '_S'... 
+    num2str(SNR,'%02.f') '_W' num2str(width) '_R' num2str(R) '.fig'],'compact')
 
 %% Plot of Lambdas
 % This section generates one box plot of the lambdas obtained by applying 
@@ -302,7 +304,7 @@ boxplot(upre_lambda,M)
 xlabel('Downsampling resolutions (n)')
 ylabel('Lambda')
 set(gca, 'FontSize',12)
-% saveas(gcf,['TF' num2str(TFnum) '_Lambdas_SNR' num2str(SNR) '_width'...
+% saveas(gcf,['TF' num2str(Fnum) '_Lambdas_SNR' num2str(SNR) '_width'...
 %     num2str(width) '_R' num2str(R) '.eps'],'epsc')   % Save file
 
 %% Plot of Errors
@@ -319,7 +321,7 @@ boxplot(upre_err,M)
 xlabel('Downsampling resolutions (n)')
 ylabel('Relative error')
 set(gca,'FontSize',12)
-% saveas(gcf,['TF' num2str(TFnum) '_RelErrors_SNR' num2str(SNR) '_width'...
+% saveas(gcf,['TF' num2str(Fnum) '_RelErrors_SNR' num2str(SNR) '_width'...
 %     num2str(width) '_R' num2str(R) '.eps'],'epsc')   % Save file
 
 %% Plot of Regularized Solutions
