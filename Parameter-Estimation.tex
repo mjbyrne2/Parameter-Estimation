@@ -161,9 +161,29 @@ s_{x*y} &= s_x + s_y, \nonumber \\
 e_{x*y} &= e_x + e_y, \label{Eq_ConResults} \\
 n_{x*y} &= n_x + n_y - 1. \nonumber
 \end{align}
-As an illustrative example, let $\mathbf{x} = [1,2,3]$ and $\mathbf{y} = [4,5,6,7]$ be row vectors stored in MATLAB. Since vectors in MATLAB have a starting index of 1, $s_x = s_y = 1$, $e_x = n_x = 3$, and $e_y = n_y = 4$. Then by \eqref{Eq_ConResults}, $s_{x*y} = 2$, $e_{x*y} = 8$, and $n_{x*y} = 6$. 
+As an illustrative example, let $\mathbf{x} = [1,2,3]$ and $\mathbf{y} = [4,5,6,7]$ be row vectors. The vectors can be thought of as the bi-infinite sequences $(x_n) = (\ldots,0,1,2,3,0\ldots)$ and $(y_n) = (\ldots,0,4,5,6,7,0,\ldots)$. If the sequences are indexed so that $x_1 = 1$ and $y_1 = 4$, then $s_x = s_y = 1$, $e_x = n_x = 3$, and $e_y = n_y = 4$. Then by \eqref{Eq_ConResults}, $s_{x*y} = 2$, $e_{x*y} = 8$, and $n_{x*y} = 6$. The bi-infinite sequence produced from the convolution is
+\[x*y = (\ldots,0,4,13,28,34,32,21,0,\ldots),\]
+where $(x*y)_2 = 4$ and $(x*y)_8 = 21$. \par 
+Since the numerical experiments for this report are conducted in MATLAB, a brief remark regarding discrete convolutions in MATLAB will be given. If the built-in function \texttt{conv} is used to evaluate the discrete convolution of row vectors $\mathbf{x}$ and $\mathbf{y}$ described in the previous example, the output is the row vector $[4,13,28,34,32,21]$.  All vectors in MATLAB have a starting index of 1, and the vector resulting from the convolution is no different: the component 4 has an index of 1. While this seems to conflict with \eqref{Eq_ConResults} (recall that $s_{x*y} = 2$, not 1), from a practical standpoint there is little reason for concern; usually the components themselves are of interest and not the indexing of the bi-infinite sequence. If one wants to keep track of the indexing as the convolution is evaluated, index vectors can be defined for $\mathbf{x}$ and $\mathbf{y}$ and \eqref{Eq_ConResults} can be applied to obtain an index vector for the resulting convolution. See [1] for an explicit MATLAB example. \par 
+
+\subsection{Toeplitz and Circulant matrices}
+In the previous subsection, the discrete convolution and some of its variants were discussed. In this subsection, matrices will be discussed that have connections to discrete convolutions and other concepts. \par 
+The first type of matrix to be discussed is a \textit{Toeplitz matrix}. An $n \times n$ matrix $T$ has the form
+\begin{equation}
+T = \begin{bmatrix}
+t_n & t_{n-1} & \ldots & t_{2} & t_1 \\
+t_{n+1} & t_n & t_{n-1} & \ddots & t_2 \\
+\vdots & \ddots & \ddots & \ddots & \vdots \\
+t_{2n-2} & \ddots & t_{n+1} & t_n & t_{n-1} \\
+t_{2n-1} & t_{2n-2} & \ldots & t_{n+1} & t_n
+\end{bmatrix}.
+\label{Eq_Toeplitz}
+\end{equation}
+In other words, a matrix is Toeplitz if it is constant along each diagonal. 
+
 
 \subsection{The Fourier transform}
+
 
 \section{Experiment design}
 
