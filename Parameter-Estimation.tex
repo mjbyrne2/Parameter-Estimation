@@ -166,21 +166,34 @@ As an illustrative example, let $\mathbf{x} = [1,2,3]$ and $\mathbf{y} = [4,5,6,
 where $(x*y)_2 = 4$ and $(x*y)_8 = 21$. \par 
 Since the numerical experiments for this report are conducted in MATLAB, a brief remark regarding discrete convolutions in MATLAB will be given. If the built-in function \texttt{conv} is used to evaluate the discrete convolution of row vectors $\mathbf{x}$ and $\mathbf{y}$ described in the previous example, the output is the row vector $[4,13,28,34,32,21]$.  All vectors in MATLAB have a starting index of 1, and the vector resulting from the convolution is no different: the component 4 has an index of 1. While this seems to conflict with \eqref{Eq_ConResults} (recall that $s_{x*y} = 2$, not 1), from a practical standpoint there is little reason for concern; usually the components themselves are of interest and not the indexing of the bi-infinite sequence. If one wants to keep track of the indexing as the convolution is evaluated, index vectors can be defined for $\mathbf{x}$ and $\mathbf{y}$ and \eqref{Eq_ConResults} can be applied to obtain an index vector for the resulting convolution. See [1] for an explicit MATLAB example. \par 
 
-\subsection{Toeplitz and Circulant matrices}
+\subsection{Circulant matrices}
 In the previous subsection, the discrete convolution and some of its variants were discussed. In this subsection, matrices will be discussed that have connections to discrete convolutions and other concepts. \par 
-The first type of matrix to be discussed is a \textit{Toeplitz matrix}. An $n \times n$ matrix $T$ has the form
-\begin{equation}
-T = \begin{bmatrix}
-t_n & t_{n-1} & \ldots & t_{2} & t_1 \\
-t_{n+1} & t_n & t_{n-1} & \ddots & t_2 \\
-\vdots & \ddots & \ddots & \ddots & \vdots \\
-t_{2n-2} & \ddots & t_{n+1} & t_n & t_{n-1} \\
-t_{2n-1} & t_{2n-2} & \ldots & t_{n+1} & t_n
-\end{bmatrix}.
-\label{Eq_Toeplitz}
-\end{equation}
-In other words, a matrix is Toeplitz if it is constant along each diagonal. 
-
+The first type of matrix to be discussed is a \textit{Toeplitz matrix}. A matrix $T$ is called a Toeplitz matrix if it is constant along each diagonal. The following matrices are examples of Toeplitz matrices.
+\[A = \begin{bmatrix}
+1 & 2 \\
+2 & 1 \\
+3 & 2
+\end{bmatrix}, \quad 
+B = \begin{bmatrix}
+1 & 2 & 3 \\
+2 & 1 & 2 
+\end{bmatrix}, \quad 
+C = \begin{bmatrix}
+1 &  2 \\
+2 & 1
+\end{bmatrix}.\]
+It is important to notice that by definition, Toeplitz matices need not be square. \par 
+The primary connection to be made in this report is that discrete convolutions can be described in the context of matrix-vector multiplication using Toeplitz matrices. For example, the discrete convolution of $\mathbf{x} = [1,2,3]$ and $\mathbf{y} = [4,5,6,7]$ from the previous subsection can be cast as a matrix-vector product by defining a matrix $X$ to be
+\[X = \begin{bmatrix}
+1 & 0 & 0 & 0 \\
+2 & 1 & 0 & 0 \\
+3 & 2 & 1 & 0 \\
+0 & 3 & 2 & 1 \\
+0 & 0 & 3 & 2 \\
+0 & 0 & 0 & 3
+\end{bmatrix}.\]
+Certainly $X$ is a Toeplitz matrix, and $x*y$ can be expressed as $Xy^\trans$ with $x*y$ being a (column) vector of length $n_{x*y} = 6$; the length of this vector agrees with result \eqref{Eq_ConResults}. The operation $Xy^\trans$ is equivalent to \texttt{conv(x,y)} in MATLAB. \par 
+If a further restriction is imposed on a matrix $T$ such that each row is a 
 
 \subsection{The Fourier transform}
 
