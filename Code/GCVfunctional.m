@@ -1,19 +1,19 @@
-function x = GCVfunctional(dataSpec,operatorSpec,smoothingSpec,lambda,...
-    trunc)
-% GCVfunctional represents the Fourier-version of the UPRE functional. The
+function x = GCVfunctional(dataSpec,operatorSpec,smoothingSpec,L,trunc)
+% GCVfunctional represents the Fourier-version of the GCV functional. The
 % vectors dataSpec, operatorSpec, and smoothingSpec must have the same
 % length.
 
-filtFact = (abs(operatorSpec).^2)./(abs(operatorSpec).^2 + ...
-    lambda.^2.*abs(smoothingSpec).^2);
-
-% Truncate spectra:
+x = zeros(size(L));
 N = length(dataSpec);
 ind = (N-trunc)/2;  % Number of components to zero-out on both sides
-filtFact([1:ind,N-ind:end]) = 0;
-dataSpec([1:ind,N-ind:end]) = 0;
+dataSpec([1:ind,N-ind:end]) = 0;    % Truncate data spectrum
 
-x = (trunc^2)*sum(abs(dataSpec).^2.*(1-filtFact).^2)./...
-    ((sum((1-filtFact))).^2);
+for i = 1:length(L)
+    filtFact = (abs(operatorSpec).^2)./(abs(operatorSpec).^2 + ...
+        L.^2.*abs(smoothingSpec).^2);
+    filtFact([1:ind,N-ind:end]) = 0;    % Truncate filter factors
+    x(i) = (trunc^2)*sum(abs(dataSpec).^2.*(1-filtFact).^2)./...
+        ((sum((1-filtFact))).^2);
+end
 
 end
