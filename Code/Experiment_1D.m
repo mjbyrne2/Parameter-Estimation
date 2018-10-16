@@ -40,7 +40,9 @@ f = testFunction('1D',Fnum);
 
 % Initialization of storage arrays:
 upre_lambda = zeros(R,length(M));
+gcv_lambda = zeros(R,length(M));
 upre_err = zeros(R,length(M));
+gcv_err = zeros(R,length(M));
 
 % Construction of vector discretizations:
 [g,h] = GaussianBlur_1D(t,f,width);
@@ -63,11 +65,14 @@ for j = 1:R
 
     % Initialization of arrays:
     upre_vectors = zeros(length(M),100);
+    gcv_vectors = zeros(length(M),100);
     best = zeros(length(M),100);
     best_lambda = zeros(size(M));
     upre_error = zeros(size(M));
+    gcv_error = zeros(size(M));
     best_error = zeros(size(M));
     upre_regf = zeros(length(M),N);
+    gcv_regf = zeros(length(M),N);
     opt_regf = zeros(length(M),N);
 
     % For computing representative solutions with the finest sampling:
@@ -105,6 +110,10 @@ for j = 1:R
             hn_hat,ones(1,length(gn)),eta,L,r);
         upre_lambda(j,i) = upre_lambda(j,i)*sqrt(n/N);  % Scale the lambda
         
+        [gcv_vectors(i,:),gcv_lambda(j,i)] = GCVparameter(gn_hat,...
+            hn_hat,ones(1,length(gn)),L,r);
+        gcv_lambda(j,i) = gcv_lambda(j,i)*sqrt(n/N);  % Scale the lambda
+        
         best_lambda(j,i) = optimalParameter(gn_hat,hn_hat,...
             ones(1,length(gn)),r,f_hat);
     end
@@ -113,6 +122,10 @@ for j = 1:R
         upre_regf(i,:) = N*real(ifft(ifftshift(...
             filterFactors(h_hatsol,upre_lambda(j,i)).*g_noise_hat./...
             replaceZeros(h_hatsol,1))));
+        
+        gcv_regf(i,:) = N*real(ifft(ifftshift(...
+            filterFactors(h_hatsol,gcv_lambda(j,i)).*g_noise_hat./...
+            replaceZeros(h_hatsol,1))));
        
         opt_regf(i,:) = N*real(ifft(ifftshift(...
             filterFactors(h_hatsol,best_lambda(j,i)).*g_noise_hat./...
@@ -120,6 +133,9 @@ for j = 1:R
 
         upre_error(i) = TikhRegErr(g_noise_hat,h_hatsol,...
             ones(1,length(g_noise_hat)),upre_lambda(j,i),r,f_hat);
+        
+        gcv_error(i) = TikhRegErr(g_noise_hat,h_hatsol,...
+            ones(1,length(g_noise_hat)),gcv_lambda(j,i),r,f_hat);
         
         best_error(i) = TikhRegErr(g_noise_hat,h_hatsol,...
             ones(1,length(g_noise_hat)),best_lambda(j,i)*sqrt(n/N),r,f_hat);
@@ -136,6 +152,7 @@ for j = 1:R
 
     % Relative solution errors: 
     upre_err(j,:) = err(upre_regf,f)';
+    gcv_err(j,:) = err(gcv_regf,f)';
 
 end
 
