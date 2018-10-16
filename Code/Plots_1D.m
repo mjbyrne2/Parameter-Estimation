@@ -288,8 +288,9 @@ set(gca,'FontSize',16)
 
 figfold = ['/Users/mjbyrne/Documents/Arizona State University/' ...
     'Parameter-Estimation/Figures/'];    % Specifies the Figures folder
-savefig(F,[figfold 'BothBoxes1D_F' num2str(Fnum) '_S'... 
-    num2str(SNR,'%02.f') '_W' num2str(width) '_R' num2str(R) '.fig'],'compact')
+savefig(F,[figfold 'BothBoxes1D_F' num2str(Fnum) '_S'...
+    num2str(SNR,'%02.f') '_W' num2str(width) '_R' num2str(R)...
+    '.fig'],'compact')
 
 %% Plot of Lambdas
 % This section generates one box plot of the lambdas obtained by applying 
@@ -342,3 +343,32 @@ legend({'N = 16','N = 32','N = 64','N = 128','N = 256','N = 512',...
     'Southwest','Fontsize',18)
 xlabel('t')
 set(gca,'Fontsize',18)
+
+%% Effect of downsampling on sample variance
+% This section generates one boxplot showing the effect of downsampling on
+% sample variance. 
+
+load Data1D_F1_S05_W100_R20.mat
+
+noise_var = zeros(R,length(M));
+
+for i = 1:R
+    for j = 1:length(M)
+        noise_var(i,j) = var(noise(i,1:(N/M(j)):end));
+    end
+end
+
+F = figure('units','normalized','outerposition',[0 0 1 1]);
+
+boxplot(noise_var,M)
+hold on
+hline(eta,'r:')
+xlabel('Downsampling resolutions (n)')
+ylabel('Sample variance')
+set(gca,'FontSize',18)
+
+figfold = ['/Users/mjbyrne/Documents/Arizona State University/' ...
+    'Parameter-Estimation/Figures/'];    % Specifies the Figures folder
+savefig(F,[figfold 'VarPlot1D_F' num2str(Fnum) '_S' num2str(SNR,'%02.f')...
+    '_W' num2str(width) '_R' num2str(R) '.fig'],'compact')
+

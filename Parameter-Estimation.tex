@@ -1,5 +1,6 @@
 \documentclass[12pt]{article}
-\usepackage{amsmath,amssymb,amsthm,bm,geometry,graphicx}
+\usepackage{amsmath,amssymb,amsthm,bm}
+\usepackage{geometry,graphicx,subcaption}
 \geometry{margin = 1 in}
 
 % Continuous notation:
@@ -252,7 +253,7 @@ The interval $[0,1]$ is discretized as equispaced points $0, 1/N, 2/N, \ldots, (
 \label{RegAndTroughGaussian}
 \end{figure}
 
-With the discretizations $\fdis$ and $\kdis$ determined, the discretization $\gdis$ of $\gcon(t)$ can be evaluation using either a circular convolution or a linear convolution with appropriate vector padding (see subsection on convolution, which needs to be added). Ultimately the vectors $\fdis$, $\kdis$, and $\gdis$ are vector discretizations of $\fcon$, $\kcon$, and $\gcon$, respectively. \par
+With the discretizations $\fdis$ and $\kdis$ determined, the discretization $\gdis$ of $\gcon(t)$ can be evaluation using either a circular convolution or a linear convolution with appropriate vector padding. Ultimately the vectors $\fdis$, $\kdis$, and $\gdis$ are vector discretizations of $\fcon$, $\kcon$, and $\gcon$, respectively. \par
 Overall, two selections for the width of the Gaussian kernel, two selections 5 and 25 for SNR value, and three test functions lead to a total of 12 experimental configurations. For each configuration, 20 noise realizations were generated and tested. The full resolution problem was constructed using $N = 4096$ points. The downsamped resolutions were selected as $n \in \{16,32,\ldots,2048\}$ for a total of nine resolutions (eight values of $n$).
 
 \subsection{Construction of noise}
@@ -317,8 +318,14 @@ Then $\tdis^4$ obtained by the product $E\tdis$ has equispaced components as des
 \end{bmatrix}^{\trans}.\]
 \indent Another property of the $N/2 \times N$ matrix $E$ defined in \eqref{Eq_E} is that $EE^{\trans} = I$, where $I$ is the $N/2 \times N/2$ identity matrix.  This is a direct consequence of $\mathbf{e}_j^\trans\mathbf{e}_j = 1$ for all $j$ with $1 \leq j \leq N/2$. Using the property in \eqref{Eq_VarProp}, the variance of the  noise vector $\noise^{N/2}$ downsampled from $\noise$ is then
 \[\Var(\noise^{N/2}) = \Var(E\noise) = E\Var(\noise)E^{\trans} = \SD^2EE^{\trans} = \SD^2I\]
-where $I$ is the $N/2 \times N/2$ identity matrix. Therefore, downsampling white noise vectors in this way produces white noise vectors of half length, theoretically preserving variance across downsamples. As a final remark, the process of downsampling described here can be used to obtain downsampled vectors of length $N/(2^2), N/(2^3), \ldots, N/N$, though the final resolution in this report has been chosen as $N/(2^8) = 16$. \par
-While in theory the variance of downsampled vectors is the same across resolutions, numerically
+where $I$ is the $N/2 \times N/2$ identity matrix. Therefore, downsampling white noise vectors in this way produces white noise vectors of half length, theoretically preserving variance across downsamples. As a final remark, the process of downsampling described here can be used to obtain downsampled vectors of length $N/(2^2), N/(2^3), \ldots, N/N$, though the final resolution in this report has been chosen as $N/(2^8) = 16$. \par 
+While the variance of the noise is preserved across downsampling resolution in theory, numerically there is some fluctuation. As the downsampling resolutions decrease, i.e. the length of the downsampled vectors decreases, the sample variances more spread out. Figure \ref{VarPlot1D} demonstrates this phenomenon by showing boxplots of sample variance versus downsampling resolutions. In light of this behavior, investigation of the effects of using sample variance instead of the theoretical variance during the implementation of the parameter estimation methods could be worthwhile. 
+
+\begin{figure}
+\centerline{\includegraphics[scale=0.45]{Figures/VarPlot1D_F1_S05_W100_R20.eps}}
+\caption{The boxplots were generated from the sample variances of downsampled noise vectors. The theoretical variance of the noise was set to 0.0327, which is indicated by the horizontal dotted line. This figure illustrates that as the length of the downsampled vectors decrease, the variance in the computed sample variances increases.}
+\label{VarPlot1D}
+\end{figure}
 
 \section{Parameter estimation methods}
 
@@ -404,26 +411,28 @@ In other words, implementation of the discepancy principle method is equivalent 
 Of the 12 experimental configurations, four are presented here, all of which pertain to the second test function. The UPRE method was used to select regularization parameters at each resolution. These parameters were used to construct regularized solutions of the full problem on $N = 4096$ points.
 
 \begin{figure}
-	\centerline{\includegraphics[scale = 0.45]{Figures/BothBoxes1D_F2_S05_W100_R20.eps}}
+	\centerline{\includegraphics[scale = 0.4]{Figures/BothBoxes1D_F2_S05_W100_R20.eps}}
 \caption{Box plots for the regularization parameters $\regparam$ (left) and relative errors (right) across resolutions for 20 noise realizations. In this configuration, $\text{SNR = 5}$ and the width of the Gaussian kernel is 100.}
+\label{BothBoxes1D_F2_S05_W100_R20}
 \end{figure}
 
 \begin{figure}
-	\centerline{\includegraphics[scale = 0.45]{Figures/BothBoxes1D_F2_S05_W200_R20.eps}}
+	\centerline{\includegraphics[scale = 0.4]{Figures/BothBoxes1D_F2_S05_W200_R20.eps}}
 \caption{Box plots for the regularization parameters $\regparam$ (left) and relative errors (right) across resolutions for 20 noise realizations. In this configuration, $\text{SNR = 5}$ and the width of the Gaussian kernel is 200.}
 \end{figure}
 
 \begin{figure}
-	\centerline{\includegraphics[scale = 0.45]{Figures/BothBoxes1D_F2_S25_W100_R20.eps}}
+	\centerline{\includegraphics[scale = 0.4]{Figures/BothBoxes1D_F2_S25_W100_R20.eps}}
 \caption{Box plots for the regularization parameters $\regparam$ (left) and relative errors (right) across resolutions for 20 noise realizations. In this configuration, $\text{SNR = 25}$ and the width of the Gaussian kernel is 100.}
 \end{figure}
 
 \begin{figure}
-	\centerline{\includegraphics[scale = 0.45]{Figures/BothBoxes1D_F2_S25_W200_R20.eps}}
+	\centerline{\includegraphics[scale = 0.4]{Figures/BothBoxes1D_F2_S25_W200_R20.eps}}
 \caption{Box plots for the regularization parameters $\regparam$ (left) and relative errors (right) across resolutions for 20 noise realizations. In this configuration, $\text{SNR = 25}$ and the width of the Gaussian kernel is 200.}
+\label{BothBoxes1D_F2_S25_W200_R20}
 \end{figure}
 
-It is interesting to note more pronounced increase in the regularization parameter across resolutions when the Gaussian kernel has a width of 100 as opposed to a width of 50. In addition, the relative errors are smaller for an SNR of 25 as opposed to an SNR of 5, which is to be expected since the variance in the noise is small for $\text{SNR} = 25$.
+The relative errors are smaller for an SNR of 25 as opposed to an SNR of 5, which is to be expected since the variance in the noise is small for $\text{SNR} = 25$. Results pertaining to the Gaussian PSF of width 100 are poor compared to the results for the Gaussian PSF of width 200. In fact, the relative errors are exceedingly large for the width 100 Gaussian PSF; in Figure \ref{BothBoxes1D_F2_S05_W100_R20} there is an outlier with a relative error above 3. These outliers most likely arise from the difficulty in minimizing the often shallow graphs of the UPRE functionals. Figure \ref{BothBoxes1D_F2_S25_W200_R20} shows that the UPRE downsampling method performed the best for $SNR = 25$ and a Gaussian PSF of width 200. However, Figure \ref{BothBoxes1D_F2_S25_W200_R20} still shows numerous outliers, again which are probably a product of the functional minimization. 
 
 
 \section*{References}
