@@ -292,57 +292,55 @@ savefig(F,[figfold 'BothBoxes1D_F' num2str(Fnum) '_S'...
     num2str(SNR,'%02.f') '_W' num2str(width) '_R' num2str(R)...
     '.fig'],'compact')
 
-%% Plot of Lambdas
-% This section generates one box plot of the lambdas obtained by applying 
-% the downsampling parameter selection method.
-%
-% A workspace must be loaded before running this section.
-
-figure('units','normalized','outerposition',[0 0 1 1])
-boxplot(upre_lambda,M)
-% title(['UPRE lambdas across resolutions (' num2str(R)...
-%     ' realizations)'],'Fontsize',24)
-xlabel('Downsampling resolutions (n)')
-ylabel('Lambda')
-set(gca, 'FontSize',12)
-% saveas(gcf,['TF' num2str(Fnum) '_Lambdas_SNR' num2str(SNR) '_width'...
-%     num2str(width) '_R' num2str(R) '.eps'],'epsc')   % Save file
-
-%% Plot of Errors
-% This section generates one box plot of the relative errors between the
-% test function and the regularized solutions across downsampling
-% resolutions.
-%
-% A workspace must be loaded before running this section.
-
-figure('units','normalized','outerposition',[0 0 1 1])
-boxplot(upre_err,M)
-% title(['Relative erros across resolutions (' num2str(R)...
-%     ' realizations)'],'Fontsize',24)
-xlabel('Downsampling resolutions (n)')
-ylabel('Relative error')
-set(gca,'FontSize',12)
-% saveas(gcf,['TF' num2str(Fnum) '_RelErrors_SNR' num2str(SNR) '_width'...
-%     num2str(width) '_R' num2str(R) '.eps'],'epsc')   % Save file
-
-%% Plot of Regularized Solutions
+%% Plot of Regularized Solutions (UPRE)
 % This section generates one plot of the regularized solutions obtained by
-% applying the downsampling parameter selection method.
+% applying the downsampling UPRE parameter selection method.
 %
 % A workspace must be loaded before running this section.
 
-figure('units','normalized','outerposition',[0 0 1 1])
+F = figure('units','normalized','outerposition',[0 0 1 1]);
+
 plot(repmat(t,length(M),1)',upre_regf','-')   % Transpose for the sake of plotting
 hold on
 plot(t,f,'k','Linewidth',1.5)   % Original function f
-% title(['Regularized solutions across resolutions using the UPRE method (width = '...
-%             num2str(width) ', SNR = ' num2str(SNR) ')'],'FontSize',24)
 grid on
+
 legend({'N = 16','N = 32','N = 64','N = 128','N = 256','N = 512',...
     'N = 1024','N = 2048','N = 4098','Original f'},'Location',...
     'Southwest','Fontsize',18)
 xlabel('t')
 set(gca,'Fontsize',18)
+
+figfold = ['/Users/mjbyrne/Documents/Arizona State University/' ...
+    'Parameter-Estimation/Figures/'];    % Specifies the Figures folder
+savefig(F,[figfold 'UPREsolutions1D_F' num2str(Fnum) '_S'...
+    num2str(SNR,'%02.f') '_W' num2str(width) '_R' num2str(R)...
+    '.fig'],'compact')
+
+%% Plot of Regularized Solutions (GCV)
+% This section generates one plot of the regularized solutions obtained by
+% applying the downsampling GCV parameter selection method.
+%
+% A workspace must be loaded before running this section.
+
+F = figure('units','normalized','outerposition',[0 0 1 1]);
+
+plot(repmat(t,length(M),1)',gcv_regf','-')   % Transpose for the sake of plotting
+hold on
+plot(t,f,'k','Linewidth',1.5)   % Original function f
+grid on
+
+legend({'N = 16','N = 32','N = 64','N = 128','N = 256','N = 512',...
+    'N = 1024','N = 2048','N = 4098','Original f'},'Location',...
+    'Southwest','Fontsize',18)
+xlabel('t')
+set(gca,'Fontsize',18)
+
+figfold = ['/Users/mjbyrne/Documents/Arizona State University/' ...
+    'Parameter-Estimation/Figures/'];    % Specifies the Figures folder
+savefig(F,[figfold 'GCVsolutions1D_F' num2str(Fnum) '_S'...
+    num2str(SNR,'%02.f') '_W' num2str(width) '_R' num2str(R)...
+    '.fig'],'compact')
 
 %% Effect of downsampling on sample variance
 % This section generates one boxplot showing the effect of downsampling on
