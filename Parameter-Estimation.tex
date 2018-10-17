@@ -2,7 +2,7 @@
 \usepackage{amsmath,amssymb,amsthm,bm}
 \usepackage{geometry,graphicx,subcaption}
 \geometry{margin = 1 in}
-
+\usepackage{color}
 % Continuous notation:
 \newcommand{\gcon}{g}
 \newcommand{\kcon}{k}
@@ -50,7 +50,8 @@
 
 % Discrepancy principle derivation notation:
 \newcommand{\D}{D}	% Discrepancy principle functional
-
+% Rosie's commands
+\newcommand{\comment}[1]{\textcolor{red}{ \textbf{Comment}: #1}}
 % Defining Trace Lemma
 \newtheorem*{TL}{Trace Lemma}
 
@@ -67,7 +68,7 @@ Given functions $\gcon(x)$ and $\kcon(x,t)$, a \textit{Fredholm equation of the 
 	\gcon(x) = \int_a^b \kcon(x,t)\fcon(t)\:dt
 	\label{Eq_Con}
 \end{equation}
-where the function $\fcon$ is unknown. If the kernel $\kcon$ is of the form $\kcon(x,t) = \kcon(x-t)$, then the integral equation represents the continuous convolution $\gcon = \kcon * \fcon$ over the interval $[a,b]$, and the kernel is spatially invariant. Convolution is often considered a smoothing operation: if $\kcon$ is integrable and $\fcon$ is bounded and locally integrable, then $\kcon * \fcon$ is a continuous function [2]. In particular, if $\kcon$ and $\fcon$ are at least piecewise smooth and bounded, the resulting convolution $\kcon * \fcon$ is continuous. \par
+where the function $\fcon$ is unknown. If the kernel $\kcon$ is of the form $\kcon(x,t) = \kcon(x-t)$, then the integral equation represents the continuous convolution $\gcon = \kcon * \fcon$ over the interval $[a,b]$, and the kernel is spatially invariant. Convolution is often considered a smoothing operation: if $\kcon$ is integrable and $\fcon$ is bounded and locally integrable, then $\kcon * \fcon$ is a continuous function \cite{DebnathLokenath1999ItHs}. In particular, if $\kcon$ and $\fcon$ are at least piecewise smooth and bounded, the resulting convolution $\kcon * \fcon$ is continuous. \par
 If $\kcon * \fcon$ is considered a smoothing operation, then finding $\fcon$ such that $\gcon = \kcon * \fcon$, given $\gcon$ and $\kcon$, could be considered a ``sharpening" operation. For instance, consider the kernel $\kcon(t) = \exp(-200(t-\frac{1}{2})^2)$ and the piecewise-smooth function $\fcon(t)$ defined as:
 \begin{equation}
 \fcon(t) = \begin{cases}
@@ -110,8 +111,8 @@ If a left Riemann sum is used with $t_j = (j-1)/n$ for $j \in \{1,2,\ldots,n\}$,
 For approximations to $\gcon(x)$ at the same points that make up the equispaced discretization of $[0,1]$, i.e. at the points $x_i = (i-1)/n$ for $j \in \{1,2,\ldots,n\}$, then \eqref{Eq_Dis} is exactly the system that provides these approximations with $\fdis = [\fcon(t_1),\fcon(t_2),\ldots,\fcon(t_n)]$, $\gdis = [\gcon(x_1),\gcon(x_2),\ldots,\gcon(x_n)]$, and the elements of $\kmat$ being
 \[K_{ij} = \frac{1}{n}\exp\left(\frac{-(i - j)^2}{2\SD^2}\right).\]
 Note that taking the collocation and quadrature points as the same ensures that the matrix $\kmat$ is square. By changing the number of collocation points or the quadrature method can change $\kmat$ from square to rectangular. \par
-If the matrix $\kmat$ is nonsingular, then the solution to the inverse problem of \eqref{Eq_Dis} is $\fdis = \kmat^{-1}\gdis$. As with many linear systems, however, direct matrix inversion is discouraged and usually impractical since the matrix $\kmat$ becomes increasingly ill-conditioned as the size of the system grows [3]. Unfortunately, large systems are necessary to adequately approximate the continuous problem, and so other methods of solving for $\fdis$ must be considered. \par
-Another consequence of $\kmat$ being ill-conditioned relates to the accuracy of the vector $\gdis$. If $\gdis$ contains errors, as is often the case in practical applications, the errors are amplified during the multiplication $\kmat^{-1}\gdis$ since $\kmat$ is ill-conditioned and so the solution $\fdis$ will contain errors as well. For this consideration, the following system will be the assumed model throughout this report
+If the matrix $\kmat$ is nonsingular, then the solution to the inverse problem of \eqref{Eq_Dis} is $\fdis = \kmat^{-1}\gdis$. \comment{It is not sufficient that $\kmat$ is nonsingular it can be non singular and still there are problems - as you state in the following. But I think that you need to note that it is the ill-posedness of the system that creates the problems} As with many linear systems, however, direct matrix inversion is discouraged and usually impractical since the matrix $\kmat$ becomes increasingly ill-conditioned as the size of the system grows \cite{Vogel:2002}. Unfortunately, large systems are necessary to adequately approximate the continuous problem, and so other methods of solving for $\fdis$ must be considered. \par
+Another consequence of $\kmat$ being ill-conditioned relates to the accuracy of the vector $\gdis$. If $\gdis$ contains errors, as is often the case in practical applications, the errors are amplified during the multiplication $\kmat^{-1}\gdis$ since $\kmat$ is ill-conditioned and so the solution $\fdis$ will contain errors as well. \comment{This is where the ill-posedness comes in to the discussion, I think it is worth discussing the Picard condition and illustrating the impact with the singular value spectrum for the operator}For this consideration, the following system will be the assumed model throughout this report
 \begin{equation}
 \gnoise = \kmat\fdis + \noise
 \end{equation}
@@ -125,7 +126,7 @@ For small $\singular_i$, the terms in the above sum are numerically unstable and
 \begin{equation}
 \fdis(\regparam) = \sum_{i = 1}^n \frac{\filt(\regparam,\singular_i){\LSV^\trans_i}\gnoise}{\singular_i}\RSV_i
 \end{equation}
-
+\comment{When $K$ is not invertible we have instead $V\Sigma^+U^T$ and you can write down the same expression for the solution but in terms of the non zero singular values}
 The most desired property of the filter functions is that $\filt(\singular_i)/\singular_i \approx 1$  for large values of $\singular_i$ and $\filt(\singular_i)/\singular_i \approx 0$ are small values of $\singular_i$. A brief overview of common filter functions will now be provided.
 
 \subsection{Filter functions}
@@ -136,7 +137,7 @@ Perhaps the simplest filter function is
 \end{cases}\]
 Using this function in (3) gives the approximate solution
 \[\fdis(\regparam) = \sum_{\singular_i^2 > \regparam} \frac{{\LSV^\trans_i}\gnoise}{\singular_i}\RSV_i\]
-which actually corresponds to the solution obtained using a truncated singular value decomposition (TSVD) of the matrix $\kmat$ [3]. \par
+which actually corresponds to the solution obtained using a truncated singular value decomposition (TSVD) of the matrix $\kmat$ \cite{Vogel:2002}. \par
 A less simple filter function is
 \begin{equation}
 \filt(\regparam,\singular_i)  = \frac{\singular_i^2}{\singular_i^2 + \regparam}
@@ -147,7 +148,7 @@ An alternative representation of the above Tikhonov solution is
 \begin{equation}
 \fdis(\regparam) = \arg\min_{\fdis \in \mathbb{R}^n} \|\kmat\fdis - \gnoise\|^2 + \regparam\|\fdis\|^2
 \end{equation}
-The term $\|\fdis\|^2$ is commonly called the penalty function [3], and is actually a specific case of the more general penalty function $\|L\fdis\|^2$ where $L$ is a linear operator (here $L = I$, the $n \times n$ identity matrix).
+The term $\|\fdis\|^2$ is commonly called the penalty function \cite{Vogel:2002}, and is actually a specific case of the more general penalty function $\|L\fdis\|^2$ where $L$ is a linear operator (here $L = I$, the $n \times n$ identity matrix).
 
 The kernel $k$ and function $f$ considered in the introduction will be retained for the numerical examples included in this report.
 
@@ -158,7 +159,7 @@ As described in the Introduction, the operation of convolution arises in various
 Let $(x_n)$ and $(y_n)$ be sequences of complex numbers indexed by the integers. Then the discrete convolution of $(x_n)$ and $(y_n)$, denoted $x*y$, is defined by
 \[(x*y)_n = \sum_{k=-\infty}^\infty x_{n-k}y_k.\]
 The series in the definition of discrete convolution is bi-infinite, meaning that the discrete convolution might not be well-defined for any two arbitrary sequences. For example, if $x_n = y_n = 1$ for all $n \in \mathbb{Z}$, then the series defining $(x*y)_n$ is $\sum_{k=-\infty}^\infty 1$, which does not converge. In various cases, however, the discrete convolution is well-defined. These cases include sequences having only finitely-many nonzero terms and sequences in $\ell^1$. (In fact, the set of sequences having finitely-many nonzero terms is a linear subspace of $\ell^1$).  \par 
-Fortunately, real-world applications usually involve finite sequences (vectors), which can be thought of as infinite or bi-infinite sequences having finitely-many nonzero terms. While such sequences do not require the evaluation of infinite series to compute discrete convolutions, it is helpful to have general results regarding the length and indices of discrete convolutions. Let $(x_n)$ and $(y_n)$ be nonzero sequences with finitely-many nonzero terms. For $(x_n)$, the assumptions imply the existence of integers $s_x$ and $e_x$ such that $x_n = 0$ for all $n \in \mathbb{Z}$ with either $n < s_x$ or $e_x < n$. Such integers exist for $(y_n)$ and will be denoted $s_y$ and $e_y$. The choice of letters reflects the fact that $s$ and $e$ represent the starting and ending indices of the section of the sequence where the terms can be nonzero. Extending this notation, the number of terms in this section of sequence is $n_x = e_x - s_x + 1$ and $n_y = e_y - s_y + 1$ for $(x_n)$ and $(y_n)$, respectively. From [1], the values of $s_{x*y}$, $e_{x*y}$, and $n_{x*y}$ are
+Fortunately, real-world applications usually involve finite sequences (vectors), which can be thought of as infinite or bi-infinite sequences having finitely-many nonzero terms. While such sequences do not require the evaluation of infinite series to compute discrete convolutions, it is helpful to have general results regarding the length and indices of discrete convolutions. Let $(x_n)$ and $(y_n)$ be nonzero sequences with finitely-many nonzero terms. For $(x_n)$, the assumptions imply the existence of integers $s_x$ and $e_x$ such that $x_n = 0$ for all $n \in \mathbb{Z}$ with either $n < s_x$ or $e_x < n$. Such integers exist for $(y_n)$ and will be denoted $s_y$ and $e_y$. The choice of letters reflects the fact that $s$ and $e$ represent the starting and ending indices of the section of the sequence where the terms can be nonzero. Extending this notation, the number of terms in this section of sequence is $n_x = e_x - s_x + 1$ and $n_y = e_y - s_y + 1$ for $(x_n)$ and $(y_n)$, respectively. From \cite{BoggessAlbert2001Afci}, the values of $s_{x*y}$, $e_{x*y}$, and $n_{x*y}$ are
 \begin{align}
 s_{x*y} &= s_x + s_y, \nonumber \\
 e_{x*y} &= e_x + e_y, \label{Eq_ConResults} \\
@@ -167,7 +168,7 @@ n_{x*y} &= n_x + n_y - 1. \nonumber
 As an illustrative example, let $\mathbf{x} = [1,2,3]$ and $\mathbf{y} = [4,5,6,7]$ be row vectors. The vectors can be thought of as the bi-infinite sequences $(x_n) = (\ldots,0,1,2,3,0\ldots)$ and $(y_n) = (\ldots,0,4,5,6,7,0,\ldots)$. If the sequences are indexed so that $x_1 = 1$ and $y_1 = 4$, then $s_x = s_y = 1$, $e_x = n_x = 3$, and $e_y = n_y = 4$. Then by \eqref{Eq_ConResults}, $s_{x*y} = 2$, $e_{x*y} = 8$, and $n_{x*y} = 6$. The bi-infinite sequence produced from the convolution is
 \[x*y = (\ldots,0,4,13,28,34,32,21,0,\ldots),\]
 where $(x*y)_2 = 4$ and $(x*y)_8 = 21$. \par 
-Since the numerical experiments for this report are conducted in MATLAB, a brief remark regarding discrete convolutions in MATLAB will be given. If the built-in function \texttt{conv} is used to evaluate the discrete convolution of row vectors $\mathbf{x}$ and $\mathbf{y}$ described in the previous example, the output is the row vector $[4,13,28,34,32,21]$.  All vectors in MATLAB have a starting index of 1, and the vector resulting from the convolution is no different: the component 4 has an index of 1. While this seems to conflict with \eqref{Eq_ConResults} (recall that $s_{x*y} = 2$, not 1), from a practical standpoint there is little reason for concern; usually the components themselves are of interest and not the indexing of the bi-infinite sequence. If one wants to keep track of the indexing as the convolution is evaluated, index vectors can be defined for $\mathbf{x}$ and $\mathbf{y}$ and \eqref{Eq_ConResults} can be applied to obtain an index vector for the resulting convolution. See [1] for an explicit MATLAB example. \par 
+Since the numerical experiments for this report are conducted in MATLAB, a brief remark regarding discrete convolutions in MATLAB will be given. If the built-in function \texttt{conv} is used to evaluate the discrete convolution of row vectors $\mathbf{x}$ and $\mathbf{y}$ described in the previous example, the output is the row vector $[4,13,28,34,32,21]$.  All vectors in MATLAB have a starting index of 1, and the vector resulting from the convolution is no different: the component 4 has an index of 1. While this seems to conflict with \eqref{Eq_ConResults} (recall that $s_{x*y} = 2$, not 1), from a practical standpoint there is little reason for concern; usually the components themselves are of interest and not the indexing of the bi-infinite sequence. If one wants to keep track of the indexing as the convolution is evaluated, index vectors can be defined for $\mathbf{x}$ and $\mathbf{y}$ and \eqref{Eq_ConResults} can be applied to obtain an index vector for the resulting convolution. See \cite{BoggessAlbert2001Afci} for an explicit MATLAB example. \par 
 
 \subsection{Circulant matrices}
 In the previous subsection, the discrete convolution and some of its variants were discussed. In this subsection, matrices will be discussed that have connections to discrete convolutions and other concepts. \par 
@@ -225,7 +226,7 @@ F_{jk} = \frac{1}{\sqrt{n}}\exp\left(\frac{-2\pi{i(j-1)(k-1)}}{n}\right), \quad 
 with the benefit being that $F$ is a unitary matrix: $F^\ctrans{F} = FF^\ctrans = I$. The DFT of a vector $\mathbf{f}\in\mathbb{C}^n$ can now be expressed as $\widehat{\mathbf{f}} = \sqrt{n}F\mathbf{f}$. \par 
 As stated previously, a significant property of circulant matrices is that they are diagonalized by the DFT. Using the definition of the $n \times n$ unitary Fourier matrix $F$, the property can be stated as
 \[C = F^\ctrans\diag(\widehat{\mathbf{c}})F,\]
-where $C$ is any $n \times n$ circulant matrix and $\widehat{\mathbf{c}}$ is the DFT of the first row of $C$ (recall that the rows of a circulant matrix are circulant right shifts a single row vector of length $n$). The components of $\widehat{\mathbf{c}}$ and the columns of $F^\ctrans$ are the eigenvalues and eigenvectors, respectively, of $C$. For a proof of this property, see [1].
+where $C$ is any $n \times n$ circulant matrix and $\widehat{\mathbf{c}}$ is the DFT of the first row of $C$ (recall that the rows of a circulant matrix are circulant right shifts a single row vector of length $n$). The components of $\widehat{\mathbf{c}}$ and the columns of $F^\ctrans$ are the eigenvalues and eigenvectors, respectively, of $C$. For a proof of this property, see \cite{BoggessAlbert2001Afci}.
 
 \section{Experiment design}
 
@@ -254,7 +255,7 @@ The interval $[0,1]$ is discretized as equispaced points $0, 1/N, 2/N, \ldots, (
 \end{figure}
 
 With the discretizations $\fdis$ and $\kdis$ determined, the discretization $\gdis$ of $\gcon(t)$ can be evaluation using either a circular convolution or a linear convolution with appropriate vector padding. Ultimately the vectors $\fdis$, $\kdis$, and $\gdis$ are vector discretizations of $\fcon$, $\kcon$, and $\gcon$, respectively. \par
-Overall, two selections for the width of the Gaussian kernel, two selections 5 and 25 for SNR value, and three test functions lead to a total of 12 experimental configurations. For each configuration, 20 noise realizations were generated and tested. The full resolution problem was constructed using $N = 4096$ points. The downsamped resolutions were selected as $n \in \{16,32,\ldots,2048\}$ for a total of nine resolutions (eight values of $n$).
+Overall, two selections for the width of the Gaussian kernel, two selections 5 and 25 for SNR value, \comment{see \eqref{Eq_SNR}} and three test functions lead to a total of 12 experimental configurations. For each configuration, 20 noise realizations were generated and tested. The full resolution problem was constructed using $N = 4096$ points. The downsamped resolutions were selected as $n \in \{16,32,\ldots,2048\}$ for a total of nine resolutions (eight values of $n$).
 
 \subsection{Construction of noise}
 
@@ -395,7 +396,7 @@ The UPRE method requires knowledge of the variance $\SD^2$ of the noise vector $
 where $\regres$ is the regularized residual defined in the derivation of the UPRE method. Similarities between the GCV and UPRE methods are that both functionals are estimators of the predictive risk, and the regularization parameter $\regparam$ is chosen as the minimizers of these functionals.
 
 \subsection{Discrepancy Principle}
-As a start to a stochastic derivation of the discrepancy principle method (for a deterministic derivation, see [3]), consider the case where $\freg \approx \fdis$. In this case,
+As a start to a stochastic derivation of the discrepancy principle method (for a deterministic derivation, see \cite{Vogel:2002}), consider the case where $\freg \approx \fdis$. In this case,
 \[\regres = \kmat\freg - \gnoise \approx \kmat\fdis - \gnoise = \noise.\]
 with a direct consequence being that $\E((1/n)\|\regres\|^2) \approx \E((1/n)\|\noise\|^2) =\SD^2$. Thus the discrepancy principle is to choose $\regparam$ such that $(1/n)\|\regres\|^2 = \SD^2$.
 Implementation of this method requires finding a solution of $\D(\regparam) = 0$, where $\D(\regparam)$ is defined to be
@@ -437,11 +438,9 @@ The relative errors are smaller for an SNR of 25 as opposed to an SNR of 5, whic
 
 \section*{References}
 \begin{itemize}
-	\item[1] Boggess, A., \& Narcowich, F. J. (2009). \textit{A first course in wavelets with Fourier analysis} (2nd ed.). Hoboken, NJ: John Wiley \& Sons.
 	\item[2] Debnath, L., \& Mikusi\'{n}ski, P. (2005). \textit{Introduction to Hilbert spaces with applications} (3rd ed.). Elsevier Academic Press.
-	\item[3] Vogel, C. R. (2002). \textit{Computational methods for inverse problems} (Frontiers in applied mathematics). Philadelphia, PA: SIAM.
-	\item[4] Golub
 \end{itemize}
-
+\bibliographystyle{siam}
+\bibliography{Parameter-Estimation}
 
 \end{document}
