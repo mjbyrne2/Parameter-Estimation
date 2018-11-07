@@ -112,7 +112,14 @@ For approximations to $\gcon(x)$ at the same points that make up the equispaced 
 \[K_{ij} = \frac{1}{n}\exp\left(\frac{-(i - j)^2}{2\SD^2}\right).\]
 Note that taking the collocation and quadrature points as the same ensures that the matrix $\kmat$ is square. By changing the number of collocation points or the quadrature method can change $\kmat$ from square to rectangular. \par
 If the matrix $\kmat$ is nonsingular, then the solution to the inverse problem of \eqref{Eq_Dis} is $\fdis = \kmat^{-1}\gdis$. \comment{It is not sufficient that $\kmat$ is nonsingular it can be non singular and still there are problems - as you state in the following. But I think that you need to note that it is the ill-posedness of the system that creates the problems} As with many linear systems, however, direct matrix inversion is discouraged and usually impractical since the matrix $\kmat$ becomes increasingly ill-conditioned as the size of the system grows \cite{Vogel:2002}. Unfortunately, large systems are necessary to adequately approximate the continuous problem, and so other methods of solving for $\fdis$ must be considered. \par
-Another consequence of $\kmat$ being ill-conditioned relates to the accuracy of the vector $\gdis$. If $\gdis$ contains errors, as is often the case in practical applications, the errors are amplified during the multiplication $\kmat^{-1}\gdis$ since $\kmat$ is ill-conditioned and so the solution $\fdis$ will contain errors as well. \comment{This is where the ill-posedness comes in to the discussion, I think it is worth discussing the Picard condition and illustrating the impact with the singular value spectrum for the operator}For this consideration, the following system will be the assumed model throughout this report
+Before discussing the consequences of ill-conditioning, the concept of an well-posed problem will be introduced, which is due to Hadamard. Given a operator $A : \mathcal{H}_1 \rightarrow \mathcal{H}_2$, where $\mathcal{H}_1$ and $\mathcal{H}_1$ are Hilbert spaces, the equation $Af = g$ is said to be well-posed if
+\begin{enumerate}
+\item[(i)] for each $g \in \mathcal{H}_2$ there exists a solution $f \in \mathcal{H}_1$ to $Af = g$,
+\item[(ii)] the solution $f$ is unique, and
+\item[(iii)] if $Af_* = g_*$ and $Af = g$, then $f \rightarrow f_*$ whenever $g \rightarrow g_*$.
+\end{enumerate}
+In order, these conditions require that a solution exist, is unique, and is stable under perturbations in $g$. If one of these conditions is not met, then $Af = g$ is said to be an ill-posed problem. The discrete version $\kmat\fdis = \gdis$ of the problem in this report is ill-posed: singularity of $\kmat$ violates conditions (i) and (ii), and a poor condition number of nonsingular $\kmat$ violates condition (iii). This second case will now be discussed further.  \par 
+A primary consequence of $\kmat$ being ill-conditioned relates to the accuracy of the vector $\gdis$. If $\gdis$ contains errors, as is often the case in practical applications, the errors are amplified during the multiplication $\kmat^{-1}\gdis$ since $\kmat$ is ill-conditioned and so the solution $\fdis$ will contain errors as well. \comment{This is where the ill-posedness comes in to the discussion, I think it is worth discussing the Picard condition and illustrating the impact with the singular value spectrum for the operator}For this consideration, the following system will be the assumed model throughout this report
 \begin{equation}
 \gnoise = \kmat\fdis + \noise
 \end{equation}
@@ -435,11 +442,6 @@ Of the 12 experimental configurations, four are presented here, all of which per
 
 The relative errors are smaller for an SNR of 25 as opposed to an SNR of 5, which is to be expected since the variance in the noise is small for $\text{SNR} = 25$. Results pertaining to the Gaussian PSF of width 100 are poor compared to the results for the Gaussian PSF of width 200. In fact, the relative errors are exceedingly large for the width 100 Gaussian PSF; in Figure \ref{BothBoxes1D_F2_S05_W100_R20} there is an outlier with a relative error above 3. These outliers most likely arise from the difficulty in minimizing the often shallow graphs of the UPRE functionals. Figure \ref{BothBoxes1D_F2_S25_W200_R20} shows that the UPRE downsampling method performed the best for $SNR = 25$ and a Gaussian PSF of width 200. However, Figure \ref{BothBoxes1D_F2_S25_W200_R20} still shows numerous outliers, again which are probably a product of the functional minimization. 
 
-
-\section*{References}
-\begin{itemize}
-	\item[2] Debnath, L., \& Mikusi\'{n}ski, P. (2005). \textit{Introduction to Hilbert spaces with applications} (3rd ed.). Elsevier Academic Press.
-\end{itemize}
 \bibliographystyle{siam}
 \bibliography{Parameter-Estimation}
 

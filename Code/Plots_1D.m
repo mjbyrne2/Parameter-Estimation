@@ -154,7 +154,6 @@ legend({'Width = 50','Width = 100','Width = 200'})
 % This sections generates one plot called LLN_Plot.eps showing the effect
 % of vector length on sample variance. This plot demonstrates the Law of
 % Large Numbers.
-%
 
 clear
 
@@ -236,6 +235,19 @@ set(gca,'Fontsize',18)
 figfold = ['/Users/mjbyrne/Documents/Arizona State University/' ...
     'Parameter-Estimation/Figures/'];    % Specifies the Figures folder
 savefig(F,[figfold 'LLN_Plot.fig'],'compact')
+
+%% Discrete Picard condition
+% This section generates one plot illustrating the discrete Picard
+% condition. 
+
+load Data1D_F1_S05_W100_R20.mat
+
+F = figure('units','normalized','outerposition',[0 0 1 1]);
+
+figfold = ['/Users/mjbyrne/Documents/Arizona State University/' ...
+    'Parameter-Estimation/Figures/'];    % Specifies the Figures folder
+savefig(F,[figfold 'DPC' num2str(Fnum) '_S'...
+    num2str(SNR,'%02.f') '_W' num2str(width) '.fig'],'compact')
 
 %% Plot functions/data for first noise realization
 % This section generates one plot showing the functions (f and g pertaining
