@@ -243,11 +243,19 @@ savefig(F,[figfold 'LLN_Plot.fig'],'compact')
 load Data1D_F1_S05_W100_R20.mat
 
 F = figure('units','normalized','outerposition',[0 0 1 1]);
+g_noise_hat_shift = fftshift(g_noise_hat);
+semilogy(abs(g_noise_hat_shift(1:100)),'Linewidth',2)
+hold on
+plot(1:100,eta*ones(1,100),'Linewidth',2)
+grid on
+set(gca,'Fontsize',14)
+xlabel('Index')
+legend({'|g_{tilde hat}|',['\eta = ' num2str(eta)]},'FontSize',18)
 
 figfold = ['/Users/mjbyrne/Documents/Arizona State University/' ...
     'Parameter-Estimation/Figures/'];    % Specifies the Figures folder
-savefig(F,[figfold 'DPC' num2str(Fnum) '_S'...
-    num2str(SNR,'%02.f') '_W' num2str(width) '.fig'],'compact')
+% savefig(F,[figfold 'DPC' num2str(Fnum) '_S'...
+%     num2str(SNR,'%02.f') '_W' num2str(width) '.fig'],'compact')
 
 %% Plot functions/data for first noise realization
 % This section generates one plot showing the functions (f and g pertaining
