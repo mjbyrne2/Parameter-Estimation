@@ -391,6 +391,60 @@ savefig(F,[figfold 'GCVsolutions1D_F' num2str(Fnum) '_S'...
     num2str(SNR,'%02.f') '_W' num2str(width) '_R' num2str(R)...
     '.fig'],'compact')
 
+%% Plot of Lambdas and Relative Errors for MDP
+% This section generates one plot consisting of two box plots. The first
+% box plot shows the lambdas obtained by applying the downsampling 
+% parameter selection method. The second box plot shows the relative errors
+% between the test function and the regularized solutions across 
+% downsampling resolutions. 
+%
+% A workspace must be loaded before running this section.
+
+F = figure('units','normalized','outerposition',[0 0 1 1]);  % Full screen
+
+subplot(1,2,1)
+boxplot(mdp_lambda,M)
+xlabel('n')
+ylabel('Lambda')
+set(gca,'FontSize',16)
+
+subplot(1,2,2)
+boxplot(mdp_err,M)
+xlabel('n')
+ylabel('Relative error')
+set(gca,'FontSize',16)
+
+figfold = ['/Users/mjbyrne/Documents/Arizona State University/' ...
+    'Parameter-Estimation/Figures/'];    % Specifies the Figures folder
+savefig(F,[figfold 'BothBoxes1D_F' num2str(Fnum) '_S'...
+    num2str(SNR,'%02.f') '_W' num2str(width) '_R' num2str(R)...
+    '.fig'],'compact')
+
+%% Plot of Regularized Solutions (MDP)
+% This section generates one plot of the regularized solutions obtained by
+% applying the downsampling MDP parameter selection method.
+%
+% A workspace must be loaded before running this section.
+
+F = figure('units','normalized','outerposition',[0 0 1 1]);
+
+plot(repmat(t,length(M),1)',mdp_regf','-')   % Transpose for the sake of plotting
+hold on
+plot(t,f,'k','Linewidth',1.5)   % Original function f
+grid on
+
+legend({'N = 16','N = 32','N = 64','N = 128','N = 256','N = 512',...
+    'N = 1024','N = 2048','N = 4098','Original f'},'Location',...
+    'Southwest','Fontsize',18)
+xlabel('t')
+set(gca,'Fontsize',18)
+
+figfold = ['/Users/mjbyrne/Documents/Arizona State University/' ...
+    'Parameter-Estimation/Figures/'];    % Specifies the Figures folder
+savefig(F,[figfold 'MDPsolutions1D_F' num2str(Fnum) '_S'...
+    num2str(SNR,'%02.f') '_W' num2str(width) '_R' num2str(R)...
+    '.fig'],'compact')
+
 %% Effect of downsampling on sample variance
 % This section generates one boxplot showing the effect of downsampling on
 % sample variance. 

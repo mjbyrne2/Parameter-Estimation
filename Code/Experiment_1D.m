@@ -121,7 +121,7 @@ for j = 1:R
         
         [mdp_vectors(i,:),mdp_lambda(j,i)] = MDPparameter(gn_hat,...
             hn_hat,ones(1,length(gn)),eta,L,r);
-        mdp_lambda(j,i) = mdp_lambda(j,i)*sqrt(n/N);  % Scale the lambda
+        mdp_lambda(j,i) = mdp_lambda(j,i);  % Scale the lambda
         
         best_lambda(j,i) = optimalParameter(gn_hat,hn_hat,...
             ones(1,length(gn)),r,f_hat);
