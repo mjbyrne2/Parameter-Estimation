@@ -27,7 +27,7 @@ SNR = 5;   % Signal-to-noise ratio; default = 5
 width = 100; % Width parameter for Gaussian PSF; default = 200
 R = 20; % Number of noise realizations; default = 20
 
-Fnum = 3; % Test function number (see testFunction.m); default = 1
+Fnum = 1; % Test function number (see testFunction.m); default = 1
 
 %% Generation of data
 % In this section, the data used in the downsampling experiment is
@@ -41,8 +41,10 @@ f = testFunction('1D',Fnum);
 % Initialization of storage arrays:
 upre_lambda = zeros(R,length(M));
 gcv_lambda = zeros(R,length(M));
+mdp_lambda = zeros(R,length(M));
 upre_err = zeros(R,length(M));
 gcv_err = zeros(R,length(M));
+mdp_err = zeros(R,length(M));
 
 % Construction of vector discretizations:
 [g,h] = GaussianBlur_1D(t,f,width);
@@ -66,13 +68,16 @@ for j = 1:R
     % Initialization of arrays:
     upre_vectors = zeros(length(M),100);
     gcv_vectors = zeros(length(M),100);
+    mdp_vectors = zeros(length(M),100);
     best = zeros(length(M),100);
     best_lambda = zeros(size(M));
     upre_error = zeros(size(M));
     gcv_error = zeros(size(M));
+    mdp_error = zeros(size(M));
     best_error = zeros(size(M));
     upre_regf = zeros(length(M),N);
     gcv_regf = zeros(length(M),N);
+    mdp_regf = zeros(length(M),N);
     opt_regf = zeros(length(M),N);
 
     % For computing representative solutions with the finest sampling:
@@ -114,6 +119,10 @@ for j = 1:R
             hn_hat,ones(1,length(gn)),L,r);
         gcv_lambda(j,i) = gcv_lambda(j,i)*sqrt(n/N);  % Scale the lambda
         
+        [mdp_vectors(i,:),mdp_lambda(j,i)] = MDPparameter(gn_hat,...
+            hn_hat,ones(1,length(gn)),eta,L,r);
+        mdp_lambda(j,i) = mdp_lambda(j,i)*sqrt(n/N);  % Scale the lambda
+        
         best_lambda(j,i) = optimalParameter(gn_hat,hn_hat,...
             ones(1,length(gn)),r,f_hat);
     end
@@ -126,6 +135,10 @@ for j = 1:R
         gcv_regf(i,:) = N*real(ifft(ifftshift(...
             filterFactors(h_hatsol,gcv_lambda(j,i)).*g_noise_hat./...
             replaceZeros(h_hatsol,1))));
+        
+        mdp_regf(i,:) = N*real(ifft(ifftshift(...
+            filterFactors(h_hatsol,mdp_lambda(j,i)).*g_noise_hat./...
+            replaceZeros(h_hatsol,1))));
        
         opt_regf(i,:) = N*real(ifft(ifftshift(...
             filterFactors(h_hatsol,best_lambda(j,i)).*g_noise_hat./...
@@ -136,6 +149,9 @@ for j = 1:R
         
         gcv_error(i) = TikhRegErr(g_noise_hat,h_hatsol,...
             ones(1,length(g_noise_hat)),gcv_lambda(j,i),r,f_hat);
+        
+        mdp_error(i) = TikhRegErr(g_noise_hat,h_hatsol,...
+            ones(1,length(g_noise_hat)),mdp_lambda(j,i),r,f_hat);
         
         best_error(i) = TikhRegErr(g_noise_hat,h_hatsol,...
             ones(1,length(g_noise_hat)),best_lambda(j,i)*sqrt(n/N),r,f_hat);
@@ -153,6 +169,7 @@ for j = 1:R
     % Relative solution errors: 
     upre_err(j,:) = err(upre_regf,f)';
     gcv_err(j,:) = err(gcv_regf,f)';
+    mdp_err(j,:) = err(mdp_regf,f)';
 
 end
 
@@ -160,5 +177,15 @@ end
 clear i j k n
 
 % Save workspace:
-save(['Data1D_F' num2str(Fnum) '_S' num2str(SNR,'%02.f') '_W'... 
-    num2str(width) '_R' num2str(R) '.mat'])
+answer = questdlg('Would you like to save the data?',...
+    'Data storage','Yes','No','No');
+switch answer
+    case 'Yes'
+        name = ['Data1D_F' num2str(Fnum) '_S' num2str(SNR,'%02.f') '_W'... 
+            num2str(width) '_R' num2str(R) '.mat'];
+        clear answer
+        save(name)
+        disp(['Data saved in ' name '.'])
+    case 'No'
+        disp('The data has not been saved.')
+end
