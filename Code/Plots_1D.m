@@ -299,29 +299,42 @@ savefig(F,[figfold,figname],'compact')
 % parameter selection method. The second box plot shows the relative errors
 % between the test function and the regularized solutions across 
 % downsampling resolutions. 
-%
-% A workspace must be loaded before running this section.
 
-F = figure('units','normalized','outerposition',[0 0 1 1]);  % Full screen
+% A workspace must be loaded before running this section:
+dataname = loadData();
 
-subplot(1,2,1)
-boxplot(upre_lambda,M)
-xlabel('n')
-ylabel('Lambda')
-set(gca,'FontSize',16)
+if ~isequal(dataname,'None')
+    
+    load(dataname)
+    figname = ['UPRE_BothBoxes1D_F' num2str(Fnum) '_S'...
+        num2str(SNR,'%02.f') '_W' num2str(width) '_R' num2str(R)...
+        '.fig'];
+    
+    % Figure only created if the figure doesn't exist yet:
+    if exist(figname) == 0
+    
+        F = figure('units','normalized','outerposition',[0 0 1 1]);  % Full screen
 
-subplot(1,2,2)
-boxplot(upre_err,M)
-xlabel('n')
-ylabel('Relative error')
-set(gca,'FontSize',16)
+        subplot(1,2,1)
+        boxplot(upre_lambda,M)
+        xlabel('n')
+        ylabel('Lambda')
+        set(gca,'FontSize',16)
 
-figfold = ['/Users/mjbyrne/Documents/Arizona State University/' ...
-    'Parameter-Estimation/Figures/'];    % Specifies the Figures folder
-figname = ['UPRE_BothBoxes1D_F' num2str(Fnum) '_S'...
-    num2str(SNR,'%02.f') '_W' num2str(width) '_R' num2str(R)...
-    '.fig'];
-savefig(F,[figfold,figname],'compact')
+        subplot(1,2,2)
+        boxplot(upre_err,M)
+        xlabel('n')
+        ylabel('Relative error')
+        set(gca,'FontSize',16)
+
+        figfold = ['/Users/mjbyrne/Documents/Arizona State University/' ...
+            'Parameter-Estimation/Figures/'];    % Specifies the Figures folder
+        savefig(F,[figfold,figname],'compact')
+    else
+        disp([figname ' already exists.'])
+    end
+    
+end
 
 %% Plot of Regularized Solutions (UPRE)
 % This section generates one plot of the regularized solutions obtained by

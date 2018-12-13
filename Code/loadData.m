@@ -11,6 +11,7 @@ specs = questdlg('Would you like to load data?',...
 
 switch specs
     case 'No'
+        dataname = [];
         disp('No data has been loaded.')
     case 'Yes'
         prompt = {'Enter dimension (1D, 2D, or 3D):',...
@@ -28,7 +29,8 @@ switch specs
         
         % Check to see if the file exists
         if exist(dataname,'file') == 0  
-            disp('Error, no such data file exists yet.')
+            disp(['Error, no such data file exists yet: ' dataname])
+            dataname = 'None';  % Delete invalid data name
         end
         
 end
