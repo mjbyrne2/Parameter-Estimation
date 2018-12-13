@@ -28,9 +28,11 @@ xlabel('t')
 legend('Test Function 1','Test Function 2','Test Function 3','Location',...
     'Northeast')
 set(gca,'Fontsize',18)
+
 figfold = ['/Users/mjbyrne/Documents/Arizona State University/' ...
     'Parameter-Estimation/Figures/'];    % Specifies the Figures folder
-savefig(F,[figfold 'TestFunctions1D.fig'],'compact')
+figname = 'TestFunctions1D.fig';
+savefig(F,[figfold,figname],'compact')
 
 %% Gaussian Distributions
 % This section generates one plot called GaussianDistributions.eps showing
@@ -53,9 +55,11 @@ axis([t(1) t(end) 0 1])
 xlabel('t')
 ylabel('p(t)')
 set(gca,'Fontsize',18)
+
 figfold = ['/Users/mjbyrne/Documents/Arizona State University/' ...
     'Parameter-Estimation/Figures/'];    % Specifies the Figures folder
-savefig(F,[figfold 'GaussianDistributions.fig'],'compact')
+figname = 'GaussianDistributions.fig';
+savefig(F,[figfold,figname],'compact')
 
 %% Gaussian PSF and Extension
 % This section generates one plot showing a Gaussian PSF of width 100 on 
@@ -86,7 +90,8 @@ set(gca,'Fontsize',18)
 
 figfold = ['/Users/mjbyrne/Documents/Arizona State University/' ...
     'Parameter-Estimation/Figures/'];    % Specifies the Figures folder
-savefig(F,[figfold 'RegAndTroughGaussian.fig'],'compact')
+figname = 'RegAndTroughGaussian.fig';
+savefig(F,[figfold,figname],'compact')
 
 %% Test function, Gaussian PSF, and blurred function
 % This section generates three plots: one of the second test function f(t) 
@@ -128,7 +133,8 @@ set(gca,'Fontsize',16)
 
 figfold = ['/Users/mjbyrne/Documents/Arizona State University/' ...
     'Parameter-Estimation/Figures/'];    % Specifies the Figures folder
-savefig(F,[figfold 'FunctionKernelPlot.fig'],'compact')
+figname = 'FunctionKernelPlot.fig';
+savefig(F,[figfold,figname],'compact')
 
 %% Comparison of Gaussian PSF spectra
 % This section generates one plot illustrating the relationship between the
@@ -234,7 +240,8 @@ set(gca,'Fontsize',18)
 
 figfold = ['/Users/mjbyrne/Documents/Arizona State University/' ...
     'Parameter-Estimation/Figures/'];    % Specifies the Figures folder
-savefig(F,[figfold 'LLN_Plot.fig'],'compact')
+figname = 'LLN_Plot.fig';
+savefig(F,[figfold,figname],'compact')
 
 %% Discrete Picard condition
 % This section generates one plot illustrating the discrete Picard
@@ -254,8 +261,9 @@ legend({'|g_{tilde hat}|',['\eta = ' num2str(eta)]},'FontSize',18)
 
 figfold = ['/Users/mjbyrne/Documents/Arizona State University/' ...
     'Parameter-Estimation/Figures/'];    % Specifies the Figures folder
-% savefig(F,[figfold 'DPC' num2str(Fnum) '_S'...
-%     num2str(SNR,'%02.f') '_W' num2str(width) '.fig'],'compact')
+figname = ['DPC' num2str(Fnum) '_S'...
+    num2str(SNR,'%02.f') '_W' num2str(width) '.fig'];
+% savefig(F,[figfold,figname],'compact')
 
 %% Plot functions/data for first noise realization
 % This section generates one plot showing the functions (f and g pertaining
@@ -278,10 +286,12 @@ ylim(y_scale)
 set(gca,'Fontsize',14)
 legend({['Test function #' num2str(Fnum)],'g','g with noise'},...
     'FontSize',18)
+
 figfold = ['/Users/mjbyrne/Documents/Arizona State University/' ...
     'Parameter-Estimation/Figures/'];    % Specifies the Figures folder
-savefig(F,[figfold 'NoisePlot1D_F' num2str(Fnum) '_S'...
-    num2str(SNR,'%02.f') '_W' num2str(width) '.fig'],'compact')
+figname = ['NoisePlot1D_F' num2str(Fnum) '_S'...
+    num2str(SNR,'%02.f') '_W' num2str(width) '.fig'];
+savefig(F,[figfold,figname],'compact')
 
 %% Plot of Lambdas and Relative Errors for UPRE
 % This section generates one plot consisting of two box plots. The first
@@ -308,9 +318,10 @@ set(gca,'FontSize',16)
 
 figfold = ['/Users/mjbyrne/Documents/Arizona State University/' ...
     'Parameter-Estimation/Figures/'];    % Specifies the Figures folder
-savefig(F,[figfold 'BothBoxes1D_F' num2str(Fnum) '_S'...
+figname = ['UPRE_BothBoxes1D_F' num2str(Fnum) '_S'...
     num2str(SNR,'%02.f') '_W' num2str(width) '_R' num2str(R)...
-    '.fig'],'compact')
+    '.fig'];
+savefig(F,[figfold,figname],'compact')
 
 %% Plot of Regularized Solutions (UPRE)
 % This section generates one plot of the regularized solutions obtained by
@@ -333,9 +344,10 @@ set(gca,'Fontsize',18)
 
 figfold = ['/Users/mjbyrne/Documents/Arizona State University/' ...
     'Parameter-Estimation/Figures/'];    % Specifies the Figures folder
-savefig(F,[figfold 'UPREsolutions1D_F' num2str(Fnum) '_S'...
+figname = ['UPREsolutions1D_F' num2str(Fnum) '_S'...
     num2str(SNR,'%02.f') '_W' num2str(width) '_R' num2str(R)...
-    '.fig'],'compact')
+    '.fig'];
+savefig(F,[figfold,figname],'compact')
 
 %% Plot of Lambdas and Relative Errors for GCV
 % This section generates one plot consisting of two box plots. The first
@@ -360,11 +372,12 @@ xlabel('n')
 ylabel('Relative error')
 set(gca,'FontSize',16)
 
-% figfold = ['/Users/mjbyrne/Documents/Arizona State University/' ...
-%     'Parameter-Estimation/Figures/'];    % Specifies the Figures folder
-% savefig(F,[figfold 'BothBoxes1D_F' num2str(Fnum) '_S'...
-%     num2str(SNR,'%02.f') '_W' num2str(width) '_R' num2str(R)...
-%     '.fig'],'compact')
+figfold = ['/Users/mjbyrne/Documents/Arizona State University/' ...
+    'Parameter-Estimation/Figures/'];    % Specifies the Figures folder
+figname = ['GCV_BothBoxes1D_F' num2str(Fnum) '_S'...
+    num2str(SNR,'%02.f') '_W' num2str(width) '_R' num2str(R)...
+    '.fig'];
+savefig(F,[figfold,figname],'compact')
 
 %% Plot of Regularized Solutions (GCV)
 % This section generates one plot of the regularized solutions obtained by
@@ -387,9 +400,10 @@ set(gca,'Fontsize',18)
 
 figfold = ['/Users/mjbyrne/Documents/Arizona State University/' ...
     'Parameter-Estimation/Figures/'];    % Specifies the Figures folder
-savefig(F,[figfold 'GCVsolutions1D_F' num2str(Fnum) '_S'...
+figname = ['GCVsolutions1D_F' num2str(Fnum) '_S'...
     num2str(SNR,'%02.f') '_W' num2str(width) '_R' num2str(R)...
-    '.fig'],'compact')
+    '.fig'];
+savefig(F,[figfold,figname],'compact')
 
 %% Plot of Lambdas and Relative Errors for MDP
 % This section generates one plot consisting of two box plots. The first
@@ -416,9 +430,10 @@ set(gca,'FontSize',16)
 
 figfold = ['/Users/mjbyrne/Documents/Arizona State University/' ...
     'Parameter-Estimation/Figures/'];    % Specifies the Figures folder
-savefig(F,[figfold 'BothBoxes1D_F' num2str(Fnum) '_S'...
+figname = ['MDP_BothBoxes1D_F' num2str(Fnum) '_S'...
     num2str(SNR,'%02.f') '_W' num2str(width) '_R' num2str(R)...
-    '.fig'],'compact')
+    '.fig'];
+savefig(F,[figfold,figname],'compact')
 
 %% Plot of Regularized Solutions (MDP)
 % This section generates one plot of the regularized solutions obtained by
@@ -441,9 +456,10 @@ set(gca,'Fontsize',18)
 
 figfold = ['/Users/mjbyrne/Documents/Arizona State University/' ...
     'Parameter-Estimation/Figures/'];    % Specifies the Figures folder
-savefig(F,[figfold 'MDPsolutions1D_F' num2str(Fnum) '_S'...
+figname = ['MDPsolutions1D_F' num2str(Fnum) '_S'...
     num2str(SNR,'%02.f') '_W' num2str(width) '_R' num2str(R)...
-    '.fig'],'compact')
+    '.fig']; 
+savefig(F,[figfold,figname],'compact')
 
 %% Effect of downsampling on sample variance
 % This section generates one boxplot showing the effect of downsampling on
@@ -470,6 +486,6 @@ set(gca,'FontSize',18)
 
 figfold = ['/Users/mjbyrne/Documents/Arizona State University/' ...
     'Parameter-Estimation/Figures/'];    % Specifies the Figures folder
-savefig(F,[figfold 'VarPlot1D_F' num2str(Fnum) '_S' num2str(SNR,'%02.f')...
-    '_W' num2str(width) '_R' num2str(R) '.fig'],'compact')
-
+figname = ['VarPlot1D_F' num2str(Fnum) '_S' num2str(SNR,'%02.f')...
+    '_W' num2str(width) '_R' num2str(R) '.fig'];
+savefig(F,[figfold,figname],'compact')
