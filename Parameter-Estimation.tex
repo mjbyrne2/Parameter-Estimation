@@ -232,7 +232,8 @@ F_{jk} = \frac{1}{\sqrt{n}}\exp\left(\frac{-2\pi{i(j-1)(k-1)}}{n}\right), \quad 
 with the benefit being that $F$ is a unitary matrix: $F^\ctrans{F} = FF^\ctrans = I$. The DFT of a vector $\mathbf{f}\in\mathbb{C}^n$ can now be expressed as $\widehat{\mathbf{f}} = \sqrt{n}F\mathbf{f}$. \par 
 As stated previously, a significant property of circulant matrices is that they are diagonalized by the DFT. Using the definition of the $n \times n$ unitary Fourier matrix $F$, the property can be stated as
 \[C = F^\ctrans\diag(\widehat{\mathbf{c}})F,\]
-where $C$ is any $n \times n$ circulant matrix and $\widehat{\mathbf{c}}$ is the DFT of the first row of $C$ (recall that the rows of a circulant matrix are circulant right shifts a single row vector of length $n$). The components of $\widehat{\mathbf{c}}$ and the columns of $F^\ctrans$ are the eigenvalues and eigenvectors, respectively, of $C$. For a proof of this property, see \cite{BoggessAlbert2001Afci}.
+where $C$ is any $n \times n$ circulant matrix and $\widehat{\mathbf{c}}$ is the DFT of the first row of $C$ (recall that the rows of a circulant matrix are circulant right shifts a single row vector of length $n$). The components of $\widehat{\mathbf{c}}$ and the columns of $F^\ctrans$ are the eigenvalues and eigenvectors, respectively, of $C$. For a proof of this property, see \cite{BoggessAlbert2001Afci}. \par
+Now the properties of the DFT will be connected with the SVD of a circulant matrix, which will be the basis for the experiment design in the following section.
 
 \section{Experiment design}
 
