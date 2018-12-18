@@ -62,7 +62,7 @@
 \begin{document}
 \maketitle
 
-\section{Introduction}
+\section{Introduction} \label{Introduction}
 Given functions $\gcon(x)$ and $\kcon(x,t)$, a \textit{Fredholm equation of the first kind} can be stated as,
 \begin{equation}
 	\gcon(x) = \int_a^b \kcon(x,t)\fcon(t)\:dt
@@ -122,20 +122,25 @@ In order, these conditions require that a solution exist, is unique, and is stab
 A primary consequence of $\kmat$ being ill-conditioned relates to the accuracy of the vector $\gdis$. If $\gdis$ contains errors, as is often the case in practical applications, the errors are amplified during the multiplication $\kmat^{-1}\gdis$ since $\kmat$ is ill-conditioned and so the solution $\fdis$ will contain errors as well. \comment{This is where the ill-posedness comes in to the discussion, I think it is worth discussing the Picard condition and illustrating the impact with the singular value spectrum for the operator}For this consideration, the following system will be the assumed model throughout this report
 \begin{equation}
 \gnoise = \kmat\fdis + \noise
+\label{Eq_DisNoise}
 \end{equation}
 where $\noise$ is a vector that represents any errors in $\gdis$ (this is equivalent to the statement $\gnoise = \gdis + \noise$). For further simplicity, assume that $\noise \sim \mathcal{N}(\bm{0},\SD^2I)$, where $\bm{0}$ is the zero vector of length $n$ and $I$ is the $n \times n$ identity matrix. In other words, the error vector $\noise$ is an $n$-dimension Gaussian random variable with mean zero and variance $\SD^2$. \par
 Since direct matrix inversion is not practical, and at times not even possible since $\kmat$ can be non-invertible, a singular value decomposition (SVD) of $\kmat$ can be an alternative. Assuming $\kmat$ is a real $m \times n$ matrix of rank $r$, the SVD of $\kmat$ is
 \[\kmat = U\Sigma{V^\trans}\]
 where the $m \times r$ matrix $U$ and the $r \times n$ matrix $V$ have orthogonal columns and $\Sigma$ is a $r \times r$ diagonal matrix. The diagonal elements of $\Sigma$ are the singular values of $\kmat$, denoted $\singular_i$ and satisfying $\singular_1 \geq \singular_2 \geq \ldots \geq \singular_r > 0$ where $r$ is the rank of $\kmat$. The columns of $U$ will be denoted $\LSV_i$ and $\RSV_i$ will denote the columns of $V$; these vectors are known as the left and right singular vectors of $\kmat$, respectively. A matrix of complex values has a SVD as well, the only difference being that the transpose is replaced with conjugate transpose. \par
-By using $\kmat^{-1} = V\Sigma^{-1}U^\trans$ when $\kmat$ is invertible, the product $\kmat^{-1}\gnoise$ is :
-\[\kmat^{-1}\gnoise = \kmat^{-1}\left(\kmat\fdis + \noise\right) = \fdis + \kmat^{-1}\noise = \fdis + V\Sigma^{-1}{U^\trans}\noise = \fdis + \sum_{i = 1}^n \frac{{\LSV^\trans_i}\noise}{\singular_i}\RSV_i\]
+By using $\kmat^{-1} = V\Sigma^{-1}U^\trans$ when $\kmat$ is invertible, the product $\kmat^{-1}\gnoise$ is
+\begin{equation}
+\kmat^{-1}\gnoise = \kmat^{-1}\left(\kmat\fdis + \noise\right) = \fdis + \kmat^{-1}\noise = \fdis + V\Sigma^{-1}{U^\trans}\noise = \fdis + \sum_{i = 1}^n \frac{{\LSV^\trans_i}\noise}{\singular_i}\RSV_i. 
+\label{Eq_InvProd}
+\end{equation}
 Even if $\kmat$ is singular, the matrix can be expressed as $\kmat = U{\Sigma^+}{V^\trans}$, where $\Sigma^+$ contains some zero singular values. In this case, the solution can still be obtained by only summing the terms that correspond to the nonzero singular values. For small $\singular_i$, the terms in the above sum are numerically unstable and must be modified. A common approach is to multiply the terms in the sum by \textit{filter functions} $\filt$ that depend upon $\singular_i$ and a \textit{regularization parameter} $\regparam$. By doing so, an approximate solution is obtained:
 \begin{equation}
 \fdis(\regparam) = \sum_{i = 1}^n \frac{\filt(\regparam,\singular_i){\LSV^\trans_i}\gnoise}{\singular_i}\RSV_i
+\label{Eq_ApproxSol}
 \end{equation}
 The most desired property of the filter functions is that $\filt(\singular_i)/\singular_i \approx 1$  for large values of $\singular_i$ and $\filt(\singular_i)/\singular_i \approx 0$ are small values of $\singular_i$. A brief overview of common filter functions will now be provided.
 
-\subsection{Filter functions}
+\subsection{Filter functions} \label{Filer functions}
 Perhaps the simplest filter function is
 \[\filt(\regparam,\singular_i) = \begin{cases}
 1, & \singular_i^2 > \regparam \\
@@ -160,7 +165,7 @@ The kernel $k$ and function $f$ considered in the introduction will be retained 
 
 \section{Analytical tools}
 
-\subsection{Discrete convolution}
+\subsection{Discrete convolution} \label{Discrete convolution}
 As described in the Introduction, the operation of convolution arises in various settings pertaining to inverse problems. Discrete convolution will first be described  in a general setting, followed by specific instances and connections to the numerical experiments conducted in this report. \par
 Let $(x_n)$ and $(y_n)$ be sequences of complex numbers indexed by the integers. Then the discrete convolution of $(x_n)$ and $(y_n)$, denoted $x*y$, is defined by
 \[(x*y)_n = \sum_{k=-\infty}^\infty x_{n-k}y_k.\]
@@ -176,7 +181,7 @@ As an illustrative example, let $\mathbf{x} = [1,2,3]$ and $\mathbf{y} = [4,5,6,
 where $(x*y)_2 = 4$ and $(x*y)_8 = 21$. \par 
 Since the numerical experiments for this report are conducted in MATLAB, a brief remark regarding discrete convolutions in MATLAB will be given. If the built-in function \texttt{conv} is used to evaluate the discrete convolution of row vectors $\mathbf{x}$ and $\mathbf{y}$ described in the previous example, the output is the row vector $[4,13,28,34,32,21]$.  All vectors in MATLAB have a starting index of 1, and the vector resulting from the convolution is no different: the component 4 has an index of 1. While this seems to conflict with \eqref{Eq_ConResults} (recall that $s_{x*y} = 2$, not 1), from a practical standpoint there is little reason for concern; usually the components themselves are of interest and not the indexing of the bi-infinite sequence. If one wants to keep track of the indexing as the convolution is evaluated, index vectors can be defined for $\mathbf{x}$ and $\mathbf{y}$ and \eqref{Eq_ConResults} can be applied to obtain an index vector for the resulting convolution. See \cite{BoggessAlbert2001Afci} for an explicit MATLAB example. \par 
 
-\subsection{Circulant matrices}
+\subsection{Circulant matrices} \label{Circulant matrices}
 In the previous subsection, the discrete convolution and some of its variants were discussed. In this subsection, matrices will be discussed that have connections to discrete convolutions and other concepts. \par 
 The first type of matrix to be discussed is a \textit{Toeplitz matrix}. A matrix $T$ is called a Toeplitz matrix if it is constant along each diagonal. The following matrices are examples of Toeplitz matrices.
 \[A = \begin{bmatrix}
@@ -211,7 +216,7 @@ If a matrix $C$ has the property that each row is the circular right shift of th
 \end{bmatrix}\] 
 is a circulant matrix generated by circular right shifts of the vector $[1,2,3,4]$. However, circulant matrices are often defined to be square, a convention that will be adopted in this report. Therefore every reference to circulant matrices from this point will be under the assumption that circulant matrices are square. A significant property of circulant matrices is that they are diagonalized by the discrete Fourier transform, a property that will be discussed in the following section.
 
-\subsection{The Discrete Fourier Transform}
+\subsection{The Discrete Fourier Transform} \label{The Discrete Fourier Transform}
 The \textit{discrete Fourier transform} (DFT) is a mapping $\mathcal{F}:\mathbb{C}^n \rightarrow \mathbb{C}^n$ defined by
 \begin{equation}
 \mathcal{F}(\mathbf{f})_j = \sum_{k=1}^{n} f_{k}\exp\left(\frac{-2\pi{ij}(k-1)}{n}\right), \quad \mathbf{f}\in\mathbb{C}^n,
@@ -231,11 +236,28 @@ F_{jk} = \frac{1}{\sqrt{n}}\exp\left(\frac{-2\pi{i(j-1)(k-1)}}{n}\right), \quad 
 \end{equation}
 with the benefit being that $F$ is a unitary matrix: $F^\ctrans{F} = FF^\ctrans = I$. The DFT of a vector $\mathbf{f}\in\mathbb{C}^n$ can now be expressed as $\widehat{\mathbf{f}} = \sqrt{n}F\mathbf{f}$. \par 
 As stated previously, a significant property of circulant matrices is that they are diagonalized by the DFT. Using the definition of the $n \times n$ unitary Fourier matrix $F$, the property can be stated as
-\[C = F^\ctrans\diag(\widehat{\mathbf{c}})F,\]
+\begin{equation}
+C = F^\ctrans\diag(\widehat{\mathbf{c}})F,
+\label{Eq_CircDiag}
+\end{equation}
 where $C$ is any $n \times n$ circulant matrix and $\widehat{\mathbf{c}}$ is the DFT of the first row of $C$ (recall that the rows of a circulant matrix are circulant right shifts a single row vector of length $n$). The components of $\widehat{\mathbf{c}}$ and the columns of $F^\ctrans$ are the eigenvalues and eigenvectors, respectively, of $C$. For a proof of this property, see \cite{BoggessAlbert2001Afci}. \par
-Now the properties of the DFT will be connected with the SVD of a circulant matrix, which will be the basis for the experiment design in the following section.
+Now the properties of the DFT will be connected with the SVD of a circulant matrix, which will be the basis for the experiment design in the following section. Let $\fdis$ and $\kdis$ be the $N$-point discretizations of functions $\fcon$ and $\kcon$ on some interval $[a,b]$. Then the cyclic convolution $\gdis = \kdis * \fdis$ can be computed as a matrix-vector product by constructing an $N \times N$ circulant matrix $\kmat$ from $\kdis$. This construction is carried out by setting the first row of $\kmat$ to be $\kdis$, and each subsequent row to be a circular right shift of the preceding row (see \ref{Circulant matrices}). In MATLAB, the command \texttt{toeplitz([h(1) fliplr(h(2:end))], h)} constructs the matrix $\kmat$. Then $\gdis = \kmat\fdis$, and after the addition of noise the equation \eqref{Eq_DisNoise} is obtained. Then by using the property \eqref{Eq_CircDiag} with the $N \times N$ unitary Fourier matrix $F$ and assuming that $\kmat$ is invertible, 
+\begin{equation}
+\kmat^{-1}\gnoise = \fdis + (F^*\diag(\widehat{\kdis})F)^{-1}\noise = \fdis + F^*\diag(\widehat{\kdis})^{-1}F\noise = \fdis + \sum_{i = 1}^n \frac{\widehat{\noise}_i}{\widehat{\kdis}_i}[F^*]_i
+\label{Eq_InvProdDFT}
+\end{equation}
+where $\widehat{\noise}_i$ and $\widehat{\kdis}_i$ are the $i$th Fourier coefficients of $\noise$ and $\kdis$, respectively, and $[F^*]_i$ is the $i$th column of the matrix $F^*$. Analogous to \eqref{Eq_InvProd}, instabilities can arise if $\widehat{\kdis}_i$ is small. By introducing filter factors to reduce possible instability, an approximate solution
+\begin{equation}
+\fdis(\regparam) = \sum_{i = 1}^n \frac{\filt(\regparam,\widehat{\kdis}_i)\widehat{\gnoise}_i}{\widehat{\kdis}_i}[F^*]_i
+\label{Eq_ApproxSolDFT}
+\end{equation}
+can be obtained analogous to \eqref{Eq_ApproxSol}. 
+Since $F^*$ is a matrix representation of the inverse DFT, the approximate solution can be rewritten as
+\[\fdis(\regparam) = F^* \frac{\filt(\regparam,\widehat{\kdis})\widehat{\gnoise}}{\widehat{\kdis}}.\]
+Here $\filt(\regparam,\widehat{\kdis})\widehat{\gnoise}/{\widehat{\kdis}}$ is a vector where the operations of multiplication and division are performed component-wise. This representation is useful for making a connection with the MATLAB implementation. \par 
+While the connection between lines \eqref{Eq_InvProdDFT} and \eqref{Eq_ApproxSolDFT} and the SVD have been noted in regard to the structure of the terms and equations, a complete connection can be made if another property about $\kmat$ is assumed. Until this point $\kmat$ is assumed to be an invertible $N \times N$ circulant matrix formed from a vector $\kdis$. If $\kmat$ is also assumed to be symmetric, then the SVD of $\kmat$ is the same as the diagonalization by the unitary DFT matrix $F$ and the singular values of $\kmat$ are also the eigenvalues. 
 
-\section{Experiment design}
+\section{Experiment design} \label{Experiment design}
 
 For the numerical experiments, three test functions are considered. While these functions vary in the extent of smoothness, all three functions are selected to be 1-periodic and the interval selected is [0,1], though this interval can be mapped to any other interval using a linear transformation. In general, the transformation from $[a,b]$ to $[c,d]$ such that $a \mapsto c$ and $b \mapsto d$ has a point-slope representation
 \[y - c = \left(\frac{d-c}{b-a}\right)(x - a)\]
@@ -264,7 +286,7 @@ The interval $[0,1]$ is discretized as equispaced points $0, 1/N, 2/N, \ldots, (
 With the discretizations $\fdis$ and $\kdis$ determined, the discretization $\gdis$ of $\gcon(t)$ can be evaluation using either a circular convolution or a linear convolution with appropriate vector padding. Ultimately the vectors $\fdis$, $\kdis$, and $\gdis$ are vector discretizations of $\fcon$, $\kcon$, and $\gcon$, respectively. \par
 Overall, two selections for the width of the Gaussian kernel, two selections 5 and 25 for SNR value, \comment{see \eqref{Eq_SNR}} and three test functions lead to a total of 12 experimental configurations. For each configuration, 20 noise realizations were generated and tested. The full resolution problem was constructed using $N = 4096$ points. The downsamped resolutions were selected as $n \in \{16,32,\ldots,2048\}$ for a total of nine resolutions (eight values of $n$).
 
-\subsection{Construction of noise}
+\subsection{Construction of noise} \label{Construction of noise}
 
 Though the definition of SNR varies, the definition chosen for this investigation is
 \begin{equation}
@@ -413,7 +435,7 @@ Implementation of this method requires finding a solution of $\D(\regparam) = 0$
 \end{equation}
 In other words, implementation of the discepancy principle method is equivalent to finding a root of $\D(\regparam)$.
 
-\section{Numerical Results}
+\section{Numerical Results} \label{Numerical results}
 
 \subsection{The UPRE method}
 Of the 12 experimental configurations, four are presented here, all of which pertain to the second test function. The UPRE method was used to select regularization parameters at each resolution. These parameters were used to construct regularized solutions of the full problem on $N = 4096$ points.
@@ -442,7 +464,7 @@ Of the 12 experimental configurations, four are presented here, all of which per
 
 The relative errors are smaller for an SNR of 25 as opposed to an SNR of 5, which is to be expected since the variance in the noise is small for $\text{SNR} = 25$. Results pertaining to the Gaussian PSF of width 100 are poor compared to the results for the Gaussian PSF of width 200. In fact, the relative errors are exceedingly large for the width 100 Gaussian PSF; in Figure \ref{BothBoxes1D_F2_S05_W100_R20} there is an outlier with a relative error above 3. These outliers most likely arise from the difficulty in minimizing the often shallow graphs of the UPRE functionals. Figure \ref{BothBoxes1D_F2_S25_W200_R20} shows that the UPRE downsampling method performed the best for $SNR = 25$ and a Gaussian PSF of width 200. However, Figure \ref{BothBoxes1D_F2_S25_W200_R20} still shows numerous outliers, again which are probably a product of the functional minimization. 
 
-\subsection{The GCV method}
+\subsection{The GCV method} 
 Of the 12 experimental configurations, four are presented here, all of which pertain to the second test function. The GCV method was used to select regularization parameters at each resolution. These parameters were used to construct regularized solutions of the full problem on $N = 4096$ points.
 
 \subsection{The MDP method}
