@@ -152,9 +152,13 @@ which actually corresponds to the solution obtained using a truncated singular v
 A less simple filter function is
 \begin{equation}
 \filt(\regparam,\singular_i)  = \frac{\singular_i^2}{\singular_i^2 + \regparam}
+\label{Eq_TikFilt}
 \end{equation}
 which is known as the Tikhonov filter function. For large values of $\regparam$, the above fraction is close to zero and for small values of $\regparam$, the fraction is near to unity. The use of the Tikhonov filter function to generate an approximate solution is known as \textit{Tikhonov regularization}; the obtained solution is
-\[\fdis(\regparam) = \sum_{i = 1}^n \frac{\singular_i^2}{\singular_i^2 + \regparam}\frac{{\LSV^\trans_i}\gnoise}{\singular_i}\RSV_i = \sum_{i = 1}^n \frac{\singular_i{\LSV^\trans_i}\gnoise}{\singular_i^2 + \regparam}\RSV_i \]
+\begin{equation}
+\fdis(\regparam) = \sum_{i = 1}^n \filt(\regparam,\singular_i)\frac{{\LSV^\trans_i}\gnoise}{\singular_i}\RSV_i = \sum_{i = 1}^n \frac{\singular_i{\LSV^\trans_i}\gnoise}{\singular_i^2 + \regparam}\RSV_i.
+\label{Eq_TikSol}
+\end{equation}
 An alternative representation of the above Tikhonov solution is
 \begin{equation}
 \fdis(\regparam) = \arg\min_{\fdis \in \mathbb{R}^n} \|\kmat\fdis - \gnoise\|^2 + \regparam\|\fdis\|^2
@@ -393,7 +397,7 @@ Since $\noise \sim \mathcal{N}(0,\SD^2)$, the expected values of $\noise_i$ and 
 
 \noindent Applying the Trace Lemma to the expression for predictive risk yields
 \[\E\left(\frac{1}{n}\|\PE\|^2\right) = \frac{1}{n}\E\left(\|(\A-I)\kmat\fdis + \A\noise\|^2\right) = \frac{1}{n}\|(\A-I)\kmat\fdis\|^2 + \frac{\SD^2}{n}\trace({\A^\trans}\A).\]
-If Tikhonov regularization is used, then the influence matrix $\A$ is $\kmat(\kmat^\trans\kmat + \regparam{I})^{-1}\kmat^\trans$. The matrix $(\kmat^\trans\kmat + \regparam{I})^{-1}$ is symmetric as a result of $\kmat^\trans\kmat$ and $\regparam{I}$ being individually symmetric, and thus the corresponding influence matrix $\A$ is symmetric.  With a symmetric matrix $\A$, the expected value of predictive risk is simplified to
+If Tikhonov regularization is used, then the influence matrix $\A$ is $\kmat(\kmat^\ctrans\kmat + \regparam{I})^{-1}\kmat^\ctrans$. The matrix $(\kmat^\ctrans\kmat + \regparam{I})^{-1}$ is symmetric as a result of $\kmat^\ctrans\kmat$ and $\regparam{I}$ being individually symmetric, and thus the corresponding influence matrix $\A$ is symmetric.  With a symmetric matrix $\A$, the expected value of predictive risk is simplified to
 \begin{equation}
 \label{Eq_PR}
 \E\left(\frac{1}{n}\|\PE\|^2\right) = \frac{1}{n}\|(\A-I)\kmat\fdis\|^2 + \frac{\SD^2}{n}\trace(\A^2).
@@ -414,7 +418,34 @@ The UPRE is defined to be
 \label{Eq_UPRE}
 \U(\regparam) = \frac{1}{n}\|\regres\|^2 + \frac{2\SD^2}{n}\trace(\A) - \SD^2
 \end{equation}
-and the UPRE method is to pick $\regparam$ as the minimizer of $\U(\regparam)$.
+and the UPRE method is to pick $\regparam$ as the minimizer of $\U(\regparam)$. \par 
+Since the DFT a the primary tool in the experiment, a spectral form of the UPRE function (one that involves DFT's) is desirable, as are spectral forms of the GCV and discrepancy principal functions in the following subsections. To derive a spectral form of \eqref{Eq_UPRE}, first recall that for Tikhonov regularization, $\A = \kmat(\kmat^\ctrans\kmat + \regparam{I})^{-1}\kmat^\ctrans$. From \eqref{Eq_CircDiag}, $\kmat = F^*\Delta{F}$, where $\Delta = \diag(\widehat{\kdis})$. This combined with letting $I = F^*IF$ then gives
+\begin{align*}
+\A &= \kmat(\kmat^\ctrans\kmat + \regparam{I})^{-1}\kmat^\ctrans \\
+&= F^*\Delta{F}((F^*\Delta{F})^\ctrans F^*\Delta{F} + \regparam{F^*IF})^{-1}(F^*\Delta{F})^\ctrans \\
+&= F^*\Delta{F}(F^*\Delta^\ctrans\Delta{F} + \regparam{F^*IF})^{-1}F^*\Delta^\ctrans{F} \\
+&= F^*\Delta{F}(F^*(\Delta^\ctrans\Delta + \regparam{I})F)^{-1}F^*\Delta^\ctrans{F} \\
+&= F^*\Delta{F}F^*(\Delta^\ctrans\Delta + \regparam{I})^{-1}FF^*\Delta^\ctrans{F} \\
+&= F^*\Delta(\Delta^\ctrans\Delta + \regparam{I})^{-1}\Delta^\ctrans{F}.
+\end{align*}
+The matrix $\Delta(\Delta^\ctrans\Delta + \regparam{I})^{-1}\Delta^\ctrans$ is diagonal, and so its diagonal entries are the the eigenvalues of $\A$. Then by definition of $\Delta$, the $i$th diagonal entry of $\Delta(\Delta^\ctrans\Delta + \regparam{I})^{-1}\Delta^\ctrans$ is $|\widehat{\kdis}_i|^2/(|\widehat{\kdis}_i|^2 + \regparam)$. Therefore,
+\begin{equation}
+\trace(\A) = \sum_{i = -n/2}^{(n/2)-1} \frac{|\widehat{\kdis}_i|^2}{|\widehat{\kdis}_i|^2 + \regparam} = \sum_{i = -n/2}^{(n/2)-1} \filt(\regparam,|\widehat{\kdis}_i|)
+\label{Eq_TraceUPRE}
+\end{equation}
+where $\filt$ is the Tikhonov filter function \eqref{Eq_TikFilt}. \par
+Next, the definition of $\regres$ gives
+\[\frac{1}{n}\|\regres\|^2 = \frac{1}{n}\|\kmat\freg - \gnoise\|^2 = \sum_{i = -n/2}^{(n/2)-1} |\widehat{\kdis}_i\widehat{(\freg)}_i - \widehat{\gnoise}_i|^2.\]
+and \eqref{Eq_TikSol} then produces
+\begin{equation}
+\frac{1}{n}\|\regres\|^2 = \sum_{i = -n/2}^{(n/2)-1} |\filt(\regparam,|\widehat{\kdis}_i|)\widehat{\gnoise}_i - \widehat{\gnoise}_i|^2 = \sum_{i = -n/2}^{(n/2)-1} |\widehat{\gnoise}_i|^2(1 - \filt(\regparam,|\widehat{\kdis}_i|))^2.
+\label{Eq_RegResNorm}
+\end{equation}
+Combining \eqref{Eq_TraceUPRE} and \eqref{Eq_RegResNorm} produces the spectral from of the UPRE function:
+\begin{equation}
+\U(\regparam) = \sum_{i = -n/2}^{(n/2)-1} |\widehat{\gnoise}_i|^2(1 - \filt(\regparam,|\widehat{\kdis}_i|))^2 + \frac{2\SD^2}{n}\sum_{i = -n/2}^{(n/2)-1} \filt(\regparam,|\widehat{\kdis}_i|) - \SD^2.
+\label{Eq_SpectralUPRE}
+\end{equation}
 
 \subsection{Generalized Cross Validation}
 The UPRE method requires knowledge of the variance $\SD^2$ of the noise vector $\noise$. In contrast, the generalized cross validation (GCV) method does not require knowledge of $\SD^2$. The GCV functional is
@@ -422,7 +453,17 @@ The UPRE method requires knowledge of the variance $\SD^2$ of the noise vector $
 \label{Eq_GCV}
 \GCV(\regparam) = \frac{\frac{1}{n}\|\regres\|^2}{\left[\frac{1}{n}\trace(I-\A)\right]^2},
 \end{equation}
-where $\regres$ is the regularized residual defined in the derivation of the UPRE method. Similarities between the GCV and UPRE methods are that both functionals are estimators of the predictive risk, and the regularization parameter $\regparam$ is chosen as the minimizers of these functionals.
+where $\regres$ is the regularized residual defined in the derivation of the UPRE method. Similarities between the GCV and UPRE methods are that both functionals are estimators of the predictive risk, and the regularization parameter $\regparam$ is chosen as the minimizers of these functionals. \par 
+By the linearity of the trace operator, $\trace(I-\A) = \trace(I)-\trace(\A) = n - \trace(\A)$. Then by \eqref{Eq_TraceUPRE},
+\begin{equation}
+\trace(I-\A) = n - \sum_{i = -n/2}^{(n/2)-1} \filt(\regparam,|\widehat{\kdis}_i|) = \sum_{i = -n/2}^{(n/2)-1} 1 - \filt(\regparam,|\widehat{\kdis}_i|).
+\label{Eq_TraceGCV}
+\end{equation}
+Substituting \eqref{Eq_RegResNorm} and \eqref{Eq_TraceGCV} into \eqref{Eq_GCV} produces the spectral form of the GCV function:
+\begin{equation}
+\GCV(\regparam) = \frac{\sum_{i = -n/2}^{(n/2)-1} |\widehat{\gnoise}_i|^2(1 - \filt(\regparam,|\widehat{\kdis}_i|))^2}{(\frac{1}{n}\sum_{i = -n/2}^{(n/2)-1} 1 - \filt(\regparam,|\widehat{\kdis}_i|))^2} = \frac{n^2\sum_{i = -n/2}^{(n/2)-1} |\widehat{\gnoise}_i|^2(1 - \filt(\regparam,|\widehat{\kdis}_i|))^2}{(\sum_{i = -n/2}^{(n/2)-1} 1 - \filt(\regparam,|\widehat{\kdis}_i|))^2}.
+\label{Eq_SpectralGCV}
+\end{equation}
 
 \subsection{Discrepancy Principle}
 As a start to a stochastic derivation of the discrepancy principle method (for a deterministic derivation, see \cite{Vogel:2002}), consider the case where $\freg \approx \fdis$. In this case,
