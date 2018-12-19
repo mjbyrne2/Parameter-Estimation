@@ -46,7 +46,7 @@
 \newcommand{\U}{U}	% UPRE functional
 
 % GCV derivation notation:
-\newcommand{\GCV}{GCV}	% GCV functional
+\newcommand{\GCV}{G}	% GCV functional
 
 % Discrepancy principle derivation notation:
 \newcommand{\D}{D}	% Discrepancy principle functional
@@ -419,7 +419,7 @@ The UPRE is defined to be
 \U(\regparam) = \frac{1}{n}\|\regres\|^2 + \frac{2\SD^2}{n}\trace(\A) - \SD^2
 \end{equation}
 and the UPRE method is to pick $\regparam$ as the minimizer of $\U(\regparam)$. \par 
-Since the DFT a the primary tool in the experiment, a spectral form of the UPRE function (one that involves DFT's) is desirable, as are spectral forms of the GCV and discrepancy principal functions in the following subsections. To derive a spectral form of \eqref{Eq_UPRE}, first recall that for Tikhonov regularization, $\A = \kmat(\kmat^\ctrans\kmat + \regparam{I})^{-1}\kmat^\ctrans$. From \eqref{Eq_CircDiag}, $\kmat = F^*\Delta{F}$, where $\Delta = \diag(\widehat{\kdis})$. This combined with letting $I = F^*IF$ then gives
+Since the DFT is a the primary tool in the experiment, a spectral form of the UPRE function (one that involves DFT's) is desirable, as are spectral forms of the GCV and discrepancy principal functions in the following subsections. To derive a spectral form of \eqref{Eq_UPRE}, first recall that for Tikhonov regularization, $\A = \kmat(\kmat^\ctrans\kmat + \regparam{I})^{-1}\kmat^\ctrans$. From \eqref{Eq_CircDiag}, $\kmat = F^*\Delta{F}$, where $\Delta = \diag(\widehat{\kdis})$. This combined with letting $I = F^*IF$ then gives
 \begin{align*}
 \A &= \kmat(\kmat^\ctrans\kmat + \regparam{I})^{-1}\kmat^\ctrans \\
 &= F^*\Delta{F}((F^*\Delta{F})^\ctrans F^*\Delta{F} + \regparam{F^*IF})^{-1}(F^*\Delta{F})^\ctrans \\
@@ -468,13 +468,16 @@ Substituting \eqref{Eq_RegResNorm} and \eqref{Eq_TraceGCV} into \eqref{Eq_GCV} p
 \subsection{Discrepancy Principle}
 As a start to a stochastic derivation of the discrepancy principle method (for a deterministic derivation, see \cite{Vogel:2002}), consider the case where $\freg \approx \fdis$. In this case,
 \[\regres = \kmat\freg - \gnoise \approx \kmat\fdis - \gnoise = \noise.\]
-with a direct consequence being that $\E((1/n)\|\regres\|^2) \approx \E((1/n)\|\noise\|^2) =\SD^2$. Thus the discrepancy principle is to choose $\regparam$ such that $(1/n)\|\regres\|^2 = \SD^2$.
+with a direct consequence being that $\E((1/n)\|\regres\|^2) \approx \E((1/n)\|\noise\|^2) =\SD^2$. Thus the discrepancy principle is to choose $\regparam$ such that $(1/n)\|\regres\|^2 = \SD^2$. A similarity exists between the discrepancy principle and the UPRE method in that the variance of the noise in the data must be known for both methods. \par 
 Implementation of this method requires finding a solution of $\D(\regparam) = 0$, where $\D(\regparam)$ is defined to be
 \begin{equation}
 \label{Eq_DP}
 \D(\regparam) = \frac{1}{n}\|\regres\|^2 - \SD^2.
 \end{equation}
-In other words, implementation of the discepancy principle method is equivalent to finding a root of $\D(\regparam)$.
+In other words, implementation of the discepancy principle method is equivalent to finding a root of $\D(\regparam)$. The spectral form of the discrepancy principle function is obtained directly from \eqref{Eq_RegResNorm} by substituting the regularized residual term:
+\begin{equation}
+\D(\regparam) = \sum_{i = -n/2}^{(n/2)-1} |\widehat{\gnoise}_i|^2(1 - \filt(\regparam,|\widehat{\kdis}_i|))^2 - \SD^2.
+\end{equation}
 
 \section{Numerical Results} \label{Numerical results}
 
@@ -503,7 +506,7 @@ Of the 12 experimental configurations, four are presented here, all of which per
 \label{BothBoxes1D_F2_S25_W200_R20}
 \end{figure}
 
-The relative errors are smaller for an SNR of 25 as opposed to an SNR of 5, which is to be expected since the variance in the noise is small for $\text{SNR} = 25$. Results pertaining to the Gaussian PSF of width 100 are poor compared to the results for the Gaussian PSF of width 200. In fact, the relative errors are exceedingly large for the width 100 Gaussian PSF; in Figure \ref{BothBoxes1D_F2_S05_W100_R20} there is an outlier with a relative error above 3. These outliers most likely arise from the difficulty in minimizing the often shallow graphs of the UPRE functionals. Figure \ref{BothBoxes1D_F2_S25_W200_R20} shows that the UPRE downsampling method performed the best for $SNR = 25$ and a Gaussian PSF of width 200. However, Figure \ref{BothBoxes1D_F2_S25_W200_R20} still shows numerous outliers, again which are probably a product of the functional minimization. 
+The relative errors are smaller for an SNR of 25 as opposed to an SNR of 5, which is to be expected since the variance in the noise is small for $\text{SNR} = 25$. Results pertaining to the Gaussian PSF of width 100 are poor compared to the results for the Gaussian PSF of width 200. In fact, the relative errors are exceedingly large for the width 100 Gaussian PSF; in Figure \ref{BothBoxes1D_F2_S05_W100_R20} there is an outlier with a relative error above 3. These outliers most likely arise from the difficulty in minimizing the often shallow graphs of the UPRE functionals. Figure \ref{BothBoxes1D_F2_S25_W200_R20} shows that the UPRE downsampling method performed the best for $\text{SNR} = 25$ and a Gaussian PSF of width 200. However, Figure \ref{BothBoxes1D_F2_S25_W200_R20} still shows numerous outliers, again which are probably a product of the functional minimization. 
 
 \subsection{The GCV method} 
 Of the 12 experimental configurations, four are presented here, all of which pertain to the second test function. The GCV method was used to select regularization parameters at each resolution. These parameters were used to construct regularized solutions of the full problem on $N = 4096$ points.
