@@ -13,7 +13,6 @@
 % See UPRE_Test_B3.m as a template.
 %
 
-
 % Fixed set-up:
 seed = RandStream('mt19937ar','Seed',53);   % Generate random seed
 M = 2.^(4:12); % Downsampling resolutions
@@ -22,19 +21,47 @@ N = 4096; % Number of points in the finest sampling
 t = linspace(0,1,N+1);
 t = t(1:end-1); % Equispaced N-point discretization of the interval [0,1]
 
-% Variable set-up:
-SNR = 5;   % Signal-to-noise ratio; default = 5
-width = 100; % Width parameter for Gaussian PSF; default = 200
-R = 20; % Number of noise realizations; default = 20
+% Variable set-up (input from the user):
+prompt = {'Enter test function number (1, 2, or 3):',...
+            'Enter SNR:',...
+            'Enter width parameter of Gaussian kernel:',...
+            'Enter number of noise realizations (20 recommended):'};
+title = 'Input data specifications';
+specs = inputdlg(prompt,title);
 
-Fnum = 1; % Test function number (see testFunction.m); default = 1
+Fnum = specs{1}; % Test function number (see testFunction.m)
+SNR = specs{2};   % Signal-to-noise ratio
+width = specs{3}; % Width parameter for Gaussian PSF
+R = specs{4}; % Number of noise realizations
+
+% Create file name for data storage:
+specs{2} = num2str(str2double(specs{2}),'%02.f');
+specs{3} = num2str(str2double(specs{3}),'%03.f');
+specs{4} = num2str(str2double(specs{4}),'%02.f');
+dataname = ['Data1D_F',specs{1},'_S',specs{2},'_W',...
+    specs{3},'_R',specs{4},'.mat'];
+
+clear specs prompt title
+
+% Check if the data already exists:
+if exist(dataname,'file') ~= 0
+    answer = questdlg(['The data for the specified configuration already exists and is stored in '...
+        dataname ', do you want to proceed? If Yes is selected, the script will run and the user will be asked if the regenerated data is to be stored.'], ...
+	'Data already exists','No');    % No is the default
+    % Handle response
+    switch answer
+        case 'Yes'
+            disp('Data is being generated...')
+        otherwise
+            disp('The script has been aborted.')
+            clear
+            return
+    end
+end
 
 %% Generation of data
 % In this section, the data used in the downsampling experiment is
-% generated using the set-up above. If a workspace of data already exists,
-% uncomment and run the first line only.
-
-% load Experiment_1D.m
+% generated using the set-up above. 
 
 f = testFunction('1D',Fnum);
 
@@ -178,14 +205,12 @@ clear i j k n
 
 % Save workspace:
 answer = questdlg('Would you like to save the data?',...
-    'Data storage','Yes','No','No');
+    'Data storage','Yes','No','No');    % No is the default
 switch answer
     case 'Yes'
-        name = ['Data1D_F' num2str(Fnum) '_S' num2str(SNR,'%02.f') '_W'... 
-            num2str(width) '_R' num2str(R) '.mat'];
         clear answer
-        save(name)
-        disp(['Data saved in ' name '.'])
-    case 'No'
+        save(dataname)
+        disp(['Data saved in ' dataname '.'])
+    otherwise
         disp('The data has not been saved.')
 end
