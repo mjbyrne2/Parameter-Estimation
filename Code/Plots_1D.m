@@ -140,21 +140,45 @@ savefig(F,[figfold,figname],'compact')
 % This section generates one plot illustrating the relationship between the
 % width of Gaussian PSF's and their spectra.
 
-width = [50, 100, 200];
-H = zeros(length(width),N);
-H_hat = H;
+N = 4096;
+width = [50,100,200];   % Width parameters for Gaussian PSF
+K = zeros(N,N,length(width));
+khats = zeros(N,length(width));
+SVs = zeros(N,length(width));
+dt = 1/N;
+i = 1:N;
+c = ceil(N/2);  % Center is chosen to be about 1/2
 for j = 1:length(width)
-    [~,H(j,:)] = GaussianBlur_1D(t,f,width(j));
-    H_hat(j,:) = sort(abs(fftshift(fft(H(j,:)))),'descend');
+    k = exp(-width(j)*(dt*(i-c)).^2); % Gaussian PSF
+    k = k/sum(abs(k));  %   Normalization
+    k = fftshift(k);    % Shift to periodic extension on [0,1]
+    khats(:,j) = fft(k);
+    K(:,:,j) = toeplitz([k(1) fliplr(k(2:end))],k);
+    SVs(:,j) = svd(K(:,:,j));   % Singular values
 end
 
-figure('units','normalized','outerposition',[0 0 1 1])
-subplot(1,2,1)
-plot(repmat(t,length(width),1)',H','Linewidth',1.5)
-subplot(1,2,2)
-semilogy(repmat(1:N,length(width),1)',(H_hat(:,1:N))','--',...
-    'Linewidth',2)
-legend({'Width = 50','Width = 100','Width = 200'})
+F = figure('units','normalized','outerposition',[0 0 1 1]);
+
+subplot(1,3,1)
+semilogy(abs(khats(1:100,:)))
+legend({'Width = 50','Width = 100','Width = 200'},'Location','East')
+xlabel('Index')
+title('|khat_i|')
+set(gca,'Fontsize',14)
+
+subplot(1,3,2)
+semilogy(SVs(1:100,:))
+legend({'Width = 50','Width = 100','Width = 200'},'Location','East')
+xlabel('Index')
+title('\sigma_i')
+set(gca,'Fontsize',14)
+
+subplot(1,3,3)
+plot(abs(SVs(1:100,:)-abs(khats(1:100,:)))./SVs(1:100,:))
+legend({'Width = 50','Width = 100','Width = 200'},'Location','East')
+xlabel('Index')
+title('|\sigma_i - |khat_i||/\sigma_i')
+set(gca,'Fontsize',14)
 
 %% Law of Large Numbers
 % This sections generates one plot called LLN_Plot.eps showing the effect

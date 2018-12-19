@@ -29,10 +29,10 @@ prompt = {'Enter test function number (1, 2, or 3):',...
 title = 'Input data specifications';
 specs = inputdlg(prompt,title);
 
-Fnum = specs{1}; % Test function number (see testFunction.m)
-SNR = specs{2};   % Signal-to-noise ratio
-width = specs{3}; % Width parameter for Gaussian PSF
-R = specs{4}; % Number of noise realizations
+Fnum = str2double(specs{1}); % Test function number (see testFunction.m)
+SNR = str2double(specs{2});   % Signal-to-noise ratio
+width = str2double(specs{3}); % Width parameter for Gaussian PSF
+R = str2double(specs{4}); % Number of noise realizations
 
 % Create file name for data storage:
 specs{2} = num2str(str2double(specs{2}),'%02.f');
@@ -48,6 +48,7 @@ if exist(dataname,'file') ~= 0
     answer = questdlg(['The data for the specified configuration already exists and is stored in '...
         dataname ', do you want to proceed? If Yes is selected, the script will run and the user will be asked if the regenerated data is to be stored.'], ...
 	'Data already exists','No');    % No is the default
+
     % Handle response
     switch answer
         case 'Yes'
@@ -57,6 +58,8 @@ if exist(dataname,'file') ~= 0
             clear
             return
     end
+else
+    disp('Data is being generated...')
 end
 
 %% Generation of data
