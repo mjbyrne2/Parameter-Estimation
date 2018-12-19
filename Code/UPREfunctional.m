@@ -14,8 +14,8 @@ for i = 1:length(L)
     filtFact = (abs(operatorSpec).^2)./(abs(operatorSpec).^2 + ...
         (L(i)^2)*(abs(smoothingSpec).^2));
     filtFact([1:ind,N-ind:end]) = 0;    % Truncate filter factors
-    u(i) = sum(abs(dataSpec).^2.*(1-filtFact).^2) + ...
-        2*(variance/N)*sum(filtFact); %;- variance;
+    u(i) = sum((abs(dataSpec).^2).*((1-filtFact).^2)) + ...
+        (2*(variance/N)*sum(filtFact)); % - variance
 end
 
 end
