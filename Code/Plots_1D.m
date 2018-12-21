@@ -271,23 +271,33 @@ savefig(F,[figfold,figname],'compact')
 % This section generates one plot illustrating the discrete Picard
 % condition. 
 
-load Data1D_F1_S05_W100_R20.mat
+load Data1D_F2_S15_W200_R20.mat
 
-F = figure('units','normalized','outerposition',[0 0 1 1]);
-g_noise_hat_shift = fftshift(g_noise_hat);
-semilogy(abs(g_noise_hat_shift(1:100)),'Linewidth',2)
+figure('units','normalized','outerposition',[0 0 1 1])
+
+[~,ind] = sort(abs(h_hat(1:2048)),'descend');
+n = 50;    % Number of terms to display in the plot
+
+subplot(1,2,1)
+semilogy(1:n,abs(h_hat(ind(1:n))),...
+    1:n,abs(g_noise_hat(ind(1:n))),...
+    1:n,abs(g_noise_hat(ind(1:n)))./abs(h_hat(ind(1:n))),'Linewidth',2)
 hold on
-plot(1:100,eta*ones(1,100),'Linewidth',2)
-grid on
-set(gca,'Fontsize',14)
+plot(1:n,var(g_noise-g)*ones(1,n),'--')
 xlabel('Index')
-legend({'|g_{tilde hat}|',['\eta = ' num2str(eta)]},'FontSize',18)
+legend({'$|\hat{k}|$','$|\hat{\tilde{g}}|$',...
+    '$|\hat{\tilde{g}}|/|\hat{k}|$','$\textrm{Var}(\eta)$'},...
+    'Fontsize',18,'Location','Northwest','Interpreter','latex')
+set(gca,'Fontsize',16)
 
-figfold = ['/Users/mjbyrne/Documents/Arizona State University/' ...
-    'Parameter-Estimation/Figures/'];    % Specifies the Figures folder
-figname = ['DPC' num2str(Fnum) '_S'...
-    num2str(SNR,'%02.f') '_W' num2str(width) '.fig'];
-% savefig(F,[figfold,figname],'compact')
+subplot(1,2,2)
+semilogy(1:n,abs(g_noise_hat(ind(1:n))),'Linewidth',2)
+hold on
+plot(1:n,(var(g_noise-g))*ones(1,n),'--')
+xlabel('Index')
+legend({'$|\hat{\tilde{g}}|$','$\textrm{Var}(\eta)$'},...
+    'Fontsize',18,'Location','Northwest','Interpreter','latex')
+set(gca,'Fontsize',16)
 
 %% Plot functions/data for first noise realization
 % This section generates one plot showing the functions (f and g pertaining
