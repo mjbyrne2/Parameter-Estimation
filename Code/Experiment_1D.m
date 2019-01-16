@@ -95,16 +95,19 @@ for j = 1:R
 
     g_noise = g + noise(j,:);
 
-    % Initialization of arrays:
+    % Initialization of storage arrays:
     upre_vectors = zeros(length(M),100);
     gcv_vectors = zeros(length(M),100);
     mdp_vectors = zeros(length(M),100);
+    
     best = zeros(length(M),100);
     best_lambda = zeros(size(M));
+    
     upre_error = zeros(size(M));
     gcv_error = zeros(size(M));
     mdp_error = zeros(size(M));
     best_error = zeros(size(M));
+    
     upre_regf = zeros(length(M),N);
     gcv_regf = zeros(length(M),N);
     mdp_regf = zeros(length(M),N);
@@ -202,6 +205,10 @@ for j = 1:R
     mdp_err(j,:) = err(mdp_regf,f)';
 
 end
+
+% Implementation of summed version of UPRE:
+gSigma_hat = (R*g_hat) + fftshift(fft(sum(noise))/N);
+[upre_V,upre_Lam] = UPREparameter(gSigma_hat,hn_hat,ones(1,N),R*eta,L,r);
 
 % Clear variables that don't need to be saved:
 clear i j k n
