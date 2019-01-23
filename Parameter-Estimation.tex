@@ -169,12 +169,12 @@ An alternative representation of the above Tikhonov solution is
 \end{equation}
 where $D$ is the matrix representation of a linear operator. The term $\|D\fdis\|^2$ is commonly called the penalty function \cite{Vogel:2002}. The representation \eqref{Eq_TikSol} follows from selecting $D$ to be $I$, the $n \times n$ identity matrix.
 
-The kernel $k$ and function $f$ considered in the introduction will be retained for the numerical examples included in this report.
+The kernel $k$ and function $f$ considered in Section \ref{Introduction} will be retained for the numerical examples included in this report.
 
-\section{Analytical tools}
+\section{Analytical tools} \label{Analytical tools}
 
 \subsection{Discrete convolution} \label{Discrete convolution}
-As described in the Introduction, the operation of convolution arises in various settings pertaining to inverse problems. Discrete convolution will first be described  in a general setting, followed by specific instances and connections to the numerical experiments conducted in this report. \par
+As described in the Section \ref{Introduction}, the operation of convolution arises in various settings pertaining to inverse problems. Discrete convolution will first be described  in a general setting, followed by specific instances and connections to the numerical experiments conducted in this report. \par
 Let $(x_n)$ and $(y_n)$ be sequences of complex numbers indexed by the integers. Then the discrete convolution of $(x_n)$ and $(y_n)$, denoted $x*y$, is defined by
 \[(x*y)_n = \sum_{k=-\infty}^\infty x_{n-k}y_k.\]
 The series in the definition of discrete convolution is bi-infinite, meaning that the discrete convolution might not be well-defined for any two arbitrary sequences. For example, if $x_n = y_n = 1$ for all $n \in \mathbb{Z}$, then the series defining $(x*y)_n$ is $\sum_{k=-\infty}^\infty 1$, which does not converge. In various cases, however, the discrete convolution is well-defined. These cases include sequences having only finitely-many nonzero terms and sequences in $\ell^1$. (In fact, the set of sequences having finitely-many nonzero terms is a linear subspace of $\ell^1$).  \par 
@@ -190,7 +190,7 @@ where $(x*y)_2 = 4$ and $(x*y)_8 = 21$. \par
 Since the numerical experiments for this report are conducted in MATLAB, a brief remark regarding discrete convolutions in MATLAB will be given. If the built-in function \texttt{conv} is used to evaluate the discrete convolution of row vectors $\mathbf{x}$ and $\mathbf{y}$ described in the previous example, the output is the row vector $[4,13,28,34,32,21]$.  All vectors in MATLAB have a starting index of 1, and the vector resulting from the convolution is no different: the component 4 has an index of 1. While this seems to conflict with \eqref{Eq_ConResults} (recall that $s_{x*y} = 2$, not 1), from a practical standpoint there is little reason for concern; usually the components themselves are of interest and not the indexing of the bi-infinite sequence. If one wants to keep track of the indexing as the convolution is evaluated, index vectors can be defined for $\mathbf{x}$ and $\mathbf{y}$ and \eqref{Eq_ConResults} can be applied to obtain an index vector for the resulting convolution. See \cite{BoggessAlbert2001Afci} for an explicit MATLAB example. \par 
 
 \subsection{Circulant matrices} \label{Circulant matrices}
-In the previous subsection, the discrete convolution and some of its variants were discussed. In this subsection, matrices will be discussed that have connections to discrete convolutions and other concepts. \par 
+In Section \ref{Discrete convolution}, the discrete convolution and some of its variants were discussed. In this section, matrices will be discussed that have connections to discrete convolutions and other concepts. \par 
 The first type of matrix to be discussed is a \textit{Toeplitz matrix}. A matrix $T$ is called a Toeplitz matrix if it is constant along each diagonal. The following matrices are examples of Toeplitz matrices.
 \[A = \begin{bmatrix}
 1 & 2 \\
@@ -206,7 +206,7 @@ C = \begin{bmatrix}
 2 & 1
 \end{bmatrix}.\]
 It is important to notice that by definition, Toeplitz matices need not be square. \par 
-The primary connection to be made in this report is that discrete convolutions can be described in the context of matrix-vector multiplication using Toeplitz matrices. For example, the discrete convolution of $\mathbf{x} = [1,2,3]$ and $\mathbf{y} = [4,5,6,7]$ from the previous subsection can be cast as a matrix-vector product by defining a matrix $X$ to be
+The primary connection to be made in this report is that discrete convolutions can be described in the context of matrix-vector multiplication using Toeplitz matrices. For example, the discrete convolution of $\mathbf{x} = [1,2,3]$ and $\mathbf{y} = [4,5,6,7]$ from Section \ref{Discrete convolution} can be cast as a matrix-vector product by defining a matrix $X$ to be
 \[X = \begin{bmatrix}
 1 & 0 & 0 & 0 \\
 2 & 1 & 0 & 0 \\
@@ -222,7 +222,7 @@ If a matrix $C$ has the property that each row is the circular right shift of th
 4 & 1 & 2 & 3 \\
 3 & 4 & 1 & 2
 \end{bmatrix}\] 
-is a circulant matrix generated by circular right shifts of the vector $[1,2,3,4]$. However, circulant matrices are often defined to be square, a convention that will be adopted in this report. Therefore every reference to circulant matrices from this point will be under the assumption that circulant matrices are square. A significant property of circulant matrices is that they are diagonalized by the discrete Fourier transform, a property that will be discussed in the following section.
+is a circulant matrix generated by circular right shifts of the vector $[1,2,3,4]$. However, circulant matrices are often defined to be square, a convention that will be adopted in this report. Therefore every reference to circulant matrices from this point will be under the assumption that circulant matrices are square. A significant property of circulant matrices is that they are diagonalized by the discrete Fourier transform, a property that will be discussed in Section \ref{The Discrete Fourier Transform}.
 
 \subsection{The Discrete Fourier Transform} \label{The Discrete Fourier Transform}
 The \textit{discrete Fourier transform} (DFT) is a mapping $\mathcal{F}:\mathbb{C}^n \rightarrow \mathbb{C}^n$ defined by
@@ -249,7 +249,7 @@ C = F^\ctrans\diag(\widehat{\mathbf{c}})F,
 \label{Eq_CircDiag}
 \end{equation}
 where $C$ is any $n \times n$ circulant matrix and $\widehat{\mathbf{c}}$ is the DFT of the first row of $C$ (recall that the rows of a circulant matrix are circulant right shifts a single row vector of length $n$). The components of $\widehat{\mathbf{c}}$ and the columns of $F^\ctrans$ are the eigenvalues and eigenvectors, respectively, of $C$. For a proof of this property, see \cite{BoggessAlbert2001Afci}. \par
-Now the properties of the DFT will be connected with the SVD of a circulant matrix, which will be the basis for the experiment design in the following section. Let $\fdis$ and $\kdis$ be the $N$-point discretizations of functions $\fcon$ and $\kcon$ on some interval $[a,b]$. Then the cyclic convolution $\gdis = \kdis * \fdis$ can be computed as a matrix-vector product by constructing an $N \times N$ circulant matrix $\kmat$ from $\kdis$. This construction is carried out by setting the first row of $\kmat$ to be $\kdis$, and each subsequent row to be a circular right shift of the preceding row (see \ref{Circulant matrices}). In MATLAB, the command \texttt{toeplitz([k(1) fliplr(k(2:end))], k)} constructs the matrix $\kmat$. Then $\gdis = \kmat\fdis$, and after the addition of noise the equation \eqref{Eq_DisNoise} is obtained. Then by using the property \eqref{Eq_CircDiag} with the $N \times N$ unitary Fourier matrix $F$ and assuming that $\kmat$ is invertible, 
+Now the properties of the DFT will be connected with the SVD of a circulant matrix, which will be the basis for the experiment design in Section \ref{Experiment design}. Let $\fdis$ and $\kdis$ be the $N$-point discretizations of functions $\fcon$ and $\kcon$ on some interval $[a,b]$. Then the cyclic convolution $\gdis = \kdis * \fdis$ can be computed as a matrix-vector product by constructing an $N \times N$ circulant matrix $\kmat$ from $\kdis$. This construction is carried out by setting the first row of $\kmat$ to be $\kdis$, and each subsequent row to be a circular right shift of the preceding row (see \ref{Circulant matrices}). In MATLAB, the command \texttt{toeplitz([k(1) fliplr(k(2:end))], k)} constructs the matrix $\kmat$. Then $\gdis = \kmat\fdis$, and after the addition of noise the equation \eqref{Eq_DisNoise} is obtained. Then by using the property \eqref{Eq_CircDiag} with the $N \times N$ unitary Fourier matrix $F$ and assuming that $\kmat$ is invertible, 
 \begin{equation}
 \kmat^{-1}\gnoise = \fdis + (F^*\diag(\widehat{\kdis})F)^{-1}\noise = \fdis + F^*\diag(\widehat{\kdis})^{-1}F\noise = \fdis + \sum_{i = 1}^n [F^*]_i\left(\frac{\widehat{\noise}_i}{\widehat{\kdis}_i}\right),
 \label{Eq_InvProdDFT}
@@ -365,9 +365,9 @@ While the variance of the noise is preserved across downsampling resolution in t
 \label{VarPlot1D}
 \end{figure}
 
-\section{Parameter estimation methods}
+\section{Parameter estimation methods} \label{Parameter estimation methods}
 
-\subsection{Unbiased Predictive Risk Estimator}
+\subsection{Unbiased Predictive Risk Estimator} \label{Unbiased Predictive Risk Estimator}
 The Unbiased Predictive Risk Estimator (UPRE) method is derived by considering the following quantity
 \[\PE := \kmat(\freg - \fdis)\]
 This quantity $\PE$ is known as the \textit{predictive error}, and is an alternative to solution error defined as $\freg - \fdis$. Given the above definition, the mean squared norm of the predictive error is
@@ -423,7 +423,7 @@ The UPRE is defined to be
 \U(\regparam) = \frac{1}{n}\|\regres\|^2 + \frac{2\SD^2}{n}\trace(\A) - \SD^2
 \end{equation}
 and the UPRE method is to pick $\regparam_{\text{UPRE}} = \argmin \U(\regparam)$. \par 
-Since the DFT is a the primary tool in the experiment, a spectral form of the UPRE function (one that involves DFT's) is desirable, as are spectral forms of the GCV and discrepancy principal functions in the following subsections. To derive a spectral form of \eqref{Eq_UPRE}, first recall that for Tikhonov regularization, $\A = \kmat(\kmat^\ctrans\kmat + \regparam{D^\ctrans}D)^{-1}\kmat^\ctrans$. From \eqref{Eq_CircDiag}, $\kmat = F^*\Delta{F}$, where $\Delta = \diag(\widehat{\kdis})$. If $D = F^\ctrans\Lambda{F}$ as well (with $\Lambda = \diag(\widehat{\ddis})$), then
+Since the DFT is a the primary tool in the experiment, a spectral form of the UPRE function (one that involves DFT's) is desirable, as are spectral forms of the GCV and discrepancy principal functions in Sections \ref{Generalized Cross Validation} and \ref{Discrepancy Principle}. To derive a spectral form of \eqref{Eq_UPRE}, first recall that for Tikhonov regularization, $\A = \kmat(\kmat^\ctrans\kmat + \regparam{D^\ctrans}D)^{-1}\kmat^\ctrans$. From \eqref{Eq_CircDiag}, $\kmat = F^*\Delta{F}$, where $\Delta = \diag(\widehat{\kdis})$. If $D = F^\ctrans\Lambda{F}$ as well (with $\Lambda = \diag(\widehat{\ddis})$), then
 \begin{align*}
 \A &= \kmat(\kmat^\ctrans\kmat + \regparam{D^\ctrans}D)^{-1}\kmat^\ctrans \\
 &= F^*\Delta{F}((F^*\Delta{F})^\ctrans F^\ctrans\Delta{F} + \regparam(F^\ctrans\Lambda{F})^\ctrans F^\ctrans\Lambda{F})^{-1}(F^*\Delta{F})^\ctrans \\
@@ -451,7 +451,7 @@ Combining \eqref{Eq_TraceUPRE} and \eqref{Eq_RegResNorm} produces the spectral f
 \label{Eq_SpectralUPRE}
 \end{equation}
 
-\subsection{Generalized Cross Validation}
+\subsection{Generalized Cross Validation} \label{Generalized Cross Validation}
 The UPRE method requires knowledge of the variance $\SD^2$ of the noise vector $\noise$. In contrast, the generalized cross validation (GCV) method does not require knowledge of $\SD^2$. The GCV functional is
 \begin{equation}
 \label{Eq_GCV}
@@ -469,7 +469,7 @@ Substituting \eqref{Eq_RegResNorm} and \eqref{Eq_TraceGCV} into \eqref{Eq_GCV} p
 \label{Eq_SpectralGCV}
 \end{equation}
 
-\subsection{Discrepancy Principle}
+\subsection{Discrepancy Principle} \label{Discrepancy Principle}
 As a start to a stochastic derivation of the discrepancy principle method (for a deterministic derivation, see \cite{Vogel:2002}), consider the case where $\freg \approx \fdis$. In this case,
 \[\regres = \kmat\freg - \gnoise \approx \kmat\fdis - \gnoise = \noise.\]
 with a direct consequence being that $\E((1/n)\|\regres\|^2) \approx \E((1/n)\|\noise\|^2) =\SD^2$. Thus the discrepancy principle is to choose $\regparam$ such that $(1/n)\|\regres\|^2 = \SD^2$. A similarity exists between the discrepancy principle and the UPRE method in that the variance of the noise in the data must be known for both methods. \par 
@@ -492,7 +492,7 @@ The value of $\delta$ can be adjusted as needed to obtain meaningful values for 
 
 \section{Numerical Results} \label{Numerical results}
 
-\subsection{The UPRE method}
+\subsection{The UPRE method} \label{The UPRE method}
 Of the 12 experimental configurations, four are presented here, all of which pertain to the second test function. The UPRE method was used to select regularization parameters at each resolution. These parameters were used to construct regularized solutions of the full problem on $N = 4096$ points.
 
 \begin{figure}
@@ -519,10 +519,10 @@ Of the 12 experimental configurations, four are presented here, all of which per
 
 The relative errors are smaller for an SNR of 25 as opposed to an SNR of 5, which is to be expected since the variance in the noise is small for $\text{SNR} = 25$. Results pertaining to the Gaussian PSF of width 100 are poor compared to the results for the Gaussian PSF of width 200. In fact, the relative errors are exceedingly large for the width 100 Gaussian PSF; in Figure \ref{BothBoxes1D_F2_S05_W100_R20} there is an outlier with a relative error above 3. These outliers most likely arise from the difficulty in minimizing the often shallow graphs of the UPRE functionals. Figure \ref{BothBoxes1D_F2_S25_W200_R20} shows that the UPRE downsampling method performed the best for $\text{SNR} = 25$ and a Gaussian PSF of width 200. However, Figure \ref{BothBoxes1D_F2_S25_W200_R20} still shows numerous outliers, again which are probably a product of the functional minimization. 
 
-\subsection{The GCV method} 
+\subsection{The GCV method} \label{The GCV method}
 Of the 12 experimental configurations, four are presented here, all of which pertain to the second test function. The GCV method was used to select regularization parameters at each resolution. These parameters were used to construct regularized solutions of the full problem on $N = 4096$ points.
 
-\subsection{The MDP method}
+\subsection{The MDP method} \label{The MDP method}
 Of the 12 experimental configurations, four are presented here, all of which pertain to the second test function. The GCV method was used to select regularization parameters at each resolution. These parameters were used to construct regularized solutions of the full problem on $N = 4096$ points.
 
 
