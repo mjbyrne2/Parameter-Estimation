@@ -137,12 +137,13 @@ By using $\kmat^{-1} = V\Sigma^{-1}U^\trans$ when $\kmat$ is invertible, the pro
 \kmat^{-1}\gnoise = \kmat^{-1}\left(\kmat\fdis + \noise\right) = \fdis + \kmat^{-1}\noise = \fdis + V\Sigma^{-1}{U^\trans}\noise = \fdis + \sum_{i = 1}^n \frac{{\LSV^\trans_i}\noise}{\singular_i}\RSV_i. 
 \label{Eq_InvProd}
 \end{equation}
-Even if $\kmat$ is singular, the matrix can still be expressed as $\kmat = U\Sigma{V^\trans}$, though $\Sigma$ will contain some zero singular values. More specifically, if $\singular_i \neq 0$ for only $i = 1,\ldots,r$ with $r < n$, then $\Sigma = \diag(\singular_1,\ldots,\singular_r,0,\ldots,0)$.  In this case, a solution can still be obtained by using the psuedoinverse $\kmat^+ = V{\Sigma^+}U^\trans$, where $\Sigma^+ = \diag(1/\singular_1,\ldots,1/\singular_r,0,\ldots,0)$, and the upper bound of summation in \eqref{Eq_InvProd} becomes $r$. In either the nonsingular or singular case for $\kmat$, however, the summands in \eqref{Eq_InvProd} are numerically unstable for small $\singular_i$ and must be modified. A common approach is to multiply the terms in the sum by \textit{filter functions} $\filt$ that depend upon $\singular_i$ and a \textit{regularization parameter} $\regparam$. By doing so, an approximate solution is obtained:
+Even if $\kmat$ is singular, the matrix can still be expressed as $\kmat = U\Sigma{V^\trans}$, though $\Sigma$ will contain some zero singular values. More specifically, if $\singular_i \neq 0$ for only $i = 1,\ldots,r$ with $r < n$, then $\Sigma = \diag(\singular_1,\ldots,\singular_r,0,\ldots,0)$.  In this case, a solution can still be obtained by using the psuedoinverse $\kmat^+ = V{\Sigma^+}U^\trans$, where $\Sigma^+ = \diag(1/\singular_1,\ldots,1/\singular_r,0,\ldots,0)$, and the upper bound of summation in \eqref{Eq_InvProd} becomes $r$. In either the nonsingular or singular case for $\kmat$, however, the summands in \eqref{Eq_InvProd} are numerically unstable for small $\singular_i$. For a visual representation of this instability, a Picard plot can be constructed. A Picard plot is a graph showing the magnitudes of $\LSV^\trans_i\noise/\singular_i$ in descending order. In this experiment, the discrete Fourier transform will be used to obtain solutions analogous to those obtained by \eqref{Eq_InvProd}. In Section \ref{The Discrete Fourier Transform} a Picard plot is provided that demonstrates the relationship between the noise, the width of the Gaussian blur, and the resulting numerical instabilities related to obtaining meaningful solutions. See \cite{Hansen1990} for more information on Picard plots and the associated discrete Picard condition. \par 
+A common approach to overcome numerical instabilities is to multiply the summands in \eqref{Eq_InvProd} by \textit{filter functions} $\filt$ that depend upon $\singular_i$ and a \textit{regularization parameter} $\regparam$. By doing so, an approximate solution is obtained:
 \begin{equation}
 \fdis(\regparam) = \sum_{i = 1}^n \RSV_i\filt(\regparam,\singular_i)\left(\frac{{\LSV^\trans_i}\gnoise}{\singular_i}\right).
 \label{Eq_ApproxSol}
 \end{equation}
-The most desired property of the filter functions is that $\filt(\singular_i)/\singular_i \approx 1$  for large values of $\singular_i$ and $\filt(\singular_i)/\singular_i \approx 0$ for small values of $\singular_i$. A brief overview of common filter functions will now be provided.
+The most desired property of the filter functions is that $\filt(\singular_i)/\singular_i \approx 1$  for large values of $\singular_i$ and $\filt(\singular_i)/\singular_i \approx 0$ for small values of $\singular_i$. A brief overview of common filter functions will now be provided. 
 
 \subsection{Filter functions} \label{Filer functions}
 Perhaps the simplest filter function is
@@ -167,9 +168,7 @@ An alternative representation of the above Tikhonov solution is
 \begin{equation}
 \fdis(\regparam) = \arg\min_{\fdis \in \mathbb{R}^n} \|\kmat\fdis - \gnoise\|^2 + \regparam\|D\fdis\|^2,
 \end{equation}
-where $D$ is the matrix representation of a linear operator. The term $\|D\fdis\|^2$ is commonly called the penalty function \cite{Vogel:2002}. The representation \eqref{Eq_TikSol} follows from selecting $D$ to be $I$, the $n \times n$ identity matrix.
-
-The kernel $k$ and function $f$ considered in Section \ref{Introduction} will be retained for the numerical examples included in this report.
+where $D$ is the matrix representation of a linear operator. The term $\|D\fdis\|^2$ is commonly called the penalty function \cite{Vogel:2002}. The representation \eqref{Eq_TikSol} follows from selecting $D$ to be $I$, the $n \times n$ identity matrix. The kernel $k(x,t)$ and function $f(t)$ considered in Section \ref{Introduction} will be retained for the numerical examples included in this report.
 
 \section{Analytical tools} \label{Analytical tools}
 
@@ -248,7 +247,7 @@ As stated previously, a significant property of circulant matrices is that they 
 C = F^\ctrans\diag(\widehat{\mathbf{c}})F,
 \label{Eq_CircDiag}
 \end{equation}
-where $C$ is any $n \times n$ circulant matrix and $\widehat{\mathbf{c}}$ is the DFT of the first row of $C$ (recall that the rows of a circulant matrix are circulant right shifts a single row vector of length $n$). The components of $\widehat{\mathbf{c}}$ and the columns of $F^\ctrans$ are the eigenvalues and eigenvectors, respectively, of $C$. For a proof of this property, see \cite{BoggessAlbert2001Afci}. \par
+where $C$ is any $n \times n$ circulant matrix and $\widehat{\mathbf{c}}$ is the DFT of the first row of $C$ (recall that the rows of a circulant matrix are circulant right shifts a single row vector of length $n$). The components of $\widehat{\mathbf{c}}$ and the columns of $F^\ctrans$ are the eigenvalues and eigenvectors, respectively, of $C$. For a proof of this property, see \cite{BoggessAlbert2001Afci} or \cite{Vogel:2002}. \par
 Now the properties of the DFT will be connected with the SVD of a circulant matrix, which will be the basis for the experiment design in Section \ref{Experiment design}. Let $\fdis$ and $\kdis$ be the $N$-point discretizations of functions $\fcon$ and $\kcon$ on some interval $[a,b]$. Then the cyclic convolution $\gdis = \kdis * \fdis$ can be computed as a matrix-vector product by constructing an $N \times N$ circulant matrix $\kmat$ from $\kdis$. This construction is carried out by setting the first row of $\kmat$ to be $\kdis$, and each subsequent row to be a circular right shift of the preceding row (see \ref{Circulant matrices}). In MATLAB, the command \texttt{toeplitz([k(1) fliplr(k(2:end))], k)} constructs the matrix $\kmat$. Then $\gdis = \kmat\fdis$, and after the addition of noise the equation \eqref{Eq_DisNoise} is obtained. Then by using the property \eqref{Eq_CircDiag} with the $N \times N$ unitary Fourier matrix $F$ and assuming that $\kmat$ is invertible, 
 \begin{equation}
 \kmat^{-1}\gnoise = \fdis + (F^*\diag(\widehat{\kdis})F)^{-1}\noise = \fdis + F^*\diag(\widehat{\kdis})^{-1}F\noise = \fdis + \sum_{i = 1}^n [F^*]_i\left(\frac{\widehat{\noise}_i}{\widehat{\kdis}_i}\right),
@@ -262,8 +261,15 @@ where $\widehat{\noise}_i$ and $\widehat{\kdis}_i$ are the $i$th Fourier coeffic
 can be obtained analogous to \eqref{Eq_ApproxSol}. 
 Since $F^*$ is a matrix representation of the inverse DFT, the approximate solution can be rewritten as
 \[\fdis(\regparam) = F^* \frac{\filt(\regparam,\widehat{\kdis})\widehat{\gnoise}}{\widehat{\kdis}}.\]
-Here $\filt(\regparam,\widehat{\kdis})\widehat{\gnoise}/{\widehat{\kdis}}$ is a vector where the operations of multiplication and division are performed component-wise. This representation is useful for making a connection with the MATLAB implementation. \par 
+Here $\filt(\regparam,\widehat{\kdis})\widehat{\gnoise}/{\widehat{\kdis}}$ is a vector where the operations of multiplication and division are performed component-wise. This representation is useful for making a connection with the MATLAB implementation. \par
+As mentioned in Section \ref{Introduction}, a Picard plot is often useful in analyzing the numerical instabilities of solutions obtained from either or \eqref{Eq_InvProd} or \eqref{Eq_InvProdDFT}. Figure \ref{PicardPlot} shows an example of a Picard plot. The terms $|\widehat{\kdis}_i|$ decrease down to machine precision, though the $|\widehat{\gnoise}_i|$ decrease but then level off just above the variance in the noise. As a result, the terms $|\widehat{\gnoise}_i|/|\widehat{\kdis}_i|$ only decrease so far and then begin increasing. The steady increase can produce a blow up of the approximate solution. While illustrating these relationships, a Picard plot is also useful in determining how to truncate the sum in \eqref{Eq_ApproxSolDFT} to avoid blow up in the solution. For the plot in Figure \ref{PicardPlot}, the sum in \eqref{Eq_ApproxSolDFT} should be truncated around index 8 to obtain a meaningful solution. \par 
 While the connection between lines \eqref{Eq_InvProdDFT} and \eqref{Eq_ApproxSolDFT} and the SVD have been noted in regard to the structure of the terms and equations, a complete connection can be made if another property about $\kmat$ is assumed. Until this point $\kmat$ is assumed to be an invertible $N \times N$ circulant matrix formed from a vector $\kdis$. If $\kmat$ is also assumed to be symmetric, then the SVD of $\kmat$ is the same as the diagonalization by the unitary DFT matrix $F$ and the singular values of $\kmat$ are also the eigenvalues. 
+
+\begin{figure}
+	\centerline{\includegraphics[scale = 0.45]{Figures/PicardPlot1D_F2_S15_W200.eps}}
+\caption{A Picard plot generated from the second test function, a Gaussian blur with a width of 200, and an SNR of 15. The terms $|\widehat{\gnoise}_i|/|\widehat{\kdis}_i|$ decrease until index 8, at which case the terms increase in magnitude. This is due to the fact that the $|\widehat{\kdis}_i|$ steadily decrease, while the $|\widehat{\gnoise}_i|$ level off just below the variance in the noise.}
+\label{PicardPlot}
+\end{figure}
 
 \section{Experiment design} \label{Experiment design}
 
@@ -283,7 +289,7 @@ which is also infinitely differentiable on $\mathbb{R}$; the third function was 
 \label{TestFunctions}
 \end{figure}
 
-The interval $[0,1]$ is discretized as equispaced points $0, 1/N, 2/N, \ldots, (N-1)/N$ for $N = 4096$. In other words, the interval is discretized as the vector $\tdis = [t_1,t_2,\ldots,t_N]$ with $t_i = (i-1)/N$. The selected test function $\fcon$ is then sampled at these points so that the discrete version $\fdis = [\fcon_1,\fcon_2,\ldots,\fcon_N]$ has elements $\fcon_i = \fcon(t_i)$. For the discrete version of $\kcon$ to be used in the convolution with $\fdis$, the periodic extension of $\kcon(t)$ is sampled in the same way that was used to construct $\fdis$. However, it is important to remember that unextended $\kcon(t)$ was assumed to be centered at the origin and compactly supported on the interval $[-1/2,1/2]$. As such, a plot of $\kdis$ will not resemble the traditional graph of a Gaussian bump but instead be a depiction of a trough between bumps in the periodic extension of $\kcon$; see Figure \ref{RegAndTroughGaussian}. In the experiments, the width of the Gaussian kernels are chosen to be 100 and 200.  \par
+The interval $[0,1]$ is discretized as equispaced points $0, 1/N, 2/N, \ldots, (N-1)/N$ for $N = 4096$. In other words, the interval is discretized as the vector $\tdis = [t_1,t_2,\ldots,t_N]$ with $t_i = (i-1)/N$. The selected test function $\fcon$ is then sampled at these points so that the discrete version $\fdis = [\fcon_1,\fcon_2,\ldots,\fcon_N]$ has elements $\fcon_i = \fcon(t_i)$. For the discrete version of $\kcon(x,t)$ to be used in the convolution with $\fdis$, the periodic extension of $\kcon(x,t)$ is sampled in the same way that was used to construct $\fdis$. However, it is important to remember that unextended $\kcon(x,t)$ was assumed to be centered at the origin and compactly supported on the interval $[-1/2,1/2]$. As such, a plot of $\kdis$ will not resemble the traditional graph of a Gaussian bump but instead be a depiction of a trough between bumps in the periodic extension of $\kcon$; see Figure \ref{RegAndTroughGaussian}. In the experiments, the width of the Gaussian kernels are chosen to be 100 and 200.  \par
 
 \begin{figure}
 	\centerline{\includegraphics[scale = 0.45]{Figures/RegAndTroughGaussian.eps}}
@@ -361,7 +367,7 @@ While the variance of the noise is preserved across downsampling resolution in t
 
 \begin{figure}
 \centerline{\includegraphics[scale=0.45]{Figures/VarPlot1D_F1_S05_W100_R20.eps}}
-\caption{The boxplots were generated from the sample variances of downsampled noise vectors. The theoretical variance of the noise was set to 0.0327, which is indicated by the horizontal dotted line. This figure illustrates that as the length of the downsampled vectors decrease, the variance in the computed sample variances increases.}
+\caption{The boxplots were generated from the sample variances of downsampled noise vectors. The theoretical variance of the noise was set to 0.0327, which is indicated by the horizontal dotted line. This figure illustrates that as the lengths of the downsampled vectors decrease, the variance in the computed sample variances increases.}
 \label{VarPlot1D}
 \end{figure}
 

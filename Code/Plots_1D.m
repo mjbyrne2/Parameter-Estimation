@@ -273,17 +273,18 @@ savefig(F,[figfold,figname],'compact')
 
 load Data1D_F2_S15_W200_R20.mat
 
-figure('units','normalized','outerposition',[0 0 1 1])
+F = figure('units','normalized','outerposition',[0 0 1 1]);
 
 [~,ind] = sort(abs(h_hat(1:2048)),'descend');
 n = 50;    % Number of terms to display in the plot
 
 subplot(1,2,1)
-semilogy(1:n,abs(h_hat(ind(1:n))),...
-    1:n,abs(g_noise_hat(ind(1:n))),...
-    1:n,abs(g_noise_hat(ind(1:n)))./abs(h_hat(ind(1:n))),'Linewidth',2)
+semilogy(1:n,abs(h_hat(ind(1:n))),'b-*',...
+    1:n,abs(g_noise_hat(ind(1:n))),'r-*',...
+    1:n,abs(g_noise_hat(ind(1:n)))./abs(h_hat(ind(1:n))),'c-*',...
+    'Linewidth',2)
 hold on
-plot(1:n,var(g_noise-g)*ones(1,n),'--')
+plot(1:n,var(g_noise-g)*ones(1,n),'k--')
 xlabel('Index')
 legend({'$|\hat{k}|$','$|\hat{\tilde{g}}|$',...
     '$|\hat{\tilde{g}}|/|\hat{k}|$','$\textrm{Var}(\eta)$'},...
@@ -291,13 +292,19 @@ legend({'$|\hat{k}|$','$|\hat{\tilde{g}}|$',...
 set(gca,'Fontsize',16)
 
 subplot(1,2,2)
-semilogy(1:n,abs(g_noise_hat(ind(1:n))),'Linewidth',2)
+semilogy(1:n,abs(g_noise_hat(ind(1:n))),'r-*','Linewidth',2)
 hold on
-plot(1:n,(var(g_noise-g))*ones(1,n),'--')
+plot(1:n,(var(g_noise-g))*ones(1,n),'k--')
 xlabel('Index')
 legend({'$|\hat{\tilde{g}}|$','$\textrm{Var}(\eta)$'},...
     'Fontsize',18,'Location','Northwest','Interpreter','latex')
 set(gca,'Fontsize',16)
+
+figfold = ['/Users/mjbyrne/Documents/Arizona State University/' ...
+    'Parameter-Estimation/Figures/'];    % Specifies the Figures folder
+figname = ['PicardPlot1D_F' num2str(Fnum) '_S'...
+    num2str(SNR,'%02.f') '_W' num2str(width) '.fig'];
+savefig(F,[figfold,figname],'compact')
 
 %% Plot functions/data for first noise realization
 % This section generates one plot showing the functions (f and g pertaining
