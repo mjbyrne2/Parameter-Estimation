@@ -82,8 +82,6 @@ upre_vectors = zeros(length(M),100,R);
 gcv_vectors = zeros(length(M),100,R);
 mdp_vectors = zeros(length(M),100,R);
 
-best = zeros(length(M),100,R);
-
 upre_regf = zeros(length(M),N,R);
 gcv_regf = zeros(length(M),N,R);
 mdp_regf = zeros(length(M),N,R);
@@ -98,6 +96,7 @@ best_error = zeros(R,length(M));
 [g,h] = GaussianBlur_1D(t,f,width);
 g_hat = fftshift(fft(g)/N);
 h_hat = fftshift(fft(h)); % No scaling needed since h was already normalized by 1/N
+L = logspace(-5,1,100); % Discretization of lambda domain
 
 % Creation of noise:
 eta = (norm(g)^2)/(N*10^(SNR/10));  % See Report for SNR definition
@@ -135,11 +134,6 @@ for j = 1:R
         f_hat = fftshift(fft(fn)/n);
         gn_hat = fftshift(fft(gn_noise)/n);
         hn_hat = fftshift(fft(hn));
-
-        L = logspace(-5,1,100);
-        
-        best(i,:,j) = TikhRegErr(gn_hat,hn_hat,...
-            ones(1,length(gn)),L,r,f_hat);
         
         [upre_vectors(i,:,j),upre_lambda(j,i)] = UPREparameter(gn_hat,...
             hn_hat,ones(1,length(gn)),eta,L,r);
@@ -155,9 +149,7 @@ for j = 1:R
         
         best_lambda(j,i) = optimalParameter(gn_hat,hn_hat,...
             ones(1,length(gn)),r,f_hat);
-    end
 
-    for i = 1:length(M)
         upre_regf(i,:,j) = N*real(ifft(ifftshift(...
             filterFactors(h_hatsol,upre_lambda(j,i)).*g_noise_hat./...
             replaceZeros(h_hatsol,1))));
@@ -174,19 +166,19 @@ for j = 1:R
             filterFactors(h_hatsol,best_lambda(j,i)).*g_noise_hat./...
             replaceZeros(h_hatsol,1))));
 
-        upre_error(j,i) = TikhRegErr(g_noise_hat,h_hatsol,...
-            ones(1,length(g_noise_hat)),upre_lambda(j,i),r,f_hat);
-        
-        gcv_error(j,i) = TikhRegErr(g_noise_hat,h_hatsol,...
-            ones(1,length(g_noise_hat)),gcv_lambda(j,i),r,f_hat);
-        
-        mdp_error(j,i) = TikhRegErr(g_noise_hat,h_hatsol,...
-            ones(1,length(g_noise_hat)),mdp_lambda(j,i),r,f_hat);
-        
-        best_error(j,i) = TikhRegErr(g_noise_hat,h_hatsol,...
-            ones(1,length(g_noise_hat)),best_lambda(j,i)*sqrt(n/N),r,f_hat);
-        
     end
+        
+    upre_error(j,:) = TikhRegErr(g_noise_hat,h_hatsol,...
+        ones(1,length(g_noise_hat)),upre_lambda(j,:),r,f_hat);
+
+    gcv_error(j,:) = TikhRegErr(g_noise_hat,h_hatsol,...
+        ones(1,length(g_noise_hat)),gcv_lambda(j,:),r,f_hat);
+
+    mdp_error(j,:) = TikhRegErr(g_noise_hat,h_hatsol,...
+        ones(1,length(g_noise_hat)),mdp_lambda(j,:),r,f_hat);
+
+    best_error(j,:) = TikhRegErr(g_noise_hat,h_hatsol,...
+        ones(1,length(g_noise_hat)),best_lambda(j,:)*sqrt(n/N),r,f_hat);    
 
     sL = [1e-3,1e-2,1e-1,1,10]; % Vector of some select lambdas
     regf = zeros(length(sL),length(tn));
