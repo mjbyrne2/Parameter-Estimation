@@ -73,28 +73,11 @@ upre_lambda = zeros(R,length(M));
 gcv_lambda = zeros(R,length(M));
 mdp_lambda = zeros(R,length(M));
 best_lambda = zeros(R,length(M));
+
 upre_err = zeros(R,length(M));
 gcv_err = zeros(R,length(M));
 mdp_err = zeros(R,length(M));
 
-% Construction of vector discretizations:
-[g,h] = GaussianBlur_1D(t,f,width);
-g_hat = fftshift(fft(g)/N);
-h_hat = fftshift(fft(h)); % No scaling needed since h was already normalized by 1/N
-
-% Creation of noise:
-eta = (norm(g)^2)/(N*10^(SNR/10));  % See Report for SNR definition
-noise = sqrt(eta)*seed.randn(R,N);
-testvar = var(noise,0,2);   % 0 specifies the default normalization N-1
-
-%% Looping over noise realizations
-% This section is where the downsampling experiments occur. The process is
-% applied to each realization of noise, and various statistics are
-% calculated and saved. 
-
-g_noise = repmat(g,R,1) + noise;
-
-% Initialization of storage arrays:
 upre_vectors = zeros(length(M),100,R);
 gcv_vectors = zeros(length(M),100,R);
 mdp_vectors = zeros(length(M),100,R);
@@ -106,12 +89,28 @@ gcv_regf = zeros(length(M),N,R);
 mdp_regf = zeros(length(M),N,R);
 opt_regf = zeros(length(M),N,R);
 
+upre_error = zeros(R,length(M));
+gcv_error = zeros(R,length(M));
+mdp_error = zeros(R,length(M));
+best_error = zeros(R,length(M));
+
+% Construction of vector discretizations:
+[g,h] = GaussianBlur_1D(t,f,width);
+g_hat = fftshift(fft(g)/N);
+h_hat = fftshift(fft(h)); % No scaling needed since h was already normalized by 1/N
+
+% Creation of noise:
+eta = (norm(g)^2)/(N*10^(SNR/10));  % See Report for SNR definition
+noise = sqrt(eta)*seed.randn(R,N);
+g_noise = repmat(g,R,1) + noise;
+testvar = var(noise,0,2);   % 0 specifies the default normalization N-1
+
+%% Looping over noise realizations
+% This section is where the downsampling experiments occur. The process is
+% applied to each realization of noise, and various statistics are
+% calculated and saved. 
+
 for j = 1:R    
-    
-    upre_error = zeros(size(M));
-    gcv_error = zeros(size(M));
-    mdp_error = zeros(size(M));
-    best_error = zeros(size(M));
 
     % For computing representative solutions with the finest sampling:
     % Michael, look in UPRE_Test_B.m at this line for incorrect addition of noise?
@@ -175,16 +174,16 @@ for j = 1:R
             filterFactors(h_hatsol,best_lambda(j,i)).*g_noise_hat./...
             replaceZeros(h_hatsol,1))));
 
-        upre_error(i) = TikhRegErr(g_noise_hat,h_hatsol,...
+        upre_error(j,i) = TikhRegErr(g_noise_hat,h_hatsol,...
             ones(1,length(g_noise_hat)),upre_lambda(j,i),r,f_hat);
         
-        gcv_error(i) = TikhRegErr(g_noise_hat,h_hatsol,...
+        gcv_error(j,i) = TikhRegErr(g_noise_hat,h_hatsol,...
             ones(1,length(g_noise_hat)),gcv_lambda(j,i),r,f_hat);
         
-        mdp_error(i) = TikhRegErr(g_noise_hat,h_hatsol,...
+        mdp_error(j,i) = TikhRegErr(g_noise_hat,h_hatsol,...
             ones(1,length(g_noise_hat)),mdp_lambda(j,i),r,f_hat);
         
-        best_error(i) = TikhRegErr(g_noise_hat,h_hatsol,...
+        best_error(j,i) = TikhRegErr(g_noise_hat,h_hatsol,...
             ones(1,length(g_noise_hat)),best_lambda(j,i)*sqrt(n/N),r,f_hat);
         
     end
@@ -204,8 +203,9 @@ for j = 1:R
 
 end
 
-% % Implementation of summed version of UPRE:
-% gSigma_hat = (R*g_hat) + fftshift(fft(sum(noise))/N);
+% Implementation of summed version of UPRE and GCV:
+upreSum_vectors = sum(upre_vectors,3); % Summing instances of noise 
+gcvSum_vectors = sum(gcv_vectors,3);   % Summing instances of noise
 % [upre_V,upre_Lam] = UPREparameter(gSigma_hat,hn_hat,ones(1,N),R*eta,L,r);
 
 % Clear variables that don't need to be saved:
