@@ -72,6 +72,7 @@ f = testFunction('1D',Fnum);
 upre_lambda = zeros(R,length(M));
 gcv_lambda = zeros(R,length(M));
 mdp_lambda = zeros(R,length(M));
+best_lambda = zeros(R,length(M));
 upre_err = zeros(R,length(M));
 gcv_err = zeros(R,length(M));
 mdp_err = zeros(R,length(M));
@@ -100,19 +101,17 @@ mdp_vectors = zeros(length(M),100,R);
 
 best = zeros(length(M),100,R);
 
+upre_regf = zeros(length(M),N,R);
+gcv_regf = zeros(length(M),N,R);
+mdp_regf = zeros(length(M),N,R);
+opt_regf = zeros(length(M),N,R);
+
 for j = 1:R    
-    
-    best_lambda = zeros(size(M));
     
     upre_error = zeros(size(M));
     gcv_error = zeros(size(M));
     mdp_error = zeros(size(M));
     best_error = zeros(size(M));
-    
-    upre_regf = zeros(length(M),N);
-    gcv_regf = zeros(length(M),N);
-    mdp_regf = zeros(length(M),N);
-    opt_regf = zeros(length(M),N);
 
     % For computing representative solutions with the finest sampling:
     % Michael, look in UPRE_Test_B.m at this line for incorrect addition of noise?
@@ -141,7 +140,7 @@ for j = 1:R
         L = logspace(-5,1,100);
         
         best(i,:,j) = TikhRegErr(gn_hat,hn_hat,...
-            ones(1,length(gn)),L(k),r,f_hat);
+            ones(1,length(gn)),L,r,f_hat);
         
         [upre_vectors(i,:,j),upre_lambda(j,i)] = UPREparameter(gn_hat,...
             hn_hat,ones(1,length(gn)),eta,L,r);
@@ -160,19 +159,19 @@ for j = 1:R
     end
 
     for i = 1:length(M)
-        upre_regf(i,:) = N*real(ifft(ifftshift(...
+        upre_regf(i,:,j) = N*real(ifft(ifftshift(...
             filterFactors(h_hatsol,upre_lambda(j,i)).*g_noise_hat./...
             replaceZeros(h_hatsol,1))));
         
-        gcv_regf(i,:) = N*real(ifft(ifftshift(...
+        gcv_regf(i,:,j) = N*real(ifft(ifftshift(...
             filterFactors(h_hatsol,gcv_lambda(j,i)).*g_noise_hat./...
             replaceZeros(h_hatsol,1))));
         
-        mdp_regf(i,:) = N*real(ifft(ifftshift(...
+        mdp_regf(i,:,j) = N*real(ifft(ifftshift(...
             filterFactors(h_hatsol,mdp_lambda(j,i)).*g_noise_hat./...
             replaceZeros(h_hatsol,1))));
        
-        opt_regf(i,:) = N*real(ifft(ifftshift(...
+        opt_regf(i,:,j) = N*real(ifft(ifftshift(...
             filterFactors(h_hatsol,best_lambda(j,i)).*g_noise_hat./...
             replaceZeros(h_hatsol,1))));
 
@@ -199,18 +198,18 @@ for j = 1:R
     end
 
     % Relative solution errors: 
-    upre_err(j,:) = err(upre_regf,f)';
-    gcv_err(j,:) = err(gcv_regf,f)';
-    mdp_err(j,:) = err(mdp_regf,f)';
+    upre_err(j,:) = err(upre_regf(:,:,j),f)';
+    gcv_err(j,:) = err(gcv_regf(:,:,j),f)';
+    mdp_err(j,:) = err(mdp_regf(:,:,j),f)';
 
 end
 
-% Implementation of summed version of UPRE:
-gSigma_hat = (R*g_hat) + fftshift(fft(sum(noise))/N);
-[upre_V,upre_Lam] = UPREparameter(gSigma_hat,hn_hat,ones(1,N),R*eta,L,r);
+% % Implementation of summed version of UPRE:
+% gSigma_hat = (R*g_hat) + fftshift(fft(sum(noise))/N);
+% [upre_V,upre_Lam] = UPREparameter(gSigma_hat,hn_hat,ones(1,N),R*eta,L,r);
 
 % Clear variables that don't need to be saved:
-clear i j k n
+clear i j k n ans
 
 % Save workspace:
 answer = questdlg('Would you like to save the data?',...
@@ -221,5 +220,6 @@ switch answer
         save(dataname)
         disp(['Data saved in ' dataname '.'])
     otherwise
+        clear answer
         disp('The data has not been saved.')
 end
