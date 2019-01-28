@@ -91,16 +91,17 @@ testvar = var(noise,0,2);   % 0 specifies the default normalization N-1
 % applied to each realization of noise, and various statistics are
 % calculated and saved. 
 
-for j = 1:R
+g_noise = repmat(g,R,1) + noise;
 
-    g_noise = g + noise(j,:);
+% Initialization of storage arrays:
+upre_vectors = zeros(length(M),100,R);
+gcv_vectors = zeros(length(M),100,R);
+mdp_vectors = zeros(length(M),100,R);
 
-    % Initialization of storage arrays:
-    upre_vectors = zeros(length(M),100);
-    gcv_vectors = zeros(length(M),100);
-    mdp_vectors = zeros(length(M),100);
+best = zeros(length(M),100,R);
+
+for j = 1:R    
     
-    best = zeros(length(M),100);
     best_lambda = zeros(size(M));
     
     upre_error = zeros(size(M));
@@ -117,7 +118,7 @@ for j = 1:R
     % Michael, look in UPRE_Test_B.m at this line for incorrect addition of noise?
     % Something to do with adding noise to longest vector, which is
     % different that above?
-    g_noise_hat = fftshift(fft(g_noise))/r;
+    g_noise_hat = fftshift(fft(g_noise(j,:)))/r;
     h_hatsol = fftshift(fft(fftshift(h)));
 
     % Loop over resolutions stored in M:
@@ -132,27 +133,25 @@ for j = 1:R
         gn = interp1(t,g,tn);
         fn = interp1(t,f,tn);
 
-        gn_noise = interp1(t,g_noise,tn);
+        gn_noise = interp1(t,g_noise(j,:),tn);
         f_hat = fftshift(fft(fn)/n);
         gn_hat = fftshift(fft(gn_noise)/n);
         hn_hat = fftshift(fft(hn));
 
         L = logspace(-5,1,100);
         
-        for k = 1:100
-            best(i,k) = TikhRegErr(gn_hat,hn_hat,...
-                ones(1,length(gn)),L(k),r,f_hat);
-        end
+        best(i,:,j) = TikhRegErr(gn_hat,hn_hat,...
+            ones(1,length(gn)),L(k),r,f_hat);
         
-        [upre_vectors(i,:),upre_lambda(j,i)] = UPREparameter(gn_hat,...
+        [upre_vectors(i,:,j),upre_lambda(j,i)] = UPREparameter(gn_hat,...
             hn_hat,ones(1,length(gn)),eta,L,r);
         upre_lambda(j,i) = upre_lambda(j,i)*sqrt(n/N);  % Scale the lambda
         
-        [gcv_vectors(i,:),gcv_lambda(j,i)] = GCVparameter(gn_hat,...
+        [gcv_vectors(i,:,j),gcv_lambda(j,i)] = GCVparameter(gn_hat,...
             hn_hat,ones(1,length(gn)),L,r);
         gcv_lambda(j,i) = gcv_lambda(j,i)*sqrt(n/N);  % Scale the lambda
         
-        [mdp_vectors(i,:),mdp_lambda(j,i)] = MDPparameter(gn_hat,...
+        [mdp_vectors(i,:,j),mdp_lambda(j,i)] = MDPparameter(gn_hat,...
             hn_hat,ones(1,length(gn)),eta,L,r);
         mdp_lambda(j,i) = mdp_lambda(j,i);  % Scale the lambda
         
