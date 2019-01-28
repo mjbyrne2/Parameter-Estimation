@@ -379,13 +379,14 @@ end
 
 %% Plot of Regularized Solutions (UPRE)
 % This section generates one plot of the regularized solutions obtained by
-% applying the downsampling UPRE parameter selection method.
+% applying the downsampling UPRE parameter selection method (first noise
+% realization).
 %
 % A workspace must be loaded before running this section.
 
 F = figure('units','normalized','outerposition',[0 0 1 1]);
 
-plot(repmat(t,length(M),1)',upre_regf','-')   % Transpose for the sake of plotting
+plot(repmat(t,length(M),1)',upre_regf(:,:,1)','-')   % Transpose for the sake of plotting
 hold on
 plot(t,f,'k','Linewidth',1.5)   % Original function f
 grid on
@@ -435,13 +436,14 @@ savefig(F,[figfold,figname],'compact')
 
 %% Plot of Regularized Solutions (GCV)
 % This section generates one plot of the regularized solutions obtained by
-% applying the downsampling GCV parameter selection method.
+% applying the downsampling GCV parameter selection method (first noise
+% realization).
 %
 % A workspace must be loaded before running this section.
 
 F = figure('units','normalized','outerposition',[0 0 1 1]);
 
-plot(repmat(t,length(M),1)',gcv_regf','-')   % Transpose for the sake of plotting
+plot(repmat(t,length(M),1)',gcv_regf(:,:,1)','-')   % Transpose for the sake of plotting
 hold on
 plot(t,f,'k','Linewidth',1.5)   % Original function f
 grid on
@@ -491,13 +493,14 @@ savefig(F,[figfold,figname],'compact')
 
 %% Plot of Regularized Solutions (MDP)
 % This section generates one plot of the regularized solutions obtained by
-% applying the downsampling MDP parameter selection method.
+% applying the downsampling MDP parameter selection method (first noise
+% realization).
 %
 % A workspace must be loaded before running this section.
 
 F = figure('units','normalized','outerposition',[0 0 1 1]);
 
-plot(repmat(t,length(M),1)',mdp_regf','-')   % Transpose for the sake of plotting
+plot(repmat(t,length(M),1)',mdp_regf(:,:,1)','-')   % Transpose for the sake of plotting
 hold on
 plot(t,f,'k','Linewidth',1.5)   % Original function f
 grid on
