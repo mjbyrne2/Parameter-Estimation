@@ -8,6 +8,7 @@
 \newcommand{\gcon}{g}
 \newcommand{\kcon}{k}
 \newcommand{\fcon}{f}
+\newcommand{\blurV}{\nu}	% Variance of Gaussian blur function
 
 % Discrete notation:
 \newcommand{\gdis}{\mathbf{g}}
@@ -33,13 +34,13 @@
 \newcommand{\filt}{\phi}
 
 % Noise notation:
-\newcommand{\SD}{s}	% Standard deviation
+\newcommand{\noiseSD}{\sigma}	% Standard deviation
 \newcommand{\noise}{\bm{\eta}}	% Noise vector
 \newcommand{\Var}{\operatorname{Var}}	% Variance
 \newcommand{\E}{\operatorname{E}}	% Expected value
 
 % Singular values and vectors:
-\newcommand{\singular}{\sigma}	% Singular values
+\newcommand{\singular}{s}	% Singular values
 \newcommand{\LSV}{\mathbf{u}}	% Left singular vector
 \newcommand{\RSV}{\mathbf{v}}	% Left singular vector
 
@@ -88,8 +89,8 @@ If $\kcon * \fcon$ is considered a smoothing operation, then finding $\fcon$ suc
 \end{equation}
 The kernel $\kcon$ is smooth and bounded on $[0,1]$, and the function $\fcon$ is 1-periodic and bounded. Plots of $\fcon(t)$ and $\kcon(t)$ are shown in Figure \ref{FunctionKernelPlot}. \par
 The kernel $\kcon(t) = \exp(-200(t-\frac{1}{2})^2)$ is an example of a Gaussian kernel. The form of a Gaussian kernel comes from the probability density function of the Gaussian distribution,
-\[p(t) = \frac{1}{\sqrt{2\pi\SD^2}}\exp\left(\frac{-(t-\mu)^2}{2\SD^2}\right),\]
-where $\mu$ is the mean and $\SD^2$ is the variance. The mean is the center of the Gaussian distribution, as well as the abscissa of the absolute maximum. The variance is a measure of dispersion of the distribution; as $\SD^2$ increases, the width of the graph of $p(t)$ increases. The standard deviation $\SD$ is also a measure of dispersion, though variance will be the measure of choice in this report. The scale factor $1/\sqrt{2\pi\SD^2}$ ensures that $\int_{\mathbb{R}} p(t) \: dt = 1$, an essential property of a continuous probability distribution defined on the entire real line. For Gaussian kernels, however, this scale factor may be dropped since having a unitary integral is not required of kernels in general.  For the Gaussian kernel example $\kcon(t) = \exp(-200(t-\frac{1}{2})^2)$, the mean is 1/2 and $-200 = -1/2\SD^2$ implies that $\SD^2 = 1/400$. Figure \ref{GaussianDistributions} illustrates the relationship between variance and width of the Gaussian distribution.
+\[p(t) = \frac{1}{\sqrt{2\pi\blurV}}\exp\left(\frac{-(t-\mu)^2}{2\blurV}\right),\]
+where $\mu$ is the mean and $\blurV$ is the variance. The mean is the center of the Gaussian distribution, as well as the abscissa of the absolute maximum. The variance is a measure of dispersion of the distribution; as $\blurV$ increases, the width of the graph of $p(t)$ increases. The standard deviation $\sqrt{\blurV}$ is also a measure of dispersion, though variance will be the measure of choice in this report. The scale factor $1/\sqrt{2\pi\blurV}$ ensures that $\int_{\mathbb{R}} p(t) \: dt = 1$, an essential property of a continuous probability distribution defined on the entire real line. For Gaussian kernels, however, this scale factor may be dropped since having a unitary integral is not required of kernels in general.  For the Gaussian kernel example $\kcon(t) = \exp(-200(t-\frac{1}{2})^2)$, the mean is 1/2 and $-200 = -1/2\noiseSD$ implies that $\blurV = 1/400$. Figure \ref{GaussianDistributions} illustrates the relationship between variance and width of the Gaussian distribution. It should be noted that the choice of $\blurV$ as the symbol for variance of the Gaussian distribution is nonstandard; a common choice for this variance is $\sigma^2$, though in this report $\sigma^2$ is reserved for the variance of the white noise from which $\noise$ is drawn in \eqref{Eq_DisNoise}. Another alternative for $\blurV$ would be $s^2$, though $s$ is reserved for singular values, the diagonal entries of $\Sigma$ in \eqref{Eq_SVD}. 
 
 \begin{figure}
 	\centerline{\includegraphics[scale=0.4]{Figures/FunctionKernelPlot.eps}}
@@ -99,7 +100,7 @@ where $\mu$ is the mean and $\SD^2$ is the variance. The mean is the center of t
 
 \begin{figure}
 	\centerline{\includegraphics[scale=0.4]{Figures/GaussianDistributions.eps}}
-\caption{Gaussian distributions for difference values of variance $\SD^2$, all centered at the origin ($\mu = 0$). As $\SD^2$ increases, the width of the distribution increases.}
+\caption{Gaussian distributions for difference values of variance $\blurV$, all centered at the origin ($\mu = 0$). As $\blurV$ increases, the width of the distribution increases.}
 \label{GaussianDistributions}
 \end{figure}
 
@@ -109,11 +110,11 @@ To find a solution to the forward problem, which is the evaluation of $\gcon = \
 \label{Eq_Dis}
 \end{equation}
 where $\fdis$ and $\gdis$ are the vector discretization of $\fcon$ and $\gcon$, respectively, and $\kmat$ is a matrix representing the discrete convolution of $\kcon$ with $\fcon$. For example, suppose $\kcon(x,t)$ is a zero-centered Gaussian kernel and the domain of integration in \eqref{Eq_Con} is $[0,1]$. Given some $x_i \in [0,1]$, the continuous forward problem is to evaluate
-\[g(x_i) = \int_0^1 \exp\left(\frac{-(x_i - t)^2}{2\SD^2}\right)\fcon(t) \: dt.\]
+\[g(x_i) = \int_0^1 \exp\left(\frac{-(x_i - t)^2}{2\blurV}\right)\fcon(t) \: dt.\]
 If a left Riemann sum is used with $t_j = (j-1)/n$ for $j \in \{1,2,\ldots,n\}$, representing an equispaced discretization of $[0,1]$ using $n$ points, then
-\[g(x_i) \approx \sum_{j=1}^n \frac{1}{n}\exp\left(\frac{-(x_i - t_j)^2}{2\SD^2}\right)\fcon(t_j).\]
+\[g(x_i) \approx \sum_{j=1}^n \frac{1}{n}\exp\left(\frac{-(x_i - t_j)^2}{2\blurV}\right)\fcon(t_j).\]
 For approximations to $\gcon(x)$ at the same points that make up the equispaced discretization of $[0,1]$, i.e. at the points $x_i = (i-1)/n$ for $j \in \{1,2,\ldots,n\}$, then \eqref{Eq_Dis} is exactly the system that provides these approximations with $\fdis = [\fcon(t_1),\fcon(t_2),\ldots,\fcon(t_n)]$, $\gdis = [\gcon(x_1),\gcon(x_2),\ldots,\gcon(x_n)]$, and the elements of $\kmat$ being
-\[K_{ij} = \frac{1}{n}\exp\left(\frac{-(i - j)^2}{2\SD^2}\right).\]
+\[K_{ij} = \frac{1}{n}\exp\left(\frac{-(i - j)^2}{2\blurV}\right).\]
 Note that taking the collocation and quadrature points as the same ensures that the matrix $\kmat$ is square. Changing the number of collocation points, or the quadrature method, can change $\kmat$ from square to rectangular. \par
 If the matrix $\kmat$ is nonsingular, then the solution to the inverse problem of \eqref{Eq_Dis} is $\fdis = \kmat^{-1}\gdis$. As with many linear systems, however, direct matrix inversion is discouraged and usually impractical since the matrix $\kmat$ becomes increasingly ill-conditioned as the size of the system grows \cite{Vogel:2002}. Unfortunately, large systems are necessary to adequately approximate the continuous problem, and so other methods of solving for $\fdis$ must be considered. \par
 Before discussing the consequences of ill-conditioning, the concept of an well-posed problem will be introduced, which is due to Hadamard. Given an operator $A : \mathcal{H}_1 \rightarrow \mathcal{H}_2$, where $\mathcal{H}_1$ and $\mathcal{H}_1$ are Hilbert spaces, the equation $Af = g$ is said to be well-posed if
@@ -128,9 +129,12 @@ A primary consequence of $\kmat$ being ill-conditioned relates to the accuracy o
 \gnoise = \kmat\fdis + \noise
 \label{Eq_DisNoise}
 \end{equation}
-where $\noise$ is a vector that represents any errors in $\gdis$ (this is equivalent to the statement $\gnoise = \gdis + \noise$). For further simplicity, assume that $\noise \sim \mathcal{N}(\bm{0},\SD^2I)$, where $\bm{0}$ is the zero vector of length $n$ and $I$ is the $n \times n$ identity matrix. In other words, the error vector $\noise$ is an $n$-dimension Gaussian random variable with mean zero and variance $\SD^2$. \par
+where $\noise$ is a vector that represents any errors in $\gdis$ (this is equivalent to the statement $\gnoise = \gdis + \noise$). For further simplicity, assume that $\noise \sim \mathcal{N}(\bm{0},\noiseSD^2I)$, where $\bm{0}$ is the zero vector of length $n$ and $I$ is the $n \times n$ identity matrix. In other words, the error vector $\noise$ is an $n$-dimension Gaussian random variable with mean zero and variance $\noiseSD^2$. \par
 Since direct matrix inversion is not practical, and at times not even possible since $\kmat$ can be singular, a singular value decomposition (SVD) of $\kmat$ can be an alternative. Assuming $\kmat$ is a real $m \times n$ matrix, the SVD of $\kmat$ is
-\[\kmat = U\Sigma{V^\trans}\]
+\begin{equation}
+\kmat = U\Sigma{V^\trans}
+\label{Eq_SVD}
+\end{equation}
 where the $m \times m$ matrix $U$ and the $n \times n$ matrix $V$ have orthogonal columns and $\Sigma$ is a $m \times n$ diagonal matrix. The diagonal elements of $\Sigma$ are the singular values of $\kmat$, denoted $\singular_i$ and satisfying $\singular_1 \geq \singular_2 \geq \ldots \geq \singular_n \geq 0$. The columns of $U$ and $V$ will be denoted $\LSV_i$ and $\RSV_i$, respectively; these vectors are known as the left and right singular vectors of $\kmat$, respectively. A matrix of complex values has a SVD as well, the only difference being that the transpose is replaced with conjugate transpose. \par
 Letting $r$ denote the rank of $\kmat$,  $\singular_1 \geq \ldots \geq \singular_r > 0$. In other words, the number of nonzero singular values of $\kmat$ is equal to the rank of $\kmat$.  A common variation of the SVD is the compact SVD, in which $\Sigma = \diag(\singular_1,\ldots,\singular_r)$, $U$ is an $m \times r$ matrix and $V^\trans$ is an $r \times n$ matrix. The matrices $U$ and $V$ are no longer orthogonal in the traditional sense because they are not square (unless $\kmat$ is nonsingular), though their columns remain orthonormal. For the remainder of this report all SVD's are assumed to be compact.  \par 
 By using $\kmat^{-1} = V\Sigma^{-1}U^\trans$ when $\kmat$ is nonsingular, the product $\kmat^{-1}\gnoise$ is
@@ -309,14 +313,14 @@ Though the definition of SNR varies, the definition chosen for this investigatio
 \text{SNR} = 10\log_{10}\left(\frac{P_{\text{signal}}}{P_{\text{noise}}}\right)
 \end{equation}
 where $P$ denotes average power. In the discrete setting, the average power of a signal $\mathbf{f}$ of length $N$ is defined as $\|\mathbf{f}\|^2/N$. Using this definition, $P_{\text{signal}} = \|\gdis\|^2/N$ and $P_{\text{noise}} = \|\noise\|^2/N$ and so the quotient in the logarithm is $\|\gdis\|^2/\|\noise\|^2$. The quotient can also be expressed as $(\|\gdis\|/\|\gnoise - \gdis\|)^2$, which is the square of the multiplicative inverse of the relative error of $\gnoise$. \par
-In MATLAB, the noise vector $\noise$ can be constructed by first taking an $N$-vector $\mathbf{e}$ drawn from the multivariate standard normal distribution and multiplying the vector by a constant $\SD$. Doing so ensures that $\noise$ has variance $\SD^2$ because $\Var(\noise) = \Var(\SD\:\mathbf{e}) = \SD^2\:\Var(\mathbf{e})$ and $\mathbf{e}$ has unit variance. Thus it is useful to rearrange the equation defining SNR into an equation that provides a way of finding the necessary variance for a given SNR value. The rearrangement is shown below, with $\|\noise\|^2$ replaced by $\E(\|\noise\|^2)$.
+In MATLAB, the noise vector $\noise$ can be constructed by first taking an $N$-vector $\mathbf{e}$ drawn from the multivariate standard normal distribution and multiplying the vector by a constant $\noiseSD$. Doing so ensures that $\noise$ has variance $\noiseSD^2$ because $\Var(\noise) = \Var(\noiseSD\:\mathbf{e}) = \noiseSD^2\:\Var(\mathbf{e})$ and $\mathbf{e}$ has unit variance. Thus it is useful to rearrange the equation defining SNR into an equation that provides a way of finding the necessary variance for a given SNR value. The rearrangement is shown below, with $\|\noise\|^2$ replaced by $\E(\|\noise\|^2)$.
 \[\E(\|\noise\|^2) = \frac{\|\gdis\|^2}{10^{(\text{SNR}/10)}}\]
-Using the properties of expected value and the fact that $\E(\|\noise\|^2) = \E(\|\SD\:\mathbf{e}\|^2)$, the term on the left hand side of the equation can be changed as
-\[\E(\|\noise\|^2) = \E(\|\SD\:\mathbf{e}\|^2) = \SD^2 \sum_{i=1}^N \E(\mathbf{e}_i^2) = \SD^2 \sum_{i=1}^N \left(\E(\mathbf{e}_i)^2 + \Var(\mathbf{e}_i)\right) = \SD^2 \sum_{i=1}^N \left(0^2 + 1\right) = \SD^2\:N.\]
+Using the properties of expected value and the fact that $\E(\|\noise\|^2) = \E(\|\noiseSD\:\mathbf{e}\|^2)$, the term on the left hand side of the equation can be changed as
+\[\E(\|\noise\|^2) = \E(\|\noiseSD\:\mathbf{e}\|^2) = \noiseSD^2 \sum_{i=1}^N \E(\mathbf{e}_i^2) = \noiseSD^2 \sum_{i=1}^N \left(\E(\mathbf{e}_i)^2 + \Var(\mathbf{e}_i)\right) = \noiseSD^2 \sum_{i=1}^N \left(0^2 + 1\right) = \noiseSD^2\:N.\]
 Utilizing this change, the following equation for variance is obtained.
 \begin{equation}
 \label{Eq_Var}
-\SD^2 = \frac{\|\gdis\|^2}{N \cdot 10^{(\text{SNR}/10)}}
+\noiseSD^2 = \frac{\|\gdis\|^2}{N \cdot 10^{(\text{SNR}/10)}}
 \end{equation}
 This equation is used for the numerical construction of the noise vectors. SNR values of 5 and 25 are used to generate the white noise added to $\gdis$, and one such data realization is shown in Figure \ref{NoisePlot1D_F2_S05_W200}. \par
 
@@ -326,7 +330,7 @@ This equation is used for the numerical construction of the noise vectors. SNR v
 \label{NoisePlot1D_F2_S05_W200}
 \end{figure}
 
-For an accurate evaluation of the numerical experiments and their results, multiple realizations of noise are used. A primary advantage of multiple noise realizations is that the sample variance of noise vectors approaches the desired variance as the number of realizations increases. More rigorously, the mean of the sample variances of the noise vectors converges almost surely to the expected value of the sample variance, which is the desired variance $\SD^2$; this is a direct consequence of the (strong) law of large numbers and the fact that the noise vectors are independent and identically distributed with standard normal distribution.  \par
+For an accurate evaluation of the numerical experiments and their results, multiple realizations of noise are used. A primary advantage of multiple noise realizations is that the sample variance of noise vectors approaches the desired variance as the number of realizations increases. More rigorously, the mean of the sample variances of the noise vectors converges almost surely to the expected value of the sample variance, which is the desired variance $\noiseSD^2$; this is a direct consequence of the (strong) law of large numbers and the fact that the noise vectors are independent and identically distributed with standard normal distribution.  \par
 
 %\begin{figure}
 %\centerline{\includegraphics[scale=0.45]{Figures/LLN_Plot.eps}}
@@ -335,12 +339,12 @@ For an accurate evaluation of the numerical experiments and their results, multi
 %\end{figure}
 
 Another numerical consideration regarding noise is how the sample variance changes across downsampling resolutions. To formalize the concept of downsampling in the context of this report, consider $\mathbf{z} = [z_1,z_2,\ldots,z_n]$. Then a vector $\mathbf{y}$ is called a downsampling of $\mathbf{z}$ if $\mathbf{y} = [z_{n_1},z_{n_2},\ldots,z_{n_m}]$, where $m \leq n$ and $n_j:\{1,2,\ldots,m\}\rightarrow\{1,2,\ldots,n\}$ is a strictly increasing function. This definition is analogous to the definition of a subsequence except with a finite number of terms. \par
-Theoretically, the variance of the noise vector does not change when a vector is downsampled because of the properties of variance. For any $m\times n$ matrix $M$ and $n$-vector $\noise \sim \mathcal{N}(\bm{0},\SD^2I)$
+Theoretically, the variance of the noise vector does not change when a vector is downsampled because of the properties of variance. For any $m\times n$ matrix $M$ and $n$-vector $\noise \sim \mathcal{N}(\bm{0},\noiseSD^2I)$
 \begin{equation}
-\Var(M\noise) = M\Var(\noise)M^{\trans} = \SD^2MIM^{\trans} = \SD^2MM^{\trans}
+\Var(M\noise) = M\Var(\noise)M^{\trans} = \noiseSD^2MIM^{\trans} = \noiseSD^2MM^{\trans}
 \label{Eq_VarProp}
 \end{equation}
-where $MM^\trans$ is an $m \times m$ matrix. Certainly for arbitrary $M$, $MM^\trans$ can differ from an $m \times m$ identity matrix, which would mean that the new noise vector $M\noise$ no longer represents white noise. However, given an $n$-vector $\noise \sim \mathcal{N}(\bm{0},\SD^2I)$ and the goal of obtaining a downsampled version of $\noise$, a matrix $E$ can be found such that $E\noise$ is the downsampled vector. Since DFT's are utilized in the regularization process, a downsampled vector whose components are still equidistant from adjacent components is desirable. Since the finest sampling $\tdis$ of the interval $[0,1]$ has $N = 4096 = 2^{12}$ points, a natural downsampling with this property would be to select every other component of $\tdis$. The resulting downsampled vector would then have length $N/2 = 2048 = 2^{11}$. The matrix $E$ that accomplishes this downsampling is the $N/2 \times N$ matrix defined as
+where $MM^\trans$ is an $m \times m$ matrix. Certainly for arbitrary $M$, $MM^\trans$ can differ from an $m \times m$ identity matrix, which would mean that the new noise vector $M\noise$ no longer represents white noise. However, given an $n$-vector $\noise \sim \mathcal{N}(\bm{0},\noiseSD^2I)$ and the goal of obtaining a downsampled version of $\noise$, a matrix $E$ can be found such that $E\noise$ is the downsampled vector. Since DFT's are utilized in the regularization process, a downsampled vector whose components are still equidistant from adjacent components is desirable. Since the finest sampling $\tdis$ of the interval $[0,1]$ has $N = 4096 = 2^{12}$ points, a natural downsampling with this property would be to select every other component of $\tdis$. The resulting downsampled vector would then have length $N/2 = 2048 = 2^{11}$. The matrix $E$ that accomplishes this downsampling is the $N/2 \times N$ matrix defined as
 \begin{equation}
 E = [\mathbf{e}_1 \: \mathbf{0} \: \mathbf{e}_2 \: \mathbf{0} \: \mathbf{e}_3 \: \mathbf{0} \ldots \mathbf{e}_N]
 \label{Eq_E}
@@ -362,7 +366,7 @@ Then $\tdis^4$ obtained by the product $E\tdis$ has equispaced components as des
 0 & \dfrac{1}{4} & \dfrac{1}{2} & \dfrac{3}{4}
 \end{bmatrix}^{\trans}.\]
 \indent Another property of the $N/2 \times N$ matrix $E$ defined in \eqref{Eq_E} is that $EE^{\trans} = I$, where $I$ is the $N/2 \times N/2$ identity matrix.  This is a direct consequence of $\mathbf{e}_j\mathbf{e}_j^\trans = 1$ for all $j$ with $1 \leq j \leq N/2$. Using the property in \eqref{Eq_VarProp}, the variance of the  noise vector $\noise^{N/2}$ downsampled from $\noise$ is then
-\[\Var(\noise^{N/2}) = \Var(E\noise) = E\Var(\noise)E^{\trans} = \SD^2EE^{\trans} = \SD^2I\]
+\[\Var(\noise^{N/2}) = \Var(E\noise) = E\Var(\noise)E^{\trans} = \noiseSD^2EE^{\trans} = \noiseSD^2I\]
 where $I$ is the $N/2 \times N/2$ identity matrix. Therefore, downsampling white noise vectors in this way produces white noise vectors of half length, theoretically preserving variance across downsamples. As a final remark, the process of downsampling described here can be used to obtain downsampled vectors of length $N/(2^2), N/(2^3), \ldots, N/N$, though the final resolution in this report has been chosen as $N/(2^8) = 16$. \par 
 While the variance of the noise is preserved across downsampling resolution in theory, numerically there is some fluctuation. As the downsampling resolutions decrease, i.e. the length of the downsampled vectors decreases, the sample variances more spread out. Figure \ref{VarPlot1D} demonstrates this phenomenon by showing boxplots of sample variance versus downsampling resolutions. 
 
@@ -390,8 +394,8 @@ Next, an $n \times n$ matrix $\A$ is defined as $\A = \kmat\R$ where $\R$ is a r
 By the assumption that $\noise$ is a discrete white noise vector, the Trace Lemma can be utilized to obtain an expression for the expected value of predictive risk.
 
 \begin{TL}
-Let $f \in \mathcal{H}$, where $\mathcal{H}$ is a deterministic, real Hilbert space, let $\noise$ be a discrete noise vector with $\noise \sim \mathcal{N}(0,\SD^2)$, and let $B: \mathbb{R}^n \rightarrow \mathcal{H}$ be a bounded linear operator. Then
-\[\E(\|f + B\noise\|_{\mathcal{H}}^2) = \|f\|_{\mathcal{H}}^2 + \SD^2\trace({B^*}B)\]
+Let $f \in \mathcal{H}$, where $\mathcal{H}$ is a deterministic, real Hilbert space, let $\noise$ be a discrete noise vector with $\noise \sim \mathcal{N}(0,\noiseSD^2)$, and let $B: \mathbb{R}^n \rightarrow \mathcal{H}$ be a bounded linear operator. Then
+\[\E(\|f + B\noise\|_{\mathcal{H}}^2) = \|f\|_{\mathcal{H}}^2 + \noiseSD^2\trace({B^*}B)\]
 where $B^*$ denotes the adjoint of $B$.
 \end{TL}
 \begin{proof}
@@ -403,31 +407,31 @@ The term $\E(\|f\|_{\mathcal{H}}^2)$ reduces to $\|f\|_{\mathcal{H}}^2$ because 
 &= \|f\|_{\mathcal{H}}^2 + 2\E(({B^*}f)^\trans\noise) + \E({\noise^\trans}{B^*}B\noise) \\
 &= \|f\|_{\mathcal{H}}^2 + 2\sum_{i=1}^n ({B^*}f)_i \E(\noise_i) + \sum_{i=1}^n\sum_{j=1}^n ({B^*}B)_{ij} \E({\noise_i}{\noise_j})
 \end{align*}
-Since $\noise \sim \mathcal{N}(0,\SD^2)$, the expected values of $\noise_i$ and ${\noise_i}{\noise_j}$ are zero and $\SD^2\delta_{ij}$, respectively. Therefore the second term above is zero and the third term is a summation expression for $\SD^2\trace({B^*}B)$.
+Since $\noise \sim \mathcal{N}(0,\noiseSD^2)$, the expected values of $\noise_i$ and ${\noise_i}{\noise_j}$ are zero and $\noiseSD^2\delta_{ij}$, respectively. Therefore the second term above is zero and the third term is a summation expression for $\noiseSD^2\trace({B^*}B)$.
 \end{proof}
 
 \noindent Applying the Trace Lemma to the expression for predictive risk yields
-\[\E\left(\frac{1}{n}\|\PE\|^2\right) = \frac{1}{n}\E\left(\|(\A-I)\kmat\fdis + \A\noise\|^2\right) = \frac{1}{n}\|(\A-I)\kmat\fdis\|^2 + \frac{\SD^2}{n}\trace({\A^\trans}\A).\]
+\[\E\left(\frac{1}{n}\|\PE\|^2\right) = \frac{1}{n}\E\left(\|(\A-I)\kmat\fdis + \A\noise\|^2\right) = \frac{1}{n}\|(\A-I)\kmat\fdis\|^2 + \frac{\noiseSD^2}{n}\trace({\A^\trans}\A).\]
 If Tikhonov regularization is used, then the influence matrix $\A$ is $\kmat(\kmat^\ctrans\kmat + \regparam{D^\ctrans}D)^{-1}\kmat^\ctrans$. The matrix $(\kmat^\ctrans\kmat + \regparam{D^\ctrans}D)^{-1}$ is symmetric as a result of $\kmat^\ctrans\kmat$ and $\regparam{D^\ctrans}D$ being individually symmetric, and thus the corresponding influence matrix $\A$ is symmetric.  With a symmetric matrix $\A$, the expected value of predictive risk is simplified to
 \begin{equation}
 \label{Eq_PR}
-\E\left(\frac{1}{n}\|\PE\|^2\right) = \frac{1}{n}\|(\A-I)\kmat\fdis\|^2 + \frac{\SD^2}{n}\trace(\A^2).
+\E\left(\frac{1}{n}\|\PE\|^2\right) = \frac{1}{n}\|(\A-I)\kmat\fdis\|^2 + \frac{\noiseSD^2}{n}\trace(\A^2).
 \end{equation}
 \indent The last step in the derivation of the UPRE method is to introduce the \textit{regularized residual}, which is defined as $\regres = \kmat\freg - \gnoise$. The regularized residual is important because it is also used in the derivation of the generalized cross validation and discrepancy principle methods. Using the influence matrix $\A$, the expression for $\regres$ can also be written as
 \[\regres = (\A-I)\gnoise = (\A-I)(\kmat\fdis + \noise) = (\A-I)\kmat\fdis + (\A-I)\noise.\]
 By the Trace Lemma and the expression for $\regres$, the expected value of $(1/n)\|\regres\|^2$ is
-\[\E\left(\frac{1}{n}\|\regres\|^2\right) = \frac{1}{n}\|(\A-I)\kmat\fdis\|^2 + \frac{\SD^2}{n}\trace({(\A-I)^\trans}(\A-I))\]
+\[\E\left(\frac{1}{n}\|\regres\|^2\right) = \frac{1}{n}\|(\A-I)\kmat\fdis\|^2 + \frac{\noiseSD^2}{n}\trace({(\A-I)^\trans}(\A-I))\]
 For symmetric $\A$, the term $(\A-I)^\trans(\A-I)$ becomes $(\A-I)^2 = \A^2 - 2\A + I$ and so by the linearity of the trace operator,
 \begin{equation}
 \label{Eq_RR}
-\E\left(\frac{1}{n}\|\regres\|^2\right) = \frac{1}{n}\|(\A-I)\kmat\fdis\|^2 + \frac{\SD^2}{n}\trace(\A^2) - \frac{2\SD^2}{n}\trace(\A) + \SD^2.
+\E\left(\frac{1}{n}\|\regres\|^2\right) = \frac{1}{n}\|(\A-I)\kmat\fdis\|^2 + \frac{\noiseSD^2}{n}\trace(\A^2) - \frac{2\noiseSD^2}{n}\trace(\A) + \noiseSD^2.
 \end{equation}
 By comparing \eqref{Eq_PR} and \eqref{Eq_RR}, the equation for the expected value of $(1/n)\|\PE\|^2$ can be expressed as
-\[\E\left(\frac{1}{n}\|\PE\|^2\right) = \E\left(\frac{1}{n}\|\regres\|^2\right) + \frac{2\SD^2}{n}\trace(\A) - \SD^2.\]
+\[\E\left(\frac{1}{n}\|\PE\|^2\right) = \E\left(\frac{1}{n}\|\regres\|^2\right) + \frac{2\noiseSD^2}{n}\trace(\A) - \noiseSD^2.\]
 The UPRE is defined to be
 \begin{equation}
 \label{Eq_UPRE}
-\U(\regparam) = \frac{1}{n}\|\regres\|^2 + \frac{2\SD^2}{n}\trace(\A) - \SD^2
+\U(\regparam) = \frac{1}{n}\|\regres\|^2 + \frac{2\noiseSD^2}{n}\trace(\A) - \noiseSD^2
 \end{equation}
 and the UPRE method is to pick $\regparam_{\text{UPRE}} = \argmin \U(\regparam)$. \par 
 Since the DFT is a the primary tool in the experiment, a spectral form of the UPRE function (one that involves DFT's) is desirable, as are spectral forms of the GCV and discrepancy principal functions in Sections \ref{Generalized Cross Validation} and \ref{Discrepancy Principle}. To derive a spectral form of \eqref{Eq_UPRE}, first recall that for Tikhonov regularization, $\A = \kmat(\kmat^\ctrans\kmat + \regparam{D^\ctrans}D)^{-1}\kmat^\ctrans$. From \eqref{Eq_CircDiag}, $\kmat = F^*\Delta{F}$, where $\Delta = \diag(\widehat{\kdis})$. If $D = F^\ctrans\Lambda{F}$ as well (with $\Lambda = \diag(\widehat{\ddis})$), then
@@ -454,22 +458,22 @@ and \eqref{Eq_TikSol} then produces
 \end{equation}
 Combining \eqref{Eq_TraceUPRE} and \eqref{Eq_RegResNorm} produces the spectral from of the UPRE function:
 \begin{equation}
-\U(\regparam) = \sum_{i = -n/2}^{(n/2)-1} |\widehat{\gnoise}_i|^2(1 - \filt(\regparam,|\widehat{\kdis}_i|))^2 + \frac{2\SD^2}{n}\sum_{i = -n/2}^{(n/2)-1} \filt(\regparam,|\widehat{\kdis}_i|) - \SD^2.
+\U(\regparam) = \sum_{i = -n/2}^{(n/2)-1} |\widehat{\gnoise}_i|^2(1 - \filt(\regparam,|\widehat{\kdis}_i|))^2 + \frac{2\noiseSD^2}{n}\sum_{i = -n/2}^{(n/2)-1} \filt(\regparam,|\widehat{\kdis}_i|) - \noiseSD^2.
 \label{Eq_SpectralUPRE}
 \end{equation} 
-Since the UPRE method relies on finding a minimum of \eqref{Eq_SpectralUPRE}, the constant $\SD^2$ can be ignored during implementation. In an effort to be more descriptive (note that \eqref{Eq_SpectralUPRE} also relies upon $n$), define
+Since the UPRE method relies on finding a minimum of \eqref{Eq_SpectralUPRE}, the constant $\noiseSD^2$ can be ignored during implementation. In an effort to be more descriptive (note that \eqref{Eq_SpectralUPRE} also relies upon $n$), define
 \begin{equation}
-\U_n(\regparam) = \sum_{i = -n/2}^{(n/2)-1} |\widehat{\gnoise}_i|^2(1 - \filt(\regparam,|\widehat{\kdis}_i|))^2 + \frac{2\SD^2}{n}\sum_{i = -n/2}^{(n/2)-1} \filt(\regparam,|\widehat{\kdis}_i|).
+\U_n(\regparam) = \sum_{i = -n/2}^{(n/2)-1} |\widehat{\gnoise}_i|^2(1 - \filt(\regparam,|\widehat{\kdis}_i|))^2 + \frac{2\noiseSD^2}{n}\sum_{i = -n/2}^{(n/2)-1} \filt(\regparam,|\widehat{\kdis}_i|).
 \label{Eq_SpectralUPREn}
 \end{equation} \par 
 Now consider the case where multiple data sets are available, which can arise from repeated observations of some time-invariant event. As an alternative to finding a regularization parameter for each data set, a single regularization parameter can be obtained by constructing a summed version of \eqref{Eq_SpectralUPREn}, assuming that $n$ is constant across all data sets to be considered. It is reasonable to expect that this single regularization parameter will perform worse that each individual parameter with respect to their corresponding data sets. However, computational time/resources could be saved because the method would involved solving a single minimization problem instead of solving a minimization problem for each data set. To bring this idea to fruition, some notation will be expanded. Let $R$ be the number of available data sets, and denote the $j$th data set by $\gnoise^j$. Similarly, let $\U_n^j(\regparam)$ be the UPRE function associated with the $j$th data set.  The sum of the UPRE functions is then 
 \begin{align*}
-\sum_{j=1}^R \U_n^j(\regparam) &= \sum_{j=1}^R \left(\sum_{i = -n/2}^{(n/2)-1} |\widehat{\gnoise^j}_i|^2(1 - \filt(\regparam,|\widehat{\kdis}_i|))^2 + \frac{2\SD^2}{n}\sum_{i = -n/2}^{(n/2)-1} \filt(\regparam,|\widehat{\kdis}_i|)\right) \\
-&= \sum_{j=1}^R \left(\sum_{i = -n/2}^{(n/2)-1} |\widehat{\gnoise^j}_i|^2(1 - \filt(\regparam,|\widehat{\kdis}_i|))^2\right) + \sum_{j=1}^R \left(\frac{2\SD^2}{n}\sum_{i = -n/2}^{(n/2)-1} \filt(\regparam,|\widehat{\kdis}_i|)\right).
+\sum_{j=1}^R \U_n^j(\regparam) &= \sum_{j=1}^R \left(\sum_{i = -n/2}^{(n/2)-1} |\widehat{\gnoise^j}_i|^2(1 - \filt(\regparam,|\widehat{\kdis}_i|))^2 + \frac{2\noiseSD^2}{n}\sum_{i = -n/2}^{(n/2)-1} \filt(\regparam,|\widehat{\kdis}_i|)\right) \\
+&= \sum_{j=1}^R \left(\sum_{i = -n/2}^{(n/2)-1} |\widehat{\gnoise^j}_i|^2(1 - \filt(\regparam,|\widehat{\kdis}_i|))^2\right) + \sum_{j=1}^R \left(\frac{2\noiseSD^2}{n}\sum_{i = -n/2}^{(n/2)-1} \filt(\regparam,|\widehat{\kdis}_i|)\right).
 \end{align*}
 By factoring terms from the first sum and noting that the summand of the second sum does not depend upon $j$, the function simplifies to
 \begin{equation}
-\sum_{j=1}^R \U_n^j(\regparam) =  \sum_{i = -n/2}^{(n/2)-1} \left(\sum_{j=1}^R |\widehat{\gnoise^j}_i|^2\right)(1 - \filt(\regparam,|\widehat{\kdis}_i|))^2 +  R\frac{2\SD^2}{n}\sum_{i = -n/2}^{(n/2)-1} \filt(\regparam,|\widehat{\kdis}_i|).
+\sum_{j=1}^R \U_n^j(\regparam) =  \sum_{i = -n/2}^{(n/2)-1} \left(\sum_{j=1}^R |\widehat{\gnoise^j}_i|^2\right)(1 - \filt(\regparam,|\widehat{\kdis}_i|))^2 +  R\frac{2\noiseSD^2}{n}\sum_{i = -n/2}^{(n/2)-1} \filt(\regparam,|\widehat{\kdis}_i|).
 \label{Eq_SpectralUPREsum}
 \end{equation}
 Numerically, \eqref{Eq_SpectralUPREsum} can be readily obtained by summing the DFT's of the data sets; note that $\widehat{\kdis}$ is unchanged across data sets. \par
@@ -478,7 +482,7 @@ To emphasize the validity of considering $\sum_{j=1}^R \U_n^j(\regparam)$, consi
 Thus $x_0$ is also a minimizer of the sum of the $F^j(x)$. Even when the $F^j(x)$ do not have the same minimizer, if the minimizers $x_0^j$ of $F^j(x)$ (respectively) are contained within an interval $[a,b]$, then $\sum_{j=1}^R F^j(x)$ has a local minimum contained in $[a,b]$ (this seems to be the case but I don't have a proof yet).
 
 \subsection{Generalized Cross Validation} \label{Generalized Cross Validation}
-The UPRE method requires knowledge of the variance $\SD^2$ of the noise vector $\noise$. In contrast, the generalized cross validation (GCV) method does not require knowledge of $\SD^2$. The GCV functional is
+The UPRE method requires knowledge of the variance $\noiseSD^2$ of the noise vector $\noise$. In contrast, the generalized cross validation (GCV) method does not require knowledge of $\noiseSD^2$. The GCV functional is
 \begin{equation}
 \label{Eq_GCV}
 \GCV(\regparam) = \frac{\frac{1}{n}\|\regres\|^2}{\left[\frac{1}{n}\trace(I-\A)\right]^2},
@@ -503,20 +507,20 @@ The case where multiple data sets are available will now be considered using not
 \subsection{Discrepancy Principle} \label{Discrepancy Principle}
 As a start to a stochastic derivation of the discrepancy principle method (for a deterministic derivation, see \cite{Vogel:2002}), consider the case where $\freg \approx \fdis$. In this case,
 \[\regres = \kmat\freg - \gnoise \approx \kmat\fdis - \gnoise = \noise.\]
-with a direct consequence being that $\E((1/n)\|\regres\|^2) \approx \E((1/n)\|\noise\|^2) =\SD^2$. Thus the discrepancy principle is to choose $\regparam$ such that $(1/n)\|\regres\|^2 = \SD^2$. A similarity exists between the discrepancy principle and the UPRE method in that the variance of the noise in the data must be known for both methods. \par 
+with a direct consequence being that $\E((1/n)\|\regres\|^2) \approx \E((1/n)\|\noise\|^2) =\noiseSD^2$. Thus the discrepancy principle is to choose $\regparam$ such that $(1/n)\|\regres\|^2 = \noiseSD^2$. A similarity exists between the discrepancy principle and the UPRE method in that the variance of the noise in the data must be known for both methods. \par 
 Implementation of this method requires finding a solution of $\D(\regparam) = 0$, where $\D(\regparam)$ is defined to be
 \begin{equation}
 \label{Eq_DP}
-\D(\regparam) = \frac{1}{n}\|\regres\|^2 - \SD^2.
+\D(\regparam) = \frac{1}{n}\|\regres\|^2 - \noiseSD^2.
 \end{equation}
 In other words, implementation of the discepancy principle method is equivalent to finding a root of $\D(\regparam)$. The spectral form of the discrepancy principle function is obtained directly from \eqref{Eq_RegResNorm} by substituting the regularized residual term:
 \begin{equation}
-\D(\regparam) = \sum_{i = -n/2}^{(n/2)-1} |\widehat{\gnoise}_i|^2(1 - \filt(\regparam,|\widehat{\kdis}_i|))^2 - \SD^2.
+\D(\regparam) = \sum_{i = -n/2}^{(n/2)-1} |\widehat{\gnoise}_i|^2(1 - \filt(\regparam,|\widehat{\kdis}_i|))^2 - \noiseSD^2.
 \label{Eq_SpectralDP}
 \end{equation}
-The function $\D(\regparam)$ will be near zero when the sum in \eqref{Eq_SpectralDP} is close to $\SD^2$. However, if regularized solution cannot be well-fit to the data, the sum will remain larger that $\SD^2$ and so $\D(\regparam)$ might not have any zeros. For this reason, $\SD^2$ can be replaced by $\delta\SD^2$ for $0 < \delta \leq 1$ so that \eqref{Eq_SpectralDP} becomes
+The function $\D(\regparam)$ will be near zero when the sum in \eqref{Eq_SpectralDP} is close to $\noiseSD^2$. However, if regularized solution cannot be well-fit to the data, the sum will remain larger that $\noiseSD^2$ and so $\D(\regparam)$ might not have any zeros. For this reason, $\noiseSD^2$ can be replaced by $\delta\noiseSD^2$ for a positive constant $\delta$ so that \eqref{Eq_SpectralDP} becomes
 \begin{equation}
-\D(\regparam) = \sum_{i = -n/2}^{(n/2)-1} |\widehat{\gnoise}_i|^2(1 - \filt(\regparam,|\widehat{\kdis}_i|))^2 - \delta\SD^2.
+\D(\regparam) = \sum_{i = -n/2}^{(n/2)-1} |\widehat{\gnoise}_i|^2(1 - \filt(\regparam,|\widehat{\kdis}_i|))^2 - \delta\noiseSD^2.
 \label{Eq_SpectralDP2}
 \end{equation}
 The value of $\delta$ can be adjusted as needed to obtain meaningful values for $\regparam_{\text{DP}}$; see \cite{ABT} for more details.
