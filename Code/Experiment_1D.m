@@ -143,8 +143,9 @@ for j = 1:R
             hn_hat,ones(1,length(gn)),L,r);
         gcv_lambda(j,i) = gcv_lambda(j,i)*sqrt(n/N);  % Scale the lambda
         
+        delta = 1;  % Default is 1
         [mdp_vectors(i,:,j),mdp_lambda(j,i)] = MDPparameter(gn_hat,...
-            hn_hat,ones(1,length(gn)),eta,L,r);
+            hn_hat,ones(1,length(gn)),eta,delta,L,r);
         mdp_lambda(j,i) = mdp_lambda(j,i);  % Scale the lambda
         
         best_lambda(j,i) = optimalParameter(gn_hat,hn_hat,...
