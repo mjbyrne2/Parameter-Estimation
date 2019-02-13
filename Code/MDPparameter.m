@@ -4,7 +4,8 @@ function [x,lambda] = MDPparameter(dataSpec,operatorSpec,smoothingSpec,...
 % parameter lambda that minimizes U. L is a vector of possible lambdas.
 %
 % Companion files: MDPfunctional.m
-x = MDPfunctional(dataSpec,operatorSpec,smoothingSpec,variance,L,trunc);
+x = MDPfunctional(dataSpec,operatorSpec,smoothingSpec,variance,delta,...
+    L,trunc);
 X = @(lambda) MDPfunctional(dataSpec,operatorSpec,...
             smoothingSpec,variance,delta,lambda,trunc);
 lambda = fzero(X,0.5);   
