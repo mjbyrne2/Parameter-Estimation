@@ -143,7 +143,7 @@ for j = 1:R
             hn_hat,ones(1,length(gn)),L,r);
         gcv_lambda(j,i) = gcv_lambda(j,i)*sqrt(n/N);  % Scale the lambda
         
-        delta = 1;  % Default is 1
+        delta = 1.1;  % Safety parameter; default is 1
         [mdp_vectors(i,:,j),mdp_lambda(j,i)] = MDPparameter(gn_hat,...
             hn_hat,ones(1,length(gn)),eta,delta,L,r);
         mdp_lambda(j,i) = mdp_lambda(j,i);  % Scale the lambda
@@ -199,6 +199,7 @@ end
 % Implementation of summed version of UPRE and GCV:
 upreSum_vectors = sum(upre_vectors,3); % Summing instances of noise 
 gcvSum_vectors = sum(gcv_vectors,3);   % Summing instances of noise
+mdpSum_vectors = sum(mdp_vectors,3);
 % [upre_V,upre_Lam] = UPREparameter(gSigma_hat,hn_hat,ones(1,N),R*eta,L,r);
 
 % Clear variables that don't need to be saved:
