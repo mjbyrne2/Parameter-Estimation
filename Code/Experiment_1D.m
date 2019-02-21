@@ -10,8 +10,6 @@
 %
 % Companion m-files: testFunction.m, GaussianBlur_1D.m
 % 
-% See UPRE_Test_B3.m as a template.
-%
 
 % Fixed set-up:
 seed = RandStream('mt19937ar','Seed',53);   % Generate random seed
@@ -143,7 +141,7 @@ for j = 1:R
             hn_hat,ones(1,length(gn)),L,r);
         gcv_lambda(j,i) = gcv_lambda(j,i)*sqrt(n/N);  % Scale the lambda
         
-        delta = 1.1;  % Safety parameter; default is 1
+        delta = 1.05;  % Safety parameter; default is 1
         [mdp_vectors(i,:,j),mdp_lambda(j,i)] = MDPparameter(gn_hat,...
             hn_hat,ones(1,length(gn)),eta,delta,L,r);
         mdp_lambda(j,i) = mdp_lambda(j,i);  % Scale the lambda
@@ -196,10 +194,10 @@ for j = 1:R
 
 end
 
-% Implementation of summed version of UPRE and GCV:
-upreSum_vectors = sum(upre_vectors,3); % Summing instances of noise 
-gcvSum_vectors = sum(gcv_vectors,3);   % Summing instances of noise
-mdpSum_vectors = sum(mdp_vectors,3);
+% Implementation of averaged versions of UPRE, GCV, and MDP:
+upreAvg_vectors = (1/R)*sum(upre_vectors,3);  
+gcvAvg_vectors = (1/R)*sum(gcv_vectors,3);
+mdpAvg_vectors = (1/R)*sum(mdp_vectors,3);
 % [upre_V,upre_Lam] = UPREparameter(gSigma_hat,hn_hat,ones(1,N),R*eta,L,r);
 
 % Clear variables that don't need to be saved:
