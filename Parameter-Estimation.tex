@@ -1,6 +1,6 @@
 \documentclass[12pt]{article}
 \usepackage{amsmath,amssymb,amsthm,bm}
-\usepackage{geometry,graphicx,subcaption}
+\usepackage{geometry,graphicx,subcaption,sidecap}
 \geometry{margin = 1 in}
 \usepackage{color}
 
@@ -500,7 +500,7 @@ Substituting \eqref{Eq_RegResNorm} and \eqref{Eq_TraceGCV} into \eqref{Eq_GCV} p
 \end{equation} \par 
 The case where multiple data sets are available will now be considered using notation analogous to that introduced in Section \ref{Unbiased Predictive Risk Estimator}; let $\GCV_n^j(\regparam)$ be the GCV function associated with the $j$th data set $\gnoise^j$ for $j = 1,\ldots,R$. Since the denominator in \eqref{Eq_SpectralGCV} is independent of the data,
 \begin{equation}
-\sum_{j=1}^R \GCV_n^j(\regparam)  = \frac{n^2\sum_{i = -n/2}^{(n/2)-1} \left(\sum_{j=1}^R |\widehat{\gnoise}_i|^2\right)(1 - \filt(\regparam,|\widehat{\kdis}_i|))^2}{(\sum_{i = -n/2}^{(n/2)-1} 1 - \filt(\regparam,|\widehat{\kdis}_i|))^2}.
+\sum_{j=1}^R \GCV_n^j(\regparam)  = \frac{n^2\sum_{i = -n/2}^{(n/2)-1} \left(\sum_{j=1}^R |\widehat{\gnoise^j}_i|^2\right)(1 - \filt(\regparam,|\widehat{\kdis}_i|))^2}{(\sum_{i = -n/2}^{(n/2)-1} 1 - \filt(\regparam,|\widehat{\kdis}_i|))^2}.
 \label{Eq_SpectralGCVsum}
 \end{equation}
 
@@ -523,7 +523,21 @@ The function $\D(\regparam)$ will be near zero when the sum in \eqref{Eq_Spectra
 \D(\regparam) = \sum_{i = -n/2}^{(n/2)-1} |\widehat{\gnoise}_i|^2(1 - \filt(\regparam,|\widehat{\kdis}_i|))^2 - \delta\noiseSD^2.
 \label{Eq_SpectralDP2}
 \end{equation}
-The value of $\delta$ can be adjusted as needed to obtain meaningful values for $\regparam_{\text{DP}}$; see \cite{ABT} for more details.
+The value of $\delta$ can be adjusted as needed to obtain meaningful values for $\regparam_{\text{DP}}$; see \cite{ABT} for more details. As stated in \cite{Vogel:2002}, $\D(\regparam)$ is monotonic, and so if the range of $\regparam$ being considered for roots of \eqref{Eq_SpectralDP2} is not chosen carefully, it is possible that no regularization parameter will be obtained; see Section \ref{The MDP method} for further discussion. \par 
+Again adopting the notation introduced in Section \ref{Unbiased Predictive Risk Estimator}, let $\D_n^j(\regparam)$ be the MDP function associated with the $j$th data set $\gnoise^j$ for $j = 1,\ldots,R$. Then assuming that $\delta$ is constant across the $\D_n^j(\regparam)$,
+\begin{equation}
+\sum_{j=1}^R \D_n^j(\regparam)  = \sum_{i = -n/2}^{(n/2)-1} \left(\sum_{j=1}^R |\widehat{\gnoise^j}_i|^2\right)(1 - \filt(\regparam,|\widehat{\kdis}_i|))^2 - R\delta\noiseSD^2. 
+\label{Eq_SpectralDPsum}
+\end{equation}
+As previously stated, the discrepancy function \eqref{Eq_SpectralDP2} is monotone increasing, and so the sum \eqref{Eq_SpectralDPsum} is monotone increasing as well. Unfortunately this does not guarantee that \eqref{Eq_SpectralDPsum} has a root, and even if it does, there is no guarantee about where the root is located. As a simple example, consider $h^j(x) = e^x + (-e)^j$ for $j \in \{1,2\}$. Explicitly, $h^1(x) = e^x - e$, which has a root located at $x = 1$, and $h^2(x) = e^x + e^2$, which has no root. Both functions are monotone increasing and so their sum $(h^1 + h^2)(x) = 2e^x - e +e^2$ is monotone increasing, but this function does not have a root. \par 
+Though the previous example is simple, the reason that the sum $(h^1 + h^2)(x)$ has no root is insightful. Both $h^1(x)$ and $h^2(x)$ have the same non-constant term $e^x$, and so the fact that the sum of the constant terms, $-e + e^2$, is positive is the cause of $(h^1 + h^2)(x)$ having no root. The situation with the sum of the discrepancy principle functions is actually the opposite: the non-constant term of $\D_n^j(\regparam)$ is different for each $j = 1,\ldots,R$, while the constant term is the same ($\delta\noiseSD^2$). This is a direct consequence of the variance of the noise remaining the same while the noise realizations themselves differ. \par 
+The preceding observation provides a possible alternative to \eqref{Eq_SpectralDPsum}.  Instead of considering the sum of the discrepancy principle functions, consider instead the mean of the functions:
+\begin{equation}
+\frac{1}{R}\sum_{j=1}^R \D_n^j(\regparam)  = \sum_{i = -n/2}^{(n/2)-1} \left(\frac{1}{R} \sum_{j=1}^R |\widehat{\gnoise^j}_i|^2\right)(1 - \filt(\regparam,|\widehat{\kdis}_i|))^2 - \delta\noiseSD^2. 
+\label{Eq_SpectralDPmean}
+\end{equation}
+The primary advantage of considering the mean is that if there are data realizations that would otherwise result in discrepancy principle functions that prove difficult or impossible for finding a root, averaging these functions with better-behaved functions could provide a single function with a meaningful root (here ``better-behaved" means that the function at least has a root and the root is located within an interval that is not excessively large). The hope is that the poorly-behaved functions are outliers so that average of the functions can be expected to have a root. If for some reason the better-behaved functions are themselves the outliers, then this averaging approach would not be expected to yield meaningful results. \par 
+To provide a more rigorous justification for using \eqref{Eq_SpectralDPmean}, a closer looks at the terms reveals that each term in the sum over $i$ is non-negative, and so the sum itself is always non-negative. Thus the sign of \eqref{Eq_SpectralDPmean} depends on the magnitude of the sum in comparison with $\delta\noiseSD^2$. If the sum is smaller than $\delta\noiseSD^2$ for a given $\regparam$, then the function output is negative and vice versa. Since the terms $(1 - \filt(\regparam,|\widehat{\kdis}_i|))^2$ are independent of $j$, for fixed $\regparam$ the sign of \eqref{Eq_SpectralDPmean} will then depend directly on the magnitudes of $(1/R) \sum_{j=1}^R |\widehat{\gnoise^j}_i|^2$ for each $i$.  
 
 \section{Numerical Results} \label{Numerical results}
 
@@ -558,7 +572,51 @@ The relative errors are smaller for an SNR of 25 as opposed to an SNR of 5, whic
 Of the 12 experimental configurations, four are presented here, all of which pertain to the second test function. The GCV method was used to select regularization parameters at each resolution. These parameters were used to construct regularized solutions of the full problem on $N = 4096$ points.
 
 \subsection{The MDP method} \label{The MDP method}
-Of the 12 experimental configurations, four are presented here, all of which pertain to the second test function. The GCV method was used to select regularization parameters at each resolution. These parameters were used to construct regularized solutions of the full problem on $N = 4096$ points.
+Of the three methods considered in this report, the MDP method seemed to be the least robust with respect to downsampling. For many of the data configuration, finding a root of the MDP function proved unsuccesful; the components of the vectors representing the discretized MDP functions were often all positive, and so a root did not exist, at least in the $\regparam$ interval $[10^{-5},10]$. In MATLAB, the built-in function \texttt{fzero} was utilized to find roots of the MDP function. If no root could be found, \texttt{NaN} was returned. Since 20 noise realizations and 9 downsampling levels were considered, a total of 180 cases were tested for each data configuration. The safety parameter $\delta$ from \eqref{Eq_SpectralDP2} was set to 1.05.  \par 
+Figure \ref{fig:MDPfailures} shows the sparsity of the resulting \texttt{NaN} cases for all data configurations considered. Perhaps the primary observation that can be made from Figure \ref{fig:MDPfailures} is that it is possible for root finding to fail at a certain downsampling level but succeed at a previous or subsequent level. This is evident from all of the plots, with the exception of the plots associated with the data configuration of an SNR of 25 and a width parameter of 100. For test functions \#1 and \#3, the MDP method for this data configuration failed considerably; no root of the MDP function was found for 110 cases ($\approx 61.1\%$) for test function \#1 and 112 cases ($\approx 62.2 \%$) for test function \#3. This data configuration proved somewhat more tractable is combination with test function \#2, with 40 cases ($\approx 22.2 \%$) of MDP method failure. This is somewhat surprising in light of the fact that test function \#2 is the least smooth of the three test functions.  \par 
+One way of eliminating the number of failed cases would be to increase the value of $\delta$ in \eqref{Eq_SpectralDP2}. The result of doing so is actually twofold; not only does the number of failed cases decrease, but the consistency of the $\regparam_{\text{MDP}}$ improves. To emphasis this second result, Figure \ref{fig:MDPfunctions} shows that the tail ends of the functions fan out, while the curves appear to come together between $\lambda = 10^{-1}$ and $\lambda = 10^0$. Unfortunately the consistency of the $\regparam_{\text{MDP}}$ obtained by increasing $\delta$ yields regularized solutions with a greater amount of error, as shown in Figure 
+
+\begin{figure}
+	\centering
+	\begin{subfigure}[b]{0.75\textwidth}
+        \includegraphics[width=\textwidth]{Figures/MDPfailures1D_F1_R20.eps}
+        \caption{}
+        \label{fig:MDPfailure_F1}
+    \end{subfigure}
+    \vspace{-5pt}
+    
+    \begin{subfigure}[b]{0.75\textwidth}
+        \includegraphics[width=\textwidth]{Figures/MDPfailures1D_F2_R20.eps}
+        \caption{}
+        \label{fig:MDPfailure_F2}
+    \end{subfigure} 
+
+    \begin{subfigure}[b]{0.75\textwidth}
+        \includegraphics[width=\textwidth]{Figures/MDPfailures1D_F3_R20.eps}
+        \caption{}
+        \label{fig:MDPfailure_F3}
+    \end{subfigure}
+    \caption{The sparsity of MDP failures across noise realizations and downsampling levels. The rows represent noise realizations and the columns represent downsampling levels; the leftmost columns represent the $n = 16$ level and the rightmost represent the full $n = 4096$ level, with levels progressing by powers of 2 from left to right. The red dots represent \texttt{NaN}, which are the failures cases. The subfigures \ref{fig:MDPfailure_F1}, \ref{fig:MDPfailure_F2}, and \ref{fig:MDPfailure_F3} are the results for test functions \#1, \#2, and \#3, respectively.}
+\label{fig:MDPfailures}
+\end{figure}
+
+\begin{figure}
+	\centering
+	\begin{subfigure}[b]{0.4\textwidth}
+        \includegraphics[width=\textwidth]{Figures/MDPfunctions_F1_S15_W100.eps}
+        \caption{}
+        \label{fig:MDPfunctions_notzoomed}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.4\textwidth}
+        \includegraphics[width=\textwidth]{Figures/MDPfunctions_F1_S15_W100_zoomed.eps}
+        \caption{}
+        \label{fig:MDPfunctions_zoomed}
+    \end{subfigure}
+    \caption{}
+\label{fig:MDPfunctions}
+\end{figure}
+
+
 
 \bibliographystyle{siam}
 \bibliography{Parameter-Estimation}
