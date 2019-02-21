@@ -180,93 +180,6 @@ xlabel('Index')
 title('|\sigma_i - |khat_i||/\sigma_i')
 set(gca,'Fontsize',14)
 
-%% Law of Large Numbers
-% This sections generates one plot called LLN_Plot.eps showing the effect
-% of vector length on sample variance. This plot demonstrates the Law of
-% Large Numbers.
-
-clear
-
-seed = RandStream('mt19937ar','Seed',53);   % Generate random seed
-M = 2.^(4:12); % Downsampling resolutions
-r = 4096; % Effective numerical rank (2^12)
-N = 4096; % Number of points in the finest sampling 
-t = linspace(0,1,N+1);
-t = t(1:end-1); % Equispaced N-point discretization of the interval [0,1]
-
-% Three test functions:
-f1 = testFunction('1D',1);
-f2 = testFunction('1D',2);
-f3 = testFunction('1D',3);
-
-% Construction of blurred functions g:
-width = 50;
-[g1,h1] = GaussianBlur_1D(t,f1,width);
-[g2,h2] = GaussianBlur_1D(t,f2,width);
-[g3,h3] = GaussianBlur_1D(t,f3,width);
-
-SNR = 5;   % Signal-to-noise ratio (SNR)
-R = 100; % Number of noise realizations
-
-v1 = (norm(g1)^2)/(N*10^(SNR/10));  % v = variance for specific SNR
-noise1 = sqrt(v1)*seed.randn(R,N);  % Creation of noise
-v2 = (norm(g2)^2)/(N*10^(SNR/10));  
-noise2 = sqrt(v2)*seed.randn(R,N);  
-v3 = (norm(g3)^2)/(N*10^(SNR/10));  
-noise3 = sqrt(v3)*seed.randn(R,N);  
-
-% Vectors for sample variances:
-sv1 = var(noise1,0,2);
-sv2 = var(noise2,0,2);
-sv3 = var(noise3,0,2);
-
-% Initialization of storage vectors for means of sample variances:
-means1 = zeros(R,1);
-means2 = means1;
-means3 = means1;
-
-% Calculation of means of sample variances:
-for j = 1:R
-   means1(j) = mean(sv1(1:j));
-   means2(j) = mean(sv2(1:j)); 
-   means3(j) = mean(sv3(1:j)); 
-end
-
-F = figure('units','normalized','outerposition',[0 0 1 1]);
-
-subplot(3,1,1)
-plot(1:R,means1,'Linewidth',2)
-hold on
-axis manual
-plot(1:R,v1*ones(1,R),'r--','Linewidth',2)
-legend({'Sample variance',['s^2 = ' num2str(v1)]},'Location','East')
-title('Result for test function #1')
-set(gca,'Fontsize',18)
-
-subplot(3,1,2)
-plot(1:R,means2,'Linewidth',2)
-hold on
-axis manual
-plot(1:R,v2*ones(1,R),'r--','Linewidth',2)
-legend({'Sample variance',['s^2 = ' num2str(v2)]},'Location','East')
-title('Result for test function #2')
-set(gca,'Fontsize',18)
-
-subplot(3,1,3)
-plot(1:R,means3,'Linewidth',2)
-hold on
-axis manual
-plot(1:R,v3*ones(1,R),'r--','Linewidth',2)
-legend({'Sample variance',['s^2 = ' num2str(v3)]},'Location','East')
-title('Result for test function #3')
-xlabel('Number of data points')
-set(gca,'Fontsize',18)
-
-figfold = ['/Users/mjbyrne/Documents/Arizona State University/' ...
-    'Parameter-Estimation/Figures/'];    % Specifies the Figures folder
-figname = 'LLN_Plot.fig';
-savefig(F,[figfold,figname],'compact')
-
 %% Discrete Picard condition
 % This section generates one plot illustrating the discrete Picard
 % condition. 
@@ -460,6 +373,47 @@ figname = ['GCVsolutions1D_F' num2str(Fnum) '_S'...
     num2str(SNR,'%02.f') '_W' num2str(width) '_R' num2str(R)...
     '.fig'];
 savefig(F,[figfold,figname],'compact')
+
+%% Plot of the NaN sparsity of the MDP lambdas
+% This section produces three plot, one for each test function, of the
+% sparsity of the MDP lambda failures (represented numerically as NaN in
+% the matrices mdp_lambdas).
+
+figfold = ['/Users/mjbyrne/Documents/Arizona State University/' ...
+    'Parameter-Estimation/Figures/'];    % Specifies the Figures folder
+
+for Fnum = [1,2,3] % Loop over functions
+    F = figure('units','normalized','outerposition',[0 0 1 1]);
+    i = 1;  % Starting position of the subplot
+    for SNR = [15,25]   % Loop over SNR
+        for width = [100,200]   % Loop width parameter
+            load(['Data1D_F' num2str(Fnum) '_S' num2str(SNR) '_W'...
+                num2str(width) '_R20.mat'])
+            subplot(1,4,i)
+            spy(isnan(mdp_lambda),'r')
+            title(['SNR = ' num2str(SNR) ', width = ' num2str(width)],...
+                'Fontsize',14)
+            i = i + 1;
+        end
+    end
+    figname = ['MDPfailures1D_F' num2str(Fnum) '_R20.fig'];
+    savefig(F,[figfold,figname],'compact')
+end
+
+%% Plot of the MDP functions
+% This section produces one plot showing the shape of the MDP functions.
+% The data configuration used for this section is test function #1, SNR 15,
+% and width parameter 100.
+
+load Data1D_F1_S15_W100_R20.mat
+F = figure('units','normalized','outerposition',[0 0 0.5 1]);
+semilogx(L,mdp_vectors(:,:,1)')
+xlim([L(1),L(end)])
+grid on
+xlabel('\lambda')
+legend({'N = 16','N = 32','N = 64','N = 128','N = 256','N = 512',...
+    'N = 1024','N = 2048','N = 4098'},'Location','Northwest','Fontsize',18)
+set(gca,'Fontsize',18)
 
 %% Plot of Lambdas and Relative Errors for MDP
 % This section generates one plot consisting of two box plots. The first
