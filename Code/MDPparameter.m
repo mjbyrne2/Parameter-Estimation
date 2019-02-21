@@ -8,6 +8,6 @@ x = MDPfunctional(dataSpec,operatorSpec,smoothingSpec,variance,delta,...
     L,trunc);
 X = @(lambda) MDPfunctional(dataSpec,operatorSpec,...
             smoothingSpec,variance,delta,lambda,trunc);
-lambda = fzero(X,0.5,optimset('TolX',1e-5));   
+lambda = fzero(X,[0,10],optimset('TolX',1e-5));   
 
 end
