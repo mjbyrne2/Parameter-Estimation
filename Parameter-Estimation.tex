@@ -32,6 +32,7 @@
 
 % Filter function:
 \newcommand{\filt}{\phi}
+\newcommand{\mfilt}{\psi}
 
 % Noise notation:
 \newcommand{\noiseSD}{\sigma}	% Standard deviation
@@ -90,7 +91,7 @@ If $\kcon * \fcon$ is considered a smoothing operation, then finding $\fcon$ suc
 The kernel $\kcon$ is smooth and bounded on $[0,1]$, and the function $\fcon$ is 1-periodic and bounded. Plots of $\fcon(t)$ and $\kcon(t)$ are shown in Figure \ref{FunctionKernelPlot}. \par
 The kernel $\kcon(t) = \exp(-200(t-\frac{1}{2})^2)$ is an example of a Gaussian kernel. The form of a Gaussian kernel comes from the probability density function of the Gaussian distribution,
 \[p(t) = \frac{1}{\sqrt{2\pi\blurV}}\exp\left(\frac{-(t-\mu)^2}{2\blurV}\right),\]
-where $\mu$ is the mean and $\blurV$ is the variance. The mean is the center of the Gaussian distribution, as well as the abscissa of the absolute maximum. The variance is a measure of dispersion of the distribution; as $\blurV$ increases, the width of the graph of $p(t)$ increases. The standard deviation $\sqrt{\blurV}$ is also a measure of dispersion, though variance will be the measure of choice in this report. The scale factor $1/\sqrt{2\pi\blurV}$ ensures that $\int_{\mathbb{R}} p(t) \: dt = 1$, an essential property of a continuous probability distribution defined on the entire real line. For Gaussian kernels, however, this scale factor may be dropped since having a unitary integral is not required of kernels in general.  For the Gaussian kernel example $\kcon(t) = \exp(-200(t-\frac{1}{2})^2)$, the mean is 1/2 and $-200 = -1/2\noiseSD$ implies that $\blurV = 1/400$. Figure \ref{GaussianDistributions} illustrates the relationship between variance and width of the Gaussian distribution. It should be noted that the choice of $\blurV$ as the symbol for variance of the Gaussian distribution is nonstandard; a common choice for this variance is $\sigma^2$, though in this report $\sigma^2$ is reserved for the variance of the white noise from which $\noise$ is drawn in \eqref{Eq_DisNoise}. Another alternative for $\blurV$ would be $s^2$, though $s$ is reserved for singular values, the diagonal entries of $\Sigma$ in \eqref{Eq_SVD}. 
+where $\mu$ is the mean and $\blurV$ is the variance. The mean is the center of the Gaussian distribution, as well as the abscissa of the absolute maximum. The variance is a measure of dispersion of the distribution; as $\blurV$ increases, the width of the graph of $p(t)$ increases. The standard deviation $\sqrt{\blurV}$ is also a measure of dispersion, though variance will be the measure of choice in this report. The scale factor $1/\sqrt{2\pi\blurV}$ ensures that $\int_{\mathbb{R}} p(t) \: dt = 1$, an essential property of a continuous probability distribution defined on the entire real line. For Gaussian kernels, however, this scale factor may be dropped since having a unitary integral is not required of kernels in general.  For the Gaussian kernel example $\kcon(t) = \exp(-200(t-\frac{1}{2})^2)$, the mean is 1/2 and $-200 = -1/2\noiseSD$ implies that $\blurV = 1/400$. Figure \ref{GaussianDistributions} illustrates the relationship between variance and width of the Gaussian distribution. It should be noted that the choice of $\blurV$ as the symbol for variance of the Gaussian distribution is nonstandard; a common choice for this variance is $\sigma^2$, though in this report $\sigma^2$ is reserved for the variance of the white noise from which $\noise$ is drawn in \eqref{Eq_DisNoise}. Another alternative for $\blurV$ would be $s^2$, though $s$ is reserved for singular values, the diagonal entries of $\Sigma$ in \eqref{Eq_SVD}. As a last remark, kernel $k(x,t)$ and function \eqref{Eq_TF2} will be retained for the numerical examples included in this report.
 
 \begin{figure}
 	\centerline{\includegraphics[scale=0.4]{Figures/FunctionKernelPlot.eps}}
@@ -143,7 +144,7 @@ By using $\kmat^{-1} = V\Sigma^{-1}U^\trans$ when $\kmat$ is nonsingular, the pr
 \label{Eq_InvProd}
 \end{equation}
 Even if $\kmat$ is singular, a solution can still be obtained by using the psuedoinverse $\kmat^+ = V{\Sigma^+}U^\trans$, where $\Sigma^+ = \diag(1/\singular_1,\ldots,1/\singular_r)$, and the upper bound of summation in \eqref{Eq_InvProd} becomes $r$. In either the nonsingular or singular case for $\kmat$, however, the summands in \eqref{Eq_InvProd} are numerically unstable for small $\singular_i$. For a visual representation of this instability, a Picard plot can be constructed. A Picard plot is a graph showing the terms $|\LSV^\trans_i\noise|/\singular_i$ in decreasing order with respect to the singular values. If the terms $|\LSV^\trans_i\noise|$ decay faster than $\singular_i$ as $i$ increases, then the terms $|\LSV^\trans_i\noise|/\singular_i$ do not become excessively large; this is the discrete Picard condition \cite{ABT}. The discrete Picard condition is thus a measure of instability. If the discrete Picard condition is not met, then the terms $|\LSV^\trans_i\noise|/\singular_i$ blow up as $i$ increases, often resulting in worthless solutions. In this experiment, the discrete Fourier transform will be used to obtain solutions analogous to those obtained by \eqref{Eq_InvProd}. In Section \ref{The Discrete Fourier Transform} a Picard plot is provided that demonstrates the relationship between the noise, the width of the Gaussian blur, and the resulting numerical instabilities related to obtaining meaningful solutions. See \cite{Hansen1990} for more information on Picard plots and the associated discrete Picard condition. \par 
-A common approach to overcome numerical instabilities is to multiply the summands in \eqref{Eq_InvProd} by \textit{filter functions} $\filt$ that depend upon $\singular_i$ and a \textit{regularization parameter} $\regparam$. By doing so, an approximate solution is obtained:
+A common approach to overcome numerical instabilities is to multiply the summands in \eqref{Eq_InvProd} by \textit{filter functions} $\filt$ that depend upon $\singular_i$ and a non-negative \textit{regularization parameter} $\regparam$. By doing so, an approximate solution is obtained:
 \begin{equation}
 \fdis(\regparam) = \sum_{i = 1}^n \RSV_i\filt(\regparam,\singular_i)\left(\frac{{\LSV^\trans_i}\gnoise}{\singular_i}\right).
 \label{Eq_ApproxSol}
@@ -161,19 +162,25 @@ Using this function in (3) gives the approximate solution
 which actually corresponds to the solution obtained using a truncated singular value decomposition (TSVD) of the matrix $\kmat$ \cite{Vogel:2002}. \par
 A less simple filter function is
 \begin{equation}
-\filt(\regparam,\singular_i)  = \frac{\singular_i^2}{\singular_i^2 + \regparam}
+\filt(\regparam,\singular_i)  = \frac{\singular_i^2}{\singular_i^2 + \regparam^2}
 \label{Eq_TikFilt}
 \end{equation}
-which is known as the Tikhonov filter function. For large values of $\regparam$, the above fraction is close to zero and for small values of $\regparam$, the fraction is near to unity. The use of the Tikhonov filter function to generate an approximate solution is known as \textit{Tikhonov regularization} \cite{Tikh1963}; the obtained solution is
+which is known as the Tikhonov filter function. For large values of $\regparam$, \eqref{Eq_TikFilt} is close to zero and for small values of $\regparam$ (and nonzero values of $\singular_i$), it is close to one. Another property of \eqref{Eq_TikFilt} is that for fixed nonzero $\singular_i$, it is monotone decreasing in $\regparam$. Tikhonov filter functions will be considered extensively through this report. Thus in addition, let
 \begin{equation}
-\fdis(\regparam) = \sum_{i = 1}^n \filt(\regparam,\singular_i)\frac{{\LSV^\trans_i}\gnoise}{\singular_i}\RSV_i = \sum_{i = 1}^n \frac{\singular_i{\LSV^\trans_i}\gnoise}{\singular_i^2 + \regparam}\RSV_i.
+\mfilt(\regparam,\singular_i) = 1 - \filt(\regparam,\singular_i) = \frac{\regparam^2}{\singular_i^2 + \regparam^2}.
+\label{Eq_TikFiltPsi}
+\end{equation}
+The expression $1 - \filt(\regparam,\singular_i)$ arises a number of time in the methods introduced in Section \ref{Parameter estimation methods}, and so $\mfilt(\regparam,\singular_i)$ will be used to simplify notation. In contrast to \eqref{Eq_TikFilt}, \eqref{Eq_TikFiltPsi} is close to one for large values of $\regparam$ and monotone increasing in $\regparam$ for fixed $\singular_i$. \par 
+The use of the Tikhonov filter function to generate an approximate solution is known as \textit{Tikhonov regularization} \cite{Tikh1963}; the obtained solution is
+\begin{equation}
+\fdis(\regparam) = \sum_{i = 1}^n \filt(\regparam,\singular_i)\frac{{\LSV^\trans_i}\gnoise}{\singular_i}\RSV_i = \sum_{i = 1}^n \frac{\singular_i{\LSV^\trans_i}\gnoise}{\singular_i^2 + \regparam^2}\RSV_i.
 \label{Eq_TikSol}
 \end{equation}
 An alternative representation of the above Tikhonov solution is
 \begin{equation}
-\fdis(\regparam) = \arg\min_{\fdis \in \mathbb{R}^n} \|\kmat\fdis - \gnoise\|^2 + \regparam\|D\fdis\|^2,
+\fdis(\regparam) = \arg\min_{\fdis \in \mathbb{R}^n} \|\kmat\fdis - \gnoise\|^2 + \regparam^2\|D\fdis\|^2,
 \end{equation}
-where $D$ is the matrix representation of a linear operator. The term $\|D\fdis\|^2$ is commonly called the penalty function \cite{Vogel:2002}. The representation \eqref{Eq_TikSol} follows from selecting $D$ to be $I$, the $n \times n$ identity matrix. The kernel $k(x,t)$ and function $f(t)$ considered in Section \ref{Introduction} will be retained for the numerical examples included in this report.
+where $D$ is the matrix representation of a linear operator. The term $\|D\fdis\|^2$ is commonly called the penalty function \cite{Vogel:2002}. The representation \eqref{Eq_TikSol} follows from selecting $D$ to be $I$, the $n \times n$ identity matrix. 
 
 \section{Analytical tools} \label{Analytical tools}
 
@@ -450,30 +457,30 @@ The matrix $\Delta(\Delta^\ctrans\Delta + \regparam\Lambda^\ctrans\Lambda)^{-1}\
 \end{equation}
 where $\filt$ is the Tikhonov filter function \eqref{Eq_TikFilt}. Since the operator $D$ is fixed, $\widehat{\ddis}$ can be pre-computed; this is reflected by the notation $\filt(\regparam,|\widehat{\kdis}_i|)$. \par
 Next, the definition of $\regres$ gives
-\[\frac{1}{n}\|\regres\|^2 = \frac{1}{n}\|\kmat\freg - \gnoise\|^2 = \sum_{i = 0}^{n-1} |\widehat{\kdis}_i\widehat{(\freg)}_i - \widehat{\gnoise}_i|^2.\]
-and \eqref{Eq_TikSol} then produces
+\[\frac{1}{n}\|\regres\|^2 = \frac{1}{n}\|\kmat\freg - \gnoise\|^2 = \sum_{i = 0}^{n-1} |\widehat{\kdis}_i\widehat{(\freg)}_i - \widehat{\gnoise}_i|^2,\]
+and \eqref{Eq_TikFiltPsi} and \eqref{Eq_TikSol} then produce
 \begin{equation}
-\frac{1}{n}\|\regres\|^2 = \sum_{i = 0}^{n-1} |\filt(\regparam,|\widehat{\kdis}_i|)\widehat{\gnoise}_i - \widehat{\gnoise}_i|^2 = \sum_{i = 0}^{n-1} |\widehat{\gnoise}_i|^2(1 - \filt(\regparam,|\widehat{\kdis}_i|))^2.
+\frac{1}{n}\|\regres\|^2 = \sum_{i = 0}^{n-1} |\filt(\regparam,|\widehat{\kdis}_i|)\widehat{\gnoise}_i - \widehat{\gnoise}_i|^2 = \sum_{i = 0}^{n-1} |\widehat{\gnoise}_i|^2(\mfilt(\regparam,|\widehat{\kdis}_i|))^2.
 \label{Eq_RegResNorm}
 \end{equation}
 Combining \eqref{Eq_TraceUPRE} and \eqref{Eq_RegResNorm} produces the spectral from of the UPRE function:
 \begin{equation}
-\U(\regparam) = \sum_{i = 0}^{n-1} |\widehat{\gnoise}_i|^2(1 - \filt(\regparam,|\widehat{\kdis}_i|))^2 + \frac{2\noiseSD^2}{n}\sum_{i = -n/2}^{(n/2)-1} \filt(\regparam,|\widehat{\kdis}_i|) - \noiseSD^2.
+\U(\regparam) = \sum_{i = 0}^{n-1} |\widehat{\gnoise}_i|^2(\mfilt(\regparam,|\widehat{\kdis}_i|))^2 + \frac{2\noiseSD^2}{n}\sum_{i = -0}^{n-1} \filt(\regparam,|\widehat{\kdis}_i|) - \noiseSD^2.
 \label{Eq_SpectralUPRE}
 \end{equation} 
 Since the UPRE method relies on finding a minimum of \eqref{Eq_SpectralUPRE}, the constant $\noiseSD^2$ can be ignored during implementation. In an effort to be more descriptive (note that \eqref{Eq_SpectralUPRE} also relies upon $n$), define
 \begin{equation}
-\U_n(\regparam) = \sum_{i = 0}^{n-1} |\widehat{\gnoise}_i|^2(1 - \filt(\regparam,|\widehat{\kdis}_i|))^2 + \frac{2\noiseSD^2}{n}\sum_{i = -n/2}^{(n/2)-1} \filt(\regparam,|\widehat{\kdis}_i|).
+\U_n(\regparam) = \sum_{i = 0}^{n-1} |\widehat{\gnoise}_i|^2(\mfilt(\regparam,|\widehat{\kdis}_i|))^2 + \frac{2\noiseSD^2}{n}\sum_{i = -n/2}^{(n/2)-1} \filt(\regparam,|\widehat{\kdis}_i|).
 \label{Eq_SpectralUPREn}
 \end{equation} \par 
 Now consider the case where multiple data sets are available, which can arise from repeated observations of some time-invariant event. As an alternative to finding a regularization parameter for each data set, a single regularization parameter can be obtained by constructing an averaged version of \eqref{Eq_SpectralUPREn}, assuming that $n$ is constant across all data sets to be considered. It is reasonable to expect that this single regularization parameter will perform worse that each individual parameter with respect to their corresponding data sets. However, computational time/resources could be saved because the method would involved solving a single minimization problem instead of solving a minimization problem for each data set. To bring this idea to fruition, some notation will be expanded. Let $R$ be the number of available data sets, and denote the $j$th data set by $\gnoise^j$. Similarly, let $\U_n^j(\regparam)$ be the UPRE function associated with the $j$th data set.  The average of the UPRE functions is then 
 \begin{align*}
-\frac{1}{R}\sum_{j=1}^R \U_n^j(\regparam) &= \frac{1}{R}\sum_{j=1}^R \left(\sum_{i = 0}^{n-1} |\widehat{\gnoise^j}_i|^2(1 - \filt(\regparam,|\widehat{\kdis}_i|))^2 + \frac{2\noiseSD^2}{n}\sum_{i = 0}^{n-1} \filt(\regparam,|\widehat{\kdis}_i|)\right) \\
-&= \frac{1}{R}\sum_{j=1}^R \left(\sum_{i = 0}^{n-1} |\widehat{\gnoise^j}_i|^2(1 - \filt(\regparam,|\widehat{\kdis}_i|))^2\right) + \frac{1}{R}\sum_{j=1}^R \left(\frac{2\noiseSD^2}{n}\sum_{i = 0}^{n-1} \filt(\regparam,|\widehat{\kdis}_i|)\right).
+\frac{1}{R}\sum_{j=1}^R \U_n^j(\regparam) &= \frac{1}{R}\sum_{j=1}^R \left(\sum_{i = 0}^{n-1} |\widehat{\gnoise^j}_i|^2(\mfilt(\regparam,|\widehat{\kdis}_i|))^2 + \frac{2\noiseSD^2}{n}\sum_{i = 0}^{n-1} \filt(\regparam,|\widehat{\kdis}_i|)\right) \\
+&= \frac{1}{R}\sum_{j=1}^R \left(\sum_{i = 0}^{n-1} |\widehat{\gnoise^j}_i|^2(\mfilt(\regparam,|\widehat{\kdis}_i|))^2\right) + \frac{1}{R}\sum_{j=1}^R \left(\frac{2\noiseSD^2}{n}\sum_{i = 0}^{n-1} \filt(\regparam,|\widehat{\kdis}_i|)\right).
 \end{align*}
 By factoring terms from the first sum and noting that the summand of the second sum does not depend upon $j$, the function simplifies to
 \begin{equation}
-\frac{1}{R}\sum_{j=1}^R \U_n^j(\regparam) =  \sum_{i = 0}^{n-1} \left(\frac{1}{R}\sum_{j=1}^R |\widehat{\gnoise^j}_i|^2\right)(1 - \filt(\regparam,|\widehat{\kdis}_i|))^2 + \frac{2\noiseSD^2}{n}\sum_{i = 0}^{n-1} \filt(\regparam,|\widehat{\kdis}_i|).
+\frac{1}{R}\sum_{j=1}^R \U_n^j(\regparam) =  \sum_{i = 0}^{n-1} \left(\frac{1}{R}\sum_{j=1}^R |\widehat{\gnoise^j}_i|^2\right)(\mfilt(\regparam,|\widehat{\kdis}_i|))^2 + \frac{2\noiseSD^2}{n}\sum_{i = 0}^{n-1} \filt(\regparam,|\widehat{\kdis}_i|).
 \label{Eq_SpectralUPREavg}
 \end{equation}
 Numerically, \eqref{Eq_SpectralUPREavg} can be readily obtained by summing the DFT's of the data sets; note that $\widehat{\kdis}$ is unchanged across data sets. \par
@@ -487,19 +494,19 @@ The UPRE method requires knowledge of the variance $\noiseSD^2$ of the noise vec
 \GCV(\regparam) = \frac{\frac{1}{n}\|\regres\|^2}{\left[\frac{1}{n}\trace(I-\A)\right]^2},
 \end{equation}
 where $\regres$ is the regularized residual defined in the derivation of the UPRE method. Similarities between the GCV and UPRE methods are that both functionals are estimators of the predictive risk, and the regularization parameter $\regparam$ is chosen as the minimizers of these functionals. \par 
-By the linearity of the trace operator, $\trace(I-\A) = \trace(I)-\trace(\A) = n - \trace(\A)$. Then by \eqref{Eq_TraceUPRE},
+By the linearity of the trace operator, $\trace(I-\A) = \trace(I)-\trace(\A) = n - \trace(\A)$. Then by \eqref{Eq_TikFiltPsi} and \eqref{Eq_TraceUPRE},
 \begin{equation}
-\trace(I-\A) = n - \sum_{i = 0}^{n-1} \filt(\regparam,|\widehat{\kdis}_i|) = \sum_{i = 0}^{n-1} 1 - \filt(\regparam,|\widehat{\kdis}_i|).
+\trace(I-\A) = n - \sum_{i = 0}^{n-1} \filt(\regparam,|\widehat{\kdis}_i|) = \sum_{i = 0}^{n-1} 1 - \filt(\regparam,|\widehat{\kdis}_i|) = \sum_{i = 0}^{n-1} \mfilt(\regparam,|\widehat{\kdis}_i|).
 \label{Eq_TraceGCV}
 \end{equation}
 Substituting \eqref{Eq_RegResNorm} and \eqref{Eq_TraceGCV} into \eqref{Eq_GCV} produces the spectral form of the GCV function:
 \begin{equation}
-\GCV(\regparam) = \frac{\sum_{i = 0}^{n-1} |\widehat{\gnoise}_i|^2(1 - \filt(\regparam,|\widehat{\kdis}_i|))^2}{(\frac{1}{n}\sum_{i = 0}^{n-1} 1 - \filt(\regparam,|\widehat{\kdis}_i|))^2} = \frac{n^2\sum_{i = 0}^{n-1} |\widehat{\gnoise}_i|^2(1 - \filt(\regparam,|\widehat{\kdis}_i|))^2}{(\sum_{i = 0}^{n-1} 1 - \filt(\regparam,|\widehat{\kdis}_i|))^2}.
+\GCV(\regparam) = \frac{\sum_{i = 0}^{n-1} |\widehat{\gnoise}_i|^2(\mfilt(\regparam,|\widehat{\kdis}_i|))^2}{(\frac{1}{n}\sum_{i = 0}^{n-1} \mfilt(\regparam,|\widehat{\kdis}_i|))^2} = \frac{n^2\sum_{i = 0}^{n-1} |\widehat{\gnoise}_i|^2(\mfilt(\regparam,|\widehat{\kdis}_i|))^2}{(\sum_{i = 0}^{n-1} \mfilt(\regparam,|\widehat{\kdis}_i|))^2}.
 \label{Eq_SpectralGCV}
 \end{equation} \par 
 The case where multiple data sets are available will now be considered using notation analogous to that introduced in Section \ref{Unbiased Predictive Risk Estimator}; let $\GCV_n^j(\regparam)$ be the GCV function associated with the $j$th data set $\gnoise^j$ for $j = 1,\ldots,R$. Since the denominator in \eqref{Eq_SpectralGCV} is independent of the data,
 \begin{equation}
-\frac{1}{R}\sum_{j=1}^R \GCV_n^j(\regparam)  = \frac{n^2\sum_{i = 0}^{n-1} \left(\sum_{j=1}^R |\widehat{\gnoise^j}_i|^2\right)(1 - \filt(\regparam,|\widehat{\kdis}_i|))^2}{R(\sum_{i = 0}^{n-1} 1 - \filt(\regparam,|\widehat{\kdis}_i|))^2}.
+\frac{1}{R}\sum_{j=1}^R \GCV_n^j(\regparam)  = \frac{n^2\sum_{i = 0}^{n-1} \left(\sum_{j=1}^R |\widehat{\gnoise^j}_i|^2\right)(\mfilt(\regparam,|\widehat{\kdis}_i|))^2}{R(\sum_{i = 0}^{n-1} \mfilt(\regparam,|\widehat{\kdis}_i|))^2}.
 \label{Eq_SpectralGCVsum}
 \end{equation}
 
@@ -514,24 +521,24 @@ Implementation of this method requires finding a solution of $\D(\regparam) = 0$
 \end{equation}
 In other words, implementation of the discepancy principle method is equivalent to finding a root of $\D(\regparam)$. The spectral form of the discrepancy principle function is obtained directly from \eqref{Eq_RegResNorm} by substituting the regularized residual term:
 \begin{equation}
-\D(\regparam) = \sum_{i = 0}^{n-1} |\widehat{\gnoise}_i|^2(1 - \filt(\regparam,|\widehat{\kdis}_i|))^2 - \noiseSD^2.
+\D(\regparam) = \sum_{i = 0}^{n-1} |\widehat{\gnoise}_i|^2(\mfilt(\regparam,|\widehat{\kdis}_i|))^2 - \noiseSD^2.
 \label{Eq_SpectralDP}
 \end{equation}
 The function $\D(\regparam)$ will be near zero when the sum in \eqref{Eq_SpectralDP} is close to $\noiseSD^2$. However, if regularized solution cannot be well-fit to the data, the sum will remain larger that $\noiseSD^2$ and so $\D(\regparam)$ might not have any zeros. For this reason, $\noiseSD^2$ can be replaced by $\delta\noiseSD^2$ for a positive constant $\delta$ so that \eqref{Eq_SpectralDP} becomes
 \begin{equation}
-\D(\regparam) = \sum_{i = 0}^{n-1} |\widehat{\gnoise}_i|^2(1 - \filt(\regparam,|\widehat{\kdis}_i|))^2 - \delta\noiseSD^2.
+\D(\regparam) = \sum_{i = 0}^{n-1} |\widehat{\gnoise}_i|^2(\mfilt(\regparam,|\widehat{\kdis}_i|))^2 - \delta\noiseSD^2.
 \label{Eq_SpectralDP2}
 \end{equation}
 The value of $\delta$ can be adjusted as needed to obtain meaningful values for $\regparam_{\text{DP}}$; see \cite{ABT} for more details. As stated in \cite{Vogel:2002}, $\D(\regparam)$ is monotonic, and so if the range of $\regparam$ being considered for roots of \eqref{Eq_SpectralDP2} is not chosen carefully, it is possible that no regularization parameter will be obtained; see Section \ref{The MDP method} for further discussion. \par 
 Again adopting the notation introduced in Section \ref{Unbiased Predictive Risk Estimator}, let $\D_n^j(\regparam)$ be the MDP function associated with the $j$th data set $\gnoise^j$ for $j = 1,\ldots,R$. Then assuming that $\delta$ is constant across the $\D_n^j(\regparam)$,
 \begin{equation}
-\frac{1}{R}\sum_{j=1}^R \D_n^j(\regparam)  = \sum_{i = 0}^{n-1} \left(\frac{1}{R} \sum_{j=1}^R |\widehat{\gnoise^j}_i|^2\right)(1 - \filt(\regparam,|\widehat{\kdis}_i|))^2 - \delta\noiseSD^2. 
+\frac{1}{R}\sum_{j=1}^R \D_n^j(\regparam)  = \sum_{i = 0}^{n-1} \left(\frac{1}{R} \sum_{j=1}^R |\widehat{\gnoise^j}_i|^2\right)(\mfilt(\regparam,|\widehat{\kdis}_i|))^2 - \delta\noiseSD^2. 
 \label{Eq_SpectralDPavg}
 \end{equation}
 As previously stated, the discrepancy function \eqref{Eq_SpectralDP2} is monotone increasing, and so the scaled sum \eqref{Eq_SpectralDPavg} is monotone increasing as well. Unfortunately this does not guarantee that \eqref{Eq_SpectralDPavg} has a root, and even if it does, there is no guarantee about where the root is located. As a simple example, consider $h^j(x) = e^x + (-e)^j$ for $j \in \{1,2\}$. Explicitly, $h^1(x) = e^x - e$, which has a root located at $x = 1$, and $h^2(x) = e^x + e^2$, which has no root. Both functions are monotone increasing and so their sum $(h^1 + h^2)(x) = 2e^x - e +e^2$ is monotone increasing, but this function does not have a root. \par 
 Back to \eqref{Eq_SpectralDPavg}, if there are data realizations that would otherwise result in discrepancy principle functions that prove difficult or impossible for finding a root, averaging these functions with better-behaved functions could provide a single function with a meaningful root (here ``better-behaved" means that the function at least has a root and the root is located within an interval that is not excessively large). The hope is that the poorly-behaved functions are outliers so that average of the functions can be expected to have a root. If for some reason the better-behaved functions are themselves the outliers, then this averaging approach would not be expected to yield meaningful results. \par 
 If \eqref{Eq_SpectralDPavg} does not have a root in $[0,\infty)$ (recall that by definition, $\regparam \geq 0$), there are two cases: $(1/R)\sum_{j=1}^R \D_n^j(\regparam)$ is strictly negative or strictly positive on $[0,\infty)$. Since the function is monotone increasing, if it is strictly negative then the function must approach some negative horizontal asymptote in which case $\delta$ has been chosen too large. If the function is strictly positive, then $(1/R)\sum_{j=1}^R \D_n^j(0) > 0$. This observation provides a test of whether or not \eqref{Eq_SpectralDPavg} will have a root, though having $(1/R)\sum_{j=1}^R \D_n^j(0) > 0$ is only a necessary condition in light of the first case.  \par 
-To provide a more rigorous justification for using \eqref{Eq_SpectralDPavg}, a closer looks at the terms reveals that each term in the sum over $i$ is non-negative, and so the sum itself is always non-negative. Thus the sign of \eqref{Eq_SpectralDPavg} depends on the magnitude of the sum in comparison with $\delta\noiseSD^2$. If the sum is smaller than $\delta\noiseSD^2$ for a given $\regparam$, then the function output is negative and vice versa. Since the terms $(1 - \filt(\regparam,|\widehat{\kdis}_i|))^2$ are independent of $j$, for fixed $\regparam$ the sign of \eqref{Eq_SpectralDPavg} will then depend directly on the magnitudes of $(1/R) \sum_{j=1}^R |\widehat{\gnoise^j}_i|^2$ for each $i$.  
+To provide a more rigorous justification for using \eqref{Eq_SpectralDPavg}, a closer looks at the terms reveals that each term in the sum over $i$ is non-negative, and so the sum itself is always non-negative. Thus the sign of \eqref{Eq_SpectralDPavg} depends on the magnitude of the sum in comparison with $\delta\noiseSD^2$. If the sum is smaller than $\delta\noiseSD^2$ for a given $\regparam$, then the function output is negative and vice versa. Since the terms $(\mfilt(\regparam,|\widehat{\kdis}_i|))^2$ are independent of $j$, for fixed $\regparam$ the sign of \eqref{Eq_SpectralDPavg} will then depend directly on the magnitudes of $(1/R) \sum_{j=1}^R |\widehat{\gnoise^j}_i|^2$ for each $i$.  
 
 \section{Numerical Results} \label{Numerical results}
 
