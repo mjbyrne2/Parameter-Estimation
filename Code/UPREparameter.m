@@ -12,6 +12,6 @@ u = UPREfunctional(dataSpec,operatorSpec,smoothingSpec,...
 % Find a minimum of the function:
 U = @(lambda) UPREfunctional(dataSpec,operatorSpec,...
     smoothingSpec,variance,lambda,trunc);
-lambda = fminbnd(U,0,10);   
+lambda = fminbnd(U,1e-15,10);   
 
 end

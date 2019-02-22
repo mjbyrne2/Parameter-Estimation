@@ -11,6 +11,6 @@ x = GCVfunctional(dataSpec,operatorSpec,smoothingSpec,L,trunc);
 % Find a minimum of the function:
 G = @(lambda) GCVfunctional(dataSpec,operatorSpec,smoothingSpec,...
     lambda,trunc);
-lambda = fminbnd(G,0,10);  
+lambda = fminbnd(G,1e-15,10);  
 
 end
