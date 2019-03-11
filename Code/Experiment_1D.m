@@ -129,7 +129,7 @@ for j = 1:R
         fn = interp1(t,f,tn);
 
         gn_noise = interp1(t,g_noise(j,:),tn);
-        f_hat = fftshift(fft(fn)/n);
+        fn_hat = fftshift(fft(fn)/n);
         gn_hat = fftshift(fft(gn_noise)/n);
         hn_hat = fftshift(fft(hn));
         
@@ -147,7 +147,7 @@ for j = 1:R
         mdp_lambda(j,i) = mdp_lambda(j,i);  % Scale the lambda
         
         best_lambda(j,i) = optimalParameter(gn_hat,hn_hat,...
-            ones(1,length(gn)),r,f_hat);
+            ones(1,length(gn)),r,fn_hat);
 
         upre_regf(i,:,j) = N*real(ifft(ifftshift(...
             filterFactors(h_hatsol,upre_lambda(j,i)).*g_noise_hat./...
@@ -168,16 +168,16 @@ for j = 1:R
     end
         
     upre_error(j,:) = TikhRegErr(g_noise_hat,h_hatsol,...
-        ones(1,length(g_noise_hat)),upre_lambda(j,:),r,f_hat);
+        ones(1,length(g_noise_hat)),upre_lambda(j,:),r,fn_hat);
 
     gcv_error(j,:) = TikhRegErr(g_noise_hat,h_hatsol,...
-        ones(1,length(g_noise_hat)),gcv_lambda(j,:),r,f_hat);
+        ones(1,length(g_noise_hat)),gcv_lambda(j,:),r,fn_hat);
 
     mdp_error(j,:) = TikhRegErr(g_noise_hat,h_hatsol,...
-        ones(1,length(g_noise_hat)),mdp_lambda(j,:),r,f_hat);
+        ones(1,length(g_noise_hat)),mdp_lambda(j,:),r,fn_hat);
 
     best_error(j,:) = TikhRegErr(g_noise_hat,h_hatsol,...
-        ones(1,length(g_noise_hat)),best_lambda(j,:)*sqrt(n/N),r,f_hat);    
+        ones(1,length(g_noise_hat)),best_lambda(j,:)*sqrt(n/N),r,fn_hat);    
 
     sL = [1e-3,1e-2,1e-1,1,10]; % Vector of some select lambdas
     regf = zeros(length(sL),length(tn));
@@ -194,11 +194,72 @@ for j = 1:R
 
 end
 
-% Implementation of averaged versions of UPRE, GCV, and MDP:
+%% Implementation of averaged versions of UPRE, GCV, and MDP
+
+gAvg_noise = (1/R)*sum(g_noise);
+
+% Initialization of storage vectors:
+upreAvg_lambda = zeros(1,length(M));
+gcvAvg_lambda = zeros(1,length(M));
+mdpAvg_lambda = zeros(1,length(M));
+
+upreAvg_regf = zeros(length(M),N);
+gcvAvg_regf = zeros(length(M),N);
+mdpAvg_regf = zeros(length(M),N);
+
+% Loop over resolutions stored in M:
+for i = 1:length(M)
+    n = M(i);
+    tn = linspace(0,1,n+1);
+    tn = tn(1:end-1);
+
+    [~,hn] = GaussianBlur_1D(tn,tn,width);
+    hn = fftshift(hn);
+
+    fn = interp1(t,f,tn);
+
+    gnAvg_noise = interp1(t,gAvg_noise,tn);
+    fn_hat = fftshift(fft(fn)/n);
+    gnAvg_hat = fftshift(fft(gnAvg_noise)/n);
+    hn_hat = fftshift(fft(hn));
+
+    [~,upreAvg_lambda(i)] = UPREparameter(gnAvg_hat,...
+        hn_hat,ones(1,length(tn)),eta,L,r);
+    upreAvg_lambda(i) = upreAvg_lambda(i)*sqrt(n/N);  % Scale the lambda
+
+    [~,gcvAvg_lambda(i)] = GCVparameter(gnAvg_hat,...
+        hn_hat,ones(1,length(tn)),L,r);
+    gcvAvg_lambda(i) = gcvAvg_lambda(i)*sqrt(n/N);  % Scale the lambda
+
+    delta = 1;  % Safety parameter; default is 1
+    [~,mdpAvg_lambda(i)] = MDPparameter(gnAvg_hat,...
+        hn_hat,ones(1,length(tn)),eta,delta,L,r);
+    mdpAvg_lambda(i) = mdpAvg_lambda(i);  % Scale the lambda
+
+    upreAvg_regf(i,:) = N*real(ifft(ifftshift(...
+        filterFactors(h_hatsol,upreAvg_lambda(i)).*g_noise_hat./...
+        replaceZeros(h_hatsol,1))));
+
+    gcvAvg_regf(i,:) = N*real(ifft(ifftshift(...
+        filterFactors(h_hatsol,gcvAvg_lambda(i)).*g_noise_hat./...
+        replaceZeros(h_hatsol,1))));
+
+    mdpAvg_regf(i,:) = N*real(ifft(ifftshift(...
+        filterFactors(h_hatsol,mdpAvg_lambda(i)).*g_noise_hat./...
+        replaceZeros(h_hatsol,1))));
+
+end
+
+% Relative solution errors:
+upreAvg_err = err(upreAvg_regf,f)';
+gcvAvg_err = err(gcvAvg_regf,f)';
+mdpAvg_err = err(mdpAvg_regf,f)';
+
 upreAvg_vectors = (1/R)*sum(upre_vectors,3);  
 gcvAvg_vectors = (1/R)*sum(gcv_vectors,3);
 mdpAvg_vectors = (1/R)*sum(mdp_vectors,3);
-% [upre_V,upre_Lam] = UPREparameter(gSigma_hat,hn_hat,ones(1,N),R*eta,L,r);
+
+%% Data Management
 
 % Clear variables that don't need to be saved:
 clear i j k n ans
