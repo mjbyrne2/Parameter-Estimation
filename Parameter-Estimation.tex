@@ -537,6 +537,17 @@ To provide a more rigorous justification for using \eqref{Eq_SpectralDPavg}, a c
 
 \section{Numerical Results} \label{Numerical results}
 
+Before discussing the numerical results of downsampling as it pertains to each parameter selection method, a numerical challenge and proposed solution will be discussed. For the minimization-based methods UPRE and GCV, the shallowness of some of the curves made finding a meaningful minimum difficult. The approach that was taken was to find the location of maximum curvature, which follows the observations and analysis presented in \cite{HansenOLeary}. \par 
+The signed curvature of a function $f$, assuming appropriate differentiablility, is
+\begin{equation}
+\kappa(x) = \frac{f''(x)}{(1+(f'(x))^2)^{3/2}}.
+\label{Eq:Curvature}
+\end{equation}
+Including the sign of the curvature is useful since a location of maximum curvature could be associated with local maximum instead of a minimum. A numerical approximation to \eqref{Eq:Curvature} can be readily obtained by discretizing $f$ on the domain of interest and using the finite difference approximations
+\[f'(x) \approx \frac{x_{j+1} - x_{j}}{\Delta{x}} \text{ and } f''(x) \approx \frac{x_{j-1} - 2x_j + x_{j+1}}{(\Delta{x})^2}\]
+for approximations of the derivatives. In MATLAB, the built-in function \texttt{diff} can be used to generate the derivative approximations. \par 
+Once a discretization of curvature is obtained, the location of maximum curvature is determined and this location is taken to be the regularization parameter from the UPRE and GCV methods. While the approach of maximizing curvature is not the same as finding a minimum a function itself, this approach does avoid the numerical challenges of minimizing the shallow UPRE and GCV functions. As justification for using the approach of maximizing curvature, a sample GCV function is presented in Figure . 
+
 \subsection{The UPRE method} \label{The UPRE method}
 Of the 12 experimental configurations, four are presented here, all of which pertain to the second test function. The UPRE method was used to select regularization parameters at each resolution. These parameters were used to construct regularized solutions of the full problem on $N = 4096$ points.
 
@@ -544,16 +555,6 @@ Of the 12 experimental configurations, four are presented here, all of which per
 	\centerline{\includegraphics[scale = 0.4]{Figures/BothBoxes1D_F2_S05_W100_R20.eps}}
 \caption{Box plots for the regularization parameters $\regparam_{\text{UPRE}}$ (left) and relative errors (right) across resolutions for 20 noise realizations. In this configuration, $\text{SNR = 5}$ and the width of the Gaussian kernel is 100.}
 \label{BothBoxes1D_F2_S05_W100_R20}
-\end{figure}
-
-\begin{figure}
-	\centerline{\includegraphics[scale = 0.4]{Figures/BothBoxes1D_F2_S05_W200_R20.eps}}
-\caption{Box plots for the regularization parameters $\regparam_{\text{UPRE}}$  (left) and relative errors (right) across resolutions for 20 noise realizations. In this configuration, $\text{SNR = 5}$ and the width of the Gaussian kernel is 200.}
-\end{figure}
-
-\begin{figure}
-	\centerline{\includegraphics[scale = 0.4]{Figures/BothBoxes1D_F2_S25_W100_R20.eps}}
-\caption{Box plots for the regularization parameters $\regparam_{\text{UPRE}}$  (left) and relative errors (right) across resolutions for 20 noise realizations. In this configuration, $\text{SNR = 25}$ and the width of the Gaussian kernel is 100.}
 \end{figure}
 
 \begin{figure}
