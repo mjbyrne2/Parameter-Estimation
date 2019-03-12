@@ -60,6 +60,8 @@
 \newcommand{\comment}[1]{\textcolor{red}{ \textbf{Comment}: #1}}
 % Defining Trace Lemma
 \newtheorem*{TL}{Trace Lemma}
+% General Lemma
+\newtheorem{lemma}{Lemma}[section]
 
 \title{\underline{Regularization Parameter Estimation (1D)}}
 \author{Michael Byrne}
@@ -532,8 +534,16 @@ Again adopting the notation introduced in Section \ref{Unbiased Predictive Risk 
 \frac{1}{R}\sum_{j=1}^R \D_n^j(\regparam)  = \sum_{i = 0}^{n-1} \left(\frac{1}{R} \sum_{j=1}^R |\widehat{\gnoise^j}_i|^2\right)(\mfilt(\regparam,|\widehat{\kdis}_i|))^2 - \noiseSD^2. 
 \label{Eq_SpectralDPavg}
 \end{equation}
-As previously stated, the discrepancy function \eqref{Eq_SpectralDP} is monotone increasing, and so the scaled sum \eqref{Eq_SpectralDPavg} is monotone increasing as well. If there are data realizations that would otherwise result in discrepancy principle functions that prove difficult or impossible for finding a root, averaging these functions with better-behaved functions could provide a single function with a meaningful root (here ``better-behaved" means that the function at least has a root and the root is located within an interval that is not excessively large). The hope is that the poorly-behaved functions are outliers so that average of the functions can be expected to have a root. If for some reason the better-behaved functions are themselves the outliers, then this averaging approach would not be expected to yield meaningful results. \par 
-To provide a more rigorous justification for using \eqref{Eq_SpectralDPavg}, a closer looks at the terms reveals that each term in the sum over $i$ is non-negative, and so the sum itself is always non-negative. Thus the sign of \eqref{Eq_SpectralDPavg} depends on the magnitude of the sum in comparison with $\noiseSD^2$. If the sum is smaller than $\noiseSD^2$ for a given $\regparam$, then the function output is negative and vice versa. Since the terms $(\mfilt(\regparam,|\widehat{\kdis}_i|))^2$ are independent of $j$, for fixed $\regparam$ the sign of \eqref{Eq_SpectralDPavg} will then depend directly on the magnitudes of $(1/R) \sum_{j=1}^R |\widehat{\gnoise^j}_i|^2$ for each $i$.  
+As previously stated, the discrepancy function \eqref{Eq_SpectralDP} is monotone increasing, and so the scaled sum \eqref{Eq_SpectralDPavg} is monotone increasing as well. If there are data realizations that would otherwise result in discrepancy principle functions that prove difficult for finding a root, averaging these functions with better-behaved functions could provide a single function with a meaningful root (here ``better-behaved" means that the function has a root located within an interval that is not excessively large). The hope is that the poorly-behaved functions are outliers so that average of the functions can be expected to have a root. If for some reason the better-behaved functions are themselves the outliers, then this averaging approach would not be expected to yield meaningful results. \par 
+Unlike the UPRE and GCV functionals, the monotonicity of the MDP functional can used to at least provide an interval for a root of \eqref{Eq_SpectralDPavg}. 
+\begin{lemma}
+Let $f_1,\ldots,f_k$ be a family of continuous, monotone increasing functions on an interval $I = [a,b]$ having roots $x_1,\ldots x_k \in I$, respectively. Then the function $\overline{f} = (1/k)\sum_{i=1}^k f_i$ has a root in $[x_m,x_M]$, where $x_m = \min\{x_1,\ldots x_k\}$ and $x_M = \max\{x_1,\ldots x_k\}$.
+\end{lemma}
+\begin{proof}
+Let the family of functions $f_1,\ldots,f_k$ be as required. Relabel the functions so that their respective roots are such that $x_1 \leq \ldots \leq x_k$. Then $x_m = \min\{x_1,\ldots,x_k\} = x_1$ and $x_M = \max\{x_1,\ldots,x_k\} = x_k$. Thus it must be shown that $\overline{f} = (1/k)\sum_{i=1}^k f_i$ has a root in $[x_1,x_k]$. Since each $f_i$ is monotone increasing on $[a,b] \supseteq [x_1,x_k]$ and $x_1 \leq \ldots \leq x_k$, $f_i(x_1) \leq 0$ for $i = 1,\ldots,k$. Similarly, $f_i(x_k) \geq 0$ for $i = 1,\ldots,k$. Thus $\overline{f}(x_1) \leq 0$ and $\overline{f}(x_k) \geq 0$, with equality only when $x_1 = \ldots = x_k$. However if this were the case, $\overline{f}(x_1) = \overline{f}(x_k) = 0$ and so certainly $\overline{f}$ has a root in $[x_1,x_k] = \{x_1\} = \ldots = \{x_k\}$. \par 
+If roots are not equal, then $\overline{f}(x_1) < 0$ and $\overline{f}(x_k) > 0$ since there would exist some $i = 1,\ldots,k$ such that $f_i(x_1) < 0$ or $f_i(x_k) > 0$, again following from the monotoncity of each function in the family. Since $\overline{f}$ is a linear combination of continuous functions, $\overline{f}$ itself is continuous. Thus having $\overline{f}(x_1) < 0$ and $\overline{f}(x_k) > 0$ implies that $\overline{f}$ has a root in $[x_1,x_k]$ by Bolzano's theorem (a corollary to the intermediate value theorem).
+\end{proof}
+
 
 \section{Numerical Results} \label{Numerical results}
 
