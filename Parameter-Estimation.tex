@@ -340,13 +340,6 @@ This equation is used for the numerical construction of the noise vectors. SNR v
 \end{figure}
 
 For an accurate evaluation of the numerical experiments and their results, multiple realizations of noise are used. A primary advantage of multiple noise realizations is that the sample variance of noise vectors approaches the desired variance as the number of realizations increases. More rigorously, the mean of the sample variances of the noise vectors converges almost surely to the expected value of the sample variance, which is the desired variance $\noiseSD^2$; this is a direct consequence of the (strong) law of large numbers and the fact that the noise vectors are independent and identically distributed with standard normal distribution.  \par
-
-%\begin{figure}
-%\centerline{\includegraphics[scale=0.45]{Figures/LLN_Plot.eps}}
-%\caption{The three plots correspond to the noise vectors generated using each of the three test functions (the right hand side of equation \eqref{Eq_Var} depends upon $\gdis$, which depends upon the test function $\fdis$ and the width of the Gaussian kernel). Equation \eqref{Eq_Var} also depends upon SNR; a SNR of 5 and Gaussian kernel width of 50 was used in all three cases. The horizontal axis represents the number of noise realizations and the vertical axis represents sample variance. All three plots show that as the number of realizations increases, the mean of the sample variances approaches the desired sample variance (the left hand side of equation \eqref{Eq_Var} and the red line in the plots).}
-%\label{LLN_Plot}
-%\end{figure}
-
 Another numerical consideration regarding noise is how the sample variance changes across downsampling resolutions. To formalize the concept of downsampling in the context of this report, consider $\mathbf{z} = [z_1,z_2,\ldots,z_n]$. Then a vector $\mathbf{y}$ is called a downsampling of $\mathbf{z}$ if $\mathbf{y} = [z_{n_1},z_{n_2},\ldots,z_{n_m}]$, where $m \leq n$ and $n_j:\{1,2,\ldots,m\}\rightarrow\{1,2,\ldots,n\}$ is a strictly increasing function. This definition is analogous to the definition of a subsequence except with a finite number of terms. \par
 Theoretically, the variance of the noise vector does not change when a vector is downsampled because of the properties of variance. For any $m\times n$ matrix $M$ and $n$-vector $\noise \sim \mathcal{N}(\bm{0},\noiseSD^2I)$
 \begin{equation}
@@ -547,7 +540,36 @@ If roots are not equal, then $\overline{f}(x_1) < 0$ and $\overline{f}(x_k) > 0$
 
 \section{Numerical Results} \label{Numerical results}
 
-Before discussing the numerical results of downsampling as it pertains to each parameter selection method, a numerical challenge and proposed solution will be discussed. For the minimization-based methods UPRE and GCV, the shallowness of some of the curves made finding a meaningful minimum difficult. The approach that was taken was to find the location of maximum curvature, which follows the observations and analysis presented in \cite{HansenOLeary}. \par 
+\subsection{The UPRE method} \label{The UPRE method}
+A primary challenge of using the UPRE method with downsampled signals is that for a course downsampling (in other words, a small number of sample points), the resulting UPRE graphs are shallow. This shallowness makes finding a minimum difficult, and sometime the selected parameter is too small. Figure \ref{fig:UPRElambdas} shows that there are often outlier parameters that are too small, even sometimes for downsamplings with a moderate number of points. At $n = 16$, the range of the parameter values is larger than for the other downsampling levels, which can also be attributed to the shallowness of the function graphs. \par 
+A consequence of choosing the regularization parameter to be too small is that the resulting relative errors are large; the outliers in Figure \ref{fig:UPREerrors} are the relative errors corresponding to the parameter outliers in Figure \ref{fig:UPRElambdas}. Unfortunately the error outliers can be significant, as even evidenced by the outlier at the full $N = 4096$ level. \par 
+Fortunately, the averaged UPRE method appears to overcome the effects of the outliers. Figure \ref{fig:UPRElambdas} shows that for each downsampling level, the parameter found using the average UPRE method was larger than the mean of the parameters found by applying the UPRE to the noise realizations individually. As a result, the corresponding relative errors are less than the means of the errors for each downsampling level, displayed in Figure \ref{fig:UPREerrors}. However, the benefit derived from using the averaged UPRE method might be a consequence of the outliers themselves. Following the approximate region of the minimums of the UPRE functions (shown in Figure \ref{fig:UPREfunctions}), the functions increase rapidly. Thus functions that are excessively shallow may having this region of rapid increase located before the region of the minimums of the other functions. It could be the case that when the average UPRE function is formed, these outlier regions of rapid increase might push the final minimum toward a location that is actually beyond the region of the minimums of the non-outlier functions, resulting in a parameter that is larger than the mean of the individual parameters. Of course, this analysis is not rigorous and perhaps worthy of further investigation. 
+
+\begin{figure}
+	\centering
+	\begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{Figures/UPRE_AvgPlot1D_F1_S15_W100_R20.eps}
+        \caption{}
+        \label{fig:UPREfunctions}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{Figures/UPRE_LamPlot1D_F1_S15_W100_R20.eps}
+        \caption{}
+        \label{fig:UPRElambdas}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{Figures/UPRE_ErrPlot1D_F1_S15_W100_R20.eps}
+        \caption{}
+        \label{fig:UPREerrors}
+    \end{subfigure}
+    \caption{Three plots showing the averaged UPRE results for the first test function with an SNR of 15 and  a Gaussian width parameter of 100. Figure \ref{fig:UPREfunctions} shows a zoomed-in portion of the averaged UPRE graph in comparison with graphs pertaining to the 20 noise realizations at a downsampling level of $n = 128$. Figure \ref{fig:UPRElambdas} shows that the resulting regularization parameter is typically greater than the average of the individual regularization parameters. Figure \ref{fig:UPREerrors} shows that the relative error corresponding to the parameter chosen from the average UPRE method is less than the average of the individual relative errors.}
+\label{fig:UPREplots}
+\end{figure} 
+
+\subsection{The GCV method} \label{The GCV method}
+The numerical results of the GCV method are similar to those of the UPRE method. At times the graphs of the GCV functions are shallow and thus difficult to minimize. This is apparent from the parameter outliers in Figure \ref{fig:GCVlambdas} and the corresponding error outliers in Figure \ref{fig:GCVerrors}. The range of the parameters selected at the $n = 16$ is again significant. Some of the parameters at this level were selected so small (quite near to zero) so that the relative errors were excessively large; the largest relative error was approximately 35, and as a result the vertical axis in Figure \ref{fig:GCVerrors} had to be scaled so that errors larger than 2 are simply grouped in a non-scaled region to produce a tractable plot. \par 
+In contrast to the UPRE method, the averaged version of the GCV method selected a regularization parameter that was worse than those selected by using individual noise realizations. The consequence of this is that the corresponding relative errors were larger than the mean of the individual relative errors. Thus the averaged GCV method does not appear to be a viable parameter selection approach. \par 
+As previously mentioned, for the minimization-based methods UPRE and GCV, the shallowness of some of the curves made finding a meaningful minimum difficult. The approach that might be worth considering is to find the location of maximum curvature, which follows the observations and analysis presented in \cite{HansenOLeary}. \par 
 The signed curvature of a function $f$, assuming appropriate differentiablility, is
 \begin{equation}
 \kappa(x) = \frac{f''(x)}{(1+(f'(x))^2)^{3/2}}.
@@ -556,74 +578,37 @@ The signed curvature of a function $f$, assuming appropriate differentiablility,
 Including the sign of the curvature is useful since a location of maximum curvature could be associated with local maximum instead of a minimum. A numerical approximation to \eqref{Eq:Curvature} can be readily obtained by discretizing $f$ on the domain of interest and using the finite difference approximations
 \[f'(x) \approx \frac{x_{j+1} - x_{j}}{\Delta{x}} \text{ and } f''(x) \approx \frac{x_{j-1} - 2x_j + x_{j+1}}{(\Delta{x})^2}\]
 for approximations of the derivatives. In MATLAB, the built-in function \texttt{diff} can be used to generate the derivative approximations. \par 
-Once a discretization of curvature is obtained, the location of maximum curvature is determined and this location is taken to be the regularization parameter from the UPRE and GCV methods. While the approach of maximizing curvature is not the same as finding a minimum a function itself, this approach does avoid the numerical challenges of minimizing the shallow UPRE and GCV functions. As justification for using the approach of maximizing curvature, a sample GCV function is presented in Figure . 
-
-\subsection{The UPRE method} \label{The UPRE method}
-Of the 12 experimental configurations, four are presented here, all of which pertain to the second test function. The UPRE method was used to select regularization parameters at each resolution. These parameters were used to construct regularized solutions of the full problem on $N = 4096$ points.
+Once a discretization of curvature is obtained, the location of maximum curvature is determined and this location is taken to be the regularization parameter from the UPRE and GCV methods. While the approach of maximizing curvature is not the same as finding a minimum a function itself, this approach could avoid the numerical challenges of minimizing the shallow UPRE and GCV functions. 
 
 \begin{figure}
-	\centerline{\includegraphics[scale = 0.4]{Figures/BothBoxes1D_F2_S05_W100_R20.eps}}
-\caption{Box plots for the regularization parameters $\regparam_{\text{UPRE}}$ (left) and relative errors (right) across resolutions for 20 noise realizations. In this configuration, $\text{SNR = 5}$ and the width of the Gaussian kernel is 100.}
-\label{BothBoxes1D_F2_S05_W100_R20}
+	\centering
+	\begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{Figures/GCV_AvgPlot1D_F1_S15_W100_R20.eps}
+        \caption{}
+        \label{fig:GCVfunctions}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{Figures/GCV_LamPlot1D_F1_S15_W100_R20.eps}
+        \caption{}
+        \label{fig:GCVlambdas}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{Figures/GCV_ErrPlot1D_F1_S15_W100_R20.eps}
+        \caption{}
+        \label{fig:GCVerrors}
+    \end{subfigure}
+    \caption{Three plots showing the averaged GCV results for the first test function with an SNR of 15 and a Gaussian width parameter of 100. Figure \ref{fig:UPREfunctions} shows a zoomed-in portion of the averaged UPRE graph in comparison with graphs pertaining to the 20 noise realizations at a downsampling level of $n = 128$. Figure \ref{fig:UPRElambdas} shows that the resulting regularization parameter is typically less than the average of the individual regularization parameters. Figure \ref{fig:UPREerrors} shows that the relative error corresponding to the parameter chosen from the average UPRE method is greater than the average of the individual relative errors.}
+\label{fig:GCVplots}
 \end{figure}
-
-\begin{figure}
-	\centerline{\includegraphics[scale = 0.4]{Figures/BothBoxes1D_F2_S25_W200_R20.eps}}
-\caption{Box plots for the regularization parameters $\regparam_{\text{UPRE}}$  (left) and relative errors (right) across resolutions for 20 noise realizations. In this configuration, $\text{SNR = 25}$ and the width of the Gaussian kernel is 200.}
-\label{BothBoxes1D_F2_S25_W200_R20}
-\end{figure}
-
-The relative errors are smaller for an SNR of 25 as opposed to an SNR of 5, which is to be expected since the variance in the noise is small for $\text{SNR} = 25$. Results pertaining to the Gaussian PSF of width 100 are poor compared to the results for the Gaussian PSF of width 200. In fact, the relative errors are exceedingly large for the width 100 Gaussian PSF; in Figure \ref{BothBoxes1D_F2_S05_W100_R20} there is an outlier with a relative error above 3. These outliers most likely arise from the difficulty in minimizing the often shallow graphs of the UPRE functionals. Figure \ref{BothBoxes1D_F2_S25_W200_R20} shows that the UPRE downsampling method performed the best for $\text{SNR} = 25$ and a Gaussian PSF of width 200. However, Figure \ref{BothBoxes1D_F2_S25_W200_R20} still shows numerous outliers, again which are probably a product of the functional minimization. 
-
-\subsection{The GCV method} \label{The GCV method}
-Of the 12 experimental configurations, four are presented here, all of which pertain to the second test function. The GCV method was used to select regularization parameters at each resolution. These parameters were used to construct regularized solutions of the full problem on $N = 4096$ points.
 
 \subsection{The MDP method} \label{The MDP method}
-Of the three methods considered in this report, the MDP method seemed to be the least robust with respect to downsampling. For many of the data configurations, finding a root of the MDP function proved unsuccesful; the components of the vectors representing the discretized MDP functions were often all positive, and so a root did not exist, at least in the $\regparam$ interval $[10^{-5},10]$. In MATLAB, the built-in function \texttt{fzero} was utilized to find roots of the MDP function. If no root could be found, \texttt{NaN} was returned. Since 20 noise realizations and 9 downsampling levels were considered, a total of 180 cases were tested for each data configuration.   \par 
-Figure \ref{fig:MDPfailures} shows the sparsity of the resulting \texttt{NaN} cases for all data configurations considered. Perhaps the primary observation that can be made from Figure \ref{fig:MDPfailures} is that it is possible for root finding to fail at a certain downsampling level but succeed at a previous or subsequent level. This is evident from all of the plots, with the exception of the plots associated with the data configuration of an SNR of 25 and a width parameter of 100. For test functions \#1 and \#3, the MDP method for this data configuration failed considerably; no root of the MDP function was found for 110 cases ($\approx 61.1\%$) for test function \#1 and 112 cases ($\approx 62.2 \%$) for test function \#3. This data configuration proved somewhat more tractable is combination with test function \#2, with 40 cases ($\approx 22.2 \%$) of MDP method failure. This is somewhat surprising in light of the fact that test function \#2 is the least smooth of the three test functions.  \par 
-
 
 \begin{figure}
-	\centering
-	\begin{subfigure}[b]{0.75\textwidth}
-        \includegraphics[width=\textwidth]{Figures/MDPfailures1D_F1_R20.eps}
-        \caption{}
-        \label{fig:MDPfailure_F1}
-    \end{subfigure}
-    \vspace{-5pt}
-    
-    \begin{subfigure}[b]{0.75\textwidth}
-        \includegraphics[width=\textwidth]{Figures/MDPfailures1D_F2_R20.eps}
-        \caption{}
-        \label{fig:MDPfailure_F2}
-    \end{subfigure} 
-
-    \begin{subfigure}[b]{0.75\textwidth}
-        \includegraphics[width=\textwidth]{Figures/MDPfailures1D_F3_R20.eps}
-        \caption{}
-        \label{fig:MDPfailure_F3}
-    \end{subfigure}
-    \caption{The sparsity of MDP failures across noise realizations and downsampling levels. The rows represent noise realizations and the columns represent downsampling levels; the leftmost columns represent the $n = 16$ level and the rightmost represent the full $n = 4096$ level, with levels progressing by powers of 2 from left to right. The red dots represent \texttt{NaN}, which are the failures cases. The subfigures \ref{fig:MDPfailure_F1}, \ref{fig:MDPfailure_F2}, and \ref{fig:MDPfailure_F3} are the results for test functions \#1, \#2, and \#3, respectively.}
-\label{fig:MDPfailures}
+\centering
+\includegraphics[width=\textwidth]{Figures/MDP_LamPlot1D_F1_S15_W100_R20.eps}
+\caption{The parameter selected by the average MDP method appear to be constant, and outside of the range of the parameters found by using the individual noise realizations. This contradicts the lemma in Section \ref{The MDP method}; more investigation is needed.}
+\label{fig:MDPlambdas}
 \end{figure}
-
-\begin{figure}
-	\centering
-	\begin{subfigure}[b]{0.4\textwidth}
-        \includegraphics[width=\textwidth]{Figures/MDPfunctions_F1_S15_W100.eps}
-        \caption{}
-        \label{fig:MDPfunctions_notzoomed}
-    \end{subfigure}
-    \begin{subfigure}[b]{0.4\textwidth}
-        \includegraphics[width=\textwidth]{Figures/MDPfunctions_F1_S15_W100_zoomed.eps}
-        \caption{}
-        \label{fig:MDPfunctions_zoomed}
-    \end{subfigure}
-    \caption{}
-\label{fig:MDPfunctions}
-\end{figure}
-
-
 
 \bibliographystyle{siam}
 \bibliography{Parameter-Estimation}
