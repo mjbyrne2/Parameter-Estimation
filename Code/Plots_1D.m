@@ -326,26 +326,28 @@ savefig(F,[figfold,figname],'compact')
 %
 % A workspace must be loaded before running this section.
 
-F = figure('units','normalized','outerposition',[0 0 1 1]);  % Full screen
-
-subplot(1,2,1)
+F1 = figure('units','normalized','outerposition',[0 0 0.5 1]);  % Half screen
 boxplot(gcv_lambda,M)
 xlabel('n')
 ylabel('Lambda')
 set(gca,'FontSize',16)
 
-subplot(1,2,2)
-boxplot(gcv_err,M)
+F2 = figure('units','normalized','outerposition',[0 0 0.5 1]);
+boxplot(gcv_err,M,'DataLim',[-Inf,Inf],'ExtremeMode','compress')
 xlabel('n')
 ylabel('Relative error')
 set(gca,'FontSize',16)
 
 figfold = ['/Users/mjbyrne/Documents/Arizona State University/' ...
     'Parameter-Estimation/Figures/'];    % Specifies the Figures folder
-figname = ['GCV_BothBoxes1D_F' num2str(Fnum) '_S'...
+figname1 = ['GCV_LamPlot1D_F' num2str(Fnum) '_S'...
     num2str(SNR,'%02.f') '_W' num2str(width) '_R' num2str(R)...
     '.fig'];
-savefig(F,[figfold,figname],'compact')
+figname2 = ['GCV_ErrPlot1D_F' num2str(Fnum) '_S'...
+    num2str(SNR,'%02.f') '_W' num2str(width) '_R' num2str(R)...
+    '.fig'];
+savefig(F1,[figfold,figname1],'compact')
+savefig(F2,[figfold,figname2],'compact')
 
 %% Plot of Regularized Solutions (GCV)
 % This section generates one plot of the regularized solutions obtained by
@@ -374,32 +376,6 @@ figname = ['GCVsolutions1D_F' num2str(Fnum) '_S'...
     '.fig'];
 savefig(F,[figfold,figname],'compact')
 
-%% Plot of the NaN sparsity of the MDP lambdas
-% This section produces three plot, one for each test function, of the
-% sparsity of the MDP lambda failures (represented numerically as NaN in
-% the matrices mdp_lambdas).
-
-figfold = ['/Users/mjbyrne/Documents/Arizona State University/' ...
-    'Parameter-Estimation/Figures/'];    % Specifies the Figures folder
-
-for Fnum = [1,2,3] % Loop over functions
-    F = figure('units','normalized','outerposition',[0 0 1 1]);
-    i = 1;  % Starting position of the subplot
-    for SNR = [15,25]   % Loop over SNR
-        for width = [100,200]   % Loop width parameter
-            load(['Data1D_F' num2str(Fnum) '_S' num2str(SNR) '_W'...
-                num2str(width) '_R20.mat'])
-            subplot(1,4,i)
-            spy(isnan(mdp_lambda),'r')
-            title(['SNR = ' num2str(SNR) ', width = ' num2str(width)],...
-                'Fontsize',14)
-            i = i + 1;
-        end
-    end
-    figname = ['MDPfailures1D_F' num2str(Fnum) '_R20.fig'];
-    savefig(F,[figfold,figname],'compact')
-end
-
 %% Plot of the MDP functions
 % This section produces one plot showing the shape of the MDP functions.
 % The data configuration used for this section is test function #1, SNR 15,
@@ -424,16 +400,18 @@ set(gca,'Fontsize',18)
 %
 % A workspace must be loaded before running this section.
 
-F = figure('units','normalized','outerposition',[0 0 1 1]);  % Full screen
-
-subplot(1,2,1)
+F1 = figure;
 boxplot(mdp_lambda,M)
+hold on
+plot(mdpAvg_lambda,'*g')
 xlabel('n')
 ylabel('Lambda')
 set(gca,'FontSize',16)
 
-subplot(1,2,2)
+F2 = figure;
 boxplot(mdp_err,M)
+hold on 
+plot(mdpAvg_err,'*g')
 xlabel('n')
 ylabel('Relative error')
 set(gca,'FontSize',16)

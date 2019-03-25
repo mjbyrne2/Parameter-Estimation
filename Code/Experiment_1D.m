@@ -259,6 +259,18 @@ upreAvg_vectors = (1/R)*sum(upre_vectors,3);
 gcvAvg_vectors = (1/R)*sum(gcv_vectors,3);
 mdpAvg_vectors = (1/R)*sum(mdp_vectors,3);
 
+%% Implementaion of machine learning method
+
+g_noise_hat = fftshift(fft(g_noise,[],2),2)/N;
+regf = @(lambda) N*real(ifft(ifftshift(...
+        filterFactors(h_hatsol,lambda).*g_noise_hat./...
+        replaceZeros(h_hatsol,1),2),[],2));
+F = @(lambda) (1/R)*sum(sum((f - regf(lambda)).^2,1));
+
+learned_lambda = fminbnd(F,1e-15,10);
+learned_sol = regf(learned_lambda);
+learned_err = err(learned_sol,f);
+
 %% Data Management
 
 % Clear variables that don't need to be saved:
