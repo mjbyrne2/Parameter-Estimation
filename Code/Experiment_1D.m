@@ -83,7 +83,7 @@ mdp_vectors = zeros(length(M),100,R);
 upre_regf = zeros(length(M),N,R);
 gcv_regf = zeros(length(M),N,R);
 mdp_regf = zeros(length(M),N,R);
-opt_regf = zeros(length(M),N,R);
+best_regf = zeros(length(M),N,R);
 
 upre_error = zeros(R,length(M));
 gcv_error = zeros(R,length(M));
@@ -161,7 +161,7 @@ for j = 1:R
             filterFactors(h_hatsol,mdp_lambda(j,i)).*g_noise_hat./...
             replaceZeros(h_hatsol,1))));
        
-        opt_regf(i,:,j) = N*real(ifft(ifftshift(...
+        best_regf(i,:,j) = N*real(ifft(ifftshift(...
             filterFactors(h_hatsol,best_lambda(j,i)).*g_noise_hat./...
             replaceZeros(h_hatsol,1))));
 
@@ -178,14 +178,6 @@ for j = 1:R
 
     best_error(j,:) = TikhRegErr(g_noise_hat,h_hatsol,...
         ones(1,length(g_noise_hat)),best_lambda(j,:)*sqrt(n/N),r,fn_hat);    
-
-    sL = [1e-3,1e-2,1e-1,1,10]; % Vector of some select lambdas
-    regf = zeros(length(sL),length(tn));
-    for i = 1:length(sL)
-        regf(i,:) = N*real(ifft(ifftshift(...
-            filterFactors(h_hatsol,sL(i)).*g_noise_hat./...
-            replaceZeros(h_hatsol,1))));
-    end
 
     % Relative solution errors: 
     upre_err(j,:) = err(upre_regf(:,:,j),f)';
