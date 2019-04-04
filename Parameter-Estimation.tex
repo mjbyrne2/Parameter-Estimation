@@ -283,13 +283,27 @@ Since $F^*$ is a matrix representation of the inverse DFT, the approximate solut
 \[\fdis(\regparam) = F^* \frac{\filt(\regparam,\widehat{\kdis})\widehat{\gnoise}}{\widehat{\kdis}}.\]
 Here $\filt(\regparam,\widehat{\kdis})\widehat{\gnoise}/{\widehat{\kdis}}$ is a vector where the operations of multiplication and division are performed component-wise. This representation is useful for making a connection with the MATLAB implementation. \par
 As mentioned in Section \ref{Introduction}, a Picard plot is often useful in analyzing the numerical instabilities of solutions obtained from either or \eqref{Eq_InvProd} or \eqref{Eq_InvProdDFT}. Figure \ref{PicardPlot} shows an example of a Picard plot. The terms $|\widehat{\kdis}_i|$ decrease down to machine precision, though the $|\widehat{\gnoise}_i|$ decrease but then level off just above the variance in the noise. As a result, the terms $|\widehat{\gnoise}_i|/|\widehat{\kdis}_i|$ only decrease so far and then begin increasing. The steady increase can produce a blow up of the approximate solution. While illustrating these relationships, a Picard plot is also useful in determining how to truncate the sum in \eqref{Eq_ApproxSolDFT} to avoid blow up in the solution. For the plot in Figure \ref{PicardPlot}, the sum in \eqref{Eq_ApproxSolDFT} should be truncated around index 8 to obtain a meaningful solution. \par 
-While the connection between lines \eqref{Eq_InvProdDFT} and \eqref{Eq_ApproxSolDFT} and the SVD have been noted in regard to the structure of the terms and equations, a complete connection can be made if another property about $\kmat$ is assumed. Until this point $\kmat$ is assumed to be an invertible $N \times N$ circulant matrix formed from a vector $\kdis$. If $\kmat$ is also assumed to be symmetric, then the SVD of $\kmat$ is the same as the diagonalization by the unitary DFT matrix $F$ and the singular values of $\kmat$ are also the eigenvalues. 
+While the connection between lines \eqref{Eq_InvProdDFT} and \eqref{Eq_ApproxSolDFT} and the SVD have been noted in regard to the structure of the terms and equations, a complete connection can be made if another property about $\kmat$ is assumed. Until this point $\kmat$ is assumed to be an invertible $N \times N$ circulant matrix formed from a vector $\kdis$. If $\kmat$ is also assumed to be symmetric, then the SVD of $\kmat$ is the same as the diagonalization by the unitary DFT matrix $F$ and the singular values of $\kmat$ are also the eigenvalues. \par 
+Since the parameter estimation methods in Section \ref{Parameter estimation methods} involve DFT's of the vector $\gnoise = \gdis + \noise$, a result regarding the distribution of the components of $\widehat{\noise}$ will be presented.
+\begin{lemma}
+Given $\noise \sim \mathcal{N}(\bm{0},\noiseSD^2I)$, where $\bm{0}$ and $I$ denote that $n \times n$ zero and identity matrices, respectively, $|\widehat{\noise}_k|^2 \sim$ for each $k = 0,\ldots,n-1$.
+\end{lemma}
+\begin{proof}
+Let $\noise \sim \mathcal{N}(\bm{0},\noiseSD^2I)$ and consider $P(|\widehat{\noise}_k|^2 \leq x)$. Certainly $P(|\widehat{\noise}_k|^2 \leq x) = 0$ for all $x \leq 0$.  Using the definition of the DFT and Euler's formula, $|\widehat{\noise}_k|^2$ is given by
+\begin{align*}
+|\widehat{\noise}_k|^2 &= \left|\frac{1}{\sqrt{n}}\sum_{j=0}^{n-1} \noise_{j}\exp\left(\frac{-2\pi{ijk}}{n}\right)\right|^2 \\
+&= \frac{1}{\sqrt{n}}\left(\sum_{j=0}^{n-1} \noise_{j}\cos\left(\frac{-2\pi{jk}}{n}\right)\right) -i\frac{1}{\sqrt{n}}\left(\sum_{j=0}^{n-1} \noise_j \sin\left(\frac{-2\pi{jk}}{n}\right) \right).
+\end{align*}
+
+\end{proof}
 
 \begin{figure}
 	\centerline{\includegraphics[scale = 0.45]{Figures/PicardPlot1D_F2_S15_W200.eps}}
 \caption{(Left) A Picard plot generated from the second test function, a Gaussian blur with a width of 200, and an SNR of 15. The terms $|\widehat{\gnoise}_i|/|\widehat{\kdis}_i|$ decrease until index 8, at which case the terms increase in magnitude. This is due to the fact that the $|\widehat{\kdis}_i|$ steadily decrease, while the $|\widehat{\gnoise}_i|$ level off just below the variance in the noise. (Right) A zoom-in of the Picard plot is provided, showing that elements of the DFT of $\gnoise$ decay only slightly below the variance of the noise in $\gnoise$.}
 \label{PicardPlot}
 \end{figure}
+
+
 
 \subsection{The Sampling Theorem and Aliasing} \label{sec:The Sampling Theorem and Aliasing}
 Since the goal of this project is to determine the efficacy of downsampling for regularization parameter estimation, the effects of downsampling on the parameter estimation methods must be carefully examined. The parameter estimation methods are considered from the perspective of the DFT, and so downsampling must be viewed from the same perspective. \par 
@@ -559,6 +573,8 @@ Let the family of functions $f_1,\ldots,f_k$ be as required. Relabel the functio
 If roots are not equal, then $\overline{f}(x_1) < 0$ and $\overline{f}(x_k) > 0$ since there would exist some $i = 1,\ldots,k$ such that $f_i(x_1) < 0$ or $f_i(x_k) > 0$, again following from the monotoncity of each function in the family. Since $\overline{f}$ is a linear combination of continuous functions, $\overline{f}$ itself is continuous. Thus having $\overline{f}(x_1) < 0$ and $\overline{f}(x_k) > 0$ implies that $\overline{f}$ has a root in $[x_1,x_k]$ by Bolzano's theorem (a corollary to the intermediate value theorem).
 \end{proof}
 
+\section{Effects of downsampling} \label{sec:Effects of downsampling}
+While analysis has been conducted regarding the convergence of predictive and estimation error for Tikhonov regularization as the number of sample points becomes large \cite{Vogel:2002}, the effects of reducing the number of sample points must be explored. To begin, results about aliasing and DFT components will be presented, followed by an analysis of each parameter estimation method in relation to downsampling. 
 
 \section{Numerical Results} \label{Numerical results}
 
