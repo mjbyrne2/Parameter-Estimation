@@ -174,8 +174,15 @@ which is known as the Tikhonov filter function. For large values of $\regparam$,
 \mfilt(\regparam,\singular_i) = 1 - \filt(\regparam,\singular_i) = \frac{\regparam^2}{\singular_i^2 + \regparam^2}.
 \label{eq:TikFiltPsi}
 \end{equation}
-The expression $1 - \filt(\regparam,\singular_i)$ arises a number of time in the methods introduced in Section \ref{sec:Parameter estimation methods}, and so $\mfilt(\regparam,\singular_i)$ will be used to simplify notation. In contrast to \eqref{eq:TikFilt}, \eqref{eq:TikFiltPsi} is close to one for large values of $\regparam$ and monotone increasing in $\regparam$ for fixed $\singular_i$. \par 
-The use of the Tikhonov filter function to generate an approximate solution is known as \textit{Tikhonov regularization} \cite{Tikh1963}; the obtained solution is
+The expression $1 - \filt(\regparam,\singular_i)$ arises a number of time in the methods introduced in Section \ref{sec:Parameter estimation methods}, and so $\mfilt(\regparam,\singular_i)$ will be used to simplify notation. In contrast to \eqref{eq:TikFilt}, \eqref{eq:TikFiltPsi} is close to one for large values of $\regparam$ and monotone increasing in $\regparam$ for fixed $\singular_i$; see Figure \ref{fig:Phi Psi Plot}. \par 
+
+\begin{figure}
+	\centerline{\includegraphics[scale = 0.5]{Figures/Phi_Psi_Plot.eps}}
+\caption{The behavior of the Tikhonov filter function $\filt(\regparam,\singular_i)$ and corresponding $\mfilt(\regparam,\singular_i) = 1 - \filt(\regparam,\singular_i)$ is displayed for choice values of $\singular_i$. For fixed $\singular_i$, $\filt(\regparam,\singular_i) \rightarrow 0$ and $\mfilt(\regparam,\singular_i) \rightarrow 1$ as $\regparam \rightarrow \infty$. Notice also that $\filt(\regparam,\singular_i) = \mfilt(\regparam,\singular_i)$ for $\alpha = \singular_i$.}
+\label{fig:Phi Psi Plot}
+\end{figure}
+
+The use of the Tikhonov filter function to generate an approximate solution is known as \textit{Tikhonov regularization} \cite{Tikh1963}; in terms of an SVD, the obtained solution is
 \begin{equation}
 \fdis(\regparam) = \sum_{i = 1}^n \filt(\regparam,\singular_i)\frac{{\LSV^\trans_i}\gnoise}{\singular_i}\RSV_i = \sum_{i = 1}^n \frac{\singular_i{\LSV^\trans_i}\gnoise}{\singular_i^2 + \regparam^2}\RSV_i.
 \label{eq:TikSol}
@@ -183,8 +190,15 @@ The use of the Tikhonov filter function to generate an approximate solution is k
 An alternative representation of the above Tikhonov solution is
 \begin{equation}
 \fdis(\regparam) = \arg\min_{\fdis \in \mathbb{R}^n} \|\kmat\fdis - \gnoise\|^2 + \regparam^2\|D\fdis\|^2,
+\label{eq:TikSol2}
 \end{equation}
-where $D$ is the matrix representation of a linear operator. The term $\|D\fdis\|^2$ is commonly called the penalty function \cite{Vogel:2002}. The representation \eqref{eq:TikSol} follows from selecting $D$ to be $I$, the $n \times n$ identity matrix. 
+where $D$ is the matrix representation of a linear operator. The term $\|D\fdis\|^2$ is commonly called the penalty function \cite{Vogel:2002}. The representation \eqref{eq:TikSol} follows from selecting $D$ to be $I$, the $n \times n$ identity matrix. If the matrix $D$ in \eqref{eq:TikSol2} is non-singular, then the substitutions $\mathbf{y} = D\fdis$ and $A = \kmat{D}^{-1}$ give
+\begin{equation}
+\mathbf{y}(\regparam) = \arg\min_{\mathbf{y} \in \mathbb{R}^n} \|A\mathbf{y} - \gnoise\|^2 + \regparam^2\|\mathbf{y}\|^2.
+\label{eq:TikSol Standard Form}
+\end{equation}
+This is known as standard form of the regularization problem. Once $\mathbf{y}$ is obtained from \eqref{eq:TikSol Standard Form}, the final solution is recovered by $\fdis = D^{-1}\mathbf{y}$.  However, there are many examples of matrices $D$ that are singular, such as finite difference matrices that approximate derivative operators. In such cases, the regularization cannot be recast in standard form. 
+
 
 \section{Analytical tools} \label{sec:Analytical tools}
 
@@ -247,7 +261,7 @@ Applying the trapezoidal rule for approximating this integral with $n$ points th
 This approximation is accurate for $k$ significantly smaller than the number of points $n$. \par 
 The \textit{discrete Fourier transform} (DFT) is a mapping $\mathcal{F}:\mathbb{C}^n \rightarrow \mathbb{C}^n$ defined by
 \begin{equation}
-\mathcal{F}(\mathbf{f})_k = \frac{1}{\sqrt{n}}\sum_{j=0}^{n-1} f_{j}\exp\left(\frac{-2\pi{ijk}}{n}\right), \quad \mathbf{f}\in\mathbb{C}^n,
+\mathcal{F}(\mathbf{f})_k = \frac{1}{\sqrt{n}}\sum_{j=0}^{n-1} f_{j}\exp\left(\frac{-2\pi{ijk}}{n}\right), \quad \mathbf{f}\in\mathbb{C}^n, \quad 0 \leq k \leq n-1
 \label{eq:DFT}
 \end{equation}
 and $i = \sqrt{-1}$. The DFT of a vector $\mathbf{f}$ will be denoted by $\widehat{\mathbf{f}}$. The inverse DFT of a vector $\widehat{\mathbf{f}}$ is given by
@@ -323,7 +337,8 @@ f(\bm{y}) = \frac{1}{\pi^n}\exp\left(-\frac{1}{2}\begin{bmatrix}
 \right).
 \label{eq:Complex Normal Joint PDF Simplified}
 \end{equation}
-
+Though $F$ is unitary, the structure of $FF^\trans$ is not obvious. By letting $F = A + iB$, where $A = \Re\{F\}$ and $B = \Im\{F\}$,
+\[FF^\trans = (A+iB)(A+iB)^\trans = (A+iB)(A^\trans + iB^\trans) = .\]
 \end{proof}
 
 \begin{figure}
@@ -693,7 +708,7 @@ Once a discretization of curvature is obtained, the location of maximum curvatur
         \caption{}
         \label{fig:GCVerrors}
     \end{subfigure}
-    \caption{Three plots showing the averaged GCV results for the first test function with an SNR of 15 and a Gaussian width parameter of 100. Figure \ref{fig:GCVfunctions} shows a zoomed-in portion of the averaged UPRE graph in comparison with graphs pertaining to the 20 noise realizations at a downsampling level of $n = 128$. Figure \ref{fig:GCVlambdas} shows that the resulting regularization parameter is typically less than the average of the individual regularization parameters. Figure \ref{fig:GCVerrors} shows that the relative error corresponding to the parameter chosen from the average UPRE method is greater than the average of the individual relative errors.}
+    \caption{Three plots showing the averaged GCV results for the first test function with an SNR of 15 and a Gaussian width parameter of 100. Figure \ref{fig:GCVfunctions} shows a zoomed-in portion of the averaged GCV graph in comparison with graphs pertaining to the 20 noise realizations at a downsampling level of $n = 128$. Figure \ref{fig:GCVlambdas} shows that the resulting regularization parameter is typically less than the average of the individual regularization parameters. Figure \ref{fig:GCVerrors} shows that the relative error corresponding to the parameter chosen from the average GCV method is greater than the average of the individual relative errors.}
 \label{fig:GCVplots}
 \end{figure}
 
