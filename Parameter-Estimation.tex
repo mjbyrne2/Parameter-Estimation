@@ -38,6 +38,7 @@
 \newcommand{\noiseSD}{\sigma}	% Standard deviation
 \newcommand{\noise}{\bm{\eta}}	% Noise vector
 \newcommand{\Var}{\operatorname{Var}}	% Variance
+\newcommand{\Cov}{\operatorname{Cov}}	% Covariance
 \newcommand{\E}{\operatorname{E}}	% Expected value
 
 % Singular values and vectors:
@@ -298,47 +299,57 @@ As mentioned in Section \ref{sec:Introduction}, a Picard plot is often useful in
 While the connection between lines \eqref{eq:InvProdDFT} and \eqref{eq:ApproxSolDFT} and the SVD have been noted in regard to the structure of the terms and equations, a complete connection can be made if another property about $\kmat$ is assumed. Until this point $\kmat$ is assumed to be an invertible $N \times N$ circulant matrix formed from a vector $\kdis$. If $\kmat$ is also assumed to be symmetric, then the SVD of $\kmat$ is the same as the diagonalization by the unitary DFT matrix $F$ and the singular values of $\kmat$ are also the eigenvalues. \par 
 Since the parameter estimation methods in Section \ref{sec:Parameter estimation methods} involve DFT's of the vector $\gnoise = \gdis + \noise$, a result regarding the distribution of the components of $\widehat{\noise}$ will be presented.
 \begin{lemma}
-Given $\noise \sim \mathcal{N}(\bm{0},\noiseSD^2I)$, where $\bm{0}$ denotes the zero $n$-vector and $I$ denotes the $n \times n$ identity matrix, $|\widehat{\noise}_k|^2 \sim$ for each fixed $k = 0,\ldots,n-1$.
+Given $\noise \sim \mathcal{N}(\bm{0},\noiseSD^2I)$, where $\bm{0}$ denotes the zero $n$-vector and $I$ denotes the $n \times n$ identity matrix, $\widehat{\noise} \sim \mathcal{N}(\bm{0},\noiseSD^2I)$.
 \end{lemma}
 \begin{proof}
-Let $\noise \sim \mathcal{N}(\bm{0},\noiseSD^2I)$. The joint probability density function of $\noise$ is
-\[f_{\noise}(\noise_1,\ldots,\noise_n) = \frac{\exp\left(-(1/2)\noise^\trans \noise)\right)}{\sqrt{(2\pi)^n}}.\]
-Letting $\bm{Z} = F\noise$, where $F$ is the Fourier matrix defined by \eqref{eq:DFT-Matrix}, $\bm{Z}$ is a complex random $n$-vector with distribution $\mathcal{N}_\mathcal{C}(\bm{0},\Gamma,C)$. Here $\mathcal{N}_\mathcal{C}$ denotes the complex normal distribution with covariance matrix $\Gamma = \E(\bm{ZZ}^\ctrans)$ and relation matrix $C = \E(\bm{ZZ}^\trans)$. By the linearity of expected value, the distribution of $\noise$, and the unitary property of $F$, 
-\[\Gamma = E(F\noise(F\noise)^\ctrans) = F\E(\noise\noise^\ctrans)F^\ctrans  = F\E(\noise\noise^\trans)F^\ctrans = F(\noiseSD^2I)F^\ctrans = \noiseSD^2I.\]
-The relation matrix $C$ is evaluated similarly:
-\[C = E(F\noise(F\noise)^\trans) = F\E(\noise\noise^\trans)F^\trans = F(\noiseSD^2I)F^\trans = \noiseSD^2FF^\trans.\]
-Thus $\bm{Z} \sim \mathcal{N}_\mathcal{C}(\bm{0},\noiseSD^2I,\noiseSD^2FF^\trans)$. The joint probability density function (pdf) is
+Let $\noise \sim \mathcal{N}(\bm{0},\noiseSD^2I)$ and $F$ be the $n \times n$ Fourier matrix with components given by \eqref{eq:DFT-Matrix}. Letting $A = \Re\{F\}$ and $B = \Im\{F\}$, it will first be shown that the real and imaginary parts of $\widehat{\noise} = F\noise$ are independent by showing that $\Cov(A\noise,B\noise) = \bm{0}$. Since $\noise \sim \mathcal{N}(\bm{0},\noiseSD^2I)$,
+\[\Cov(A\noise,B\noise) = A\noiseSD^2IB^\trans = \noiseSD^2AB^\trans.\]
+Thus it must be shown that $AB^\trans = \bm{0}$. By Euler's identity, 
 \begin{equation}
-f(\bm{y}) = \frac{1}{\pi^n\sqrt{\det(\Gamma)\det(C)}}\exp\left(-\frac{1}{2}\begin{bmatrix}
-(\overline{\bm{y}})^\trans & \bm{y}^\trans
-\end{bmatrix}
-\begin{bmatrix}
-\Gamma & C \\
-\overline{C} & \overline{\Gamma}
-\end{bmatrix}^{-1} \begin{bmatrix}
-\bm{y} \\
-\overline{\bm{y}}
-\end{bmatrix}
-\right).
-\label{eq:Complex Normal Joint PDF}
+A_{jk} = \frac{1}{\sqrt{n}}\cos\left(\frac{-2\pi{jk}}{n}\right), \quad B_{jk} = \frac{1}{\sqrt{n}}\sin\left(\frac{-2\pi{jk}}{n}\right),
+\label{eq:Components Re(F) and Im(F)}
 \end{equation}
-Noting that $\det(\Gamma) = \det(C) = 1$ and the block matrix in \eqref{eq:Complex Normal Joint PDF} is involutory, the joint pdf simplifies to
+and so the components of $AB^\trans$ are
 \begin{equation}
-f(\bm{y}) = \frac{1}{\pi^n}\exp\left(-\frac{1}{2}\begin{bmatrix}
-(\overline{\bm{y}})^\trans & \bm{y}^\trans
-\end{bmatrix}
-\begin{bmatrix}
-\Gamma & C \\
-\overline{C} & \overline{\Gamma}
-\end{bmatrix}^{-1} \begin{bmatrix}
-\bm{y} \\
-\overline{\bm{y}}
-\end{bmatrix}
-\right).
-\label{eq:Complex Normal Joint PDF Simplified}
+(AB^\trans)_{jk} = \frac{1}{n}\sum_{\ell=0}^{n-1}\cos\left(\frac{-2\pi{j\ell}}{n}\right)\sin\left(\frac{-2\pi{\ell{k}}}{n}\right).
+\label{eq:Covariance product}
 \end{equation}
-Though $F$ is unitary, the structure of $FF^\trans$ is not obvious. By letting $F = A + iB$, where $A = \Re\{F\}$ and $B = \Im\{F\}$,
-\[FF^\trans = (A+iB)(A+iB)^\trans = (A+iB)(A^\trans + iB^\trans) = .\]
+Applying the appropriate product-to-sum trigonometric identity and using the fact that sine is an odd function allows for sum in \eqref{eq:Covariance product} to be evaluated as
+\begin{align*}
+\frac{1}{n}\sum_{\ell=0}^{n-1}\cos\left(\frac{-2\pi{j\ell}}{n}\right)\sin\left(\frac{-2\pi{\ell{k}}}{n}\right) &= \frac{1}{2n}\sum_{\ell=0}^{n-1}\left[\sin\left(\frac{-2\pi{\ell(j+k)}}{n}\right) - \sin\left(\frac{-2\pi{\ell(k-j)}}{n}\right)\right] \\
+&= \frac{1}{2n}\sum_{\ell=0}^{n-1}\left[\sin\left(\frac{2\pi{\ell(k-j)}}{n}\right) - \sin\left(\frac{2\pi{\ell(j+k)}}{n}\right)\right] \\
+&= \frac{1}{2n}\left(S_1 - S_2\right),
+\end{align*}
+where
+\[S_1 = \sum_{\ell=0}^{n-1}\sin\left(\frac{2\pi{\ell(k-j)}}{n}\right), \quad S_2 = \sum_{\ell=0}^{n-1}\sin\left(\frac{2\pi{\ell(j+k)}}{n}\right).\]
+There are four cases depending upon the values of $j$ and $k$. \par 
+If $j = k$ and $j + k = n$, then the summands of $S_1$ and $S_2$ are zero. Thus $(S_1 - S_2)/2n$, and so $(AB^\trans)_{jk} = 0$. \par 
+If $j \neq k$ and $j + k \neq n$, then the summands of $S_1$ and $S_2$ are not necessarily zero. However, the arguments of the sine terms are in arithmetic progression, and so both $S_1$ and $S_2$ can be simplified. $S_1$ can be expressed as
+\begin{equation}
+S_1 = \frac{\sin(\pi{(j+k)})\sin(\pi(n-1)(j+k)/n)}{\sin(\pi{(j+k)}/n)}
+\label{eq:S1}
+\end{equation}
+and similarly, $S_2$ can be expressed as
+\begin{equation}
+S_2 = \frac{\sin(\pi(k-j))\sin(\pi(n-1)(k-j)/n)}{\sin(\pi{(k-j)}/n)}.
+\label{eq:S2}
+\end{equation}
+Since $j+k$ and $k-j$ are integers, the expressions \eqref{eq:S1} and \eqref{eq:S2} are both zero because of the first sine terms in the numerators. Thus $(AB^\trans)_{jk} = 0$ in this case as well. \par 
+The last two cases are $j = k$ and $j + k \neq n$, and $j \neq k$ and $j + k = n$. These cases are resolved in ways similar to the first two; the summands of one of the sums are zero and the other sum evaluates to zero using either \eqref{eq:S1} and \eqref{eq:S2}. \par 
+Therefore $\Cov(A\noise,B\noise) = AB^\trans = \bm{0}$, and so the real and imaginary parts of $\widehat{\noise}$ are independent. \par 
+Next it will be shown that $A\noise$ and $B\noise$ are identically distributed as $\mathcal{N}(\bm{0},\noiseSD^2I)$. The covariance matrices of $A\noise$ and $B\noise$ are $A(\noiseSD^2I)A^\trans = \noiseSD^2AA^\trans$ and $B(\noiseSD^2I)B^\trans = \noiseSD^2BB^\trans$, respectively. Thus it must be shown that $AA^\trans = BB^\trans$. Using \eqref{eq:Components Re(F) and Im(F)} and product-to-sum identities, the components of $AA^\trans$ are
+\begin{equation}
+(AA^\trans)_{jk} = \frac{1}{2n}\sum_{\ell=0}^{n-1} \left[\cos\left(\frac{-2\pi(k-j)\ell}{n}\right) + \cos\left(\frac{-2\pi(j+k)\ell}{n}\right)\right]
+\label{eq:Matrix AA}
+\end{equation}
+and the components of $BB^\trans$ are
+\begin{equation}
+(BB^\trans)_{jk} = \frac{1}{2n}\sum_{\ell=0}^{n-1} \left[\cos\left(\frac{-2\pi(k-j)\ell}{n}\right) - \cos\left(\frac{-2\pi(j+k)\ell}{n}\right)\right].
+\label{eq:Matrix BB}
+\end{equation}
+Letting
+\[S_3 = \sum_{\ell=0}^{n-1} \cos\left(\frac{-2\pi(k-j)\ell}{n}\right), \quad S_4 = \sum_{\ell=0}^{n-1} \cos\left(\frac{-2\pi(j+k)\ell}{n}\right),\]
+the sums in \eqref{eq:Matrix AA} and \eqref{eq:Matrix BB} can be expressed as $(S_3 + S_4)/2n$ and $(S_3 - S_4)/2n$, respectively.  
 \end{proof}
 
 \begin{figure}
