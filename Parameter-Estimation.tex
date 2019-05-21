@@ -1,5 +1,5 @@
 \documentclass[12pt]{article}
-\usepackage{amsmath,amssymb,amsthm,bm}
+\usepackage{amsmath,amssymb,amsthm,bm,enumitem}
 \usepackage{geometry,graphicx,subcaption,sidecap}
 \geometry{margin = 1 in}
 \usepackage{color}
@@ -21,7 +21,10 @@
 \newcommand{\trans}{\mathrm{T}}	% Matrix transpose
 \newcommand{\ctrans}{*}	% Conjugate transpose
 \newcommand{\trace}{\operatorname{trace}}	% Trace
-\newcommand{\diag}{\operatorname{diag}}
+\newcommand{\diag}{\operatorname{diag}}	% Diagonal matrix
+\newcommand{\rank}{\operatorname{rank}}	% Rank of a matrix
+\newcommand{\range}{\operatorname{range}}	% Range (space) of a matrix
+\newcommand{\nullspace}{\operatorname{null}}	% Null space of a matrix
 
 % Regularization notation:
 \newcommand{\regparam}{\alpha}
@@ -198,7 +201,8 @@ where $D$ is the matrix representation of a linear operator. The term $\|D\fdis\
 \mathbf{y}(\regparam) = \arg\min_{\mathbf{y} \in \mathbb{R}^n} \|A\mathbf{y} - \gnoise\|^2 + \regparam^2\|\mathbf{y}\|^2.
 \label{eq:TikSol Standard Form}
 \end{equation}
-This is known as standard form of the regularization problem. Once $\mathbf{y}$ is obtained from \eqref{eq:TikSol Standard Form}, the final solution is recovered by $\fdis = D^{-1}\mathbf{y}$.  However, there are many examples of matrices $D$ that are singular, such as finite difference matrices that approximate derivative operators. In such cases, the regularization cannot be recast in standard form. 
+This is known as standard form of the regularization problem. Once $\mathbf{y}$ is obtained from \eqref{eq:TikSol Standard Form}, the final solution is recovered by $\fdis = D^{-1}\mathbf{y}$.  \par 
+However, there are many examples of matrices $D$ that are singular, such as finite difference matrices that approximate derivative operators. In such cases, the regularization can still be recast in standard form as follows. 
 
 
 \section{Analytical tools} \label{sec:Analytical tools}
@@ -297,60 +301,168 @@ Since $F^*$ is a matrix representation of the inverse DFT, the approximate solut
 Here $\filt(\regparam,\widehat{\kdis})\widehat{\gnoise}/{\widehat{\kdis}}$ is a vector where the operations of multiplication and division are performed component-wise. This representation is useful for making a connection with the MATLAB implementation. \par
 As mentioned in Section \ref{sec:Introduction}, a Picard plot is often useful in analyzing the numerical instabilities of solutions obtained from either or \eqref{eq:InvProd} or \eqref{eq:InvProdDFT}. Figure \ref{PicardPlot} shows an example of a Picard plot. The terms $|\widehat{\kdis}_i|$ decrease down to machine precision, though the $|\widehat{\gnoise}_i|$ decrease but then level off just above the variance in the noise. As a result, the terms $|\widehat{\gnoise}_i|/|\widehat{\kdis}_i|$ only decrease so far and then begin increasing. The steady increase can produce a blow up of the approximate solution. While illustrating these relationships, a Picard plot is also useful in determining how to truncate the sum in \eqref{eq:ApproxSolDFT} to avoid blow up in the solution. For the plot in Figure \ref{PicardPlot}, the sum in \eqref{eq:ApproxSolDFT} should be truncated around index 8 to obtain a meaningful solution. \par 
 While the connection between lines \eqref{eq:InvProdDFT} and \eqref{eq:ApproxSolDFT} and the SVD have been noted in regard to the structure of the terms and equations, a complete connection can be made if another property about $\kmat$ is assumed. Until this point $\kmat$ is assumed to be an invertible $N \times N$ circulant matrix formed from a vector $\kdis$. If $\kmat$ is also assumed to be symmetric, then the SVD of $\kmat$ is the same as the diagonalization by the unitary DFT matrix $F$ and the singular values of $\kmat$ are also the eigenvalues. \par 
-Since the parameter estimation methods in Section \ref{sec:Parameter estimation methods} involve DFT's of the vector $\gnoise = \gdis + \noise$, a result regarding the distribution of the components of $\widehat{\noise}$ will be presented.
-\begin{lemma}
-Given $\noise \sim \mathcal{N}(\bm{0},\noiseSD^2I)$, where $\bm{0}$ denotes the zero $n$-vector and $I$ denotes the $n \times n$ identity matrix, $\widehat{\noise} \sim \mathcal{N}(\bm{0},\noiseSD^2I)$.
-\end{lemma}
-\begin{proof}
-Let $\noise \sim \mathcal{N}(\bm{0},\noiseSD^2I)$ and $F$ be the $n \times n$ Fourier matrix with components given by \eqref{eq:DFT-Matrix}. Letting $A = \Re\{F\}$ and $B = \Im\{F\}$, it will first be shown that the real and imaginary parts of $\widehat{\noise} = F\noise$ are independent by showing that $\Cov(A\noise,B\noise) = \bm{0}$. Since $\noise \sim \mathcal{N}(\bm{0},\noiseSD^2I)$,
-\[\Cov(A\noise,B\noise) = A\noiseSD^2IB^\trans = \noiseSD^2AB^\trans.\]
-Thus it must be shown that $AB^\trans = \bm{0}$. By Euler's identity, 
+
+Since the parameter estimation methods in Section \ref{sec:Parameter estimation methods} involve DFT's of the vector $\gnoise = \gdis + \noise$, some results regarding the distribution of the components of $\widehat{\noise}$ will be presented. The first results will be in regard to the real and imaginary parts of the $\widehat{\noise}$. Letting $A$ and $B$ be the real and imaginary parts, respectively, of the $n \times n$ DFT matrix, Euler's identity gives
 \begin{equation}
 A_{jk} = \frac{1}{\sqrt{n}}\cos\left(\frac{-2\pi{jk}}{n}\right), \quad B_{jk} = \frac{1}{\sqrt{n}}\sin\left(\frac{-2\pi{jk}}{n}\right),
 \label{eq:Components Re(F) and Im(F)}
 \end{equation}
-and so the components of $AB^\trans$ are
+for $0 \leq j,k \leq n-1$. It is clear from \eqref{eq:Components Re(F) and Im(F)} that the matrices $A$ and $B$ are symmetric. The rows (and by symmetry, columns) of $A$ and $B$ have the following orthogonality properties.
+\begin{lemma}
+Let $A$ and $B$ be the real and imaginary parts, respectively, of the $n \times n$ DFT matrix, and let $\langle\cdot,\cdot\rangle$ denote standard inner product (dot product) of $\mathbb{R}^n$. Then for $0 \leq j,k \leq n-1$:
+\begin{enumerate}[label=(\roman*)]
+\item $\langle A_{j\cdot}, B_{k\cdot}\rangle = 0$.
+\item If $n$ is even, then 
+\begin{align*}
+\langle A_{j\cdot}, A_{k\cdot}\rangle &= \begin{cases}
+1 & j = k, j+k \equiv 0 \bmod n \\ 
+1/2 & j = k, j+k \not\equiv 0 \bmod n \\ 
+1/2 & j \neq k, j+k \equiv 0 \bmod n \\ 
+0 & \text{otherwise} \end{cases}, \\
+\langle B_{j\cdot}, B_{k\cdot}\rangle &= \begin{cases}
+0 & j = k, j+k \equiv 0 \bmod n \\ 
+1/2 & j = k, j+k \not\equiv 0 \bmod n \\ 
+-1/2 & j \neq k, j+k \equiv 0 \bmod n \\ 
+0 & \text{otherwise} \end{cases}.
+\end{align*}
+\item If $n$ is odd, then
+\[\langle A_{j\cdot}, A_{k\cdot}\rangle = \begin{cases}
+1 & j = k = 0 \\ 
+1/2 & j = k \neq 0 \\
+1/2 & j+k = n \\
+0 & \text{otherwise} \end{cases}, \quad 
+\langle B_{j\cdot}, B_{k\cdot}\rangle = \begin{cases}
+0 & j = k = 0 \\ 
+1/2 & j = k \neq 0 \\
+-1/2 & j+k = n \\
+0 & \text{otherwise} \end{cases}.\]
+\end{enumerate}
+\begin{proof}
+Property (i) will first be established. Letting $A$ and $B$ be as required, \eqref{eq:Components Re(F) and Im(F)} gives
 \begin{equation}
-(AB^\trans)_{jk} = \frac{1}{n}\sum_{\ell=0}^{n-1}\cos\left(\frac{-2\pi{j\ell}}{n}\right)\sin\left(\frac{-2\pi{\ell{k}}}{n}\right).
-\label{eq:Covariance product}
+\langle A_{j\cdot}, B_{k\cdot}\rangle = \frac{1}{n}\sum_{\ell=0}^{n-1}\cos\left(\frac{-2\pi{j\ell}}{n}\right)\sin\left(\frac{-2\pi{\ell{k}}}{n}\right).
+\label{eq: <Re(F),Im(F)>}
 \end{equation}
-Applying the appropriate product-to-sum trigonometric identity and using the fact that sine is an odd function allows for sum in \eqref{eq:Covariance product} to be evaluated as
+Applying the appropriate product-to-sum trigonometric identity and using the fact that sine is an odd function allows for sum in \eqref{eq: <Re(F),Im(F)>} to be evaluated as
 \begin{align*}
 \frac{1}{n}\sum_{\ell=0}^{n-1}\cos\left(\frac{-2\pi{j\ell}}{n}\right)\sin\left(\frac{-2\pi{\ell{k}}}{n}\right) &= \frac{1}{2n}\sum_{\ell=0}^{n-1}\left[\sin\left(\frac{-2\pi{\ell(j+k)}}{n}\right) - \sin\left(\frac{-2\pi{\ell(k-j)}}{n}\right)\right] \\
 &= \frac{1}{2n}\sum_{\ell=0}^{n-1}\left[\sin\left(\frac{2\pi{\ell(k-j)}}{n}\right) - \sin\left(\frac{2\pi{\ell(j+k)}}{n}\right)\right] \\
-&= \frac{1}{2n}\left(S_1 - S_2\right),
+&= \frac{1}{2n}\left(s_1 - s_2\right),
 \end{align*}
 where
-\[S_1 = \sum_{\ell=0}^{n-1}\sin\left(\frac{2\pi{\ell(k-j)}}{n}\right), \quad S_2 = \sum_{\ell=0}^{n-1}\sin\left(\frac{2\pi{\ell(j+k)}}{n}\right).\]
-There are four cases depending upon the values of $j$ and $k$. \par 
-If $j = k$ and $j + k = n$, then the summands of $S_1$ and $S_2$ are zero. Thus $(S_1 - S_2)/2n$, and so $(AB^\trans)_{jk} = 0$. \par 
-If $j \neq k$ and $j + k \neq n$, then the summands of $S_1$ and $S_2$ are not necessarily zero. However, the arguments of the sine terms are in arithmetic progression, and so both $S_1$ and $S_2$ can be simplified. $S_1$ can be expressed as
+\[s_1 = \sum_{\ell=0}^{n-1}\sin\left(\frac{2\pi{\ell(k-j)}}{n}\right), \quad s_2 = \sum_{\ell=0}^{n-1}\sin\left(\frac{2\pi{\ell(j+k)}}{n}\right).\]
+If $j = k$, then the summands for $s_1$ are zero and thus $s_1 = 0$. If $j \neq k$, then since the arguments of the sine terms are in arithmetic progression, $s_1$ can be expressed as
 \begin{equation}
-S_1 = \frac{\sin(\pi{(j+k)})\sin(\pi(n-1)(j+k)/n)}{\sin(\pi{(j+k)}/n)}
-\label{eq:S1}
+s_1 = \frac{\sin(\pi{(k-j)})\sin(\pi(n-1)(k-j)/n)}{\sin(\pi{(k-j)}/n)}.
+\label{eq:s1}
 \end{equation}
-and similarly, $S_2$ can be expressed as
+Since $k-j$ is an integer, the first sine term in the numerator of \eqref{eq:s1} is zero, making $s_1 = 0$. Similarly, if $j + k = n$, then the summands for $s_2$ are zero and thus $s_2 = 0$. If $j + k \neq n$, then $s_2$ can be expressed as
 \begin{equation}
-S_2 = \frac{\sin(\pi(k-j))\sin(\pi(n-1)(k-j)/n)}{\sin(\pi{(k-j)}/n)}.
-\label{eq:S2}
+s_2 = \frac{\sin(\pi(j+k))\sin(\pi(n-1)(j+k)/n)}{\sin(\pi{(j+k)}/n)}.
+\label{eq:s2}
 \end{equation}
-Since $j+k$ and $k-j$ are integers, the expressions \eqref{eq:S1} and \eqref{eq:S2} are both zero because of the first sine terms in the numerators. Thus $(AB^\trans)_{jk} = 0$ in this case as well. \par 
-The last two cases are $j = k$ and $j + k \neq n$, and $j \neq k$ and $j + k = n$. These cases are resolved in ways similar to the first two; the summands of one of the sums are zero and the other sum evaluates to zero using either \eqref{eq:S1} and \eqref{eq:S2}. \par 
-Therefore $\Cov(A\noise,B\noise) = AB^\trans = \bm{0}$, and so the real and imaginary parts of $\widehat{\noise}$ are independent. \par 
-Next it will be shown that $A\noise$ and $B\noise$ are identically distributed as $\mathcal{N}(\bm{0},\noiseSD^2I)$. The covariance matrices of $A\noise$ and $B\noise$ are $A(\noiseSD^2I)A^\trans = \noiseSD^2AA^\trans$ and $B(\noiseSD^2I)B^\trans = \noiseSD^2BB^\trans$, respectively. Thus it must be shown that $AA^\trans = BB^\trans$. Using \eqref{eq:Components Re(F) and Im(F)} and product-to-sum identities, the components of $AA^\trans$ are
+Again $j+k$ is an integer, so the first sine term in the numerator of \eqref{eq:s1} is zero and thus $s_2 = 0$.  Therefore $\langle A_{j\cdot}, B_{k\cdot}\rangle = 0$ for all $0 \leq j,k \leq n-1$. \par
+The results of properties (ii) and (iii) regarding $A$ will now be proved; the results regarding $B$ will be handled afterwards. Utilizing \eqref{eq:Components Re(F) and Im(F)} again,
 \begin{equation}
-(AA^\trans)_{jk} = \frac{1}{2n}\sum_{\ell=0}^{n-1} \left[\cos\left(\frac{-2\pi(k-j)\ell}{n}\right) + \cos\left(\frac{-2\pi(j+k)\ell}{n}\right)\right]
-\label{eq:Matrix AA}
+\langle A_{j\cdot}, A_{k\cdot}\rangle = \frac{1}{n}\sum_{\ell=0}^{n-1}\cos\left(\frac{-2\pi{j\ell}}{n}\right)\cos\left(\frac{-2\pi{\ell{k}}}{n}\right).
+\label{eq: <A,A>}
 \end{equation}
-and the components of $BB^\trans$ are
+By the fact that cosine is an even function and applying another product-to-sum identity gives $\langle A_{j\cdot}, A_{k\cdot}\rangle = (c_1 + c_2)/2n$, where
+\[c_1 = \sum_{\ell=0}^{n-1}\cos\left(\frac{2\pi{(j-k)\ell}}{n}\right), \quad c_2 = \sum_{\ell=0}^{n-1}\cos\left(\frac{2\pi{(j+k)\ell}}{n}\right).\]
+\indent Assume that $n$ is even, and suppose that $j = k$. Certainly $c_1 = n$, but there are two cases for $c_2$. If $j + k$ is equal to zero or $n$, then $c_2 = n$ as well, so that $\langle A_{j\cdot}, A_{k\cdot}\rangle = (n+n)/2n = 1$. If $j + k$ is not equal to zero or $n$, then since the arguments of the cosines in $c_2$ are in arithmetic progression, $c_2$ can be rewritten as
 \begin{equation}
-(BB^\trans)_{jk} = \frac{1}{2n}\sum_{\ell=0}^{n-1} \left[\cos\left(\frac{-2\pi(k-j)\ell}{n}\right) - \cos\left(\frac{-2\pi(j+k)\ell}{n}\right)\right].
-\label{eq:Matrix BB}
+c_2 = \frac{\sin(\pi(j+k))\cos(\pi(n-1)(j+k)/n)}{\sin(\pi(j+k)/n)}.
+\label{eq:c2}
 \end{equation}
-Letting
-\[S_3 = \sum_{\ell=0}^{n-1} \cos\left(\frac{-2\pi(k-j)\ell}{n}\right), \quad S_4 = \sum_{\ell=0}^{n-1} \cos\left(\frac{-2\pi(j+k)\ell}{n}\right),\]
-the sums in \eqref{eq:Matrix AA} and \eqref{eq:Matrix BB} can be expressed as $(S_3 + S_4)/2n$ and $(S_3 - S_4)/2n$, respectively.  
+Since $j+k$ is an integer, \eqref{eq:c2} is reduced to $c_2 = 0$. Thus $\langle A_{j\cdot},A_{k\cdot}\rangle = (n+0)/2n = 1/2$ for $j = k$ and $j + k \not\equiv 0 \bmod n$. If $j \neq k$ but $j+k \equiv 0 \bmod n$, then $c_2 = 0$ and $c_1$ can be rewritten as
+\begin{equation}
+c_1 = \frac{\sin(\pi(j-k))\cos(\pi(n-1)(j-k)/n)}{\sin(\pi(j-k)/n)}.
+\label{eq:c1}
+\end{equation}
+Since $j-k$ is an integer, \eqref{eq:c1} reduces to $c_1 = 0$, and so $\langle A_{j\cdot},A_{k\cdot}\rangle = (0+n)/2n = 1/2$ for $j \neq k$ and $j + k \equiv 0 \bmod n$. Lastly, if $j \neq k$ and $j+k \not\equiv 0 \bmod n$ then \eqref{eq:c1} and \eqref{eq:c2} are both reduced to $c_1 = c_2 = 0$. Thus $\langle A_{j\cdot},A_{k\cdot}\rangle = 0$ for $j \neq k$ and $j+k \not\equiv 0 \bmod n$, which completes the result of property (ii) regarding $A$ when $n$ is even.  \par
+If $n$ is odd, then it is not possible for both $j = k$ and $j + k = n$ because this would imply that $n$ is even. Thus the conditions $j=k$ and $j+k \equiv 0 \bmod n$ become the condition that $j = k = 0$. If $j \neq k$, then the condition $j+k \equiv 0 \bmod n$ simplifies to $j + k = n$. \par 
+For the results regarding $B$, recall that the DFT matrix $F$ is unitary. Expanding the product $FF^\ctrans$ in terms of $A$ and $B$ gives
+\[I = FF^\ctrans = (A+iB)(A^\trans - iB^\trans) = AA^\trans - iAB^\trans + iBA^\trans + BB^\trans.\]
+Property (i) implies that $-iAB^\trans$ and $iBA^\trans$ are zero matrices, so $I = AA^\trans + BB^\trans$. Since the components of the matrix $BB^\trans$ are equal to the inner products of the rows of $B$, the results of properties (ii) and (iii) regarding $B$ then follow from subtracting the results about $A$ from the identity matrix.
 \end{proof}
+\end{lemma}
+
+There are some important consequences of this lemma. First, the lemma shows that while the rows (columns) of $F$ form an orthonormal basis for $\mathbb{C}^n$, the orthogonality of the rows of $A$ and $B$ are limited by conditions on the row indices. Another consequence is that while $F$ is invertible and therefore have full rank, the matrices $A$ and $B$ are rank-deficient. Just how the components of $A$ and $B$ depend upon the parity of $n$, the next lemma illustrates that the rank of these matrices depend upon $n$ as well.
+
+\begin{lemma}
+Let $A$ and $B$ be the real and imaginary parts, respectively, of the $n \times n$ DFT matrix. If $n$ is even, then $\rank(A) = (n/2)+1$ and $\rank(B) = (n/2)-1$. If $n$ is odd, then $\rank(A) = (n+1)/2$ and $\rank(B) = (n-1)/2$. 
+\begin{proof}
+Let the matrices $A$, and $B$ be as required. By applying various properties of the rank of a matrix, all of the effort can be dedicated to finding the rank of $A$. Since the rank of a matrix is equal to the dimension of the row space, the approach that will be taken is to determine the dimension of the row space of $A$ using the preceding lemma. The dimension of the row space will be determined by counting the number of linearly independent rows of $A$. \par 
+From lemma LEMMA, 
+
+
+Thus the first $(n/2)+1$ rows of $A$ form an orthogonal set of vectors, and so they are linearly independent. \par 
+However, this only shows that $\rank(A) \geq (n/2)+1$. In order to show equality, it will now be shown that the remaining $(n/2)-1$ rows of $A$ are copies of preceding rows. Let $0 \leq j \leq n/2$, and consider row $\ell = n - j$. From \eqref{eq:Components Re(F) and Im(F)} and the parity of cosine, the components of row $\ell$ are
+\[A_{\ell{k}} = \frac{1}{\sqrt{n}}\cos\left(\frac{-2\pi{\ell{k}}}{n}\right) = \frac{1}{\sqrt{n}}\cos\left(\frac{-2\pi{(n-j){k}}}{n}\right) = \frac{1}{\sqrt{n}}\cos\left(\frac{-2\pi{jk}}{n} + 2\pi{k}\right).\]
+Since the column index $k$ is an integer, the periodicity of cosine gives $A_{\ell{k}} = A_{jk}$. Thus rows $j$ and $n-j$ of the matrix $A$ are the same for all $0 \leq j \leq n/2$, and therefore $\rank(A) = (n/2)+1$.  The argument that $\rank(A) = (n+1)/2$ for odd $n$ is identical with the exception that $j$ and $\ell$ are restricted so $j \neq \ell$ and $0 \leq j,\ell \leq (n-1)/2$. \par 
+A similar argument for the rank of $B$ could be made, but for the sake of brevity a different approach can be taken which uses some matrix rank inequalities and  the result from lemma LEMMA that $AB^\trans$ is a zero matrix (regardless of the parity of $n$). Recalling that an invertible matrix has full rank and using the subadditive property of rank,
+\[n = \rank(F) = \rank(A + iB) \leq \rank(A) + \rank(iB) = \rank(A) + \rank(B).\] 
+Applying Sylvester's rank inequality to the product $AB^\trans$ gives
+\[\rank(A) + \rank(B) - n = \rank(A) + \rank(B^\trans) - n \leq \rank(AB^\trans) = 0,\]
+which implies that $\rank(A) + \rank(B) \leq n$. Thus $\rank(A) + \rank(B) = n$, and since the rank of $A$ has been determined for both even and odd $n$, the rank of $B$ immediately follows. 
+\end{proof}
+\end{lemma} 
+
+With the ranks of the real and imaginary parts of $F$ determined, the probability density functions of $\Re\{\widehat{\noise}\}$ and $\Im\{\widehat{\noise}\}$ can now be established. The density functions can be expressed by defining new transformations based on the rank of $AA^\trans$ and $BB^\trans$ \cite{Rao1973}. Starting with $\Sigma = AA^\trans$ and letting $r = \rank(A)$, we form an $n \times r$ matrix $R$ whose columns are the first $r$ columns of $A$ after normalization. By the previous lemma, the columns of $R$ are thus orthonormal vectors belonging to $\range(AA^\trans)$. By the rank-nullity theorem, there exists an $n \times (n-r)$ matrix $N$ whose columns are in $\nullspace(A)$. Using a colon to denote horizontal concatenation, let $P' = [R:N]$. 
+
+%\begin{lemma}
+%If $\noise \sim \mathcal{N}(\bm{0},\noiseSD^2I)$, where $\bm{0}$ denotes the zero $n$-vector and $I$ denotes the $n \times n$ identity matrix, then  $\Re\{\widehat{\noise}\}$ and $\Im\{\widehat{\noise}\}$ are independent.
+%\end{lemma}
+%\begin{proof}
+%Let $\noise \sim \mathcal{N}(\bm{0},\noiseSD^2I)$ and $F$ be the $n \times n$ Fourier matrix with components given by \eqref{eq:DFT-Matrix}. Letting $A = \Re\{F\}$ and $B = \Im\{F\}$, it will be shown that the real and imaginary parts of $\widehat{\noise} = F\noise$ are independent by showing that $\Cov(A\noise,B\noise) = \bm{0}$. Since $\noise \sim \mathcal{N}(\bm{0},\noiseSD^2I)$,
+%\[\Cov(A\noise,B\noise) = A\noiseSD^2IB^\trans = \noiseSD^2AB^\trans.\]
+%Thus it must be shown that $AB^\trans = \bm{0}$. By Euler's identity, 
+%\begin{equation}
+%A_{jk} = \frac{1}{\sqrt{n}}\cos\left(\frac{-2\pi{jk}}{n}\right), \quad B_{jk} = \frac{1}{\sqrt{n}}\sin\left(\frac{-2\pi{jk}}{n}\right),
+%\label{eq:Components Re(F) and Im(F)}
+%\end{equation}
+%and so the components of $AB^\trans$ are
+%\begin{equation}
+%(AB^\trans)_{jk} = \frac{1}{n}\sum_{\ell=0}^{n-1}\cos\left(\frac{-2\pi{j\ell}}{n}\right)\sin\left(\frac{-2\pi{\ell{k}}}{n}\right).
+%\label{eq:Covariance product}
+%\end{equation}
+%Applying the appropriate product-to-sum trigonometric identity and using the fact that sine is an odd function allows for sum in \eqref{eq:Covariance product} to be evaluated as
+%\begin{align*}
+%\frac{1}{n}\sum_{\ell=0}^{n-1}\cos\left(\frac{-2\pi{j\ell}}{n}\right)\sin\left(\frac{-2\pi{\ell{k}}}{n}\right) &= \frac{1}{2n}\sum_{\ell=0}^{n-1}\left[\sin\left(\frac{-2\pi{\ell(j+k)}}{n}\right) - \sin\left(\frac{-2\pi{\ell(k-j)}}{n}\right)\right] \\
+%&= \frac{1}{2n}\sum_{\ell=0}^{n-1}\left[\sin\left(\frac{2\pi{\ell(k-j)}}{n}\right) - \sin\left(\frac{2\pi{\ell(j+k)}}{n}\right)\right] \\
+%&= \frac{1}{2n}\left(S_1 - S_2\right),
+%\end{align*}
+%where
+%\[S_1 = \sum_{\ell=0}^{n-1}\sin\left(\frac{2\pi{\ell(k-j)}}{n}\right), \quad S_2 = \sum_{\ell=0}^{n-1}\sin\left(\frac{2\pi{\ell(j+k)}}{n}\right).\]
+%If $j = k$, then the summands for $S_1$ are zero and thus $S_1 = 0$. If $j \neq k$, then since the arguments of the sine terms are in arithmetic progression, $S_1$ can be expressed as
+%\begin{equation}
+%S_1 = \frac{\sin(\pi{(k-j)})\sin(\pi(n-1)(k-j)/n)}{\sin(\pi{(k-j)}/n)}.
+%\label{eq:S1}
+%\end{equation}
+%Since $k-j$ is an integer, the first sine term in the numerator of \eqref{eq:S1} is zero, making $S_1 = 0$. \par 
+%Similarly, if $j + k = n$, then the summands for $S_2$ are zero and thus $S_2 = 0$. If $j + k \neq n$, then $S_2$ can be expressed as
+%\begin{equation}
+%S_2 = \frac{\sin(\pi(j+k))\sin(\pi(n-1)(j+k)/n)}{\sin(\pi{(j+k)}/n)}.
+%\label{eq:S2}
+%\end{equation}
+%Again $j+k$ is an integer, so the first sine term in the numerator of \eqref{eq:S1} is zero and thus $S_2 = 0$.  In summary $(AB^\trans)_{jk} = 0$ for all $0 \leq j,k \leq n-1$, meaning $\Cov(A\noise,B\noise) = AB^\trans = \bm{0}$. Therefore the real and imaginary parts of $\widehat{\noise}$ are independent. 
+%\end{proof}
+
+Though $\Re\{\widehat{\noise}\}$ and $\Im\{\widehat{\noise}\}$ are independent, an issue arises when trying to discuss their distributions. Specifically the issue pertains to their probability density functions because $AA^\trans = A^2 = \Re\{F\}^2$ and $BB^\trans = B^2 = \Im\{F\}^2$ are both singular. However, it is possible to construct density functions which exist in $\rank(AA^\trans)$ and $\rank(BB^\trans)$-dimensional subspaces of $\mathbb{R}^n$. Since $\rank(MM^\trans) = \rank(M)$ for any matrix $M$, effort will be made to determine the rank of $A$ and $B$. The rank of $A$ and $B$ depend upon the dimension of $F$ as follows.
+
+\begin{lemma}
+Given an $n$-dimensional random vector $\noise$ with $\noise \sim \mathcal{N}(\bm{0},\noiseSD^2 I)$, $\Re\{\widehat{\noise}_0\} \sim \mathcal{N}(0,n\noiseSD^2)$.
+\begin{proof}
+Let $\noise$ be an $n$-dimensional random vector with $\noise \sim \mathcal{N}(\bm{0},\noiseSD^2 I)$. Since the covariance matrix of $\noise$ is $\noiseSD^2 I$, the components of $\noise$ are independent and identically distributed with $\noise_k \sim \mathcal{N}(0,\noiseSD^2)$ for all $0 \leq k \leq n-1$. Using \eqref{eq:Components Re(F) and Im(F)} and the properties of independent normally distributed random variables,
+\begin{equation}
+\Re\{\widehat{\noise}_j\} \sim \mathcal{N}\left(\sum_{k=0}^{n-1}\frac{1}{\sqrt{n}}\cos\left(\frac{-2\pi{jk}}{n}\right)\mu_k, \sum_{k=0}^{n-1} \left(\frac{1}{\sqrt{n}}\cos\left(\frac{-2\pi{jk}}{n}\right)\right)^2\noiseSD_k^2\right), 
+\label{eq:Real distribution}
+\end{equation}
+where $\mu_k$ is the expected value of $\noise_k$. However since $\noise \sim \mathcal{N}(\bm{0},\noiseSD^2 I)$, $\mu_k = 0$ for all $0 \leq k \leq n-1$ and so the expected value of $\Re\{\widehat{\noise}_j\}$ is reduced to zero.  In addition, $\noiseSD_k^2 = \noiseSD^2$ for all $0 \leq k \leq n-1$ as well, and so the variance terms in \eqref{eq:Real distribution} can be factored out of the sum. The variance of $\Re\{\widehat{\noise}_j\}$ can now be simplified as
+\[\sum_{k=0}^{n-1} \left(\frac{1}{\sqrt{n}}\cos\left(\frac{-2\pi{jk}}{n}\right)\right)^2\noiseSD_k^2 = \frac{\noiseSD^2}{n}\sum_{k=0}^{n-1} \left(\cos\left(\frac{-2\pi{jk}}{n}\right)\right)^2 = \langle A_{j\cdot},A_{j,\cdot}\rangle,\]
+where the final equality comes from Lemma. 
+\end{proof}
+\end{lemma}
 
 \begin{figure}
 	\centerline{\includegraphics[scale = 0.45]{Figures/PicardPlot1D_F2_S15_W200.eps}}
@@ -583,9 +695,27 @@ Combining \eqref{eq:TraceUPRE} and \eqref{eq:RegResNorm} produces the spectral f
 \end{equation} 
 Since the UPRE method relies on finding a minimum of \eqref{eq:SpectralUPRE}, the constant $\noiseSD^2$ can be ignored during implementation. In an effort to be more descriptive (note that \eqref{eq:SpectralUPRE} also relies upon $n$), define
 \begin{equation}
-\U_n(\regparam) = \sum_{i = 0}^{n-1} |\widehat{\gnoise}_i|^2(\mfilt(\regparam,|\widehat{\kdis}_i|))^2 + \frac{2\noiseSD^2}{n}\sum_{i = 0}^{n-1} \filt(\regparam,|\widehat{\kdis}_i|).
+\U_n(\regparam) = \sum_{j = 0}^{n-1} |\widehat{\gnoise}_j|^2(\mfilt(\regparam,|\widehat{\kdis}_j|))^2 + \frac{2\noiseSD^2}{n}\sum_{j = 0}^{n-1} \filt(\regparam,|\widehat{\kdis}_j|).
 \label{eq:SpectralUPREn}
-\end{equation} \par 
+\end{equation}
+The problem of finding a minimizer of \eqref{eq:SpectralUPREn} can be recast as a root-finding problem by using the derivative of the UPRE function, which is
+\begin{equation}
+\U'_n(\regparam) = 2\regparam^2\left[\sum_{j = 0}^{n-1} \frac{|\widehat{\gnoise}_j|^2|\widehat{\kdis}_j|^2}{(|\widehat{\kdis}_j|^2 + \regparam^2)^3} - \frac{2\noiseSD^2}{n}\sum_{j = 0}^{n-1} \frac{|\widehat{\kdis}_j|^2}{(|\widehat{\kdis}_j|^2 + \regparam^2)^2}\right].
+\label{eq:SpectralUPREnDeriv}
+\end{equation}
+It is clear that $\regparam = 0$ is a root of \eqref{eq:SpectralUPREnDeriv} regardless of the data and operator spectra, so this root should be ignored (since a solution generated for $\regparam = 0$ is in fact a non-regularized solution). Therefore any meaningful regularization parameter selected from the UPRE method will be a root of
+\begin{equation}
+V_n(\regparam) := \sum_{j = 0}^{n-1} \frac{|\widehat{\gnoise}_j|^2|\widehat{\kdis}_j|^2}{(|\widehat{\kdis}_j|^2 + \regparam^2)^3} - \frac{2\noiseSD^2}{n}\sum_{j = 0}^{n-1} \frac{|\widehat{\kdis}_j|^2}{(|\widehat{\kdis}_j|^2 + \regparam^2)^2}.
+\label{eq:SpectralUPREnDeriv2}
+\end{equation}
+Now the variance of \eqref{eq:SpectralUPREnDeriv2} will be determined. Fixing $\regparam$ and noting that the second sum in \eqref{eq:SpectralUPREnDeriv2} is deterministic,
+\begin{align*}
+\Var\left(V_n(\regparam)\right) &= \Var\left(\sum_{j = 0}^{n-1} \frac{|\widehat{\gnoise}_j|^2|\widehat{\kdis}_j|^2}{(|\widehat{\kdis}_j|^2 + \regparam^2)^3}\right) \\
+&= \sum_{j,\ell = 0}^{n-1} \frac{|\widehat{\kdis}_j|^2|\widehat{\kdis}_\ell|^2}{(|\widehat{\kdis}_j|^2 + \regparam^2)^3(|\widehat{\kdis}_\ell|^2 + \regparam^2)^3}\Cov\left(|\widehat{\gnoise}_j|^2,|\widehat{\gnoise}_\ell|^2\right). 
+\end{align*}
+
+
+\par 
 Now consider the case where multiple data sets are available, which can arise from repeated observations of some time-invariant event. As an alternative to finding a regularization parameter for each data set, a single regularization parameter can be obtained by constructing an averaged version of \eqref{eq:SpectralUPREn}, assuming that $n$ is constant across all data sets to be considered. It is reasonable to expect that this single regularization parameter will perform worse that each individual parameter with respect to their corresponding data sets. However, computational time/resources could be saved because the method would involved solving a single minimization problem instead of solving a minimization problem for each data set. To bring this idea to fruition, some notation will be expanded. Let $R$ be the number of available data sets, and denote the $j$th data set by $\gnoise^j$. Similarly, let $\U_n^j(\regparam)$ be the UPRE function associated with the $j$th data set.  The average of the UPRE functions is then 
 \begin{align*}
 \frac{1}{R}\sum_{j=1}^R \U_n^j(\regparam) &= \frac{1}{R}\sum_{j=1}^R \left(\sum_{i = 0}^{n-1} |\widehat{\gnoise^j}_i|^2(\mfilt(\regparam,|\widehat{\kdis}_i|))^2 + \frac{2\noiseSD^2}{n}\sum_{i = 0}^{n-1} \filt(\regparam,|\widehat{\kdis}_i|)\right) \\
