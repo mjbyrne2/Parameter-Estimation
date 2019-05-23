@@ -387,7 +387,7 @@ Property (i) implies that $-iAB^\trans$ and $iBA^\trans$ are zero matrices, so $
 \end{proof}
 \end{lemma}
 
-There are some important consequences of this lemma. First, the lemma shows that while the rows (columns) of $F$ form an orthonormal basis for $\mathbb{C}^n$, the orthogonality of the rows of $A$ and $B$ are limited by conditions on the row indices. Another consequence is that while $F$ is invertible and therefore have full rank, the matrices $A$ and $B$ are rank-deficient. Just how the components of $A$ and $B$ depend upon the parity of $n$, the next lemma illustrates that the rank of these matrices depend upon $n$ as well.
+There are some important consequences of this lemma. First, the lemma shows that while the rows (columns) of $F$ form an orthonormal basis for $\mathbb{C}^n$, the orthogonality of the rows of $A$ and $B$ are limited by conditions on the row indices. Another consequence is that while $F$ is invertible and therefore has full rank, the matrices $A$ and $B$ are rank-deficient. Just how the components of $A$ and $B$ depend upon the parity of $n$, the next lemma illustrates that the rank of these matrices depend upon $n$ as well.
 
 \begin{lemma}
 Let $A$ and $B$ be the real and imaginary parts, respectively, of the $n \times n$ DFT matrix. If $n$ is even, then $\rank(A) = (n/2)+1$ and $\rank(B) = (n/2)-1$. If $n$ is odd, then $\rank(A) = (n+1)/2$ and $\rank(B) = (n-1)/2$. 
@@ -408,68 +408,46 @@ which implies that $\rank(A) + \rank(B) \leq n$. Thus $\rank(A) + \rank(B) = n$,
 \end{proof}
 \end{lemma} 
 
-With the ranks of the real and imaginary parts of $F$ determined, the probability density functions of $\Re\{\widehat{\noise}\}$ and $\Im\{\widehat{\noise}\}$ can now be established. The density functions can be expressed by defining new transformations based on the rank of $AA^\trans$ and $BB^\trans$ \cite{Rao1973}. Starting with $\Sigma = AA^\trans$ and letting $r = \rank(A)$, we form an $n \times r$ matrix $R$ whose columns are the first $r$ columns of $A$ after normalization. By the previous lemma, the columns of $R$ are thus orthonormal vectors belonging to $\range(AA^\trans)$. By the rank-nullity theorem, there exists an $n \times (n-r)$ matrix $N$ whose columns are in $\nullspace(A)$. Using a colon to denote horizontal concatenation, let $P' = [R:N]$. 
-
-%\begin{lemma}
-%If $\noise \sim \mathcal{N}(\bm{0},\noiseSD^2I)$, where $\bm{0}$ denotes the zero $n$-vector and $I$ denotes the $n \times n$ identity matrix, then  $\Re\{\widehat{\noise}\}$ and $\Im\{\widehat{\noise}\}$ are independent.
-%\end{lemma}
-%\begin{proof}
-%Let $\noise \sim \mathcal{N}(\bm{0},\noiseSD^2I)$ and $F$ be the $n \times n$ Fourier matrix with components given by \eqref{eq:DFT-Matrix}. Letting $A = \Re\{F\}$ and $B = \Im\{F\}$, it will be shown that the real and imaginary parts of $\widehat{\noise} = F\noise$ are independent by showing that $\Cov(A\noise,B\noise) = \bm{0}$. Since $\noise \sim \mathcal{N}(\bm{0},\noiseSD^2I)$,
-%\[\Cov(A\noise,B\noise) = A\noiseSD^2IB^\trans = \noiseSD^2AB^\trans.\]
-%Thus it must be shown that $AB^\trans = \bm{0}$. By Euler's identity, 
-%\begin{equation}
-%A_{jk} = \frac{1}{\sqrt{n}}\cos\left(\frac{-2\pi{jk}}{n}\right), \quad B_{jk} = \frac{1}{\sqrt{n}}\sin\left(\frac{-2\pi{jk}}{n}\right),
-%\label{eq:Components Re(F) and Im(F)}
-%\end{equation}
-%and so the components of $AB^\trans$ are
-%\begin{equation}
-%(AB^\trans)_{jk} = \frac{1}{n}\sum_{\ell=0}^{n-1}\cos\left(\frac{-2\pi{j\ell}}{n}\right)\sin\left(\frac{-2\pi{\ell{k}}}{n}\right).
-%\label{eq:Covariance product}
-%\end{equation}
-%Applying the appropriate product-to-sum trigonometric identity and using the fact that sine is an odd function allows for sum in \eqref{eq:Covariance product} to be evaluated as
-%\begin{align*}
-%\frac{1}{n}\sum_{\ell=0}^{n-1}\cos\left(\frac{-2\pi{j\ell}}{n}\right)\sin\left(\frac{-2\pi{\ell{k}}}{n}\right) &= \frac{1}{2n}\sum_{\ell=0}^{n-1}\left[\sin\left(\frac{-2\pi{\ell(j+k)}}{n}\right) - \sin\left(\frac{-2\pi{\ell(k-j)}}{n}\right)\right] \\
-%&= \frac{1}{2n}\sum_{\ell=0}^{n-1}\left[\sin\left(\frac{2\pi{\ell(k-j)}}{n}\right) - \sin\left(\frac{2\pi{\ell(j+k)}}{n}\right)\right] \\
-%&= \frac{1}{2n}\left(S_1 - S_2\right),
-%\end{align*}
-%where
-%\[S_1 = \sum_{\ell=0}^{n-1}\sin\left(\frac{2\pi{\ell(k-j)}}{n}\right), \quad S_2 = \sum_{\ell=0}^{n-1}\sin\left(\frac{2\pi{\ell(j+k)}}{n}\right).\]
-%If $j = k$, then the summands for $S_1$ are zero and thus $S_1 = 0$. If $j \neq k$, then since the arguments of the sine terms are in arithmetic progression, $S_1$ can be expressed as
-%\begin{equation}
-%S_1 = \frac{\sin(\pi{(k-j)})\sin(\pi(n-1)(k-j)/n)}{\sin(\pi{(k-j)}/n)}.
-%\label{eq:S1}
-%\end{equation}
-%Since $k-j$ is an integer, the first sine term in the numerator of \eqref{eq:S1} is zero, making $S_1 = 0$. \par 
-%Similarly, if $j + k = n$, then the summands for $S_2$ are zero and thus $S_2 = 0$. If $j + k \neq n$, then $S_2$ can be expressed as
-%\begin{equation}
-%S_2 = \frac{\sin(\pi(j+k))\sin(\pi(n-1)(j+k)/n)}{\sin(\pi{(j+k)}/n)}.
-%\label{eq:S2}
-%\end{equation}
-%Again $j+k$ is an integer, so the first sine term in the numerator of \eqref{eq:S1} is zero and thus $S_2 = 0$.  In summary $(AB^\trans)_{jk} = 0$ for all $0 \leq j,k \leq n-1$, meaning $\Cov(A\noise,B\noise) = AB^\trans = \bm{0}$. Therefore the real and imaginary parts of $\widehat{\noise}$ are independent. 
-%\end{proof}
-
-Though $\Re\{\widehat{\noise}\}$ and $\Im\{\widehat{\noise}\}$ are independent, an issue arises when trying to discuss their distributions. Specifically the issue pertains to their probability density functions because $AA^\trans = A^2 = \Re\{F\}^2$ and $BB^\trans = B^2 = \Im\{F\}^2$ are both singular. However, it is possible to construct density functions which exist in $\rank(AA^\trans)$ and $\rank(BB^\trans)$-dimensional subspaces of $\mathbb{R}^n$. Since $\rank(MM^\trans) = \rank(M)$ for any matrix $M$, effort will be made to determine the rank of $A$ and $B$. The rank of $A$ and $B$ depend upon the dimension of $F$ as follows.
+The rank deficiency of $A$ and $B$ have statistical significance as well.  Given $\noise \sim \mathcal{N}(\bm{0},\noiseSD^2I)$ and using the properties of the multivariate normal distribution, 
+\begin{equation}
+\Re\{\widehat{\noise}\} = A\noise \sim \mathcal{N}(\bm{0},\noiseSD^2 AA^\trans), \quad \Im\{\widehat{\noise}\} = B\noise \sim \mathcal{N}(\bm{0},\noiseSD^2 BB^\trans), \quad
+\label{eq:Real and imaginary distributions}
+\end{equation}
+However, the covariance matrices of $\Re\{\widehat{\noise}\}$ and $\Im\{\widehat{\noise}\}$ are rank-deficient, and therefore do not have density functions in the traditional sense; their density functions exist in $\rank(AA^\trans)$ and $\rank(BB^\trans)$-dimensional subspaces of $\mathbb{R}^n$. These density functions can be expressed using the psuedoinverses of the covariance matrices or, equivalently, by defining new transformations based on the rank of $AA^\trans$ and $BB^\trans$ \cite{Rao1973}. \par 
+Instead of dealing with density functions of multivariate distributions, the distribution of the components of $\Re\{\widehat{\noise}\}$ and $\Im\{\widehat{\noise}\}$ will be determined individually. The independence of 
 
 \begin{lemma}
-Given an $n$-dimensional random vector $\noise$ with $\noise \sim \mathcal{N}(\bm{0},\noiseSD^2 I)$, $\Re\{\widehat{\noise}_0\} \sim \mathcal{N}(0,n\noiseSD^2)$.
+Let $X = \Re\{\widehat{\noise}\}$ and $Y = \Im\{\widehat{\noise}\}$, where $\noise$ is a random $n$-vector with $\noise \sim \mathcal{N}(\bm{0},\noiseSD^2 I)$.  
+\begin{enumerate}[label=(\roman*)]
+\item If $n$ is even, then
+\[X_j \sim \begin{cases}
+\mathcal{N}(0,\noiseSD^2), & j \in \{0,n/2\} \\
+\mathcal{N}(0,\noiseSD^2/2), & \text{otherwise} \end{cases}.\]
+\item If $n$ is odd, then
+\[X_j \sim \begin{cases}
+\mathcal{N}(0,\noiseSD^2), & j = 0 \\
+\mathcal{N}(0,\noiseSD^2/2), & \text{otherwise} \end{cases}.\]
+\end{enumerate}
 \begin{proof}
-Let $\noise$ be an $n$-dimensional random vector with $\noise \sim \mathcal{N}(\bm{0},\noiseSD^2 I)$. Since the covariance matrix of $\noise$ is $\noiseSD^2 I$, the components of $\noise$ are independent and identically distributed with $\noise_k \sim \mathcal{N}(0,\noiseSD^2)$ for all $0 \leq k \leq n-1$. Using \eqref{eq:Components Re(F) and Im(F)} and the properties of independent normally distributed random variables,
-\begin{equation}
-\Re\{\widehat{\noise}_j\} \sim \mathcal{N}\left(\sum_{k=0}^{n-1}\frac{1}{\sqrt{n}}\cos\left(\frac{-2\pi{jk}}{n}\right)\mu_k, \sum_{k=0}^{n-1} \left(\frac{1}{\sqrt{n}}\cos\left(\frac{-2\pi{jk}}{n}\right)\right)^2\noiseSD_k^2\right), 
-\label{eq:Real distribution}
-\end{equation}
-where $\mu_k$ is the expected value of $\noise_k$. However since $\noise \sim \mathcal{N}(\bm{0},\noiseSD^2 I)$, $\mu_k = 0$ for all $0 \leq k \leq n-1$ and so the expected value of $\Re\{\widehat{\noise}_j\}$ is reduced to zero.  In addition, $\noiseSD_k^2 = \noiseSD^2$ for all $0 \leq k \leq n-1$ as well, and so the variance terms in \eqref{eq:Real distribution} can be factored out of the sum. The variance of $\Re\{\widehat{\noise}_j\}$ can now be simplified as
-\[\sum_{k=0}^{n-1} \left(\frac{1}{\sqrt{n}}\cos\left(\frac{-2\pi{jk}}{n}\right)\right)^2\noiseSD_k^2 = \frac{\noiseSD^2}{n}\sum_{k=0}^{n-1} \left(\cos\left(\frac{-2\pi{jk}}{n}\right)\right)^2 = \langle A_{j\cdot},A_{j,\cdot}\rangle,\]
-where the final equality comes from Lemma. 
+Let $X$ and $Y$ be as required. Using \eqref{eq:Components Re(F) and Im(F)}, $X_j$ can be written as
+\[X_j = \sum_{k=0}^{n-1} \frac{1}{\sqrt{n}}\cos\left(\frac{-2\pi{jk}}{n}\right)\noise_k.\]
+Since the covariance matrix of $\noise$ is $\noiseSD^2 I$, the components of $\noise$ are independent and identically distributed $\mathcal{N}(0,\noiseSD^2)$. Thus by the properties of a sum of independent normal random variables \cite{CasellaBerger02},
+\[X_j \sim \mathcal{N}\left(0, \noiseSD^2\sum_{k=0}^{n-1} \left(\frac{1}{\sqrt{n}}\cos\left(\frac{-2\pi{jk}}{n}\right)\right)^2\right) = \mathcal{N}\left(0, \noiseSD^2 \langle A_{j\cdot},A_{j\cdot} \rangle\right).\]
 \end{proof}
 \end{lemma}
+
+\begin{lemma}
+Given $\noise \sim \mathcal{N}(\bm{0},\noiseSD^2 I)$, let $X = \Re\{\widehat{\noise}\}$ and $Y = \Im\{\widehat{\noise}\}$. Then $X_j^2 \sim \chi^2(1)$ for $0 \leq j \leq n-1$, where $\chi^2(1)$ denotes the chi-squared distribution with 1 degree of freedom. 
+\end{lemma}
+
+
+
 
 \begin{figure}
 	\centerline{\includegraphics[scale = 0.45]{Figures/PicardPlot1D_F2_S15_W200.eps}}
 \caption{(Left) A Picard plot generated from the second test function, a Gaussian blur with a width of 200, and an SNR of 15. The terms $|\widehat{\gnoise}_i|/|\widehat{\kdis}_i|$ decrease until index 8, at which case the terms increase in magnitude. This is due to the fact that the $|\widehat{\kdis}_i|$ steadily decrease, while the $|\widehat{\gnoise}_i|$ level off just below the variance in the noise. (Right) A zoom-in of the Picard plot is provided, showing that elements of the DFT of $\gnoise$ decay only slightly below the variance of the noise in $\gnoise$.}
 \label{PicardPlot}
 \end{figure}
-
 
 
 \subsection{The Sampling Theorem and Aliasing} \label{sec:The Sampling Theorem and Aliasing}
