@@ -65,9 +65,11 @@
 % Defining Trace Lemma
 \newtheorem*{TL}{Trace Lemma}
 % General Lemma
-\newtheorem*{lemma}{Lemma}
+\newtheorem{lemma}{Lemma}[section]
 % Sampling Theorem
 \newtheorem*{SWST}{Shannon-Whittaker Sampling Theorem}
+% General Theorem
+\newtheorem{theorem}{Theorem}[section]
 
 \title{\underline{Regularization Parameter Estimation (1D)}}
 \author{Michael Byrne}
@@ -309,6 +311,7 @@ A_{jk} = \frac{1}{\sqrt{n}}\cos\left(\frac{-2\pi{jk}}{n}\right), \quad B_{jk} = 
 \end{equation}
 for $0 \leq j,k \leq n-1$. It is clear from \eqref{eq:Components Re(F) and Im(F)} that the matrices $A$ and $B$ are symmetric. The rows (and by symmetry, columns) of $A$ and $B$ have the following orthogonality properties.
 \begin{lemma}
+\label{lem:Inner products}
 Let $A$ and $B$ be the real and imaginary parts, respectively, of the $n \times n$ DFT matrix, and let $\langle\cdot,\cdot\rangle$ denote standard inner product (dot product) of $\mathbb{R}^n$. Then for $0 \leq j,k \leq n-1$:
 \begin{enumerate}[label=(\roman*)]
 \item $\langle A_{j\cdot}, B_{k\cdot}\rangle = 0$.
@@ -387,20 +390,21 @@ Property (i) implies that $-iAB^\trans$ and $iBA^\trans$ are zero matrices, so $
 \end{proof}
 \end{lemma}
 
-There are some important consequences of this lemma. First, the lemma shows that while the rows (columns) of $F$ form an orthonormal basis for $\mathbb{C}^n$, the orthogonality of the rows of $A$ and $B$ are limited by conditions on the row indices. Another consequence is that while $F$ is invertible and therefore has full rank, the matrices $A$ and $B$ are rank-deficient. Just how the components of $A$ and $B$ depend upon the parity of $n$, the next lemma illustrates that the rank of these matrices depend upon $n$ as well.
+There are some important consequences of this lemma. First, it shows that while the rows (columns) of $F$ form an orthonormal basis for $\mathbb{C}^n$, the orthogonality of the rows of $A$ and $B$ are limited by conditions on the row indices. Another consequence is that while $F$ is invertible and therefore has full rank, the matrices $A$ and $B$ are rank-deficient. Just how the components of $A$ and $B$ depend upon the parity of $n$, the next lemma illustrates that the rank of these matrices depend upon $n$ as well.
 
 \begin{lemma}
+\label{lem:Rank of A and B}
 Let $A$ and $B$ be the real and imaginary parts, respectively, of the $n \times n$ DFT matrix. If $n$ is even, then $\rank(A) = (n/2)+1$ and $\rank(B) = (n/2)-1$. If $n$ is odd, then $\rank(A) = (n+1)/2$ and $\rank(B) = (n-1)/2$. 
 \begin{proof}
 Let the matrices $A$, and $B$ be as required. By applying various properties of the rank of a matrix, all of the effort can be dedicated to finding the rank of $A$. Since the rank of a matrix is equal to the dimension of the row space, the approach that will be taken is to determine the dimension of the row space of $A$ using the preceding lemma. The dimension of the row space will be determined by counting the number of linearly independent rows of $A$. \par 
-From lemma LEMMA, 
+From Lemma \ref{lem:Inner products},
 
 
 Thus the first $(n/2)+1$ rows of $A$ form an orthogonal set of vectors, and so they are linearly independent. \par 
 However, this only shows that $\rank(A) \geq (n/2)+1$. In order to show equality, it will now be shown that the remaining $(n/2)-1$ rows of $A$ are copies of preceding rows. Let $0 \leq j \leq n/2$, and consider row $\ell = n - j$. From \eqref{eq:Components Re(F) and Im(F)} and the parity of cosine, the components of row $\ell$ are
 \[A_{\ell{k}} = \frac{1}{\sqrt{n}}\cos\left(\frac{-2\pi{\ell{k}}}{n}\right) = \frac{1}{\sqrt{n}}\cos\left(\frac{-2\pi{(n-j){k}}}{n}\right) = \frac{1}{\sqrt{n}}\cos\left(\frac{-2\pi{jk}}{n} + 2\pi{k}\right).\]
 Since the column index $k$ is an integer, the periodicity of cosine gives $A_{\ell{k}} = A_{jk}$. Thus rows $j$ and $n-j$ of the matrix $A$ are the same for all $0 \leq j \leq n/2$, and therefore $\rank(A) = (n/2)+1$.  The argument that $\rank(A) = (n+1)/2$ for odd $n$ is identical with the exception that $j$ and $\ell$ are restricted so $j \neq \ell$ and $0 \leq j,\ell \leq (n-1)/2$. \par 
-A similar argument for the rank of $B$ could be made, but for the sake of brevity a different approach can be taken which uses some matrix rank inequalities and  the result from lemma LEMMA that $AB^\trans$ is a zero matrix (regardless of the parity of $n$). Recalling that an invertible matrix has full rank and using the subadditive property of rank,
+A similar argument for the rank of $B$ could be made, but for the sake of brevity a different approach can be taken which uses some matrix rank inequalities and  the result from Lemma \ref{lem:Inner products} that $AB^\trans$ is a zero matrix (regardless of the parity of $n$). Recalling that an invertible matrix has full rank and using the subadditive property of rank,
 \[n = \rank(F) = \rank(A + iB) \leq \rank(A) + \rank(iB) = \rank(A) + \rank(B).\] 
 Applying Sylvester's rank inequality to the product $AB^\trans$ gives
 \[\rank(A) + \rank(B) - n = \rank(A) + \rank(B^\trans) - n \leq \rank(AB^\trans) = 0,\]
@@ -417,30 +421,34 @@ However, the covariance matrices of $\Re\{\widehat{\noise}\}$ and $\Im\{\widehat
 Instead of dealing with density functions of multivariate distributions, the distribution of the components of $\Re\{\widehat{\noise}\}$ and $\Im\{\widehat{\noise}\}$ will be determined individually. The independence of 
 
 \begin{lemma}
-Let $X = \Re\{\widehat{\noise}\}$ and $Y = \Im\{\widehat{\noise}\}$, where $\noise$ is a random $n$-vector with $\noise \sim \mathcal{N}(\bm{0},\noiseSD^2 I)$.  
+\label{lem:Component distributions}
+Let $X = \Re\{\widehat{\noise}\}$ and $Y = \Im\{\widehat{\noise}\}$, where $\noise$ is a random $n$-vector with $\noise \sim \mathcal{N}(\bm{0},\noiseSD^2 I)$. Then for $0 \leq j \leq n-1$, the distribution of $X_j$ and $Y_j$ is as follows.  
 \begin{enumerate}[label=(\roman*)]
-\item If $n$ is even, then
+\item If $n$ is even, then the distribution of the components of $X$ is that
 \[X_j \sim \begin{cases}
 \mathcal{N}(0,\noiseSD^2), & j \in \{0,n/2\} \\
 \mathcal{N}(0,\noiseSD^2/2), & \text{otherwise} \end{cases}.\]
-\item If $n$ is odd, then
+The distribution of the components of $Y$ is that $Y_j = 0$ for $j \in \{0,n/2\}$ and $Y_j \sim \mathcal{N}(0,\noiseSD^2/2)$ otherwise.
+\item If $n$ is odd, then the distribution of the components of $X$ is that
 \[X_j \sim \begin{cases}
 \mathcal{N}(0,\noiseSD^2), & j = 0 \\
 \mathcal{N}(0,\noiseSD^2/2), & \text{otherwise} \end{cases}.\]
+The distribution of the components of $Y$ is that $Y_j = 0$ for $j = 0$ and $Y_j \sim \mathcal{N}(0,\noiseSD^2/2)$ otherwise.
 \end{enumerate}
 \begin{proof}
 Let $X$ and $Y$ be as required. Using \eqref{eq:Components Re(F) and Im(F)}, $X_j$ can be written as
 \[X_j = \sum_{k=0}^{n-1} \frac{1}{\sqrt{n}}\cos\left(\frac{-2\pi{jk}}{n}\right)\noise_k.\]
 Since the covariance matrix of $\noise$ is $\noiseSD^2 I$, the components of $\noise$ are independent and identically distributed $\mathcal{N}(0,\noiseSD^2)$. Thus by the properties of a sum of independent normal random variables \cite{CasellaBerger02},
 \[X_j \sim \mathcal{N}\left(0, \noiseSD^2\sum_{k=0}^{n-1} \left(\frac{1}{\sqrt{n}}\cos\left(\frac{-2\pi{jk}}{n}\right)\right)^2\right) = \mathcal{N}\left(0, \noiseSD^2 \langle A_{j\cdot},A_{j\cdot} \rangle\right).\]
+Lemma \ref{lem:Inner products} then provides the cases for evaluation of the inner product. Determination of the distribution of $Y_k$ is similar.
 \end{proof}
 \end{lemma}
 
-\begin{lemma}
-Given $\noise \sim \mathcal{N}(\bm{0},\noiseSD^2 I)$, let $X = \Re\{\widehat{\noise}\}$ and $Y = \Im\{\widehat{\noise}\}$. Then $X_j^2 \sim \chi^2(1)$ for $0 \leq j \leq n-1$, where $\chi^2(1)$ denotes the chi-squared distribution with 1 degree of freedom. 
-\end{lemma}
+With the distribution of the components of $\Re\{\widehat{\noise}\}$ and $\Im\{\widehat{\noise}\}$ established, the distribution of the components of $|\widehat{\noise}|^2$ can finally be examined.
 
-
+\begin{theorem}
+Let $\noise$ be a random $n$-vector with $\noise \sim \mathcal{N}(\bm{0},\noiseSD^2 I)$. Then for $0 \leq j \leq n-1$, the distribution of $|\widehat{\noise}_j|^2$ is as follows.
+\end{theorem}
 
 
 \begin{figure}
