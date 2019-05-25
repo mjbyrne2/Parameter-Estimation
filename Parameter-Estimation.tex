@@ -447,7 +447,37 @@ Lemma \ref{lem:Inner products} then provides the cases for evaluation of the inn
 With the distribution of the components of $\Re\{\widehat{\noise}\}$ and $\Im\{\widehat{\noise}\}$ established, the distribution of the components of $|\widehat{\noise}|^2$ can finally be examined.
 
 \begin{theorem}
-Let $\noise$ be a random $n$-vector with $\noise \sim \mathcal{N}(\bm{0},\noiseSD^2 I)$. Then for $0 \leq j \leq n-1$, the distribution of $|\widehat{\noise}_j|^2$ is as follows.
+Let $\noise$ be a random $n$-vector with $\noise \sim \mathcal{N}(\bm{0},\noiseSD^2 I)$. Then for $0 \leq j \leq n-1$, the distribution of $|\widehat{\noise}_j|^2 = \Re\{\widehat{\noise}_j\}^2 + \Im\{\widehat{\noise}_j\}^2$ is as follows.
+
+\begin{proof}
+Let $\noise \sim \mathcal{N}(\bm{0},\noiseSD^2 I)$, $X = \Re\{\widehat{\noise}\}$, and $Y = \Im\{\widehat{\noise}\}$. The proof relies on determining the distribution of the components of $X^2$ and $Y^2$ (here the exponent indicates that the components are individually squared) and then looking at their sum. Determination of the distribution of the components of $X^2$ and $Y^2$ is carried out by applying a result regarding univariate one-to-one transformations \cite{CasellaBerger02}. Without loss of generality, we assume that $n$ is odd. \par
+First consider the components of $X^2$. Since $n$ is odd, the two cases of $X^2_j$ to be considered are for $j = 0$ and $j \neq 0$, both of which are handled by Lemma \ref{lem:Component distributions}. If $j = 0$, then $X_j \sim \mathcal{N}(0,\noiseSD^2)$. Letting $g(x) = x^2$, the transformation $U = g(X_j) = X^2_j$ is not one-to-one on the entire sample space $\mathbb{R}$. However, $\mathbb{R}$ can be partitioned as $A_0 \cup A_1 \cup A_2$ with $A_0 = \{0\}$, $A_1 = (-\infty,0)$, and $A_2 = (0,\infty)$. Defining $g_1(x) = x^2$ and $g_2(x) = x^2$ with $g_1^{-1}(u) = -\sqrt{u}$ and $g_2^{-1}(u) = \sqrt{u}$,
+\begin{enumerate}
+\item $g(x) = g_1(x) = g_2(x)$ for all $x \in A_1 \cup A_2$,
+\item $g_1$ and $g_2$ are monotone on $A_1$ and $A_2$, respectively,
+\item $g_1(A_1) = g_2(A_2) = (0,\infty)$, and
+\item the derivatives $g_1^{-1}$ and $g_2^{-1}$ are continuous on $(0,\infty)$.
+\end{enumerate}
+Lastly the set $A_0$ is of no concern since $P(X_j \in A_0) = P(X_j = 0) = 0$. Then using the probability density function of the normal distribution, the density function of $U$ is
+\begin{align*}
+f_U(u) &= \frac{1}{\sqrt{2\pi\noiseSD^2}}\exp\left(\frac{-(g_1^{-1}(u))^2}{2\noiseSD^2}\right)\left|\frac{d}{du}g_1^{-1}(u)\right| + \frac{1}{\sqrt{2\pi\noiseSD^2}}\exp\left(\frac{-(g_2^{-1}(u))^2}{2\noiseSD^2}\right)\left|\frac{d}{du}g_2^{-1}(u)\right| \\
+&= \frac{1}{\sqrt{2\pi\noiseSD^2}}\exp\left(\frac{-u}{2\noiseSD^2}\right)\left|\frac{-1}{2\sqrt{u}}\right| + \frac{1}{\sqrt{2\pi\noiseSD^2}}\exp\left(\frac{-u}{2\noiseSD^2}\right)\left|\frac{1}{2\sqrt{u}}\right| \\
+&= \frac{1}{\sqrt{2\pi\noiseSD^2}} \frac{1}{\sqrt{u}} \exp\left(\frac{-u}{2\noiseSD^2}\right).
+\end{align*}
+This is probability density function of the gamma distribution with shape parameter $1/2$ and scale parameter $2\noiseSD^2$. The same argument holds for when $j \neq 0$, with scale parameter instead being $\noiseSD^2$. The argument can also be applied for $Y_j^2$ when $j \neq 0$ since $X_j$ and $Y_j$ are identically distributed in this case. When $j = 0$, $Y_j$ is a constant random variable with $Y_j = 0$, and so $Y_j^2 = 0$ as well. \par 
+Now that the distribution of $X_j^2$ and $Y_j^2$ is known, the distribution of their sum can be established. The situation is more interesting when $j \neq 0$ since $Y_j^2$ is no longer a constant random variable. By Lemma LEMMA, $X_j$ and $Y_j$ are independent for all $0 \leq j \leq n-1$. As a consequence, $X_j^2$ and $Y_j^2$ are independent for all $0 \leq j \leq n-1$. Let $f_{X_j^2}$ and $f_{Y_j^2}$ denotes the probability density functions of $X_j^2$ and $Y_j^2$, respectively. Since the probability density function of a sum of two independent continuous random variables is equal to the convolution of their individual density functions \cite{CasellaBerger02}, the density function of $V_j = X_j^2 + Y_j^2$ is given by 
+\[f_V(v) = \int_{-\infty}^{\infty} f_{X_j^2}(w)f_{Y_j^2}(v-w) \: dw.\]
+Fortunately $X_j^2$ and $Y_j^2$ are non-negative, meaning that the interval of integration of the convolution can be reduced; $f_{X_j^2}(w) = 0$ for $w < 0$ and $f_{Y_j^2}(v-w) = 0$ for $w > v$ implies an of $[0,v]$. Using the density functions and the substitution $t = w/v$ then gives
+\begin{align*}
+f_V(v) &= \int_0^v \left[\frac{1}{\sqrt{\pi\noiseSD^2}} \frac{1}{\sqrt{w}} \exp\left(\frac{-w}{\noiseSD^2}\right)\right]\left[\frac{1}{\sqrt{\pi\noiseSD^2}} \frac{1}{\sqrt{v-w}} \exp\left(\frac{-(v-w)}{\noiseSD^2}\right)\right] \: dw \\
+&= \frac{1}{\pi\noiseSD^2} \exp\left(\frac{-v}{\noiseSD^2}\right) \int_0^v \frac{1}{\sqrt{w}} \frac{1}{\sqrt{v-w}} \: dw \\
+&= \frac{1}{\pi\noiseSD^2} \exp\left(\frac{-v}{\noiseSD^2}\right) \int_0^1 \frac{1}{\sqrt{vt}} \frac{1}{\sqrt{v-vt}}v \: dt \\
+&= \frac{1}{\pi\noiseSD^2} \exp\left(\frac{-v}{\noiseSD^2}\right) \int_0^1 \frac{1}{\sqrt{t}} \frac{1}{\sqrt{1-t}} \: dt.
+\end{align*}
+The last integral represents $B(1/2,1/2)$, the beta function evaluated at $(1/2,1/2)$. Since $B(1/2,1/2) = \pi$, the probability density function of $V_j$ is
+\[f_V(v) = \frac{1}{\noiseSD^2} \exp\left(\frac{-v}{\noiseSD^2}\right).\]
+This is the density function of the exponential distribution with scale parameter $\noiseSD^2$.
+\end{proof}
 \end{theorem}
 
 
