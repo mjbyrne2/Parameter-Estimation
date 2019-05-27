@@ -397,10 +397,12 @@ There are some important consequences of this lemma. First, it shows that while 
 Let $A$ and $B$ be the real and imaginary parts, respectively, of the $n \times n$ DFT matrix. If $n$ is even, then $\rank(A) = (n/2)+1$ and $\rank(B) = (n/2)-1$. If $n$ is odd, then $\rank(A) = (n+1)/2$ and $\rank(B) = (n-1)/2$. 
 \begin{proof}
 Let the matrices $A$, and $B$ be as required. By applying various properties of the rank of a matrix, all of the effort can be dedicated to finding the rank of $A$. Since the rank of a matrix is equal to the dimension of the row space, the approach that will be taken is to determine the dimension of the row space of $A$ using the preceding lemma. The dimension of the row space will be determined by counting the number of linearly independent rows of $A$. \par 
-From Lemma \ref{lem:Inner products},
-
-
-Thus the first $(n/2)+1$ rows of $A$ form an orthogonal set of vectors, and so they are linearly independent. \par 
+Assuming that $n$ is even, let $0 \leq j,\ell \leq n/2$ with $j \neq \ell$. From Lemma \ref{lem:Inner products},
+\[\langle A_{j\cdot},A_{\ell\cdot}\rangle = \begin{cases}
+1/2 & j+\ell \equiv 0 \bmod n \\
+0 & j+\ell \not\equiv 0 \bmod n
+\end{cases}.\]
+However, $0 \leq j,\ell \leq n/2$ implies that $j+\ell \not\equiv 0 \bmod n$ because congruence is only achieved if both $j$ and $\ell$ are zero or $n/2$, and this would violate the condition that $j \neq \ell$. Thus the first $(n/2)+1$ rows of $A$ form an orthogonal set of vectors, and so they are linearly independent. \par 
 However, this only shows that $\rank(A) \geq (n/2)+1$. In order to show equality, it will now be shown that the remaining $(n/2)-1$ rows of $A$ are copies of preceding rows. Let $0 \leq j \leq n/2$, and consider row $\ell = n - j$. From \eqref{eq:Components Re(F) and Im(F)} and the parity of cosine, the components of row $\ell$ are
 \[A_{\ell{k}} = \frac{1}{\sqrt{n}}\cos\left(\frac{-2\pi{\ell{k}}}{n}\right) = \frac{1}{\sqrt{n}}\cos\left(\frac{-2\pi{(n-j){k}}}{n}\right) = \frac{1}{\sqrt{n}}\cos\left(\frac{-2\pi{jk}}{n} + 2\pi{k}\right).\]
 Since the column index $k$ is an integer, the periodicity of cosine gives $A_{\ell{k}} = A_{jk}$. Thus rows $j$ and $n-j$ of the matrix $A$ are the same for all $0 \leq j \leq n/2$, and therefore $\rank(A) = (n/2)+1$.  The argument that $\rank(A) = (n+1)/2$ for odd $n$ is identical with the exception that $j$ and $\ell$ are restricted so $j \neq \ell$ and $0 \leq j,\ell \leq (n-1)/2$. \par 
@@ -418,7 +420,23 @@ The rank deficiency of $A$ and $B$ have statistical significance as well.  Given
 \label{eq:Real and imaginary distributions}
 \end{equation}
 However, the covariance matrices of $\Re\{\widehat{\noise}\}$ and $\Im\{\widehat{\noise}\}$ are rank-deficient, and therefore do not have density functions in the traditional sense; their density functions exist in $\rank(AA^\trans)$ and $\rank(BB^\trans)$-dimensional subspaces of $\mathbb{R}^n$. These density functions can be expressed using the psuedoinverses of the covariance matrices or, equivalently, by defining new transformations based on the rank of $AA^\trans$ and $BB^\trans$ \cite{Rao1973}. \par 
-Instead of dealing with density functions of multivariate distributions, the distribution of the components of $\Re\{\widehat{\noise}\}$ and $\Im\{\widehat{\noise}\}$ will be determined individually. The independence of 
+Instead of dealing with density functions of multivariate distributions, the distribution of the components of $\Re\{\widehat{\noise}\}$ and $\Im\{\widehat{\noise}\}$ will be determined individually. As a step towards this goal, the independence of the components of $\Re\{\widehat{\noise}\}$ and $\Im\{\widehat{\noise}\}$ can be established by applying the following result regarding independence of linear combinations of random variables \cite{LukacsKing}
+
+\begin{theorem}
+\label{thm:Independence Theorem}
+Let $X_1,\ldots,X_n$ be $n$ independently distributed random variable, and assume that the $n$th moment of each $X_{\ell}$ $(\ell = 1,\ldots,n)$ exists. The necessary and sufficient conditions for the existence of two statistically independent linear forms $Y_1 = \sum_{\ell=1}^n a_{\ell}X_{\ell}$ and $Y_2 = \sum_{\ell=1}^n b_{\ell}X_{\ell}$ are:
+\begin{enumerate}[label=(\roman*)]
+\item Each random variable which has a nonzero coefficient in both forms is normally distributed.
+\item $\sum_{\ell=1}^n a_{\ell}b_{\ell}\sigma_{\ell}^2 = 0$, where $\sigma_{\ell}^2$ denotes the variance of $X_{\ell}$ $(\ell = 1,\ldots,n)$.
+\end{enumerate}
+\end{theorem}
+
+Since the components of $\noise$ are 
+
+\begin{lemma}
+\label{lem:App of Ind Thm}
+
+\end{lemma}
 
 \begin{lemma}
 \label{lem:Component distributions}
@@ -426,7 +444,7 @@ Let $X = \Re\{\widehat{\noise}\}$ and $Y = \Im\{\widehat{\noise}\}$, where $\noi
 \begin{enumerate}[label=(\roman*)]
 \item If $n$ is even, then the distribution of the components of $X$ is that
 \[X_j \sim \begin{cases}
-\mathcal{N}(0,\noiseSD^2), & j \in \{0,n/2\} \\
+\mathcal{N}(0,\noiseSD^2), & j = 0,n/2 \\
 \mathcal{N}(0,\noiseSD^2/2), & \text{otherwise} \end{cases}.\]
 The distribution of the components of $Y$ is that $Y_j = 0$ for $j \in \{0,n/2\}$ and $Y_j \sim \mathcal{N}(0,\noiseSD^2/2)$ otherwise.
 \item If $n$ is odd, then the distribution of the components of $X$ is that
