@@ -420,23 +420,32 @@ The rank deficiency of $A$ and $B$ have statistical significance as well.  Given
 \label{eq:Real and imaginary distributions}
 \end{equation}
 However, the covariance matrices of $\Re\{\widehat{\noise}\}$ and $\Im\{\widehat{\noise}\}$ are rank-deficient, and therefore do not have density functions in the traditional sense; their density functions exist in $\rank(AA^\trans)$ and $\rank(BB^\trans)$-dimensional subspaces of $\mathbb{R}^n$. These density functions can be expressed using the psuedoinverses of the covariance matrices or, equivalently, by defining new transformations based on the rank of $AA^\trans$ and $BB^\trans$ \cite{Rao1973}. \par 
-Instead of dealing with density functions of multivariate distributions, the distribution of the components of $\Re\{\widehat{\noise}\}$ and $\Im\{\widehat{\noise}\}$ will be determined individually. As a step towards this goal, the independence of the components of $\Re\{\widehat{\noise}\}$ and $\Im\{\widehat{\noise}\}$ can be established by applying the following result regarding independence of linear combinations of random variables \cite{LukacsKing}
+Instead of dealing with density functions of multivariate distributions, the distribution of the components of $\Re\{\widehat{\noise}\}$ and $\Im\{\widehat{\noise}\}$ will be determined individually. As a step towards this goal, the independence of the components of $\Re\{\widehat{\noise}\}$ and $\Im\{\widehat{\noise}\}$ can be established by applying the following result regarding independence of linear combinations of random variables \cite{LukacsKing}.
 
 \begin{theorem}
 \label{thm:Independence Theorem}
-Let $X_1,\ldots,X_n$ be $n$ independently distributed random variable, and assume that the $n$th moment of each $X_{\ell}$ $(\ell = 1,\ldots,n)$ exists. The necessary and sufficient conditions for the existence of two statistically independent linear forms $Y_1 = \sum_{\ell=1}^n a_{\ell}X_{\ell}$ and $Y_2 = \sum_{\ell=1}^n b_{\ell}X_{\ell}$ are:
+Let $X_1,\ldots,X_n$ be $n$ independently distributed random variables, and assume that the $n$th moment of each $X_{\ell}$ $(\ell = 1,\ldots,n)$ exists. The necessary and sufficient conditions for the existence of two statistically independent linear forms $Y_1 = \sum_{\ell=1}^n a_{\ell}X_{\ell}$ and $Y_2 = \sum_{\ell=1}^n b_{\ell}X_{\ell}$ are:
 \begin{enumerate}[label=(\roman*)]
 \item Each random variable which has a nonzero coefficient in both forms is normally distributed.
 \item $\sum_{\ell=1}^n a_{\ell}b_{\ell}\sigma_{\ell}^2 = 0$, where $\sigma_{\ell}^2$ denotes the variance of $X_{\ell}$ $(\ell = 1,\ldots,n)$.
 \end{enumerate}
 \end{theorem}
 
-Since the components of $\noise$ are 
-
 \begin{lemma}
 \label{lem:App of Ind Thm}
-
+Let $\noise$ be a random $n$-vector with $\noise \sim \mathcal{N}(\bm{0},\noiseSD^2 I)$, $X = \Re\{\widehat{\noise}\}$ and $Y = \Im\{\widehat{\noise}\}$. Then $X_j$ and $Y_j$ are independent random variables for each $0 \leq j \leq n-1$.
+\begin{proof}
+Let $X$ and $Y$ be as required. For each $0 \leq j \leq n-1$, the components $X_j$ and $Y_j$ are linear combinations of the components of $\noise$, with coefficients given by \eqref{eq:Components Re(F) and Im(F)}:
+\[X_j = \sum_{\ell=0}^{n-1} \frac{1}{\sqrt{n}}\cos\left(\frac{-2\pi{j\ell}}{n}\right)\noise_{\ell}, \quad Y_j = \sum_{\ell=0}^{n-1} \frac{1}{\sqrt{n}}\sin\left(\frac{-2\pi{j\ell}}{n}\right)\noise_{\ell}.\]
+Since the covariance matrix of $\noise$ is $\noiseSD^2 I$, the components of $\noise$ are independent. Furthermore, $\noise_{\ell} \sim \mathcal{N}(0,\noiseSD^2)$ and so each component has an $n$th moment. Thus the first condition of Theorem \ref{thm:Independence Theorem} is satisfied. As for the final condition, the following sum must be shown to be equal to zero:
+\[\sum_{\ell=0}^{n-1} \left[\frac{1}{\sqrt{n}}\cos\left(\frac{-2\pi{j\ell}}{n}\right)\right]\left[\frac{1}{\sqrt{n}}\sin\left(\frac{-2\pi{j\ell}}{n}\right)\right]\noiseSD_{\ell}^2.\]
+The $\noise_{\ell}$ are identically distributed with $\noiseSD_{\ell}^2 = \noiseSD^2$ for all $0 \leq \ell \leq n-1$. Thus
+\[\sum_{\ell=0}^{n-1} \left[\frac{1}{\sqrt{n}}\cos\left(\frac{-2\pi{j\ell}}{n}\right)\right]\left[\frac{1}{\sqrt{n}}\sin\left(\frac{-2\pi{j\ell}}{n}\right)\right]\noiseSD_\ell^2 = \noiseSD^2 \langle A_{j\cdot},B_{j\cdot}\rangle = 0,\]
+where the last equality follows from Lemma \ref{lem:Inner products}. Therefore $X_j$ and $Y_j$ are independent for each $0 \leq j \leq n-1$.
+\end{proof}
 \end{lemma}
+
+Having established the independence of the components of $\Re\{\widehat{\noise}\}$ and $\Im\{\widehat{\noise}\}$, their individual distributions will be determined.
 
 \begin{lemma}
 \label{lem:Component distributions}
@@ -462,7 +471,7 @@ Lemma \ref{lem:Inner products} then provides the cases for evaluation of the inn
 \end{proof}
 \end{lemma}
 
-With the distribution of the components of $\Re\{\widehat{\noise}\}$ and $\Im\{\widehat{\noise}\}$ established, the distribution of the components of $|\widehat{\noise}|^2$ can finally be examined.
+The distribution of the components of $|\widehat{\noise}|^2$ can finally be examined.
 
 \begin{theorem}
 Let $\noise$ be a random $n$-vector with $\noise \sim \mathcal{N}(\bm{0},\noiseSD^2 I)$. Then for $0 \leq j \leq n-1$, the distribution of $|\widehat{\noise}_j|^2 = \Re\{\widehat{\noise}_j\}^2 + \Im\{\widehat{\noise}_j\}^2$ is as follows.
