@@ -101,7 +101,7 @@ If $\kcon * \fcon$ is considered a smoothing operation, then finding $\fcon$ suc
 The kernel $\kcon$ is smooth and bounded on $[0,1]$, and the function $\fcon$ is 1-periodic and bounded. Plots of $\fcon(t)$ and $\kcon(t)$ are shown in Figure \ref{FunctionKernelPlot}. \par
 The kernel $\kcon(t) = \exp(-200(t-\frac{1}{2})^2)$ is an example of a Gaussian kernel. The form of a Gaussian kernel comes from the probability density function of the Gaussian distribution,
 \[p(t) = \frac{1}{\sqrt{2\pi\blurV}}\exp\left(\frac{-(t-\mu)^2}{2\blurV}\right),\]
-where $\mu$ is the mean and $\blurV$ is the variance. The mean is the center of the Gaussian distribution, as well as the abscissa of the absolute maximum. The variance is a measure of dispersion of the distribution; as $\blurV$ increases, the width of the graph of $p(t)$ increases. The standard deviation $\sqrt{\blurV}$ is also a measure of dispersion, though variance will be the measure of choice in this report. The scale factor $1/\sqrt{2\pi\blurV}$ ensures that $\int_{\mathbb{R}} p(t) \: dt = 1$, an essential property of a continuous probability distribution defined on the entire real line. For Gaussian kernels, however, this scale factor may be dropped since having a unitary integral is not required of kernels in general.  For the Gaussian kernel example $\kcon(t) = \exp(-200(t-\frac{1}{2})^2)$, the mean is 1/2 and $-200 = -1/2\noiseSD$ implies that $\blurV = 1/400$. Figure \ref{GaussianDistributions} illustrates the relationship between variance and width of the Gaussian distribution. It should be noted that the choice of $\blurV$ as the symbol for variance of the Gaussian distribution is nonstandard; a common choice for this variance is $\sigma^2$, though in this report $\sigma^2$ is reserved for the variance of the white noise from which $\noise$ is drawn in \eqref{eq:DisNoise}. Another alternative for $\blurV$ would be $s^2$, though $s$ is reserved for singular values, the diagonal entries of $\Sigma$ in \eqref{eq:SVD}. As a last remark, kernel $k(x,t)$ and function \eqref{eq:Test Function 2} will be retained for the numerical examples included in this report.
+where $\mu$ is the mean and $\blurV$ is the variance. The mean is the center of the Gaussian distribution, as well as the abscissa of the absolute maximum. The variance is a measure of dispersion of the distribution; as $\blurV$ increases, the width of the graph of $p(t)$ increases. The standard deviation $\sqrt{\blurV}$ is also a measure of dispersion, though variance will be the measure of choice in this report. The scale factor $1/\sqrt{2\pi\blurV}$ ensures that $\int_{\mathbb{R}} p(t) \: dt = 1$, an essential property of a continuous probability distribution defined on the entire real line. For Gaussian kernels, however, this scale factor may be dropped since having a unitary integral is not required of kernels in general.  For the Gaussian kernel example $\kcon(t) = \exp(-200(t-\frac{1}{2})^2)$, the mean is 1/2 and $-1/2\noiseSD = -200$ implies that $\blurV = 1/400$. Figure \ref{GaussianDistributions} illustrates the relationship between variance and width of the Gaussian distribution. It should be noted that the choice of $\blurV$ as the symbol for variance of the Gaussian distribution is nonstandard; a common choice for this variance is $\sigma^2$, though in this report $\sigma^2$ is reserved for the variance of the white noise in measured data.  As a last remark, kernel $k(x,t)$ and function $\fcon(t)$ \eqref{eq:Test Function 2} will be used repeatedly the numerical examples included in this report.
 
 \begin{figure}
 	\centerline{\includegraphics[scale=0.4]{Figures/FunctionKernelPlot.eps}}
@@ -120,12 +120,12 @@ To find a solution to the forward problem, which is the evaluation of $\gcon = \
 \gdis = \kmat\fdis,
 \label{eq:Dis}
 \end{equation}
-where $\fdis$ and $\gdis$ are the vector discretization of $\fcon$ and $\gcon$, respectively, and $\kmat$ is a matrix representing the discrete convolution of $\kcon$ with $\fcon$. For example, suppose $\kcon(x,t)$ is a zero-centered Gaussian kernel and the domain of integration in \eqref{eq:Con} is $[0,1]$. Given some $x_i \in [0,1]$, the continuous forward problem is to evaluate
-\[g(x_i) = \int_0^1 \exp\left(\frac{-(x_i - t)^2}{2\blurV}\right)\fcon(t) \: dt.\]
-If a left Riemann sum is used with $t_j = (j-1)/n$ for $j \in \{1,2,\ldots,n\}$, representing an equispaced discretization of $[0,1]$ using $n$ points, then
-\[g(x_i) \approx \sum_{j=1}^n \frac{1}{n}\exp\left(\frac{-(x_i - t_j)^2}{2\blurV}\right)\fcon(t_j).\]
-For approximations to $\gcon(x)$ at the same points that make up the equispaced discretization of $[0,1]$, i.e. at the points $x_i = (i-1)/n$ for $j \in \{1,2,\ldots,n\}$, then \eqref{eq:Dis} is exactly the system that provides these approximations with $\fdis = [\fcon(t_1),\fcon(t_2),\ldots,\fcon(t_n)]$, $\gdis = [\gcon(x_1),\gcon(x_2),\ldots,\gcon(x_n)]$, and the elements of $\kmat$ being
-\[K_{ij} = \frac{1}{n}\exp\left(\frac{-(i - j)^2}{2\blurV}\right).\]
+where $\fdis$ and $\gdis$ are the vector discretization of $\fcon$ and $\gcon$, respectively, and $\kmat$ is a matrix representing the discrete convolution of $\kcon$ with $\fcon$. For example, suppose $\kcon(x,t)$ is a zero-centered Gaussian kernel and the domain of integration in \eqref{eq:Con} is $[0,1]$. Given some $x_j \in [0,1]$, the continuous forward problem is to evaluate
+\[g(x_j) = \int_0^1 \exp\left(\frac{-(x_j - t)^2}{2\blurV}\right)\fcon(t) \: dt.\]
+If a left Riemann sum is used with $t_k = (k-1)/n$ for $k \in \{1,2,\ldots,n\}$, representing an equispaced discretization of $[0,1]$ using $n$ points, then
+\[g(x_j) \approx \sum_{k=1}^n \frac{1}{n}\exp\left(\frac{-(x_j - t_k)^2}{2\blurV}\right)\fcon(t_j).\]
+For approximations to $\gcon(x)$ at the same points that make up the equispaced discretization of $[0,1]$, i.e. at the points $x_j = (j-1)/n$ for $j \in \{1,2,\ldots,n\}$, then \eqref{eq:Dis} is exactly the system that provides these approximations with $\fdis = [\fcon(t_1),\fcon(t_2),\ldots,\fcon(t_n)]$, $\gdis = [\gcon(x_1),\gcon(x_2),\ldots,\gcon(x_n)]$, and the elements of $\kmat$ being
+\[K_{jk} = \frac{1}{n}\exp\left(\frac{-(j - k)^2}{2\blurV}\right).\]
 Note that taking the collocation and quadrature points as the same ensures that the matrix $\kmat$ is square. Changing the number of collocation points, or the quadrature method, can change $\kmat$ from square to rectangular. \par
 If the matrix $\kmat$ is nonsingular, then the solution to the inverse problem of \eqref{eq:Dis} is $\fdis = \kmat^{-1}\gdis$. As with many linear systems, however, direct matrix inversion is discouraged and usually impractical since the matrix $\kmat$ becomes increasingly ill-conditioned as the size of the system grows \cite{Vogel:2002}. Unfortunately, large systems are necessary to adequately approximate the continuous problem, and so other methods of solving for $\fdis$ must be considered. \par
 Before discussing the consequences of ill-conditioning, the concept of an well-posed problem will be introduced, which is due to Hadamard. Given an operator $A : \mathcal{H}_1 \rightarrow \mathcal{H}_2$, where $\mathcal{H}_1$ and $\mathcal{H}_1$ are Hilbert spaces, the equation $Af = g$ is said to be well-posed if
@@ -134,8 +134,8 @@ Before discussing the consequences of ill-conditioning, the concept of an well-p
 \item[(ii)] the solution $f$ is unique, and
 \item[(iii)] if $Af_* = g_*$ and $Af = g$, then $f \rightarrow f_*$ whenever $g \rightarrow g_*$.
 \end{enumerate}
-In order, these conditions require that a solution exists, is unique, and is stable under perturbations in $g$. If one of these conditions is not met, then $Af = g$ is said to be an ill-posed problem. The discrete version $\kmat\fdis = \gdis$ of the problem in this report is ill-posed: singularity of $\kmat$ violates conditions (i) and (ii), and a poor condition number of nonsingular $\kmat$ violates condition (iii). This second case will now be discussed further.  \par 
-A primary consequence of $\kmat$ being ill-conditioned relates to the accuracy of the vector $\gdis$. If $\gdis$ contains errors, as is often the case in practical applications, the errors are amplified during the multiplication $\kmat^{-1}\gdis$ since $\kmat$ is ill-conditioned and so the solution $\fdis$ will contain errors as well. For this consideration, the following system will be the assumed model throughout this report
+In order, these conditions require that a solution exists, is unique, and is stable under perturbations in $g$. If one of these conditions is not met, then $Af = g$ is said to be an ill-posed problem. The discrete version $\kmat\fdis = \gdis$ of the problem in this report is ill-posed: singularity of $\kmat$ violates conditions (i) and (ii), and a poor condition number of nonsingular $\kmat$ violates condition (iii). If the matrix $\kmat$ is rectangular, then $\kmat$ is singular and certainly (i) is violated.  \par 
+A primary consequence of $\kmat$ being ill-conditioned relates to the accuracy of the vector $\gdis$. If $\gdis$ contains errors, as is often the case in practical applications, the errors are amplified during the multiplication $\kmat^{-1}\gdis$ since $\kmat$ is ill-conditioned and so the solution $\fdis$ will contain errors as well. In other words, $\fdis$ is sensitive to errors in $\gdis$. For this consideration, the following system will be the assumed model throughout this report
 \begin{equation}
 \gnoise = \kmat\fdis + \noise
 \label{eq:DisNoise}
@@ -147,50 +147,50 @@ Since direct matrix inversion is not practical, and at times not even possible s
 \label{eq:SVD}
 \end{equation}
 where the $m \times m$ matrix $U$ and the $n \times n$ matrix $V$ have orthogonal columns and $\Sigma$ is a $m \times n$ diagonal matrix. The diagonal elements of $\Sigma$ are the singular values of $\kmat$, denoted $\singular_i$ and satisfying $\singular_1 \geq \singular_2 \geq \ldots \geq \singular_n \geq 0$. The columns of $U$ and $V$ will be denoted $\LSV_i$ and $\RSV_i$, respectively; these vectors are known as the left and right singular vectors of $\kmat$, respectively. A matrix of complex values has a SVD as well, the only difference being that the transpose is replaced with conjugate transpose. \par
-Letting $r$ denote the rank of $\kmat$,  $\singular_1 \geq \ldots \geq \singular_r > 0$. In other words, the number of nonzero singular values of $\kmat$ is equal to the rank of $\kmat$.  A common variation of the SVD is the compact SVD, in which $\Sigma = \diag(\singular_1,\ldots,\singular_r)$, $U$ is an $m \times r$ matrix and $V^\trans$ is an $r \times n$ matrix. The matrices $U$ and $V$ are no longer orthogonal in the traditional sense because they are not square (unless $\kmat$ is nonsingular), though their columns remain orthonormal. For the remainder of this report all SVD's are assumed to be compact.  \par 
+Let $r$ denote the rank of $\kmat$. Then $\singular_1 \geq \ldots \geq \singular_r > 0$, i.e. the number of nonzero singular values of $\kmat$ is equal to the rank of $\kmat$.  A common variation of the SVD is the compact SVD (or economy SVD \cite{golub2013matrix}), in which $\Sigma = \diag(\singular_1,\ldots,\singular_r)$, $U$ is an $m \times r$ matrix and $V^\trans$ is an $r \times n$ matrix. The matrices $U$ and $V$ are no longer orthogonal in the traditional sense because they are not square (unless $\kmat$ is nonsingular), though their columns remain orthonormal. For the remainder of this report all SVD's are assumed to be compact.  \par 
 By using $\kmat^{-1} = V\Sigma^{-1}U^\trans$ when $\kmat$ is nonsingular, the product $\kmat^{-1}\gnoise$ is
 \begin{equation}
-\kmat^{-1}\gnoise = \kmat^{-1}\left(\kmat\fdis + \noise\right) = \fdis + \kmat^{-1}\noise = \fdis + V\Sigma^{-1}{U^\trans}\noise = \fdis + \sum_{i = 1}^n \frac{{\LSV^\trans_i}\noise}{\singular_i}\RSV_i. 
+\kmat^{-1}\gnoise = \kmat^{-1}\left(\kmat\fdis + \noise\right) = \fdis + \kmat^{-1}\noise = \fdis + V\Sigma^{-1}{U^\trans}\noise = \fdis + \sum_{\ell = 1}^n \frac{{\LSV^\trans_\ell}\noise}{\singular_\ell}\RSV_\ell. 
 \label{eq:InvProd}
 \end{equation}
 Even if $\kmat$ is singular, a solution can still be obtained by using the psuedoinverse $\kmat^+ = V{\Sigma^+}U^\trans$, where $\Sigma^+ = \diag(1/\singular_1,\ldots,1/\singular_r)$, and the upper bound of summation in \eqref{eq:InvProd} becomes $r$. In either the nonsingular or singular case for $\kmat$, however, the summands in \eqref{eq:InvProd} are numerically unstable for small $\singular_i$. For a visual representation of this instability, a Picard plot can be constructed. A Picard plot is a graph showing the terms $|\LSV^\trans_i\noise|/\singular_i$ in decreasing order with respect to the singular values. If the terms $|\LSV^\trans_i\noise|$ decay faster than $\singular_i$ as $i$ increases, then the terms $|\LSV^\trans_i\noise|/\singular_i$ do not become excessively large; this is the discrete Picard condition \cite{ABT}. The discrete Picard condition is thus a measure of instability. If the discrete Picard condition is not met, then the terms $|\LSV^\trans_i\noise|/\singular_i$ blow up as $i$ increases, often resulting in worthless solutions. In this experiment, the discrete Fourier transform will be used to obtain solutions analogous to those obtained by \eqref{eq:InvProd}. In Section \ref{sec:The Discrete Fourier Transform} a Picard plot is provided that demonstrates the relationship between the noise, the width of the Gaussian blur, and the resulting numerical instabilities related to obtaining meaningful solutions. See \cite{Hansen1990} for more information on Picard plots and the associated discrete Picard condition. \par 
 A common approach to overcome numerical instabilities is to multiply the summands in \eqref{eq:InvProd} by \textit{filter functions} $\filt$ that depend upon $\singular_i$ and a non-negative \textit{regularization parameter} $\regparam$. By doing so, an approximate solution is obtained:
 \begin{equation}
-\fdis(\regparam) = \sum_{i = 1}^n \RSV_i\filt(\regparam,\singular_i)\left(\frac{{\LSV^\trans_i}\gnoise}{\singular_i}\right).
+\fdis(\regparam) = \sum_{\ell = 1}^n \RSV_\ell\filt(\regparam,\singular_\ell)\left(\frac{{\LSV^\trans_\ell}\gnoise}{\singular_\ell}\right) = V\Phi\Sigma^+U^\trans\gnoise,
 \label{eq:ApproxSol}
 \end{equation}
-The most desired property of the filter functions is that $\filt(\singular_i)/\singular_i \approx 1$  for large values of $\singular_i$ and $\filt(\singular_i)/\singular_i \approx 0$ for small values of $\singular_i$. A brief overview of common filter functions will now be provided. 
+where the matrix $\Phi$ is diagonal with $\Phi_{\ell\ell} = \filt(\regparam,\singular_\ell)$ for $\ell = 1,\ldots,n$. The most desired property of the filter functions is that $\filt(\singular_\ell)/\singular_\ell \approx 1$  for large values of $\singular_\ell$ and $\filt(\singular_\ell)/\singular_\ell \approx 0$ for small values of $\singular_\ell$. A brief overview of common filter functions will now be provided. 
 
 \subsection{Filter functions} \label{sec:Filter functions}
 Perhaps the simplest filter function is
-\[\filt(\regparam,\singular_i) = \begin{cases}
-1, & \singular_i^2 > \regparam \\
-0, & \singular_i^2 \leq \regparam
+\[\filt(\regparam,\singular_\ell) = \begin{cases}
+1, & \singular_\ell^2 > \regparam \\
+0, & \singular_\ell^2 \leq \regparam
 \end{cases}\]
 Using this function in (3) gives the approximate solution
-\[\fdis(\regparam) = \sum_{\singular_i^2 > \regparam} \frac{{\LSV^\trans_i}\gnoise}{\singular_i}\RSV_i\]
+\[\fdis(\regparam) = \sum_{\singular_\ell^2 > \regparam} \frac{{\LSV^\trans_\ell}\gnoise}{\singular_\ell}\RSV_\ell\]
 which actually corresponds to the solution obtained using a truncated singular value decomposition (TSVD) of the matrix $\kmat$ \cite{Vogel:2002}. \par
 A less simple filter function is
 \begin{equation}
-\filt(\regparam,\singular_i)  = \frac{\singular_i^2}{\singular_i^2 + \regparam^2}
+\filt(\regparam,\singular_\ell)  = \frac{\singular_\ell^2}{\singular_\ell^2 + \regparam^2}
 \label{eq:TikFilt}
 \end{equation}
-which is known as the Tikhonov filter function. For large values of $\regparam$, \eqref{eq:TikFilt} is close to zero and for small values of $\regparam$ (and nonzero values of $\singular_i$), it is close to one. Another property of \eqref{eq:TikFilt} is that for fixed nonzero $\singular_i$, it is monotone decreasing in $\regparam$. Tikhonov filter functions will be considered extensively through this report. Thus in addition, let
+which is known as the Tikhonov filter function. For large values of $\regparam$, \eqref{eq:TikFilt} is close to zero and for small values of $\regparam$ (and nonzero values of $\singular_\ell$), it is close to one. Another property of \eqref{eq:TikFilt} is that for fixed nonzero $\singular_\ell$, it is monotone decreasing in $\regparam$. Tikhonov filter functions will be considered extensively through this report. Thus in addition, let
 \begin{equation}
-\mfilt(\regparam,\singular_i) = 1 - \filt(\regparam,\singular_i) = \frac{\regparam^2}{\singular_i^2 + \regparam^2}.
+\mfilt(\regparam,\singular_\ell) = 1 - \filt(\regparam,\singular_\ell) = \frac{\regparam^2}{\singular_\ell^2 + \regparam^2}.
 \label{eq:TikFiltPsi}
 \end{equation}
-The expression $1 - \filt(\regparam,\singular_i)$ arises a number of time in the methods introduced in Section \ref{sec:Parameter estimation methods}, and so $\mfilt(\regparam,\singular_i)$ will be used to simplify notation. In contrast to \eqref{eq:TikFilt}, \eqref{eq:TikFiltPsi} is close to one for large values of $\regparam$ and monotone increasing in $\regparam$ for fixed $\singular_i$; see Figure \ref{fig:Phi Psi Plot}. \par 
+The expression $1 - \filt(\regparam,\singular_\ell)$ arises a number of time in the methods introduced in Section \ref{sec:Parameter estimation methods}, and so $\mfilt(\regparam,\singular_\ell)$ will be used to simplify notation. In contrast to \eqref{eq:TikFilt}, \eqref{eq:TikFiltPsi} is close to one for large values of $\regparam$ and monotone increasing in $\regparam$ for fixed $\singular_\ell$; see Figure \ref{fig:Phi Psi Plot}. \par 
 
 \begin{figure}
 	\centerline{\includegraphics[scale = 0.5]{Figures/Phi_Psi_Plot.eps}}
-\caption{The behavior of the Tikhonov filter function $\filt(\regparam,\singular_i)$ and corresponding $\mfilt(\regparam,\singular_i) = 1 - \filt(\regparam,\singular_i)$ is displayed for choice values of $\singular_i$. For fixed $\singular_i$, $\filt(\regparam,\singular_i) \rightarrow 0$ and $\mfilt(\regparam,\singular_i) \rightarrow 1$ as $\regparam \rightarrow \infty$. Notice also that $\filt(\regparam,\singular_i) = \mfilt(\regparam,\singular_i)$ for $\alpha = \singular_i$.}
+\caption{The behavior of the Tikhonov filter function $\filt(\regparam,\singular_\ell)$ and corresponding $\mfilt(\regparam,\singular_\ell) = 1 - \filt(\regparam,\singular_\ell)$ is displayed for choice values of $\singular_\ell$. For fixed $\singular_\ell$, $\filt(\regparam,\singular_\ell) \rightarrow 0$ and $\mfilt(\regparam,\singular_\ell) \rightarrow 1$ as $\regparam \rightarrow \infty$. Notice also that $\filt(\regparam,\singular_\ell) = \mfilt(\regparam,\singular_\ell) = 1/2$ for $\alpha = \singular_\ell$.}
 \label{fig:Phi Psi Plot}
 \end{figure}
 
 The use of the Tikhonov filter function to generate an approximate solution is known as \textit{Tikhonov regularization} \cite{Tikh1963}; in terms of an SVD, the obtained solution is
 \begin{equation}
-\fdis(\regparam) = \sum_{i = 1}^n \filt(\regparam,\singular_i)\frac{{\LSV^\trans_i}\gnoise}{\singular_i}\RSV_i = \sum_{i = 1}^n \frac{\singular_i{\LSV^\trans_i}\gnoise}{\singular_i^2 + \regparam^2}\RSV_i.
+\fdis(\regparam) = \sum_{\ell = 1}^n \filt(\regparam,\singular_\ell)\frac{{\LSV^\trans_\ell}\gnoise}{\singular_\ell}\RSV_\ell = \sum_{\ell = 1}^n \frac{\singular_\ell{\LSV^\trans_\ell}\gnoise}{\singular_\ell^2 + \regparam^2}\RSV_\ell = V\Phi\Sigma^+U^\trans\gnoise.
 \label{eq:TikSol}
 \end{equation}
 An alternative representation of the above Tikhonov solution is
@@ -209,10 +209,12 @@ However, there are many examples of matrices $D$ that are singular, such as fini
 
 \section{Analytical tools} \label{sec:Analytical tools}
 
+A number of analytic tools are used in this experiment. First, convolutions and certain associated matrices will be discussed. The discrete Fourier transform and some properties will then be examined. Lastly, the effects and resulting statistics of the Fourier transform as applied to Gaussian noise will be presented.
+
 \subsection{Discrete convolution} \label{sec:Discrete convolution}
 As described in the Section \ref{sec:Introduction}, the operation of convolution arises in various settings pertaining to inverse problems. Discrete convolution will first be described  in a general setting, followed by specific instances and connections to the numerical experiments conducted in this report. \par
 Let $(x_n)$ and $(y_n)$ be sequences of complex numbers indexed by the integers. Then the discrete convolution of $(x_n)$ and $(y_n)$, denoted $x*y$, is defined by
-\[(x*y)_n = \sum_{j=-\infty}^\infty x_{n-k}y_k.\]
+\[(x*y)_n = \sum_{\ell=-\infty}^\infty x_{n-\ell}y_\ell.\]
 The series in the definition of discrete convolution is bi-infinite, meaning that the discrete convolution might not be well-defined for any two arbitrary sequences. For example, if $x_n = y_n = 1$ for all $n \in \mathbb{Z}$, then the series defining $(x*y)_n$ is $\sum_{j=-\infty}^\infty 1$, which does not converge. In various cases, however, the discrete convolution is well-defined. These cases include sequences having only finitely-many nonzero terms and sequences in $\ell^1$. (In fact, the set of sequences having finitely-many nonzero terms is a linear subspace of $\ell^1$).  \par 
 Fortunately, real-world applications usually involve finite sequences (vectors), which can be thought of as infinite or bi-infinite sequences having finitely-many nonzero terms. While such sequences do not require the evaluation of infinite series to compute discrete convolutions, it is helpful to have general results regarding the length and indices of discrete convolutions. Let $(x_n)$ and $(y_n)$ be nonzero sequences with finitely-many nonzero terms. For $(x_n)$, the assumptions imply the existence of integers $s_x$ and $e_x$ such that $x_n = 0$ for all $n \in \mathbb{Z}$ with either $n < s_x$ or $e_x < n$. Such integers exist for $(y_n)$ and will be denoted $s_y$ and $e_y$. The choice of letters reflects the fact that $s$ and $e$ represent the starting and ending indices of the section of the sequence where the terms can be nonzero. Extending this notation, the number of terms in this section of sequence is $n_x = e_x - s_x + 1$ and $n_y = e_y - s_y + 1$ for $(x_n)$ and $(y_n)$, respectively. From \cite{BoggessAlbert2001Afci}, the values of $s_{x*y}$, $e_{x*y}$, and $n_{x*y}$ are
 \begin{align}
