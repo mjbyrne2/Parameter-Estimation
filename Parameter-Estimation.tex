@@ -4,19 +4,14 @@
 \geometry{margin = 1 in}
 \usepackage{color}
 
-% Continuous notation:
-\newcommand{\gcon}{g}
-\newcommand{\kcon}{k}
-\newcommand{\fcon}{f}
-\newcommand{\blurV}{\nu}	% Variance of Gaussian blur function
-
 % Discrete notation:
-\newcommand{\gdis}{\mathbf{g}}
-\newcommand{\gnoise}{\widetilde{\mathbf{g}}}
-\newcommand{\kdis}{\mathbf{k}}
-\newcommand{\kmat}{K}	% Matrix K
-\newcommand{\fdis}{\mathbf{f}}
-\newcommand{\tdis}{\mathbf{t}}
+\newcommand{\gVec}{\mathbf{g}}
+\newcommand{\gnoise}{\widetilde{g}}	% Component
+\newcommand{\gnoiseVec}{\widetilde{\mathbf{g}}}	% Vector
+\newcommand{\kVec}{\mathbf{k}}
+\newcommand{\kMat}{K}	% Matrix K
+\newcommand{\fVec}{\mathbf{f}}	% Vector
+\newcommand{\tVec}{\mathbf{t}}
 \newcommand{\ddis}{\mathbf{d}}	% Differential operator
 \newcommand{\trans}{\mathrm{T}}	% Matrix transpose
 \newcommand{\ctrans}{*}	% Conjugate transpose
@@ -29,7 +24,7 @@
 % Regularization notation:
 \newcommand{\regparam}{\alpha}
 \newcommand{\R}{R_{\regparam}}	% Regularization matrix
-\newcommand{\freg}{\fdis_{\regparam}}	% Regularized solution
+\newcommand{\freg}{\fVec_{\regparam}}	% Regularized solution
 \DeclareMathOperator*{\argmax}{arg\,max}
 \DeclareMathOperator*{\argmin}{arg\,min}
 
@@ -37,12 +32,17 @@
 \newcommand{\filt}{\phi}
 \newcommand{\mfilt}{\psi}
 
-% Noise notation:
+% Statistics notation:
+\newcommand{\noise}{\eta}	% Noise (single component/variable)
 \newcommand{\noiseSD}{\sigma}	% Standard deviation
-\newcommand{\noise}{\bm{\eta}}	% Noise vector
+\newcommand{\noiseVec}{\bm{\noise}}	% Noise vector
+\newcommand{\blurV}{\nu}	% Variance of Gaussian blur function
 \newcommand{\Var}{\operatorname{Var}}	% Variance
 \newcommand{\Cov}{\operatorname{Cov}}	% Covariance
 \newcommand{\E}{\operatorname{E}}	% Expected value
+\renewcommand{\Re}{\operatorname{Re}}	% Real part
+\renewcommand{\Im}{\operatorname{Im}}	% Imaginary part
+\newcommand{\NCchi}{\chi'\:}	
 
 % Singular values and vectors:
 \newcommand{\singular}{s}	% Singular values
@@ -79,15 +79,15 @@
 \maketitle
 
 \section{Introduction} \label{sec:Introduction}
-Given functions $\gcon(x)$ and $\kcon(x,t)$, a \textit{Fredholm equation of the first kind} can be stated as
+Given functions $g(x)$ and $k(x,t)$, a \textit{Fredholm equation of the first kind} can be stated as
 \begin{equation}
-	\gcon(x) = \int_a^b \kcon(x,t)\fcon(t)\:dt,
+	g(x) = \int_a^b k(x,t)f(t)\:dt,
 	\label{eq:Con}
 \end{equation}
-where the function $\fcon$ is unknown. If the kernel $\kcon$ is of the form $\kcon(x,t) = \kcon(x-t)$, then the integral equation represents the continuous convolution $\gcon = \kcon * \fcon$ over the interval $[a,b]$, and the kernel is spatially invariant. Convolution is a smoothing operation: if $\kcon$ is integrable and $\fcon$ is bounded and locally integrable, then $\kcon * \fcon$ is a continuous function \cite{DebnathLokenath1999ItHs}. In particular, if $\kcon$ and $\fcon$ are at least piecewise smooth and bounded, the resulting convolution $\kcon * \fcon$ is continuous. \par
-If $\kcon * \fcon$ is considered a smoothing operation, then finding $\fcon$ such that $\gcon = \kcon * \fcon$, given $\gcon$ and $\kcon$, could be considered a ``sharpening" operation. For instance, consider the kernel $\kcon(t) = \exp(-200(t-\frac{1}{2})^2)$ and the piecewise-smooth function $\fcon(t)$ defined as:
+where the function $f$ is unknown. If the kernel $k$ is of the form $k(x,t) = k(x-t)$, then the integral equation represents the continuous convolution $g = k * f$ over the interval $[a,b]$, and the kernel is spatially invariant. Convolution is a smoothing operation: if $k$ is integrable and $f$ is bounded and locally integrable, then $k * f$ is a continuous function \cite{DebnathLokenath1999ItHs}. In particular, if $k$ and $f$ are at least piecewise smooth and bounded, the resulting convolution $k * f$ is continuous. \par
+If $k * f$ is considered a smoothing operation, then finding $f$ such that $g = k * f$, given $g$ and $k$, could be considered a ``sharpening" operation. For instance, consider the kernel $k(t) = \exp(-200(t-\frac{1}{2})^2)$ and the piecewise-smooth function $f(t)$ defined as:
 \begin{equation}
-\fcon(t) = \begin{cases}
+f(t) = \begin{cases}
 \sin\left(8\pi{t}\right), & 0 < t \leq \frac{1}{4} \\
 0, & \frac{1}{4} < t \leq \frac{1}{3} \\
 24\left(t-\frac{1}{3}\right), & \frac{1}{3} < t \leq \frac{3}{8} \\
@@ -98,14 +98,14 @@ If $\kcon * \fcon$ is considered a smoothing operation, then finding $\fcon$ suc
 \end{cases}.
 \label{eq:Test Function 2}
 \end{equation}
-The kernel $\kcon$ is smooth and bounded on $[0,1]$, and the function $\fcon$ is 1-periodic and bounded. Plots of $\fcon(t)$ and $\kcon(t)$ are shown in Figure \ref{FunctionKernelPlot}. \par
-The kernel $\kcon(t) = \exp(-200(t-\frac{1}{2})^2)$ is an example of a Gaussian kernel. The form of a Gaussian kernel comes from the probability density function of the Gaussian distribution,
+The kernel $k$ is smooth and bounded on $[0,1]$, and the function $f$ is 1-periodic and bounded. Plots of $f(t)$ and $k(t)$ are shown in Figure \ref{FunctionKernelPlot}. \par
+The kernel $k(t) = \exp(-200(t-\frac{1}{2})^2)$ is an example of a Gaussian kernel. The form of a Gaussian kernel comes from the probability density function of the Gaussian distribution,
 \[p(t) = \frac{1}{\sqrt{2\pi\blurV}}\exp\left(\frac{-(t-\mu)^2}{2\blurV}\right),\]
-where $\mu$ is the mean and $\blurV$ is the variance. The mean is the center of the Gaussian distribution, as well as the abscissa of the absolute maximum. The variance is a measure of dispersion of the distribution; as $\blurV$ increases, the width of the graph of $p(t)$ increases. The standard deviation $\sqrt{\blurV}$ is also a measure of dispersion, though variance will be the measure of choice in this report. The scale factor $1/\sqrt{2\pi\blurV}$ ensures that $\int_{\mathbb{R}} p(t) \: dt = 1$, an essential property of a continuous probability distribution defined on the entire real line. For Gaussian kernels, however, this scale factor may be dropped since having a unitary integral is not required of kernels in general.  For the Gaussian kernel example $\kcon(t) = \exp(-200(t-\frac{1}{2})^2)$, the mean is 1/2 and $-1/2\noiseSD = -200$ implies that $\blurV = 1/400$. Figure \ref{GaussianDistributions} illustrates the relationship between variance and width of the Gaussian distribution. It should be noted that the choice of $\blurV$ as the symbol for variance of the Gaussian distribution is nonstandard; a common choice for this variance is $\sigma^2$, though in this report $\sigma^2$ is reserved for the variance of the white noise in measured data.  As a last remark, kernel $k(x,t)$ and function $\fcon(t)$ \eqref{eq:Test Function 2} will be used repeatedly the numerical examples included in this report.
+where $\mu$ is the mean and $\blurV$ is the variance. The mean is the center of the Gaussian distribution, as well as the abscissa of the absolute maximum. The variance is a measure of dispersion of the distribution; as $\blurV$ increases, the width of the graph of $p(t)$ increases. The standard deviation $\sqrt{\blurV}$ is also a measure of dispersion, though variance will be the measure of choice in this report. The scale factor $1/\sqrt{2\pi\blurV}$ ensures that $\int_{\mathbb{R}} p(t) \: dt = 1$, an essential property of a continuous probability distribution defined on the entire real line. For Gaussian kernels, however, this scale factor may be dropped since having a unitary integral is not required of kernels in general.  For the Gaussian kernel example $k(t) = \exp(-200(t-\frac{1}{2})^2)$, the mean is 1/2 and $-1/2\noiseSD = -200$ implies that $\blurV = 1/400$. Figure \ref{GaussianDistributions} illustrates the relationship between variance and width of the Gaussian distribution. It should be noted that the choice of $\blurV$ as the symbol for variance of the Gaussian distribution is nonstandard; a common choice for this variance is $\sigma^2$, though in this report $\sigma^2$ is reserved for the variance of the white noise in measured data.  As a last remark, kernel $k(x,t)$ and function $f(t)$ \eqref{eq:Test Function 2} will be used repeatedly the numerical examples included in this report.
 
 \begin{figure}
 	\centerline{\includegraphics[scale=0.4]{Figures/FunctionKernelPlot.eps}}
-\caption{Left: The graphs of the piecewise-smooth function $\fcon(t)$. Right: The Gaussian kernel $\kcon(t)$.}
+\caption{Left: The graphs of the piecewise-smooth function $f(t)$. Right: The Gaussian kernel $k(t)$.}
 \label{FunctionKernelPlot}
 \end{figure}
 
@@ -115,48 +115,48 @@ where $\mu$ is the mean and $\blurV$ is the variance. The mean is the center of 
 \label{GaussianDistributions}
 \end{figure}
 
-To find a solution to the forward problem, which is the evaluation of $\gcon = \kcon * \fcon$, a quadrature method can be used to find a numerical approximation to the convolution integral. In the discrete setting, (1) can be stated as
+To find a solution to the forward problem, which is the evaluation of $g = k * f$, a quadrature method can be used to find a numerical approximation to the convolution integral. In the discrete setting, (1) can be stated as
 \begin{equation}
-\gdis = \kmat\fdis,
+\gVec = \kMat\fVec,
 \label{eq:Dis}
 \end{equation}
-where $\fdis$ and $\gdis$ are the vector discretization of $\fcon$ and $\gcon$, respectively, and $\kmat$ is a matrix representing the discrete convolution of $\kcon$ with $\fcon$. For example, suppose $\kcon(x,t)$ is a zero-centered Gaussian kernel and the domain of integration in \eqref{eq:Con} is $[0,1]$. Given some $x_j \in [0,1]$, the continuous forward problem is to evaluate
-\[g(x_j) = \int_0^1 \exp\left(\frac{-(x_j - t)^2}{2\blurV}\right)\fcon(t) \: dt.\]
+where $\fVec$ and $\gVec$ are the vector discretization of $f$ and $g$, respectively, and $\kMat$ is a matrix representing the discrete convolution of $k$ with $f$. For example, suppose $k(x,t)$ is a zero-centered Gaussian kernel and the domain of integration in \eqref{eq:Con} is $[0,1]$. Given some $x_j \in [0,1]$, the continuous forward problem is to evaluate
+\[g(x_j) = \int_0^1 \exp\left(\frac{-(x_j - t)^2}{2\blurV}\right)f(t) \: dt.\]
 If a left Riemann sum is used with $t_k = (k-1)/n$ for $k \in \{1,2,\ldots,n\}$, representing an equispaced discretization of $[0,1]$ using $n$ points, then
-\[g(x_j) \approx \sum_{k=1}^n \frac{1}{n}\exp\left(\frac{-(x_j - t_k)^2}{2\blurV}\right)\fcon(t_j).\]
-For approximations to $\gcon(x)$ at the same points that make up the equispaced discretization of $[0,1]$, i.e. at the points $x_j = (j-1)/n$ for $j \in \{1,2,\ldots,n\}$, then \eqref{eq:Dis} is exactly the system that provides these approximations with $\fdis = [\fcon(t_1),\fcon(t_2),\ldots,\fcon(t_n)]$, $\gdis = [\gcon(x_1),\gcon(x_2),\ldots,\gcon(x_n)]$, and the elements of $\kmat$ being
+\[g(x_j) \approx \sum_{k=1}^n \frac{1}{n}\exp\left(\frac{-(x_j - t_k)^2}{2\blurV}\right)f(t_j).\]
+For approximations to $g(x)$ at the same points that make up the equispaced discretization of $[0,1]$, i.e. at the points $x_j = (j-1)/n$ for $j \in \{1,2,\ldots,n\}$, then \eqref{eq:Dis} is exactly the system that provides these approximations with $\fVec = [f(t_1),f(t_2),\ldots,f(t_n)]$, $\gVec = [g(x_1),g(x_2),\ldots,g(x_n)]$, and the elements of $\kMat$ being
 \[K_{jk} = \frac{1}{n}\exp\left(\frac{-(j - k)^2}{2\blurV}\right).\]
-Note that taking the collocation and quadrature points as the same ensures that the matrix $\kmat$ is square. Changing the number of collocation points, or the quadrature method, can change $\kmat$ from square to rectangular. \par
-If the matrix $\kmat$ is nonsingular, then the solution to the inverse problem of \eqref{eq:Dis} is $\fdis = \kmat^{-1}\gdis$. As with many linear systems, however, direct matrix inversion is discouraged and usually impractical since the matrix $\kmat$ becomes increasingly ill-conditioned as the size of the system grows \cite{Vogel:2002}. Unfortunately, large systems are necessary to adequately approximate the continuous problem, and so other methods of solving for $\fdis$ must be considered. \par
+Note that taking the collocation and quadrature points as the same ensures that the matrix $\kMat$ is square. Changing the number of collocation points, or the quadrature method, can change $\kMat$ from square to rectangular. \par
+If the matrix $\kMat$ is nonsingular, then the solution to the inverse problem of \eqref{eq:Dis} is $\fVec = \kMat^{-1}\gVec$. As with many linear systems, however, direct matrix inversion is discouraged and usually impractical since the matrix $\kMat$ becomes increasingly ill-conditioned as the size of the system grows \cite{Vogel:2002}. Unfortunately, large systems are necessary to adequately approximate the continuous problem, and so other methods of solving for $\fVec$ must be considered. \par
 Before discussing the consequences of ill-conditioning, the concept of an well-posed problem will be introduced, which is due to Hadamard. Given an operator $A : \mathcal{H}_1 \rightarrow \mathcal{H}_2$, where $\mathcal{H}_1$ and $\mathcal{H}_1$ are Hilbert spaces, the equation $Af = g$ is said to be well-posed if
 \begin{enumerate}
 \item[(i)] for each $g \in \mathcal{H}_2$ there exists a solution $f \in \mathcal{H}_1$ to $Af = g$,
 \item[(ii)] the solution $f$ is unique, and
 \item[(iii)] if $Af_* = g_*$ and $Af = g$, then $f \rightarrow f_*$ whenever $g \rightarrow g_*$.
 \end{enumerate}
-In order, these conditions require that a solution exists, is unique, and is stable under perturbations in $g$. If one of these conditions is not met, then $Af = g$ is said to be an ill-posed problem. The discrete version $\kmat\fdis = \gdis$ of the problem in this report is ill-posed: singularity of $\kmat$ violates conditions (i) and (ii), and a poor condition number of nonsingular $\kmat$ violates condition (iii). If the matrix $\kmat$ is rectangular, then $\kmat$ is singular and certainly (i) is violated.  \par 
-A primary consequence of $\kmat$ being ill-conditioned relates to the accuracy of the vector $\gdis$. If $\gdis$ contains errors, as is often the case in practical applications, the errors are amplified during the multiplication $\kmat^{-1}\gdis$ since $\kmat$ is ill-conditioned and so the solution $\fdis$ will contain errors as well. In other words, $\fdis$ is sensitive to errors in $\gdis$. For this consideration, the following system will be the assumed model throughout this report
+In order, these conditions require that a solution exists, is unique, and is stable under perturbations in $g$. If one of these conditions is not met, then $Af = g$ is said to be an ill-posed problem. The discrete version $\kMat\fVec = \gVec$ of the problem in this report is ill-posed: singularity of $\kMat$ violates conditions (i) and (ii), and a poor condition number of nonsingular $\kMat$ violates condition (iii). If the matrix $\kMat$ is rectangular, then $\kMat$ is singular and certainly (i) is violated.  \par 
+A primary consequence of $\kMat$ being ill-conditioned relates to the accuracy of the vector $\gVec$. If $\gVec$ contains errors, as is often the case in practical applications, the errors are amplified during the multiplication $\kMat^{-1}\gVec$ since $\kMat$ is ill-conditioned and so the solution $\fVec$ will contain errors as well. In other words, $\fVec$ is sensitive to errors in $\gVec$. For this consideration, the following system will be the assumed model throughout this report
 \begin{equation}
-\gnoise = \kmat\fdis + \noise
+\gnoiseVec = \kMat\fVec + \noiseVec
 \label{eq:DisNoise}
 \end{equation}
-where $\noise$ is a vector that represents any errors in $\gdis$ (this is equivalent to the statement $\gnoise = \gdis + \noise$). For further simplicity, assume that $\noise \sim \mathcal{N}(\bm{0},\noiseSD^2I)$, where $\bm{0}$ is the zero vector of length $n$ and $I$ is the $n \times n$ identity matrix. In other words, the error vector $\noise$ is an $n$-dimension Gaussian random variable with mean zero and variance $\noiseSD^2$. \par
-Since direct matrix inversion is not practical, and at times not even possible since $\kmat$ can be singular, a singular value decomposition (SVD) of $\kmat$ can be an alternative. Assuming $\kmat$ is a real $m \times n$ matrix, the SVD of $\kmat$ is
+where $\noiseVec$ is a vector that represents any errors in $\gVec$ (this is equivalent to the statement $\gnoiseVec = \gVec + \noiseVec$). For further simplicity, assume that $\noiseVec \sim \mathcal{N}(\bm{0},\noiseSD^2I)$, where $\bm{0}$ is the zero vector of length $n$ and $I$ is the $n \times n$ identity matrix. In other words, the error vector $\noiseVec$ is an $n$-dimension Gaussian random variable with mean zero and variance $\noiseSD^2$. \par
+Since direct matrix inversion is not practical, and at times not even possible since $\kMat$ can be singular, a singular value decomposition (SVD) of $\kMat$ can be an alternative. Assuming $\kMat$ is a real $m \times n$ matrix, the SVD of $\kMat$ is
 \begin{equation}
-\kmat = U\Sigma{V^\trans}
+\kMat = U\Sigma{V^\trans}
 \label{eq:SVD}
 \end{equation}
-where the $m \times m$ matrix $U$ and the $n \times n$ matrix $V$ have orthogonal columns and $\Sigma$ is a $m \times n$ diagonal matrix. The diagonal elements of $\Sigma$ are the singular values of $\kmat$, denoted $\singular_i$ and satisfying $\singular_1 \geq \singular_2 \geq \ldots \geq \singular_n \geq 0$. The columns of $U$ and $V$ will be denoted $\LSV_i$ and $\RSV_i$, respectively; these vectors are known as the left and right singular vectors of $\kmat$, respectively. A matrix of complex values has a SVD as well, the only difference being that the transpose is replaced with conjugate transpose. \par
-Let $r$ denote the rank of $\kmat$. Then $\singular_1 \geq \ldots \geq \singular_r > 0$, i.e. the number of nonzero singular values of $\kmat$ is equal to the rank of $\kmat$.  A common variation of the SVD is the compact SVD (or economy SVD \cite{golub2013matrix}), in which $\Sigma = \diag(\singular_1,\ldots,\singular_r)$, $U$ is an $m \times r$ matrix and $V^\trans$ is an $r \times n$ matrix. The matrices $U$ and $V$ are no longer orthogonal in the traditional sense because they are not square (unless $\kmat$ is nonsingular), though their columns remain orthonormal. For the remainder of this report all SVD's are assumed to be compact.  \par 
-By using $\kmat^{-1} = V\Sigma^{-1}U^\trans$ when $\kmat$ is nonsingular, the product $\kmat^{-1}\gnoise$ is
+where the $m \times m$ matrix $U$ and the $n \times n$ matrix $V$ have orthogonal columns and $\Sigma$ is a $m \times n$ diagonal matrix. The diagonal elements of $\Sigma$ are the singular values of $\kMat$, denoted $\singular_i$ and satisfying $\singular_1 \geq \singular_2 \geq \ldots \geq \singular_n \geq 0$. The columns of $U$ and $V$ will be denoted $\LSV_i$ and $\RSV_i$, respectively; these vectors are known as the left and right singular vectors of $\kMat$, respectively. A matrix of complex values has a SVD as well, the only difference being that the transpose is replaced with conjugate transpose. \par
+Let $r$ denote the rank of $\kMat$. Then $\singular_1 \geq \ldots \geq \singular_r > 0$, i.e. the number of nonzero singular values of $\kMat$ is equal to the rank of $\kMat$.  A common variation of the SVD is the compact SVD (or economy SVD \cite{golub2013matrix}), in which $\Sigma = \diag(\singular_1,\ldots,\singular_r)$, $U$ is an $m \times r$ matrix and $V^\trans$ is an $r \times n$ matrix. The matrices $U$ and $V$ are no longer orthogonal in the traditional sense because they are not square (unless $\kMat$ is nonsingular), though their columns remain orthonormal. For the remainder of this report all SVD's are assumed to be compact.  \par 
+By using $\kMat^{-1} = V\Sigma^{-1}U^\trans$ when $\kMat$ is nonsingular, the product $\kMat^{-1}\gnoiseVec$ is
 \begin{equation}
-\kmat^{-1}\gnoise = \kmat^{-1}\left(\kmat\fdis + \noise\right) = \fdis + \kmat^{-1}\noise = \fdis + V\Sigma^{-1}{U^\trans}\noise = \fdis + \sum_{\ell = 1}^n \frac{{\LSV^\trans_\ell}\noise}{\singular_\ell}\RSV_\ell. 
+\kMat^{-1}\gnoiseVec = \kMat^{-1}\left(\kMat\fVec + \noiseVec\right) = \fVec + \kMat^{-1}\noiseVec = \fVec + V\Sigma^{-1}{U^\trans}\noiseVec = \fVec + \sum_{\ell = 1}^n \frac{{\LSV^\trans_\ell}\noiseVec}{\singular_\ell}\RSV_\ell. 
 \label{eq:InvProd}
 \end{equation}
-Even if $\kmat$ is singular, a solution can still be obtained by using the psuedoinverse $\kmat^+ = V{\Sigma^+}U^\trans$, where $\Sigma^+ = \diag(1/\singular_1,\ldots,1/\singular_r)$, and the upper bound of summation in \eqref{eq:InvProd} becomes $r$. In either the nonsingular or singular case for $\kmat$, however, the summands in \eqref{eq:InvProd} are numerically unstable for small $\singular_i$. For a visual representation of this instability, a Picard plot can be constructed. A Picard plot is a graph showing the terms $|\LSV^\trans_i\noise|/\singular_i$ in decreasing order with respect to the singular values. If the terms $|\LSV^\trans_i\noise|$ decay faster than $\singular_i$ as $i$ increases, then the terms $|\LSV^\trans_i\noise|/\singular_i$ do not become excessively large; this is the discrete Picard condition \cite{ABT}. The discrete Picard condition is thus a measure of instability. If the discrete Picard condition is not met, then the terms $|\LSV^\trans_i\noise|/\singular_i$ blow up as $i$ increases, often resulting in worthless solutions. In this experiment, the discrete Fourier transform will be used to obtain solutions analogous to those obtained by \eqref{eq:InvProd}. In Section \ref{sec:The Discrete Fourier Transform} a Picard plot is provided that demonstrates the relationship between the noise, the width of the Gaussian blur, and the resulting numerical instabilities related to obtaining meaningful solutions. See \cite{Hansen1990} for more information on Picard plots and the associated discrete Picard condition. \par 
+Even if $\kMat$ is singular, a solution can still be obtained by using the psuedoinverse $\kMat^+ = V{\Sigma^+}U^\trans$, where $\Sigma^+ = \diag(1/\singular_1,\ldots,1/\singular_r)$, and the upper bound of summation in \eqref{eq:InvProd} becomes $r$. In either the nonsingular or singular case for $\kMat$, however, the summands in \eqref{eq:InvProd} are numerically unstable for small $\singular_i$. For a visual representation of this instability, a Picard plot can be constructed. A Picard plot is a graph showing the terms $|\LSV^\trans_i\noiseVec|/\singular_i$ in decreasing order with respect to the singular values. If the terms $|\LSV^\trans_i\noise|$ decay faster than $\singular_i$ as $i$ increases, then the terms $|\LSV^\trans_i\noiseVec|/\singular_i$ do not become excessively large; this is the discrete Picard condition \cite{ABT}. The discrete Picard condition is thus a measure of instability. If the discrete Picard condition is not met, then the terms $|\LSV^\trans_i\noiseVec|/\singular_i$ blow up as $i$ increases, often resulting in worthless solutions. In this experiment, the discrete Fourier transform will be used to obtain solutions analogous to those obtained by \eqref{eq:InvProd}. In Section \ref{sec:The Discrete Fourier Transform} a Picard plot is provided that demonstrates the relationship between the noise, the width of the Gaussian blur, and the resulting numerical instabilities related to obtaining meaningful solutions. See \cite{Hansen1990} for more information on Picard plots and the associated discrete Picard condition. \par 
 A common approach to overcome numerical instabilities is to multiply the summands in \eqref{eq:InvProd} by \textit{filter functions} $\filt$ that depend upon $\singular_i$ and a non-negative \textit{regularization parameter} $\regparam$. By doing so, an approximate solution is obtained:
 \begin{equation}
-\fdis(\regparam) = \sum_{\ell = 1}^n \RSV_\ell\filt(\regparam,\singular_\ell)\left(\frac{{\LSV^\trans_\ell}\gnoise}{\singular_\ell}\right) = V\Phi\Sigma^+U^\trans\gnoise,
+\fVec(\regparam) = \sum_{\ell = 1}^n \RSV_\ell\filt(\regparam,\singular_\ell)\left(\frac{{\LSV^\trans_\ell}\gnoiseVec}{\singular_\ell}\right) = V\Phi\Sigma^+U^\trans\gnoiseVec,
 \label{eq:ApproxSol}
 \end{equation}
 where the matrix $\Phi$ is diagonal with $\Phi_{\ell\ell} = \filt(\regparam,\singular_\ell)$ for $\ell = 1,\ldots,n$. The most desired property of the filter functions is that $\filt(\singular_\ell)/\singular_\ell \approx 1$  for large values of $\singular_\ell$ and $\filt(\singular_\ell)/\singular_\ell \approx 0$ for small values of $\singular_\ell$. A brief overview of common filter functions will now be provided. 
@@ -168,8 +168,8 @@ Perhaps the simplest filter function is
 0, & \singular_\ell^2 \leq \regparam
 \end{cases}\]
 Using this function in (3) gives the approximate solution
-\[\fdis(\regparam) = \sum_{\singular_\ell^2 > \regparam} \frac{{\LSV^\trans_\ell}\gnoise}{\singular_\ell}\RSV_\ell\]
-which actually corresponds to the solution obtained using a truncated singular value decomposition (TSVD) of the matrix $\kmat$ \cite{Vogel:2002}. \par
+\[\fVec(\regparam) = \sum_{\singular_\ell^2 > \regparam} \frac{{\LSV^\trans_\ell}\gnoiseVec}{\singular_\ell}\RSV_\ell\]
+which actually corresponds to the solution obtained using a truncated singular value decomposition (TSVD) of the matrix $\kMat$ \cite{Vogel:2002}. \par
 A less simple filter function is
 \begin{equation}
 \filt(\regparam,\singular_\ell)  = \frac{\singular_\ell^2}{\singular_\ell^2 + \regparam^2}
@@ -190,20 +190,20 @@ The expression $1 - \filt(\regparam,\singular_\ell)$ arises a number of time in 
 
 The use of the Tikhonov filter function to generate an approximate solution is known as \textit{Tikhonov regularization} \cite{Tikh1963}; in terms of an SVD, the obtained solution is
 \begin{equation}
-\fdis(\regparam) = \sum_{\ell = 1}^n \filt(\regparam,\singular_\ell)\frac{{\LSV^\trans_\ell}\gnoise}{\singular_\ell}\RSV_\ell = \sum_{\ell = 1}^n \frac{\singular_\ell{\LSV^\trans_\ell}\gnoise}{\singular_\ell^2 + \regparam^2}\RSV_\ell = V\Phi\Sigma^+U^\trans\gnoise.
+\fVec(\regparam) = \sum_{\ell = 1}^n \filt(\regparam,\singular_\ell)\frac{{\LSV^\trans_\ell}\gnoiseVec}{\singular_\ell}\RSV_\ell = \sum_{\ell = 1}^n \frac{\singular_\ell{\LSV^\trans_\ell}\gnoiseVec}{\singular_\ell^2 + \regparam^2}\RSV_\ell = V\Phi\Sigma^+U^\trans\gnoiseVec.
 \label{eq:TikSol}
 \end{equation}
 An alternative representation of the above Tikhonov solution is
 \begin{equation}
-\fdis(\regparam) = \arg\min_{\fdis \in \mathbb{R}^n} \|\kmat\fdis - \gnoise\|^2 + \regparam^2\|D\fdis\|^2,
+\fVec(\regparam) = \arg\min_{\fVec \in \mathbb{R}^n} \|\kMat\fVec - \gnoiseVec\|^2 + \regparam^2\|D\fVec\|^2,
 \label{eq:TikSol2}
 \end{equation}
-where $D$ is the matrix representation of a linear operator. The term $\|D\fdis\|^2$ is commonly called the penalty function \cite{Vogel:2002}. The representation \eqref{eq:TikSol} follows from selecting $D$ to be $I$, the $n \times n$ identity matrix. If the matrix $D$ in \eqref{eq:TikSol2} is non-singular, then the substitutions $\mathbf{y} = D\fdis$ and $A = \kmat{D}^{-1}$ give
+where $D$ is the matrix representation of a linear operator. The term $\|D\fVec\|^2$ is commonly called the penalty function \cite{Vogel:2002}. The representation \eqref{eq:TikSol} follows from selecting $D$ to be $I$, the $n \times n$ identity matrix. If the matrix $D$ in \eqref{eq:TikSol2} is non-singular, then the substitutions $\mathbf{y} = D\fVec$ and $A = \kMat{D}^{-1}$ give
 \begin{equation}
-\mathbf{y}(\regparam) = \arg\min_{\mathbf{y} \in \mathbb{R}^n} \|A\mathbf{y} - \gnoise\|^2 + \regparam^2\|\mathbf{y}\|^2.
+\mathbf{y}(\regparam) = \arg\min_{\mathbf{y} \in \mathbb{R}^n} \|A\mathbf{y} - \gnoiseVec\|^2 + \regparam^2\|\mathbf{y}\|^2.
 \label{eq:TikSol Standard Form}
 \end{equation}
-This is known as standard form of the regularization problem. Once $\mathbf{y}$ is obtained from \eqref{eq:TikSol Standard Form}, the final solution is recovered by $\fdis = D^{-1}\mathbf{y}$.  \par 
+This is known as standard form of the regularization problem. Once $\mathbf{y}$ is obtained from \eqref{eq:TikSol Standard Form}, the final solution is recovered by $\fVec = D^{-1}\mathbf{y}$.  \par 
 However, there are many examples of matrices $D$ that are singular, such as finite difference matrices that approximate derivative operators. In such cases, the regularization can still be recast in standard form as follows. 
 
 
@@ -289,24 +289,24 @@ C = F^\ctrans\diag(\widehat{\mathbf{c}})F,
 \label{eq:CircDiag}
 \end{equation}
 where $C$ is any $n \times n$ circulant matrix and $\widehat{\mathbf{c}}$ is the DFT of the first row of $C$ (recall that the rows of a circulant matrix are circulant right shifts a single row vector of length $n$). The components of $\widehat{\mathbf{c}}$ and the columns of $F^\ctrans$ are the eigenvalues and eigenvectors, respectively, of $C$. For a proof of this property, see \cite{BoggessAlbert2001Afci} or \cite{Vogel:2002}. \par
-Now the properties of the DFT will be connected with the SVD of a circulant matrix, which will be the basis for the experiment design in Section \ref{sec:Experiment design}. Let $\fdis$ and $\kdis$ be the $N$-point discretizations of functions $\fcon$ and $\kcon$ on some interval $[a,b]$. Then the cyclic convolution $\gdis = \kdis * \fdis$ can be computed as a matrix-vector product by constructing an $N \times N$ circulant matrix $\kmat$ from $\kdis$. This construction is carried out by setting the first row of $\kmat$ to be $\kdis$, and each subsequent row to be a circular right shift of the preceding row (see \ref{sec:Circulant matrices}). In MATLAB, the command \texttt{toeplitz([k(1) fliplr(k(2:end))], k)} constructs the matrix $\kmat$. Then $\gdis = \kmat\fdis$, and after the addition of noise the equation \eqref{eq:DisNoise} is obtained. Then by using the property \eqref{eq:CircDiag} with the $N \times N$ unitary Fourier matrix $F$ and assuming that $\kmat$ is invertible, 
+Now the properties of the DFT will be connected with the SVD of a circulant matrix, which will be the basis for the experiment design in Section \ref{sec:Experiment design}. Let $\fVec$ and $\kVec$ be the $N$-point discretizations of functions $f$ and $k$ on some interval $[a,b]$. Then the cyclic convolution $\gVec = \kVec * \fVec$ can be computed as a matrix-vector product by constructing an $N \times N$ circulant matrix $\kMat$ from $\kVec$. This construction is carried out by setting the first row of $\kMat$ to be $\kVec$, and each subsequent row to be a circular right shift of the preceding row (see \ref{sec:Circulant matrices}). In MATLAB, the command \texttt{toeplitz([k(1) fliplr(k(2:end))], k)} constructs the matrix $\kMat$. Then $\gVec = \kMat\fVec$, and after the addition of noise the equation \eqref{eq:DisNoise} is obtained. Then by using the property \eqref{eq:CircDiag} with the $N \times N$ unitary Fourier matrix $F$ and assuming that $\kMat$ is invertible, 
 \begin{equation}
-\kmat^{-1}\gnoise = \fdis + (F^*\diag(\widehat{\kdis})F)^{-1}\noise = \fdis + F^*\diag(\widehat{\kdis})^{-1}F\noise = \fdis + \sum_{i = 0}^{n-1} [F^*]_i\left(\frac{\widehat{\noise}_i}{\widehat{\kdis}_i}\right),
+\kMat^{-1}\gnoiseVec = \fVec + (F^*\diag(\widehat{\kVec})F)^{-1}\noiseVec = \fVec + F^*\diag(\widehat{\kVec})^{-1}F\noiseVec = \fVec + \sum_{i = 0}^{n-1} [F^*]_i\left(\frac{\widehat{\noise}_i}{\widehat{k}_i}\right),
 \label{eq:InvProdDFT}
 \end{equation}
-where $\widehat{\noise}_i$ and $\widehat{\kdis}_i$ are the $i$th Fourier coefficients of $\noise$ and $\kdis$, respectively, and $[F^*]_i$ is the $i$th column of the matrix $F^*$. Analogous to \eqref{eq:InvProd}, instabilities can arise if $\widehat{\kdis}_i$ is small. By introducing filter factors to reduce possible instability, an approximate solution
+where $\widehat{\noise}_i$ and $\widehat{k}_i$ are the $i$th Fourier coefficients of $\noiseVec$ and $\kVec$, respectively, and $[F^*]_i$ is the $i$th column of the matrix $F^*$. Analogous to \eqref{eq:InvProd}, instabilities can arise if $\widehat{k}_i$ is small. By introducing filter factors to reduce possible instability, an approximate solution
 \begin{equation}
-\fdis(\regparam) = \sum_{i = 1}^n [F^*]_i\left(\frac{\filt(\regparam,\widehat{\kdis}_i)\widehat{\gnoise}_i}{\widehat{\kdis}_i}\right)
+\fVec(\regparam) = \sum_{i = 1}^n [F^*]_i\left(\frac{\filt(\regparam,\widehat{k}_i)\widehat{\gnoise}_i}{\widehat{k}_i}\right)
 \label{eq:ApproxSolDFT}
 \end{equation}
 can be obtained analogous to \eqref{eq:ApproxSol}. 
 Since $F^*$ is a matrix representation of the inverse DFT, the approximate solution can be rewritten as
-\[\fdis(\regparam) = F^* \frac{\filt(\regparam,\widehat{\kdis})\widehat{\gnoise}}{\widehat{\kdis}}.\]
-Here $\filt(\regparam,\widehat{\kdis})\widehat{\gnoise}/{\widehat{\kdis}}$ is a vector where the operations of multiplication and division are performed component-wise. This representation is useful for making a connection with the MATLAB implementation. \par
-As mentioned in Section \ref{sec:Introduction}, a Picard plot is often useful in analyzing the numerical instabilities of solutions obtained from either or \eqref{eq:InvProd} or \eqref{eq:InvProdDFT}. Figure \ref{PicardPlot} shows an example of a Picard plot. The terms $|\widehat{\kdis}_i|$ decrease down to machine precision, though the $|\widehat{\gnoise}_i|$ decrease but then level off just above the variance in the noise. As a result, the terms $|\widehat{\gnoise}_i|/|\widehat{\kdis}_i|$ only decrease so far and then begin increasing. The steady increase can produce a blow up of the approximate solution. While illustrating these relationships, a Picard plot is also useful in determining how to truncate the sum in \eqref{eq:ApproxSolDFT} to avoid blow up in the solution. For the plot in Figure \ref{PicardPlot}, the sum in \eqref{eq:ApproxSolDFT} should be truncated around index 8 to obtain a meaningful solution. \par 
-While the connection between lines \eqref{eq:InvProdDFT} and \eqref{eq:ApproxSolDFT} and the SVD have been noted in regard to the structure of the terms and equations, a complete connection can be made if another property about $\kmat$ is assumed. Until this point $\kmat$ is assumed to be an invertible $N \times N$ circulant matrix formed from a vector $\kdis$. If $\kmat$ is also assumed to be symmetric, then the SVD of $\kmat$ is the same as the diagonalization by the unitary DFT matrix $F$ and the singular values of $\kmat$ are also the eigenvalues. \par 
+\[\fVec(\regparam) = F^* \frac{\filt(\regparam,\widehat{\kVec})\widehat{\gnoiseVec}}{\widehat{\kVec}}.\]
+Here $\filt(\regparam,\widehat{\kVec})\widehat{\gnoiseVec}/{\widehat{\kVec}}$ is a vector where the operations of multiplication and division are performed component-wise. This representation is useful for making a connection with the MATLAB implementation. \par
+As mentioned in Section \ref{sec:Introduction}, a Picard plot is often useful in analyzing the numerical instabilities of solutions obtained from either or \eqref{eq:InvProd} or \eqref{eq:InvProdDFT}. Figure \ref{PicardPlot} shows an example of a Picard plot. The terms $|\widehat{k}_i|$ decrease down to machine precision, though the $|\widehat{\gnoise}_i|$ decrease but then level off just above the variance in the noise. As a result, the terms $|\widehat{\gnoise}_i|/|\widehat{k}_i|$ only decrease so far and then begin increasing. The steady increase can produce a blow up of the approximate solution. While illustrating these relationships, a Picard plot is also useful in determining how to truncate the sum in \eqref{eq:ApproxSolDFT} to avoid blow up in the solution. For the plot in Figure \ref{PicardPlot}, the sum in \eqref{eq:ApproxSolDFT} should be truncated around index 8 to obtain a meaningful solution. \par 
+While the connection between lines \eqref{eq:InvProdDFT} and \eqref{eq:ApproxSolDFT} and the SVD have been noted in regard to the structure of the terms and equations, a complete connection can be made if another property about $\kMat$ is assumed. Until this point $\kMat$ is assumed to be an invertible $N \times N$ circulant matrix formed from a vector $\kVec$. If $\kMat$ is also assumed to be symmetric, then the SVD of $\kMat$ is the same as the diagonalization by the unitary DFT matrix $F$ and the singular values of $\kMat$ are also the eigenvalues. \par 
 
-Since the parameter estimation methods in Section \ref{sec:Parameter estimation methods} involve DFT's of the vector $\gnoise = \gdis + \noise$, some results regarding the distribution of the components of $\widehat{\noise}$ will be presented. The first results will be in regard to the real and imaginary parts of the $\widehat{\noise}$. Letting $A$ and $B$ be the real and imaginary parts, respectively, of the $n \times n$ DFT matrix, Euler's identity gives
+Since the parameter estimation methods in Section \ref{sec:Parameter estimation methods} involve DFT's of the vector $\gnoiseVec = \gVec + \noiseVec$, some results regarding the distribution of the components of $\widehat{\noiseVec}$ will be presented. The first results will be in regard to the real and imaginary parts of the $\widehat{\noiseVec}$. Letting $A$ and $B$ be the real and imaginary parts, respectively, of the $n \times n$ DFT matrix, Euler's identity gives
 \begin{equation}
 A_{jk} = \frac{1}{\sqrt{n}}\cos\left(\frac{-2\pi{jk}}{n}\right), \quad B_{jk} = \frac{1}{\sqrt{n}}\sin\left(\frac{-2\pi{jk}}{n}\right),
 \label{eq:Components Re(F) and Im(F)}
@@ -416,13 +416,13 @@ which implies that $\rank(A) + \rank(B) \leq n$. Thus $\rank(A) + \rank(B) = n$,
 \end{proof}
 \end{lemma} 
 
-The rank deficiency of $A$ and $B$ have statistical significance as well.  Given $\noise \sim \mathcal{N}(\bm{0},\noiseSD^2I)$ and using the properties of the multivariate normal distribution, 
+The rank deficiency of $A$ and $B$ have statistical significance as well.  Given $\noiseVec \sim \mathcal{N}(\bm{0},\noiseSD^2I)$ and using the properties of the multivariate normal distribution, 
 \begin{equation}
-\Re\{\widehat{\noise}\} = A\noise \sim \mathcal{N}(\bm{0},\noiseSD^2 AA^\trans), \quad \Im\{\widehat{\noise}\} = B\noise \sim \mathcal{N}(\bm{0},\noiseSD^2 BB^\trans), \quad
+\Re(\widehat{\noiseVec}) = A\noise \sim \mathcal{N}(\bm{0},\noiseSD^2 AA^\trans), \quad \Im(\widehat{\noiseVec}) = B\noiseVec \sim \mathcal{N}(\bm{0},\noiseSD^2 BB^\trans), \quad
 \label{eq:Real and imaginary distributions}
 \end{equation}
-However, the covariance matrices of $\Re\{\widehat{\noise}\}$ and $\Im\{\widehat{\noise}\}$ are rank-deficient, and therefore do not have density functions in the traditional sense; their density functions exist in $\rank(AA^\trans)$ and $\rank(BB^\trans)$-dimensional subspaces of $\mathbb{R}^n$. These density functions can be expressed using the psuedoinverses of the covariance matrices or, equivalently, by defining new transformations based on the rank of $AA^\trans$ and $BB^\trans$ \cite{Rao1973}. \par 
-Instead of dealing with density functions of multivariate distributions, the distribution of the components of $\Re\{\widehat{\noise}\}$ and $\Im\{\widehat{\noise}\}$ will be determined individually. As a step towards this goal, the independence of the components of $\Re\{\widehat{\noise}\}$ and $\Im\{\widehat{\noise}\}$ can be established by applying the following result regarding independence of linear combinations of random variables \cite{LukacsKing}.
+However, the covariance matrices of $\Re(\widehat{\noiseVec})$ and $\Im(\widehat{\noiseVec})$ are rank-deficient, and therefore do not have density functions in the traditional sense; their density functions exist in $\rank(AA^\trans)$ and $\rank(BB^\trans)$-dimensional subspaces of $\mathbb{R}^n$. These density functions can be expressed using the psuedoinverses of the covariance matrices or, equivalently, by defining new transformations based on the rank of $AA^\trans$ and $BB^\trans$ \cite{Rao1973}. \par 
+Instead of dealing with density functions of multivariate distributions, the distribution of the components of $\Re(\widehat{\noiseVec})$ and $\Im(\widehat{\noiseVec})$ will be determined individually. As a step towards this goal, the independence of the components of $\Re(\widehat{\noiseVec})$ and $\Im\{\widehat{\noiseVec}\}$ can be established by applying the following result regarding independence of linear combinations of random variables \cite{LukacsKing}.
 
 \begin{theorem}
 \label{thm:Independence Theorem}
@@ -435,11 +435,11 @@ Let $X_1,\ldots,X_n$ be $n$ independently distributed random variables, and assu
 
 \begin{lemma}
 \label{lem:App of Ind Thm}
-Let $\noise$ be a random $n$-vector with $\noise \sim \mathcal{N}(\bm{0},\noiseSD^2 I)$, $X = \Re\{\widehat{\noise}\}$ and $Y = \Im\{\widehat{\noise}\}$. Then $X_j$ and $Y_j$ are independent random variables for each $0 \leq j \leq n-1$.
+Let $\noiseVec$ be a random $n$-vector with $\noiseVec \sim \mathcal{N}(\bm{0},\noiseSD^2 I)$, $X = \Re(\widehat{\noiseVec})$ and $Y = \Im(\widehat{\noiseVec})$. Then $X_j$ and $Y_j$ are independent random variables for each $0 \leq j \leq n-1$.
 \begin{proof}
-Let $X$ and $Y$ be as required. For each $0 \leq j \leq n-1$, the components $X_j$ and $Y_j$ are linear combinations of the components of $\noise$, with coefficients given by \eqref{eq:Components Re(F) and Im(F)}:
+Let $X$ and $Y$ be as required. For each $0 \leq j \leq n-1$, the components $X_j$ and $Y_j$ are linear combinations of the components of $\noiseVec$, with coefficients given by \eqref{eq:Components Re(F) and Im(F)}:
 \[X_j = \sum_{\ell=0}^{n-1} \frac{1}{\sqrt{n}}\cos\left(\frac{-2\pi{j\ell}}{n}\right)\noise_{\ell}, \quad Y_j = \sum_{\ell=0}^{n-1} \frac{1}{\sqrt{n}}\sin\left(\frac{-2\pi{j\ell}}{n}\right)\noise_{\ell}.\]
-Since the covariance matrix of $\noise$ is $\noiseSD^2 I$, the components of $\noise$ are independent. Furthermore, $\noise_{\ell} \sim \mathcal{N}(0,\noiseSD^2)$ and so each component has an $n$th moment. Thus the first condition of Theorem \ref{thm:Independence Theorem} is satisfied. As for the final condition, the following sum must be shown to be equal to zero:
+Since the covariance matrix of $\noiseVec$ is $\noiseSD^2 I$, the components of $\noiseVec$ are independent. Furthermore, $\noise_{\ell} \sim \mathcal{N}(0,\noiseSD^2)$ and so each component has an $n$th moment. Thus the first condition of Theorem \ref{thm:Independence Theorem} is satisfied. As for the final condition, the following sum must be shown to be equal to zero:
 \[\sum_{\ell=0}^{n-1} \left[\frac{1}{\sqrt{n}}\cos\left(\frac{-2\pi{j\ell}}{n}\right)\right]\left[\frac{1}{\sqrt{n}}\sin\left(\frac{-2\pi{j\ell}}{n}\right)\right]\noiseSD_{\ell}^2.\]
 The $\noise_{\ell}$ are identically distributed with $\noiseSD_{\ell}^2 = \noiseSD^2$ for all $0 \leq \ell \leq n-1$. Thus
 \[\sum_{\ell=0}^{n-1} \left[\frac{1}{\sqrt{n}}\cos\left(\frac{-2\pi{j\ell}}{n}\right)\right]\left[\frac{1}{\sqrt{n}}\sin\left(\frac{-2\pi{j\ell}}{n}\right)\right]\noiseSD_\ell^2 = \noiseSD^2 \langle A_{j\cdot},B_{j\cdot}\rangle = 0,\]
@@ -447,11 +447,11 @@ where the last equality follows from Lemma \ref{lem:Inner products}. Therefore $
 \end{proof}
 \end{lemma}
 
-Having established the independence of the components of $\Re\{\widehat{\noise}\}$ and $\Im\{\widehat{\noise}\}$, their individual distributions will be determined.
+Having established the independence of the components of $\Re(\widehat{\noiseVec})$ and $\Im(\widehat{\noiseVec})$, their individual distributions will be determined.
 
 \begin{lemma}
 \label{lem:Component distributions}
-Let $X = \Re\{\widehat{\noise}\}$ and $Y = \Im\{\widehat{\noise}\}$, where $\noise$ is a random $n$-vector with $\noise \sim \mathcal{N}(\bm{0},\noiseSD^2 I)$. Then for $0 \leq j \leq n-1$, the distribution of $X_j$ and $Y_j$ is as follows.  
+Let $X = \Re(\widehat{\noiseVec})$ and $Y = \Im(\widehat{\noiseVec})$, where $\noiseVec$ is a random $n$-vector with $\noiseVec \sim \mathcal{N}(\bm{0},\noiseSD^2 I)$. Then for $0 \leq j \leq n-1$, the distribution of $X_j$ and $Y_j$ is as follows.  
 \begin{enumerate}[label=(\roman*)]
 \item If $n$ is even, then the distribution of the components of $X$ is that
 \[X_j \sim \begin{cases}
@@ -467,20 +467,30 @@ The distribution of the components of $Y$ is that $Y_j = 0$ for $j = 0$ and $Y_j
 \begin{proof}
 Let $X$ and $Y$ be as required. Using \eqref{eq:Components Re(F) and Im(F)}, $X_j$ can be written as
 \[X_j = \sum_{k=0}^{n-1} \frac{1}{\sqrt{n}}\cos\left(\frac{-2\pi{jk}}{n}\right)\noise_k.\]
-Since the covariance matrix of $\noise$ is $\noiseSD^2 I$, the components of $\noise$ are independent and identically distributed $\mathcal{N}(0,\noiseSD^2)$. Thus by the properties of a sum of independent normal random variables \cite{CasellaBerger02},
+Since the covariance matrix of $\noiseVec$ is $\noiseSD^2 I$, the components of $\noiseVec$ are independent and identically distributed $\mathcal{N}(0,\noiseSD^2)$. Thus by the properties of a sum of independent normal random variables \cite{CasellaBerger02},
 \[X_j \sim \mathcal{N}\left(0, \noiseSD^2\sum_{k=0}^{n-1} \left(\frac{1}{\sqrt{n}}\cos\left(\frac{-2\pi{jk}}{n}\right)\right)^2\right) = \mathcal{N}\left(0, \noiseSD^2 \langle A_{j\cdot},A_{j\cdot} \rangle\right).\]
 Lemma \ref{lem:Inner products} then provides the cases for evaluation of the inner product. Determination of the distribution of $Y_k$ is similar.
 \end{proof}
 \end{lemma}
 
-The distribution of the components of $|\widehat{\noise}|^2$ can finally be examined.
+The distribution of the components of $|\widehat{\noiseVec}|^2$ can finally be examined.
 
 \begin{theorem}
-Let $\noise$ be a random $n$-vector with $\noise \sim \mathcal{N}(\bm{0},\noiseSD^2 I)$. Then for $0 \leq j \leq n-1$, the distribution of $|\widehat{\noise}_j|^2 = \Re\{\widehat{\noise}_j\}^2 + \Im\{\widehat{\noise}_j\}^2$ is as follows.
-
+\label{thm:Mag. squared theorem}
+Let $\noiseVec$ be a random $n$-vector with $\noiseVec \sim \mathcal{N}(\bm{0},\noiseSD^2 I)$. Then for $0 \leq j \leq n-1$, the distribution of $|\widehat{\noise}_j|^2 = \Re(\widehat{\noise}_j)^2 + \Im(\widehat{\noise}_j)^2$ is as follows.
+\begin{enumerate}[label=(\roman*)]
+\item If $n$ is even, then the distribution of the components $|\widehat{\noise}_j|^2$ is
+\[|\widehat{\noise}_j|^2 \sim \begin{cases}
+\emph{gamma}(1/2,2\noiseSD^2), & j = 0,n/2 \\
+\emph{exponential}(\noiseSD^2), & \text{otherwise} \end{cases}.\]
+\item If $n$ is odd, then the distribution of the components of $X$ is that
+\[|\widehat{\noise}_j|^2 \sim \begin{cases}
+\emph{gamma}(1/2,2\noiseSD^2), & j = 0 \\
+\emph{exponential}(\noiseSD^2), & \text{otherwise} \end{cases}.\]
+\end{enumerate}
 \begin{proof}
-Let $\noise \sim \mathcal{N}(\bm{0},\noiseSD^2 I)$, $X = \Re\{\widehat{\noise}\}$, and $Y = \Im\{\widehat{\noise}\}$. The proof relies on determining the distribution of the components of $X^2$ and $Y^2$ (here the exponent indicates that the components are individually squared) and then looking at their sum. Determination of the distribution of the components of $X^2$ and $Y^2$ is carried out by applying a result regarding univariate one-to-one transformations \cite{CasellaBerger02}. Without loss of generality, we assume that $n$ is odd. \par
-First consider the components of $X^2$. Since $n$ is odd, the two cases of $X^2_j$ to be considered are for $j = 0$ and $j \neq 0$, both of which are handled by Lemma \ref{lem:Component distributions}. If $j = 0$, then $X_j \sim \mathcal{N}(0,\noiseSD^2)$. Letting $g(x) = x^2$, the transformation $U = g(X_j) = X^2_j$ is not one-to-one on the entire sample space $\mathbb{R}$. However, $\mathbb{R}$ can be partitioned as $A_0 \cup A_1 \cup A_2$ with $A_0 = \{0\}$, $A_1 = (-\infty,0)$, and $A_2 = (0,\infty)$. Defining $g_1(x) = x^2$ and $g_2(x) = x^2$ with $g_1^{-1}(u) = -\sqrt{u}$ and $g_2^{-1}(u) = \sqrt{u}$,
+Let $\noiseVec \sim \mathcal{N}(\bm{0},\noiseSD^2 I)$, $\bm{X} = \Re(\widehat{\noiseVec})$, and $\bm{Y} = \Im(\widehat{\noiseVec})$. The proof relies on determining the distribution of the components of $\bm{X}^2$ and $\bm{Y}^2$ (here the exponent indicates that the components are individually squared) and then looking at their sum. Determination of the distribution of the components of $\bm{X}^2$ and $\bm{Y}^2$ is carried out by applying a result regarding univariate one-to-one transformations \cite{CasellaBerger02}. Without loss of generality, we assume that $n$ is odd. \par
+First consider the components of $\bm{X}^2$. Since $n$ is odd, the two cases of $X^2_j$ to be considered are for $j = 0$ and $j \neq 0$, both of which are handled by Lemma \ref{lem:Component distributions}. If $j = 0$, then $X_j \sim \mathcal{N}(0,\noiseSD^2)$. Letting $g(x) = x^2$, the transformation $U = g(X_j) = X^2_j$ is not one-to-one on the entire sample space $\mathbb{R}$. However, $\mathbb{R}$ can be partitioned as $A_0 \cup A_1 \cup A_2$ with $A_0 = \{0\}$, $A_1 = (-\infty,0)$, and $A_2 = (0,\infty)$. Defining $g_1(x) = x^2$ and $g_2(x) = x^2$ with $g_1^{-1}(u) = -\sqrt{u}$ and $g_2^{-1}(u) = \sqrt{u}$,
 \begin{enumerate}
 \item $g(x) = g_1(x) = g_2(x)$ for all $x \in A_1 \cup A_2$,
 \item $g_1$ and $g_2$ are monotone on $A_1$ and $A_2$, respectively,
@@ -494,7 +504,7 @@ f_U(u) &= \frac{1}{\sqrt{2\pi\noiseSD^2}}\exp\left(\frac{-(g_1^{-1}(u))^2}{2\noi
 &= \frac{1}{\sqrt{2\pi\noiseSD^2}} \frac{1}{\sqrt{u}} \exp\left(\frac{-u}{2\noiseSD^2}\right).
 \end{align*}
 This is probability density function of the gamma distribution with shape parameter $1/2$ and scale parameter $2\noiseSD^2$. The same argument holds for when $j \neq 0$, with scale parameter instead being $\noiseSD^2$. The argument can also be applied for $Y_j^2$ when $j \neq 0$ since $X_j$ and $Y_j$ are identically distributed in this case. When $j = 0$, $Y_j$ is a constant random variable with $Y_j = 0$, and so $Y_j^2 = 0$ as well. \par 
-Now that the distribution of $X_j^2$ and $Y_j^2$ is known, the distribution of their sum can be established. The situation is more interesting when $j \neq 0$ since $Y_j^2$ is no longer a constant random variable. By Lemma LEMMA, $X_j$ and $Y_j$ are independent for all $0 \leq j \leq n-1$. As a consequence, $X_j^2$ and $Y_j^2$ are independent for all $0 \leq j \leq n-1$. Let $f_{X_j^2}$ and $f_{Y_j^2}$ denotes the probability density functions of $X_j^2$ and $Y_j^2$, respectively. Since the probability density function of a sum of two independent continuous random variables is equal to the convolution of their individual density functions \cite{CasellaBerger02}, the density function of $V_j = X_j^2 + Y_j^2$ is given by 
+Now that the distribution of $X_j^2$ and $Y_j^2$ is known, the distribution of their sum can be established. If $j = 0$, then $X_j^2 + Y_j^2$ has the same distribution as just $X_j^2$. The situation is more interesting when $j \neq 0$ since $Y_j^2$ is no longer a constant random variable. By Lemma \ref{lem:App of Ind Thm}, $X_j$ and $Y_j$ are independent for all $0 \leq j \leq n-1$. As a consequence, $X_j^2$ and $Y_j^2$ are independent for all $0 \leq j \leq n-1$. Let $f_{X_j^2}$ and $f_{Y_j^2}$ denotes the probability density functions of $X_j^2$ and $Y_j^2$, respectively. Since the probability density function of a sum of two independent continuous random variables is equal to the convolution of their individual density functions \cite{CasellaBerger02}, the density function of $V = X_j^2 + Y_j^2$ is given by 
 \[f_V(v) = \int_{-\infty}^{\infty} f_{X_j^2}(w)f_{Y_j^2}(v-w) \: dw.\]
 Fortunately $X_j^2$ and $Y_j^2$ are non-negative, meaning that the interval of integration of the convolution can be reduced; $f_{X_j^2}(w) = 0$ for $w < 0$ and $f_{Y_j^2}(v-w) = 0$ for $w > v$ implies an of $[0,v]$. Using the density functions and the substitution $t = w/v$ then gives
 \begin{align*}
@@ -509,10 +519,95 @@ This is the density function of the exponential distribution with scale paramete
 \end{proof}
 \end{theorem}
 
+With the statistics of the DFT of white noise established, the combination $\gVec + \noiseVec = \gnoiseVec$ can be analyzed. By the properties of the multivariate normal distribution, if $\noiseVec \sim \mathcal{N}(\bm{0},\noiseSD^2 I)$ then $\gnoiseVec \sim \mathcal{N}(\gVec,\noiseSD^2 I)$ because $\gVec$ is a constant vector. Thus the distribution of the components of $\Re(\widehat{\gnoiseVec})$ and $\Im(\widehat{\gnoiseVec})$ are readily obtained be extending previous results.
+
+\begin{lemma}[Extension of Lemma \ref{lem:Component distributions}]
+\label{lem:Component distributions ext.}
+Let $\bm{X} = \Re(\widehat{\gnoiseVec})$ and $\bm{Y} = \Im(\widehat{\gnoiseVec})$, where $\gnoiseVec$ is a random $n$-vector with $\gnoiseVec \sim \mathcal{N}(\gVec,\noiseSD^2 I)$. Then for $0 \leq j \leq n-1$, the distribution of $X_j$ and $Y_j$ is as follows.  
+\begin{enumerate}[label=(\roman*)]
+\item If $n$ is even, then the distribution of the components of $\bm{X}$ is that
+\[X_j \sim \begin{cases}
+\mathcal{N}(\Re(\widehat{g}_j),\noiseSD^2), & j = 0,n/2 \\
+\mathcal{N}(\Re(\widehat{g}_j),\noiseSD^2/2), & \text{otherwise} \end{cases}.\]
+The distribution of the components of $\bm{Y}$ is that $Y_j = 0$ for $j \in \{0,n/2\}$ and $Y_j \sim \mathcal{N}(\Im(\widehat{g}_j),\noiseSD^2/2)$ otherwise.
+\item If $n$ is odd, then the distribution of the components of $\bm{X}$ is that
+\[X_j \sim \begin{cases}
+\mathcal{N}(\Re(\widehat{g}_j),\noiseSD^2), & j = 0 \\
+\mathcal{N}(\Re(\widehat{g}_j),\noiseSD^2/2), & \text{otherwise} \end{cases}.\]
+The distribution of the components of $\bm{Y}$ is that $Y_j = 0$ for $j = 0$ and \\ $Y_j \sim \mathcal{N}(\Im(\widehat{g}_j),\noiseSD^2/2)$ otherwise.
+\end{enumerate}
+\begin{proof}
+Let $X$ and $Y$ be as required. Using \eqref{eq:Components Re(F) and Im(F)}, $X_j$ can be written as
+\[X_j = \sum_{k=0}^{n-1} \frac{1}{\sqrt{n}}\cos\left(\frac{-2\pi{jk}}{n}\right)\gnoise_k.\]
+Since the covariance matrix of $\gnoiseVec$ is $\noiseSD^2 I$, the components $\gnoise_k$ are independent and distributed $\mathcal{N}(\gVec_k,\noiseSD^2)$ for all $0 \leq k \leq n-1$. Thus by the properties of a sum of independent normal random variables \cite{CasellaBerger02},
+\begin{align*}
+X_j &\sim \mathcal{N}\left(\sum_{k=0}^{n-1} \frac{1}{\sqrt{n}}\cos\left(\frac{-2\pi{jk}}{n}\right)g_k, \noiseSD^2\sum_{k=0}^{n-1} \left(\frac{1}{\sqrt{n}}\cos\left(\frac{-2\pi{jk}}{n}\right)\right)^2\right) \\
+&= \mathcal{N}\left(\Re(\widehat{g}_j), \noiseSD^2 \langle A_{j\cdot},A_{j\cdot} \rangle\right).
+\end{align*}
+Lemma \ref{lem:Inner products} then provides the cases for evaluation of the inner product. Determination of the distribution of $Y_k$ is similar.
+\end{proof}
+\end{lemma}
+
+In contrast, however, to the results regarding the components of $|\widehat{\noiseVec}|^2$, the distribution of the components of $|\widehat{\gnoiseVec}|^2$ is somewhat  complicated. To illustrate this, consider $U = X_0^2$, where $\bm{X} = \Re(\widehat{\gnoiseVec})$ for odd-length $\gnoiseVec$ distributed $\mathcal{N}(\gVec,\noiseSD^2 I)$. To simplify notation, let $\bm{\mu} = \Re(\widehat{\gVec})$ so that by Lemma \ref{lem:Component distributions ext.}, $X_0 \sim \mathcal{N}(\mu_0,\noiseSD^2)$. Applying the same transformation technique from Theorem \ref{thm:Mag. squared theorem}, the probability density function of $U$ is 
+\begin{align*}
+f_U(u) &= \frac{1}{\sqrt{2\pi\noiseSD^2}}\exp\left(\frac{-(-\sqrt{u} - \mu_0)^2}{2\noiseSD^2}\right)\left|\frac{-1}{2\sqrt{u}}\right| + \frac{1}{\sqrt{2\pi\noiseSD^2}}\exp\left(\frac{-(\sqrt{u} - \mu_0)^2}{2\noiseSD^2}\right)\left|\frac{1}{2\sqrt{u}}\right| \\
+&= \frac{1}{2\sqrt{2\pi\noiseSD^2}} \frac{1}{\sqrt{u}} \left[\exp\left(\frac{-(\sqrt{u} + \mu_0)^2}{2\noiseSD^2}\right) + \exp\left(\frac{-(\sqrt{u} - \mu_0)^2}{2\noiseSD^2}\right)\right].
+\end{align*}
+Unfortunately this density function is not easily identified. However, rescaling $X_0$ as $X_0/\noiseSD$ before applying the square transformation results in a random variable that has a more tractable density function. The density function of $V = (X_0/\noiseSD)^2$ can be equated to that of the noncentered chi-squared distribution with 1 degree of freedom and noncentrality parameter $\lambda = (\mu_0/\noiseSD)^2/2$.
+
+\begin{theorem}[Extension of Theorem \ref{thm:Mag. squared theorem}]
+Let $\gnoiseVec$ be a random $n$-vector with $\gnoiseVec \sim \mathcal{N}(\gVec,\noiseSD^2 I)$, and define the diagonal matrix $M$ by
+\[M_{jj} = \begin{cases}
+1/\noiseSD & j = 0, n/2 \\
+\sqrt{2}/\noiseSD & \text{otherwise}
+\end{cases}.\]
+(If $n$ is odd, $n/2$ is omitted). Then for $0 \leq j \leq n-1$, the distribution of $|(M\widehat{\gnoise})_j|^2 = \Re((M\widehat{\gnoiseVec})_j)^2 + \Im((M\widehat{\gnoiseVec})_j)^2$ is as follows.
+\begin{enumerate}[label=(\roman*)]
+\item If $n$ is even, then the distribution of the components $|(M\widehat{\gnoiseVec})_j|^2$ is
+\[|(M\widehat{\gnoiseVec})_j|^2 \sim \begin{cases}
+\NCchi^2\left(1,\dfrac{1}{2}\left(\dfrac{\Re(\widehat{g}_j)}{\noiseSD}\right)^2\right), & j = 0,n/2 \\
+\NCchi^2\left(2,\dfrac{|\widehat{g}_j|^2}{\noiseSD^2}\right), & \text{otherwise} \end{cases}.\]
+\item If $n$ is odd, then the distribution of the components $|(M\widehat{\gnoiseVec})_j|^2$ is
+\[|(M\widehat{\gnoiseVec})_j|^2 \sim \begin{cases}
+\NCchi^2\left(1,\dfrac{1}{2}\left(\dfrac{\Re(\widehat{g}_j)}{\noiseSD}\right)^2\right), & j = 0 \\
+\NCchi^2\left(2,\dfrac{|\widehat{g}_j|^2}{\noiseSD^2}\right), & \text{otherwise} \end{cases},\]
+\end{enumerate}
+where $\NCchi^2(k,\lambda)$ denotes the noncentral chi-squared distribution with $k$ degrees of freedom and noncentrality parameter $\lambda$.
+\label{thm:Mag. squared theorem ext.}
+\end{theorem}
+\begin{proof}
+Let $\gnoiseVec \sim \mathcal{N}(\gVec,\noiseSD^2 I)$, $\bm{X} = \Re(M\widehat{\gnoiseVec})$, and $\bm{Y} = \Im(M\widehat{\gnoiseVec})$. Again without loss of generality, we assume that $n$ is odd so that the two cases to be considered are $j = 0$ and $j \neq 0$. \par
+First, the components of $\bm{X}^2$ will be determined. If $j = 0$, then $\Re(\widehat{\gnoise}_j) \sim \mathcal{N}(\mu_j,\noiseSD^2)$ from Lemma \ref{lem:Component distributions ext.}, where $\bm{\mu} = \Re(\widehat{\gVec})$ for readability. Thus by the properties of the normal distribution \cite{CasellaBerger02}, $\Re(\widehat{\gnoise}_j/\noiseSD) = \Re((M\widehat{\gnoiseVec})_j) = X_j \sim \mathcal{N}(\sqrt{2\lambda},1)$ where $\lambda = (\mu_j/\noiseSD)^2/2$. Applying the transformation technique used in Theorem \ref{thm:Mag. squared theorem}, the probability density function of $V = X_j^2$ is
+\[f_V(v) = \frac{1}{2\sqrt{2\pi}} \frac{1}{\sqrt{v}} \left[\exp\left(\frac{-(\sqrt{v} + \sqrt{2\lambda})^2}{2}\right) + \exp\left(\frac{-(\sqrt{v} - \sqrt{2\lambda})^2}{2}\right)\right].\]
+Expanding the arguments of the exponential terms allows for the function to be rewritten as
+\begin{align*}
+f_V(v) &= \frac{1}{2\sqrt{2\pi}} \frac{1}{\sqrt{v}} \left[\exp\left(\frac{-(\sqrt{v} + \sqrt{2\lambda})^2}{2}\right) + \exp\left(\frac{-(\sqrt{v} - \sqrt{2\lambda})^2}{2}\right)\right] \\
+&= \frac{1}{2\sqrt{2\pi}} \frac{1}{\sqrt{v}} \left[\exp\left(-\frac{v}{2} - \sqrt{2\lambda{v}} - \lambda\right) + \exp\left(-\frac{v}{2} + \sqrt{2\lambda{v}} - \lambda\right)\right] \\
+&= \frac{1}{\sqrt{2\pi}} \frac{1}{\sqrt{v}}\exp\left(\frac{-v}{2}-\lambda\right) \left[\frac{\exp(-\sqrt{2\lambda{v}}) + \exp(\sqrt{2\lambda{v}})}{2}\right] \\ 
+&= \frac{1}{\sqrt{2\pi}} \frac{1}{\sqrt{v}}\exp\left(\frac{-v}{2}-\lambda\right)\cosh(\sqrt{2\lambda{v}}).
+\end{align*}
+Hyperbolic cosine is an entire function with Taylor expansion $\cosh(z) = \sum_{\ell=0}^{\infty} z^{2\ell}/(2\ell)!$. From \cite[p.~255]{AS}, 
+\begin{equation}
+\label{eq:Gamma relation}
+\Gamma\left(\ell + \frac{1}{2}\right) = \frac{1\cdot3\cdot5\cdot7\cdot\ldots\cdot(2\ell-1)}{2^\ell}\Gamma\left(\frac{1}{2}\right) = \frac{(2\ell-1)!!}{2^\ell}\sqrt{\pi}
+\end{equation} 
+for all integers $\ell$. Thus as an intermediate step, the double factorial $(2\ell-1)!!$ must be related to $(2\ell)!$ in order to modify the density function to the desired form. This is accomplished by using the relation $(2\ell-1)!!2^\ell\ell! = (2\ell)!$ \cite{WolframDF}, and so \eqref{eq:Gamma relation} becomes the identity $\Gamma(\ell + 1/2) = (2\ell)!\sqrt{\pi}/4^\ell{\ell!}$. Therefore,
+\begin{align*}
+f_V(v) &= \frac{1}{\sqrt{2\pi}} \frac{1}{\sqrt{v}}\exp\left(\frac{-v}{2}-\lambda\right) \sum_{\ell=0}^{\infty} \frac{(\sqrt{2\lambda{v}})^{2\ell}}{(2\ell)!} \\
+&= \frac{1}{\sqrt{2\pi}} \frac{1}{\sqrt{v}}\exp\left(\frac{-v}{2}-\lambda\right) \sum_{\ell=0}^{\infty} \frac{(2\lambda{v})^{\ell}\sqrt{\pi}}{\Gamma(n + 1/2)4^n{n!}} \\
+&= \sum_{\ell=0}^{\infty} \exp\left(\frac{-v}{2}-\lambda\right)\frac{(\lambda{v})^{\ell}v^{-1/2}}{\Gamma(n + 1/2)2^n{n!}\sqrt{2}} \\
+&= \sum_{\ell=0}^{\infty} \frac{v^{\ell - 1/2}\exp(-v/2)\lambda^\ell\exp(-\lambda)}{\Gamma(\ell + 1/2)2^{\ell+1/2}\ell!},
+\end{align*}
+matching the probability density function \cite[p.~166]{CasellaBerger02} of the noncentral chi-squared distribution with 1 degree of freedom and noncentrality parameter $\lambda = (\mu_j/\noiseSD)^2/2 = (\Re(\widehat{g}_j)/\noiseSD)^2/2$. \par
+If $j \neq 0$, then Lemma \ref{lem:Component distributions ext.} gives that $\Re(\widehat{\gnoise}_j) \sim \mathcal{N}(\Re(\widehat{g}_j),\noiseSD^2/2)$. This implies that $\Re((\sqrt{2}\widehat{\gnoise}/\noiseSD)_j) = \Re((M\widehat{\gnoise})_j) = X_j \sim \mathcal{N}(\sqrt{2\lambda},1)$, now with $\lambda = (\mu_j/\noiseSD)^2$. Thus the same argument can be applied so that $X_j^2 \sim \NCchi^2(1,(\mu_j/\noiseSD)^2) = \NCchi^2(1,(\Re(\widehat{g}_j)/\noiseSD)^2)$. \par 
+With the components of $\bm{X}^2$ examined, focus can directed towards the components of $\bm{Y}^2$. If $j = 0$, then Lemma \ref{lem:Component distributions ext.} gives that $\Im(\widehat{\gnoise}_j) = 0$ (a constant random variable). This implies that $\Im(\widehat{\gnoise}_j/\noiseSD) = \Im((M\widehat{\gnoiseVec})_j) = Y_j = 0$, meaning $Y_j^2 = 0$ as well. If $j \neq 0$, then $\Im(\widehat{\gnoise}_j) \sim \mathcal{N}(\Im(\widehat{g}_j),\noiseSD^2/2)$. Thus by the argument for $X_j$, $Y_j^2 \sim \NCchi^2(1,(\Im(\widehat{g}_j)/\noiseSD)^2)$. \par 
+The final part of the proof is to establish the distribution of $X_j^2 + Y_j^2$ for the two cases of $j$. If $j = 0$, then $Y_j^2 = 0$ and so $X_j^2 + Y_j^2$ has the same distribution of $X_j^2$, which is $\NCchi^2(1,(\Re(\widehat{g}_j)/\noiseSD)^2/2)$. If $j \neq 0$, then $X_j^2$ and $Y_j^2$ are distributed $\NCchi^2(1,(\Re(\widehat{g}_j)/\noiseSD)^2)$ and $\NCchi^2(1,(\Im(\widehat{g}_j)/\noiseSD)^2)$, respectively. Thus by their independence and the reproductive property of the noncentral chi-squared distribution \cite[p.~182]{Rao1973},
+\[X_j^2 + Y_j^2 \sim \NCchi^2\left(1 + 1,\left(\frac{\Re(\widehat{g}_j)}{\noiseSD}\right)^2 + \left(\frac{\Im(\widehat{g}_j)}{\noiseSD}\right)^2\right) = \NCchi^2\left(2,\frac{|\widehat{g}_j|^2}{\noiseSD^2}\right).\]
+\end{proof}
 
 \begin{figure}
 	\centerline{\includegraphics[scale = 0.45]{Figures/PicardPlot1D_F2_S15_W200.eps}}
-\caption{(Left) A Picard plot generated from the second test function, a Gaussian blur with a width of 200, and an SNR of 15. The terms $|\widehat{\gnoise}_i|/|\widehat{\kdis}_i|$ decrease until index 8, at which case the terms increase in magnitude. This is due to the fact that the $|\widehat{\kdis}_i|$ steadily decrease, while the $|\widehat{\gnoise}_i|$ level off just below the variance in the noise. (Right) A zoom-in of the Picard plot is provided, showing that elements of the DFT of $\gnoise$ decay only slightly below the variance of the noise in $\gnoise$.}
+\caption{(Left) A Picard plot generated from the second test function, a Gaussian blur with a width of 200, and an SNR of 15. The terms $|\widehat{\gnoise}_i|/|\widehat{k}_i|$ decrease until index 8, at which case the terms increase in magnitude. This is due to the fact that the $|\widehat{k}_i|$ steadily decrease, while the $|\widehat{\gnoise}_i|$ level off just below the variance in the noise. (Right) A zoom-in of the Picard plot is provided, showing that elements of the DFT of $\gnoiseVec$ decay only slightly below the variance of the noise in $\gnoiseVec$.}
 \label{PicardPlot}
 \end{figure}
 
@@ -531,9 +626,9 @@ Suppose that $\widehat{f}(\omega)$ is continuous, piecewise smooth, and $\wideha
 which converges uniformly. 
 \end{SWST}
 Given the smallest frequency $\Omega$ such that $\widehat{f}(\omega) = 0$ for $|\omega| > \Omega$, the quantity $\Omega/2\pi$ is called the \textit{Nyquist frequency} and the quantity $\Omega/\pi$ is called the \textit{Nyquist rate}. Functions for which $\Omega$ exists such that $\widehat{f}(\omega) = 0$ for $|\omega| > \Omega$ are called \textit{band-limited}. \par 
-The test function $\fcon(x) = \cos(4\pi{t})\sin(6\pi{t})$ is band-limited. Applying a product-to-sum identity allows for the function to be rewritten as
+The test function $f(x) = \cos(4\pi{t})\sin(6\pi{t})$ is band-limited. Applying a product-to-sum identity allows for the function to be rewritten as
 \begin{equation}
-\fcon(t) = \cos(4\pi{t})\sin(6\pi{t}) = \frac{1}{2}\left[\sin(10\pi{t}) + \sin(2\pi{t})\right].
+f(t) = \cos(4\pi{t})\sin(6\pi{t}) = \frac{1}{2}\left[\sin(10\pi{t}) + \sin(2\pi{t})\right].
 \label{eq:Test Function 1}
 \end{equation}
 Though $f$ is not in $L^1(\mathbb{R})$, its Fourier transform can be express using the Dirac delta function:
@@ -558,9 +653,9 @@ Now the $k$th complex Fourier coefficient will be computed for the second test f
 For the numerical experiments, three test functions are considered. While these functions vary in the extent of smoothness, all three functions are selected to be 1-periodic and the interval selected is [0,1], though this interval can be mapped to any other interval using a linear transformation. In general, the transformation from $[a,b]$ to $[c,d]$ such that $a \mapsto c$ and $b \mapsto d$ has a point-slope representation
 \[y - c = \left(\frac{d-c}{b-a}\right)(x - a)\]
 where $y \in [c,d]$ is the image of $x \in [a,b]$. \par
-The first test function is $\fcon(t) = \cos(4\pi{t})\sin(6\pi{t})$, which is infinitely differentiable on all of $\mathbb{R}$. The second test function \eqref{eq:Test Function 2} is piecewise-smooth. The third and final test function is
+The first test function is $f(t) = \cos(4\pi{t})\sin(6\pi{t})$, which is infinitely differentiable on all of $\mathbb{R}$. The second test function \eqref{eq:Test Function 2} is piecewise-smooth. The third and final test function is
 \begin{equation}
-\fcon(t) = \cos(8\pi{t})\exp(\sin(10\pi{t})-1)
+f(t) = \cos(8\pi{t})\exp(\sin(10\pi{t})-1)
 \label{eq:Test Function 3}
 \end{equation}
 which is also infinitely differentiable on $\mathbb{R}$; the third function was selected to be more interesting than the first test function. Graphs of all three test functions are found in Figure \ref{TestFunctions}.  \par
@@ -571,15 +666,15 @@ which is also infinitely differentiable on $\mathbb{R}$; the third function was 
 \label{TestFunctions}
 \end{figure}
 
-The interval $[0,1]$ is discretized as equispaced points $0, 1/N, 2/N, \ldots, (N-1)/N$ for $N = 4096$. In other words, the interval is discretized as the vector $\tdis = [t_1,t_2,\ldots,t_N]$ with $t_i = (i-1)/N$. The selected test function $\fcon$ is then sampled at these points so that the discrete version $\fdis = [\fcon_1,\fcon_2,\ldots,\fcon_N]$ has elements $\fcon_i = \fcon(t_i)$. For the discrete version of $\kcon(x,t)$ to be used in the convolution with $\fdis$, the periodic extension of $\kcon(x,t)$ is sampled in the same way that was used to construct $\fdis$. However, it is important to remember that unextended $\kcon(x,t)$ was assumed to be centered at the origin and compactly supported on the interval $[-1/2,1/2]$. As such, a plot of $\kdis$ will not resemble the traditional graph of a Gaussian bump but instead be a depiction of a trough between bumps in the periodic extension of $\kcon$; see Figure \ref{RegAndTroughGaussian}. In the experiments, the width of the Gaussian kernels are chosen to be 100 and 200.  \par
+The interval $[0,1]$ is discretized as equispaced points $0, 1/N, 2/N, \ldots, (N-1)/N$ for $N = 4096$. In other words, the interval is discretized as the vector $\tVec = [t_1,t_2,\ldots,t_N]$ with $t_i = (i-1)/N$. The selected test function $f$ is then sampled at these points so that the discrete version $\fVec = [f_1,f_2,\ldots,f_N]$ has elements $f_i = f(t_i)$. For the discrete version of $k(x,t)$ to be used in the convolution with $\fVec$, the periodic extension of $k(x,t)$ is sampled in the same way that was used to construct $\fVec$. However, it is important to remember that unextended $k(x,t)$ was assumed to be centered at the origin and compactly supported on the interval $[-1/2,1/2]$. As such, a plot of $\kVec$ will not resemble the traditional graph of a Gaussian bump but instead be a depiction of a trough between bumps in the periodic extension of $k$; see Figure \ref{RegAndTroughGaussian}. In the experiments, the width of the Gaussian kernels are chosen to be 100 and 200.  \par
 
 \begin{figure}
 	\centerline{\includegraphics[scale = 0.45]{Figures/RegAndTroughGaussian.eps}}
-\caption{Plots of different discretizations of the kernel $\kcon(t)$. The discretization on the left reflects the compact support of $\kcon(t)$ on the interval $[-1/2,1/2]$. The discretization on the right represents the periodic extension of $\kcon(t)$ on the interval $[0,1]$.}
+\caption{Plots of different discretizations of the kernel $k(t)$. The discretization on the left reflects the compact support of $k(t)$ on the interval $[-1/2,1/2]$. The discretization on the right represents the periodic extension of $k(t)$ on the interval $[0,1]$.}
 \label{RegAndTroughGaussian}
 \end{figure}
 
-With the discretizations $\fdis$ and $\kdis$ determined, the discretization $\gdis$ of $\gcon(t)$ can be evaluation using either a circular convolution or a linear convolution with appropriate vector padding. Ultimately the vectors $\fdis$, $\kdis$, and $\gdis$ are vector discretizations of $\fcon(t)$, $\kcon(t)$, and $\gcon(t)$, respectively. \par
+With the discretizations $\fVec$ and $\kVec$ determined, the discretization $\gVec$ of $g(t)$ can be evaluation using either a circular convolution or a linear convolution with appropriate vector padding. Ultimately the vectors $\fVec$, $\kVec$, and $\gVec$ are vector discretizations of $f(t)$, $k(t)$, and $g(t)$, respectively. \par
 Overall, two selections for the width of the Gaussian kernel, two selections 5 and 25 for SNR value, and three test functions lead to a total of 12 experimental configurations. For each configuration, 20 noise realizations were generated and tested. The full resolution problem was constructed using $N = 4096$ points. The downsamped resolutions were selected as $n \in \{16,32,\ldots,2048\}$ for a total of nine resolutions (eight values of $n$).
 
 \subsection{Construction of noise} \label{sec:Construction of noise}
@@ -589,54 +684,54 @@ Though the definition of SNR varies, the definition chosen for this investigatio
 \label{eq:SNR}
 \text{SNR} = 10\log_{10}\left(\frac{P_{\text{signal}}}{P_{\text{noise}}}\right)
 \end{equation}
-where $P$ denotes average power. In the discrete setting, the average power of a signal $\mathbf{f}$ of length $N$ is defined as $\|\mathbf{f}\|^2/N$. Using this definition, $P_{\text{signal}} = \|\gdis\|^2/N$ and $P_{\text{noise}} = \|\noise\|^2/N$ and so the quotient in the logarithm is $\|\gdis\|^2/\|\noise\|^2$. The quotient can also be expressed as $(\|\gdis\|/\|\gnoise - \gdis\|)^2$, which is the square of the multiplicative inverse of the relative error of $\gnoise$. \par
-In MATLAB, the noise vector $\noise$ can be constructed by first taking an $N$-vector $\mathbf{e}$ drawn from the multivariate standard normal distribution and multiplying the vector by a constant $\noiseSD$. Doing so ensures that $\noise$ has variance $\noiseSD^2$ because $\Var(\noise) = \Var(\noiseSD\:\mathbf{e}) = \noiseSD^2\:\Var(\mathbf{e})$ and $\mathbf{e}$ has unit variance. Thus it is useful to rearrange the equation defining SNR into an equation that provides a way of finding the necessary variance for a given SNR value. The rearrangement is shown below, with $\|\noise\|^2$ replaced by $\E(\|\noise\|^2)$.
-\[\E(\|\noise\|^2) = \frac{\|\gdis\|^2}{10^{(\text{SNR}/10)}}\]
-Using the properties of expected value and the fact that $\E(\|\noise\|^2) = \E(\|\noiseSD\:\mathbf{e}\|^2)$, the term on the left hand side of the equation can be changed as
-\[\E(\|\noise\|^2) = \E(\|\noiseSD\:\mathbf{e}\|^2) = \noiseSD^2 \sum_{j=1}^N \E(\mathbf{e}_i^2) = \noiseSD^2 \sum_{j=1}^N \left(\E(\mathbf{e}_i)^2 + \Var(\mathbf{e}_i)\right) = \noiseSD^2 \sum_{j=1}^N \left(0^2 + 1\right) = \noiseSD^2\:N.\]
+where $P$ denotes average power. In the discrete setting, the average power of a signal $\mathbf{f}$ of length $N$ is defined as $\|\mathbf{f}\|^2/N$. Using this definition, $P_{\text{signal}} = \|\gVec\|^2/N$ and $P_{\text{noise}} = \|\noiseVec\|^2/N$ and so the quotient in the logarithm is $\|\gVec\|^2/\|\noiseVec\|^2$. The quotient can also be expressed as $(\|\gVec\|/\|\gnoiseVec - \gVec\|)^2$, which is the square of the multiplicative inverse of the relative error of $\gnoiseVec$. \par
+In MATLAB, the noise vector $\noiseVec$ can be constructed by first taking an $N$-vector $\mathbf{e}$ drawn from the multivariate standard normal distribution and multiplying the vector by a constant $\noiseSD$. Doing so ensures that $\noiseVec$ has variance $\noiseSD^2$ because $\Var(\noise) = \Var(\noiseSD\:\mathbf{e}) = \noiseSD^2\:\Var(\mathbf{e})$ and $\mathbf{e}$ has unit variance. Thus it is useful to rearrange the equation defining SNR into an equation that provides a way of finding the necessary variance for a given SNR value. The rearrangement is shown below, with $\|\noiseVec\|^2$ replaced by $\E(\|\noiseVec\|^2)$.
+\[\E(\|\noiseVec\|^2) = \frac{\|\gVec\|^2}{10^{(\text{SNR}/10)}}\]
+Using the properties of expected value and the fact that $\E(\|\noiseVec\|^2) = \E(\|\noiseSD\:\mathbf{e}\|^2)$, the term on the left hand side of the equation can be changed as
+\[\E(\|\noiseVec\|^2) = \E(\|\noiseSD\:\mathbf{e}\|^2) = \noiseSD^2 \sum_{j=1}^N \E(\mathbf{e}_i^2) = \noiseSD^2 \sum_{j=1}^N \left(\E(\mathbf{e}_i)^2 + \Var(\mathbf{e}_i)\right) = \noiseSD^2 \sum_{j=1}^N \left(0^2 + 1\right) = \noiseSD^2\:N.\]
 Utilizing this change, the following equation for variance is obtained.
 \begin{equation}
 \label{eq:Var}
-\noiseSD^2 = \frac{\|\gdis\|^2}{N \cdot 10^{(\text{SNR}/10)}}
+\noiseSD^2 = \frac{\|\gVec\|^2}{N \cdot 10^{(\text{SNR}/10)}}
 \end{equation}
-This equation is used for the numerical construction of the noise vectors. SNR values of 5 and 25 are used to generate the white noise added to $\gdis$, and one such data realization is shown in Figure \ref{NoisePlot1D_F2_S05_W200}. \par
+This equation is used for the numerical construction of the noise vectors. SNR values of 5 and 25 are used to generate the white noise added to $\gVec$, and one such data realization is shown in Figure \ref{NoisePlot1D_F2_S05_W200}. \par
 
 \begin{figure}
 	\centerline{\includegraphics[scale = 0.45]{Figures/NoisePlot1D_F2_S05_W200.eps}}
-\caption{The plot shows one data realization of $\gdis$ with noise, where the original function $f$ was the second test function. The SNR value is 5 and the width of the Gaussian PSF is 200.}
+\caption{The plot shows one data realization of $\gVec$ with noise, where the original function $f$ was the second test function. The SNR value is 5 and the width of the Gaussian PSF is 200.}
 \label{NoisePlot1D_F2_S05_W200}
 \end{figure}
 
 For an accurate evaluation of the numerical experiments and their results, multiple realizations of noise are used. A primary advantage of multiple noise realizations is that the sample variance of noise vectors approaches the desired variance as the number of realizations increases. More rigorously, the mean of the sample variances of the noise vectors converges almost surely to the expected value of the sample variance, which is the desired variance $\noiseSD^2$; this is a direct consequence of the (strong) law of large numbers and the fact that the noise vectors are independent and identically distributed with standard normal distribution.  \par
 Another numerical consideration regarding noise is how the sample variance changes across downsampling resolutions. To formalize the concept of downsampling in the context of this report, consider $\mathbf{z} = [z_1,z_2,\ldots,z_n]$. Then a vector $\mathbf{y}$ is called a downsampling of $\mathbf{z}$ if $\mathbf{y} = [z_{n_1},z_{n_2},\ldots,z_{n_m}]$, where $m \leq n$ and $n_j:\{1,2,\ldots,m\}\rightarrow\{1,2,\ldots,n\}$ is a strictly increasing function. This definition is analogous to the definition of a subsequence except with a finite number of terms. \par
-Theoretically, the variance of the noise vector does not change when a vector is downsampled because of the properties of variance. For any $m\times n$ matrix $M$ and $n$-vector $\noise \sim \mathcal{N}(\bm{0},\noiseSD^2I)$
+Theoretically, the variance of the noise vector does not change when a vector is downsampled because of the properties of variance. For any $m\times n$ matrix $M$ and $n$-vector $\noiseVec \sim \mathcal{N}(\bm{0},\noiseSD^2I)$
 \begin{equation}
-\Var(M\noise) = M\Var(\noise)M^{\trans} = \noiseSD^2MIM^{\trans} = \noiseSD^2MM^{\trans}
+\Var(M\noiseVec) = M\Var(\noiseVec)M^{\trans} = \noiseSD^2MIM^{\trans} = \noiseSD^2MM^{\trans}
 \label{eq:VarProp}
 \end{equation}
-where $MM^\trans$ is an $m \times m$ matrix. Certainly for arbitrary $M$, $MM^\trans$ can differ from an $m \times m$ identity matrix, which would mean that the new noise vector $M\noise$ no longer represents white noise. However, given an $n$-vector $\noise \sim \mathcal{N}(\bm{0},\noiseSD^2I)$ and the goal of obtaining a downsampled version of $\noise$, a matrix $E$ can be found such that $E\noise$ is the downsampled vector. Since DFT's are utilized in the regularization process, a downsampled vector whose components are still equidistant from adjacent components is desirable. Since the finest sampling $\tdis$ of the interval $[0,1]$ has $N = 4096 = 2^{12}$ points, a natural downsampling with this property would be to select every other component of $\tdis$. The resulting downsampled vector would then have length $N/2 = 2048 = 2^{11}$. The matrix $E$ that accomplishes this downsampling is the $N/2 \times N$ matrix defined as
+where $MM^\trans$ is an $m \times m$ matrix. Certainly for arbitrary $M$, $MM^\trans$ can differ from an $m \times m$ identity matrix, which would mean that the new noise vector $M\noiseVec$ no longer represents white noise. However, given an $n$-vector $\noiseVec \sim \mathcal{N}(\bm{0},\noiseSD^2I)$ and the goal of obtaining a downsampled version of $\noiseVec$, a matrix $E$ can be found such that $E\noiseVec$ is the downsampled vector. Since DFT's are utilized in the regularization process, a downsampled vector whose components are still equidistant from adjacent components is desirable. Since the finest sampling $\tVec$ of the interval $[0,1]$ has $N = 4096 = 2^{12}$ points, a natural downsampling with this property would be to select every other component of $\tVec$. The resulting downsampled vector would then have length $N/2 = 2048 = 2^{11}$. The matrix $E$ that accomplishes this downsampling is the $N/2 \times N$ matrix defined as
 \begin{equation}
 E = [\mathbf{e}_1 \: \mathbf{0} \: \mathbf{e}_2 \: \mathbf{0} \: \mathbf{e}_3 \: \mathbf{0} \ldots \mathbf{e}_N]
 \label{eq:Downsampling matrix}
 \end{equation}
-where $\mathbf{0}$ is the $N/2$-vector of all zeros and $\mathbf{e}_j$ is the $N/2$-vector of all zeros except for 1 as the $j\text{th}$ component, $1 \leq j \leq N/2$. Another explanation of how to construct $E$ is to concatenate every other row of an $N \times N$ identity matrix. In an effort to clarify this downsampling process, let $\tdis^{n}$ denote the $n$-point downsampling of $\tdis$. Then with this new notation, $\tdis^{2046} = E\tdis$. \par
+where $\mathbf{0}$ is the $N/2$-vector of all zeros and $\mathbf{e}_j$ is the $N/2$-vector of all zeros except for 1 as the $j\text{th}$ component, $1 \leq j \leq N/2$. Another explanation of how to construct $E$ is to concatenate every other row of an $N \times N$ identity matrix. In an effort to clarify this downsampling process, let $\tVec^{n}$ denote the $n$-point downsampling of $\tVec$. Then with this new notation, $\tVec^{2046} = E\tVec$. \par
 As a smaller example, consider the vector
-\[\tdis = \begin{bmatrix}
+\[\tVec = \begin{bmatrix}
 0 & \dfrac{1}{8} & \dfrac{1}{4} & \dfrac{3}{8} & \dfrac{1}{2} & \dfrac{5}{8} & \dfrac{3}{4} & \dfrac{7}{8}
 \end{bmatrix}^{\trans},\]
-which is an equispaced 8-point discretization of $[0,1]$. The $4 \times 8$ matrix $E$ used to obtain downsampling $\tdis^{4}$ is
+which is an equispaced 8-point discretization of $[0,1]$. The $4 \times 8$ matrix $E$ used to obtain downsampling $\tVec^{4}$ is
 \[E = \begin{bmatrix}
 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 \\
 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 \\
 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 \\
 \end{bmatrix}.\]
-Then $\tdis^4$ obtained by the product $E\tdis$ has equispaced components as desired:
-\[\tdis^4 = E\tdis = \begin{bmatrix}
+Then $\tVec^4$ obtained by the product $E\tVec$ has equispaced components as desired:
+\[\tVec^4 = E\tVec = \begin{bmatrix}
 0 & \dfrac{1}{4} & \dfrac{1}{2} & \dfrac{3}{4}
 \end{bmatrix}^{\trans}.\]
-\indent Another property of the $N/2 \times N$ matrix $E$ defined in \eqref{eq:Downsampling matrix} is that $EE^{\trans} = I$, where $I$ is the $N/2 \times N/2$ identity matrix.  This is a direct consequence of $\mathbf{e}_j\mathbf{e}_j^\trans = 1$ for all $j$ with $1 \leq j \leq N/2$. Using the property in \eqref{eq:VarProp}, the variance of the  noise vector $\noise^{N/2}$ downsampled from $\noise$ is then
-\[\Var(\noise^{N/2}) = \Var(E\noise) = E\Var(\noise)E^{\trans} = \noiseSD^2EE^{\trans} = \noiseSD^2I\]
+\indent Another property of the $N/2 \times N$ matrix $E$ defined in \eqref{eq:Downsampling matrix} is that $EE^{\trans} = I$, where $I$ is the $N/2 \times N/2$ identity matrix.  This is a direct consequence of $\mathbf{e}_j\mathbf{e}_j^\trans = 1$ for all $j$ with $1 \leq j \leq N/2$. Using the property in \eqref{eq:VarProp}, the variance of the  noise vector $\noiseVec^{N/2}$ downsampled from $\noiseVec$ is then
+\[\Var(\noiseVec^{N/2}) = \Var(E\noiseVec) = E\Var(\noiseVec)E^{\trans} = \noiseSD^2EE^{\trans} = \noiseSD^2I\]
 where $I$ is the $N/2 \times N/2$ identity matrix. Therefore, downsampling white noise vectors in this way produces white noise vectors of half length, theoretically preserving variance across downsamples. As a final remark, the process of downsampling described here can be used to obtain downsampled vectors of length $N/(2^2), N/(2^3), \ldots, N/N$, though the final resolution in this report has been chosen as $N/(2^8) = 16$. \par 
 While the variance of the noise is preserved across downsampling resolution in theory, numerically there is some fluctuation. As the downsampling resolutions decrease, i.e. the length of the downsampled vectors decreases, the sample variances more spread out. Figure \ref{VarPlot1D} demonstrates this phenomenon by showing boxplots of sample variance versus downsampling resolutions. 
 
@@ -650,58 +745,58 @@ While the variance of the noise is preserved across downsampling resolution in t
 
 Perhaps the simplest method of selecting a regularization parameter is to use
 \begin{equation}
-\regparam_{\text{best}} := \argmin_{\regparam \geq 0} \|\fdis - \freg\|^2.
+\regparam_{\text{best}} := \argmin_{\regparam \geq 0} \|\fVec - \freg\|^2.
 \label{eq:Minimize Error}
 \end{equation}
-Here ``best'' is used to indicate the fact that the parameter is chosen to minimize the error of the regularized solution. The primary disadvantage of using this method is that the true solution $\fdis$ must be known. Not only would knowing the true solution render the process of finding a regularized solution pointless, but in practice a true solution is not known. This motivates the use of other methods, which do not rely upon knowledge of a true solution. The three such methods considered in this report are the Unbiased Predictive Risk Estimator method (Section \ref{sec:Unbiased Predictive Risk Estimator}), the Generalized Cross Validation method (Section \ref{sec:Generalized Cross Validation}), and the Discepancy Principle method (Section \ref{sec:Discrepancy Principle}). Since true solutions are known for use in the numerical experiments, the method on line \eqref{eq:Minimize Error} will be used as a benchmark for comparing the other three methods.
+Here ``best'' is used to indicate the fact that the parameter is chosen to minimize the error of the regularized solution. The primary disadvantage of using this method is that the true solution $\fVec$ must be known. Not only would knowing the true solution render the process of finding a regularized solution pointless, but in practice a true solution is not known. This motivates the use of other methods, which do not rely upon knowledge of a true solution. The three such methods considered in this report are the Unbiased Predictive Risk Estimator method (Section \ref{sec:Unbiased Predictive Risk Estimator}), the Generalized Cross Validation method (Section \ref{sec:Generalized Cross Validation}), and the Discepancy Principle method (Section \ref{sec:Discrepancy Principle}). Since true solutions are known for use in the numerical experiments, the method on line \eqref{eq:Minimize Error} will be used as a benchmark for comparing the other three methods.
 
 \subsection{Unbiased Predictive Risk Estimator} \label{sec:Unbiased Predictive Risk Estimator}
 The Unbiased Predictive Risk Estimator (UPRE) method is derived by considering the following quantity
-\[\PE := \kmat(\freg - \fdis)\]
-This quantity $\PE$ is known as the \textit{predictive error}, and is an alternative to solution error defined as $\freg - \fdis$. Given the above definition, the mean squared norm of the predictive error is
-\[\frac{1}{n}\|\PE\|^2 = \frac{1}{n}\|\kmat(\freg - \fdis)\|^2\]
-which is called the predictive risk.  As a first step in deriving the UPRE method, assume that the noise $\noise$ is a random vector, instead of a realization of a random vector. Direct consequences of this assumption are that $\gdis$ and $\freg$ are random vectors and the predictive risk $(1/n)\|\PE\|^2$ is a random variable. \par
-Next, an $n \times n$ matrix $\A$ is defined as $\A = \kmat\R$ where $\R$ is a regularization matrix. The notation $\A$ is chosen to indicate that the matrix depends upon the regularization parameter contained in $\R$. Using the influence matrix with $\freg = \R\gnoise$, the predictive error can be rewritten:
+\[\PE := \kMat(\freg - \fVec)\]
+This quantity $\PE$ is known as the \textit{predictive error}, and is an alternative to solution error defined as $\freg - \fVec$. Given the above definition, the mean squared norm of the predictive error is
+\[\frac{1}{n}\|\PE\|^2 = \frac{1}{n}\|\kMat(\freg - \fVec)\|^2\]
+which is called the predictive risk.  As a first step in deriving the UPRE method, assume that the noise $\noiseVec$ is a random vector, instead of a realization of a random vector. Direct consequences of this assumption are that $\gVec$ and $\freg$ are random vectors and the predictive risk $(1/n)\|\PE\|^2$ is a random variable. \par
+Next, an $n \times n$ matrix $\A$ is defined as $\A = \kMat\R$ where $\R$ is a regularization matrix. The notation $\A$ is chosen to indicate that the matrix depends upon the regularization parameter contained in $\R$. Using the influence matrix with $\freg = \R\gnoiseVec$, the predictive error can be rewritten:
 \begin{align*}
-\PE &= \kmat\freg - \kmat\fdis \\
-&= \A\gnoise - \kmat\fdis \\
-&= \A(\kmat\fdis + \noise) - \kmat\fdis \\
-&= (\A - I)\kmat\fdis + \A\noise
+\PE &= \kMat\freg - \kMat\fVec \\
+&= \A\gnoiseVec - \kMat\fVec \\
+&= \A(\kMat\fVec + \noiseVec) - \kMat\fVec \\
+&= (\A - I)\kMat\fVec + \A\noiseVec
 \end{align*}
-By the assumption that $\noise$ is a discrete white noise vector, the Trace Lemma can be utilized to obtain an expression for the expected value of predictive risk.
+By the assumption that $\noiseVec$ is a discrete white noise vector, the Trace Lemma can be utilized to obtain an expression for the expected value of predictive risk.
 
 \begin{TL}
-Let $f \in \mathcal{H}$, where $\mathcal{H}$ is a deterministic, real Hilbert space, let $\noise$ be a discrete noise vector with $\noise \sim \mathcal{N}(0,\noiseSD^2)$, and let $B: \mathbb{R}^n \rightarrow \mathcal{H}$ be a bounded linear operator. Then
+Let $f \in \mathcal{H}$, where $\mathcal{H}$ is a deterministic, real Hilbert space, let $\noiseVec$ be a discrete noise vector with $\noiseVec \sim \mathcal{N}(0,\noiseSD^2)$, and let $B: \mathbb{R}^n \rightarrow \mathcal{H}$ be a bounded linear operator. Then
 \[\E(\|f + B\noise\|_{\mathcal{H}}^2) = \|f\|_{\mathcal{H}}^2 + \noiseSD^2\trace({B^*}B)\]
 where $B^*$ denotes the adjoint of $B$.
 \end{TL}
 \begin{proof}
 By the linearity of inner products and the expected value operator,
-\[\E(\|f + B\noise\|_{\mathcal{H}}^2) = \E(\langle f + B\noise, f + B\noise\rangle_{\mathcal{H}}) = \E(\|f\|_{\mathcal{H}}^2) + 2\E(\langle f, B\noise\rangle_{\mathcal{H}}) + \E(\langle B\noise, B\noise\rangle_{\mathcal{H}}).\]
+\[\E(\|f + B\noiseVec\|_{\mathcal{H}}^2) = \E(\langle f + B\noiseVec, f + B\noiseVec\rangle_{\mathcal{H}}) = \E(\|f\|_{\mathcal{H}}^2) + 2\E(\langle f, B\noiseVec\rangle_{\mathcal{H}}) + \E(\langle B\noiseVec, B\noiseVec\rangle_{\mathcal{H}}).\]
 The term $\E(\|f\|_{\mathcal{H}}^2)$ reduces to $\|f\|_{\mathcal{H}}^2$ because $f$ is an element of a deterministic Hilbert space. Next, the inner products can be rewritten using the adjoint of $B$:
 \begin{align*}
-\E(\|f + B\noise\|_{\mathcal{H}}^2) &= \|f\|_{\mathcal{H}}^2 + 2\E(\langle f, B\noise\rangle_{\mathcal{H}}) + \E(\langle B\noise, B\noise\rangle_{\mathcal{H}}) \\
-&= \|f\|_{\mathcal{H}}^2 + 2\E(({B^*}f)^\trans\noise) + \E({\noise^\trans}{B^*}B\noise) \\
+\E(\|f + B\noiseVec\|_{\mathcal{H}}^2) &= \|f\|_{\mathcal{H}}^2 + 2\E(\langle f, B\noiseVec\rangle_{\mathcal{H}}) + \E(\langle B\noiseVec, B\noiseVec\rangle_{\mathcal{H}}) \\
+&= \|f\|_{\mathcal{H}}^2 + 2\E(({B^*}f)^\trans\noiseVec) + \E({\noiseVec^\trans}{B^*}B\noiseVec) \\
 &= \|f\|_{\mathcal{H}}^2 + 2\sum_{j=1}^n ({B^*}f)_i \E(\noise_i) + \sum_{j=1}^n\sum_{j=1}^n ({B^*}B)_{ij} \E({\noise_i}{\noise_j})
 \end{align*}
-Since $\noise \sim \mathcal{N}(0,\noiseSD^2)$, the expected values of $\noise_i$ and ${\noise_i}{\noise_j}$ are zero and $\noiseSD^2\delta_{ij}$, respectively. Therefore the second term above is zero and the third term is a summation expression for $\noiseSD^2\trace({B^*}B)$.
+Since $\noiseVec \sim \mathcal{N}(0,\noiseSD^2)$, the expected values of $\noise_i$ and ${\noise_i}{\noise_j}$ are zero and $\noiseSD^2\delta_{ij}$, respectively. Therefore the second term above is zero and the third term is a summation expression for $\noiseSD^2\trace({B^*}B)$.
 \end{proof}
 
 \noindent Applying the Trace Lemma to the expression for predictive risk yields
-\[\E\left(\frac{1}{n}\|\PE\|^2\right) = \frac{1}{n}\E\left(\|(\A-I)\kmat\fdis + \A\noise\|^2\right) = \frac{1}{n}\|(\A-I)\kmat\fdis\|^2 + \frac{\noiseSD^2}{n}\trace({\A^\trans}\A).\]
-If Tikhonov regularization is used, then the influence matrix $\A$ is $\kmat(\kmat^\ctrans\kmat + \regparam{D^\ctrans}D)^{-1}\kmat^\ctrans$. The matrix $(\kmat^\ctrans\kmat + \regparam{D^\ctrans}D)^{-1}$ is symmetric as a result of $\kmat^\ctrans\kmat$ and $\regparam{D^\ctrans}D$ being individually symmetric, and thus the corresponding influence matrix $\A$ is symmetric.  With a symmetric matrix $\A$, the expected value of predictive risk is simplified to
+\[\E\left(\frac{1}{n}\|\PE\|^2\right) = \frac{1}{n}\E\left(\|(\A-I)\kMat\fVec + \A\noiseVec\|^2\right) = \frac{1}{n}\|(\A-I)\kMat\fVec\|^2 + \frac{\noiseSD^2}{n}\trace({\A^\trans}\A).\]
+If Tikhonov regularization is used, then the influence matrix $\A$ is $\kMat(\kMat^\ctrans\kMat + \regparam{D^\ctrans}D)^{-1}\kMat^\ctrans$. The matrix $(\kMat^\ctrans\kMat + \regparam{D^\ctrans}D)^{-1}$ is symmetric as a result of $\kMat^\ctrans\kMat$ and $\regparam{D^\ctrans}D$ being individually symmetric, and thus the corresponding influence matrix $\A$ is symmetric.  With a symmetric matrix $\A$, the expected value of predictive risk is simplified to
 \begin{equation}
 \label{eq:PR}
-\E\left(\frac{1}{n}\|\PE\|^2\right) = \frac{1}{n}\|(\A-I)\kmat\fdis\|^2 + \frac{\noiseSD^2}{n}\trace(\A^2).
+\E\left(\frac{1}{n}\|\PE\|^2\right) = \frac{1}{n}\|(\A-I)\kMat\fVec\|^2 + \frac{\noiseSD^2}{n}\trace(\A^2).
 \end{equation}
-\indent The last step in the derivation of the UPRE method is to introduce the \textit{regularized residual}, which is defined as $\regres = \kmat\freg - \gnoise$. The regularized residual is important because it is also used in the derivation of the generalized cross validation and discrepancy principle methods. Using the influence matrix $\A$, the expression for $\regres$ can also be written as
-\[\regres = (\A-I)\gnoise = (\A-I)(\kmat\fdis + \noise) = (\A-I)\kmat\fdis + (\A-I)\noise.\]
+\indent The last step in the derivation of the UPRE method is to introduce the \textit{regularized residual}, which is defined as $\regres = \kMat\freg - \gnoiseVec$. The regularized residual is important because it is also used in the derivation of the generalized cross validation and discrepancy principle methods. Using the influence matrix $\A$, the expression for $\regres$ can also be written as
+\[\regres = (\A-I)\gnoiseVec = (\A-I)(\kMat\fVec + \noiseVec) = (\A-I)\kMat\fVec + (\A-I)\noiseVec.\]
 By the Trace Lemma and the expression for $\regres$, the expected value of $(1/n)\|\regres\|^2$ is
-\[\E\left(\frac{1}{n}\|\regres\|^2\right) = \frac{1}{n}\|(\A-I)\kmat\fdis\|^2 + \frac{\noiseSD^2}{n}\trace({(\A-I)^\trans}(\A-I))\]
+\[\E\left(\frac{1}{n}\|\regres\|^2\right) = \frac{1}{n}\|(\A-I)\kMat\fVec\|^2 + \frac{\noiseSD^2}{n}\trace({(\A-I)^\trans}(\A-I))\]
 For symmetric $\A$, the term $(\A-I)^\trans(\A-I)$ becomes $(\A-I)^2 = \A^2 - 2\A + I$ and so by the linearity of the trace operator,
 \begin{equation}
 \label{eq:RR}
-\E\left(\frac{1}{n}\|\regres\|^2\right) = \frac{1}{n}\|(\A-I)\kmat\fdis\|^2 + \frac{\noiseSD^2}{n}\trace(\A^2) - \frac{2\noiseSD^2}{n}\trace(\A) + \noiseSD^2.
+\E\left(\frac{1}{n}\|\regres\|^2\right) = \frac{1}{n}\|(\A-I)\kMat\fVec\|^2 + \frac{\noiseSD^2}{n}\trace(\A^2) - \frac{2\noiseSD^2}{n}\trace(\A) + \noiseSD^2.
 \end{equation}
 By comparing \eqref{eq:PR} and \eqref{eq:RR}, the equation for the expected value of $(1/n)\|\PE\|^2$ can be expressed as
 \[\E\left(\frac{1}{n}\|\PE\|^2\right) = \E\left(\frac{1}{n}\|\regres\|^2\right) + \frac{2\noiseSD^2}{n}\trace(\A) - \noiseSD^2.\]
@@ -711,72 +806,72 @@ The UPRE is defined to be
 \U(\regparam) = \frac{1}{n}\|\regres\|^2 + \frac{2\noiseSD^2}{n}\trace(\A) - \noiseSD^2
 \end{equation}
 and the UPRE method is to pick $\regparam_{\text{UPRE}} = \argmin_{\regparam \geq 0} \U(\regparam)$. \par 
-Since the DFT is a the primary tool in the experiment, a spectral form of the UPRE function (one that involves DFT's) is desirable, as are spectral forms of the GCV and discrepancy principal functions in Sections \ref{sec:Generalized Cross Validation} and \ref{sec:Discrepancy Principle}. To derive a spectral form of \eqref{eq:UPRE}, first recall that for Tikhonov regularization, $\A = \kmat(\kmat^\ctrans\kmat + \regparam{D^\ctrans}D)^{-1}\kmat^\ctrans$. From \eqref{eq:CircDiag}, $\kmat = F^*\Delta{F}$, where $\Delta = \diag(\widehat{\kdis})$. If $D = F^\ctrans\Lambda{F}$ as well (with $\Lambda = \diag(\widehat{\ddis})$), then
+Since the DFT is a the primary tool in the experiment, a spectral form of the UPRE function (one that involves DFT's) is desirable, as are spectral forms of the GCV and discrepancy principal functions in Sections \ref{sec:Generalized Cross Validation} and \ref{sec:Discrepancy Principle}. To derive a spectral form of \eqref{eq:UPRE}, first recall that for Tikhonov regularization, $\A = \kMat(\kMat^\ctrans\kMat + \regparam{D^\ctrans}D)^{-1}\kMat^\ctrans$. From \eqref{eq:CircDiag}, $\kMat = F^*\Delta{F}$, where $\Delta = \diag(\widehat{\kVec})$. If $D = F^\ctrans\Lambda{F}$ as well (with $\Lambda = \diag(\widehat{\ddis})$), then
 \begin{align*}
-\A &= \kmat(\kmat^\ctrans\kmat + \regparam{D^\ctrans}D)^{-1}\kmat^\ctrans \\
+\A &= \kMat(\kMat^\ctrans\kMat + \regparam{D^\ctrans}D)^{-1}\kMat^\ctrans \\
 &= F^*\Delta{F}((F^*\Delta{F})^\ctrans F^\ctrans\Delta{F} + \regparam(F^\ctrans\Lambda{F})^\ctrans F^\ctrans\Lambda{F})^{-1}(F^*\Delta{F})^\ctrans \\
 &= F^\ctrans\Delta{F}(F^\ctrans\Delta^\ctrans\Delta{F} + \regparam{F^\ctrans\Lambda^\ctrans\Lambda{F}})^{-1}F^\ctrans\Delta^\ctrans{F} \\
 &= F^\ctrans\Delta{F}(F^\ctrans(\Delta^\ctrans\Delta + \regparam\Lambda^\ctrans\Lambda)F)^{-1}F^\ctrans\Delta^\ctrans{F} \\
 &= F^\ctrans\Delta{F}F^\ctrans(\Delta^\ctrans\Delta + \regparam\Lambda^\ctrans\Lambda)^{-1}FF^\ctrans\Delta^\ctrans{F} \\
 &= F^\ctrans\Delta(\Delta^\ctrans\Delta + \regparam\Lambda^\ctrans\Lambda)^{-1}\Delta^\ctrans{F}.
 \end{align*}
-The matrix $\Delta(\Delta^\ctrans\Delta + \regparam\Lambda^\ctrans\Lambda)^{-1}\Delta^\ctrans$ is diagonal, and so its diagonal entries are the the eigenvalues of $\A$. Then by definition of $\Delta$ and $\Lambda$, the $i$th diagonal entry of $\Delta(\Delta^\ctrans\Delta + \regparam\Lambda^\ctrans\Lambda)^{-1}\Delta^\ctrans$ is $|\widehat{\kdis}_i|^2/(|\widehat{\kdis}_i|^2 + \regparam|\widehat{\ddis}_i|^2)$. Therefore,
+The matrix $\Delta(\Delta^\ctrans\Delta + \regparam\Lambda^\ctrans\Lambda)^{-1}\Delta^\ctrans$ is diagonal, and so its diagonal entries are the the eigenvalues of $\A$. Then by definition of $\Delta$ and $\Lambda$, the $i$th diagonal entry of $\Delta(\Delta^\ctrans\Delta + \regparam\Lambda^\ctrans\Lambda)^{-1}\Delta^\ctrans$ is $|\widehat{k}_i|^2/(|\widehat{k}_i|^2 + \regparam|\widehat{\ddis}_i|^2)$. Therefore,
 \begin{equation}
-\trace(\A) = \sum_{i = 0}^{n-1} \frac{|\widehat{\kdis}_i|^2}{|\widehat{\kdis}_i|^2 + \regparam|\widehat{\ddis}_i|^2} = \sum_{i = 0}^{n-1} \filt(\regparam,|\widehat{\kdis}_i|)
+\trace(\A) = \sum_{i = 0}^{n-1} \frac{|\widehat{k}_i|^2}{|\widehat{k}_i|^2 + \regparam|\widehat{\ddis}_i|^2} = \sum_{i = 0}^{n-1} \filt(\regparam,|\widehat{k}_i|)
 \label{eq:TraceUPRE}
 \end{equation}
-where $\filt$ is the Tikhonov filter function \eqref{eq:TikFilt}. Since the operator $D$ is fixed, $\widehat{\ddis}$ can be pre-computed; this is reflected by the notation $\filt(\regparam,|\widehat{\kdis}_i|)$. \par
+where $\filt$ is the Tikhonov filter function \eqref{eq:TikFilt}. Since the operator $D$ is fixed, $\widehat{\ddis}$ can be pre-computed; this is reflected by the notation $\filt(\regparam,|\widehat{k}_i|)$. \par
 Next, the definition of $\regres$ gives
-\[\frac{1}{n}\|\regres\|^2 = \frac{1}{n}\|\kmat\freg - \gnoise\|^2 = \sum_{i = 0}^{n-1} |\widehat{\kdis}_i\widehat{(\freg)}_i - \widehat{\gnoise}_i|^2,\]
+\[\frac{1}{n}\|\regres\|^2 = \frac{1}{n}\|\kMat\freg - \gnoiseVec\|^2 = \sum_{i = 0}^{n-1} |\widehat{k}_i\widehat{(\freg)}_i - \widehat{\gnoise}_i|^2,\]
 and \eqref{eq:TikFiltPsi} and \eqref{eq:TikSol} then produce
 \begin{equation}
-\frac{1}{n}\|\regres\|^2 = \sum_{i = 0}^{n-1} |\filt(\regparam,|\widehat{\kdis}_i|)\widehat{\gnoise}_i - \widehat{\gnoise}_i|^2 = \sum_{i = 0}^{n-1} |\widehat{\gnoise}_i|^2(\mfilt(\regparam,|\widehat{\kdis}_i|))^2.
+\frac{1}{n}\|\regres\|^2 = \sum_{i = 0}^{n-1} |\filt(\regparam,|\widehat{k}_i|)\widehat{\gnoise}_i - \widehat{\gnoise}_i|^2 = \sum_{i = 0}^{n-1} |\widehat{\gnoise}_i|^2(\mfilt(\regparam,|\widehat{k}_i|))^2.
 \label{eq:RegResNorm}
 \end{equation}
 Combining \eqref{eq:TraceUPRE} and \eqref{eq:RegResNorm} produces the spectral from of the UPRE function:
 \begin{equation}
-\U(\regparam) = \sum_{i = 0}^{n-1} |\widehat{\gnoise}_i|^2(\mfilt(\regparam,|\widehat{\kdis}_i|))^2 + \frac{2\noiseSD^2}{n}\sum_{i = -0}^{n-1} \filt(\regparam,|\widehat{\kdis}_i|) - \noiseSD^2.
+\U(\regparam) = \sum_{i = 0}^{n-1} |\widehat{\gnoise}_i|^2(\mfilt(\regparam,|\widehat{k}_i|))^2 + \frac{2\noiseSD^2}{n}\sum_{i = -0}^{n-1} \filt(\regparam,|\widehat{k}_i|) - \noiseSD^2.
 \label{eq:SpectralUPRE}
 \end{equation} 
 Since the UPRE method relies on finding a minimum of \eqref{eq:SpectralUPRE}, the constant $\noiseSD^2$ can be ignored during implementation. In an effort to be more descriptive (note that \eqref{eq:SpectralUPRE} also relies upon $n$), define
 \begin{equation}
-\U_n(\regparam) = \sum_{j = 0}^{n-1} |\widehat{\gnoise}_j|^2(\mfilt(\regparam,|\widehat{\kdis}_j|))^2 + \frac{2\noiseSD^2}{n}\sum_{j = 0}^{n-1} \filt(\regparam,|\widehat{\kdis}_j|).
+\U_n(\regparam) = \sum_{j = 0}^{n-1} |\widehat{\gnoise}_j|^2(\mfilt(\regparam,|\widehat{k}_j|))^2 + \frac{2\noiseSD^2}{n}\sum_{j = 0}^{n-1} \filt(\regparam,|\widehat{k}_j|).
 \label{eq:SpectralUPREn}
 \end{equation}
 The problem of finding a minimizer of \eqref{eq:SpectralUPREn} can be recast as a root-finding problem by using the derivative of the UPRE function, which is
 \begin{equation}
-\U'_n(\regparam) = 2\regparam^2\left[\sum_{j = 0}^{n-1} \frac{|\widehat{\gnoise}_j|^2|\widehat{\kdis}_j|^2}{(|\widehat{\kdis}_j|^2 + \regparam^2)^3} - \frac{2\noiseSD^2}{n}\sum_{j = 0}^{n-1} \frac{|\widehat{\kdis}_j|^2}{(|\widehat{\kdis}_j|^2 + \regparam^2)^2}\right].
+\U'_n(\regparam) = 2\regparam^2\left[\sum_{j = 0}^{n-1} \frac{|\widehat{\gnoise}_j|^2|\widehat{k}_j|^2}{(|\widehat{k}_j|^2 + \regparam^2)^3} - \frac{2\noiseSD^2}{n}\sum_{j = 0}^{n-1} \frac{|\widehat{k}_j|^2}{(|\widehat{k}_j|^2 + \regparam^2)^2}\right].
 \label{eq:SpectralUPREnDeriv}
 \end{equation}
 It is clear that $\regparam = 0$ is a root of \eqref{eq:SpectralUPREnDeriv} regardless of the data and operator spectra, so this root should be ignored (since a solution generated for $\regparam = 0$ is in fact a non-regularized solution). Therefore any meaningful regularization parameter selected from the UPRE method will be a root of
 \begin{equation}
-V_n(\regparam) := \sum_{j = 0}^{n-1} \frac{|\widehat{\gnoise}_j|^2|\widehat{\kdis}_j|^2}{(|\widehat{\kdis}_j|^2 + \regparam^2)^3} - \frac{2\noiseSD^2}{n}\sum_{j = 0}^{n-1} \frac{|\widehat{\kdis}_j|^2}{(|\widehat{\kdis}_j|^2 + \regparam^2)^2}.
+V_n(\regparam) := \sum_{j = 0}^{n-1} \frac{|\widehat{\gnoise}_j|^2|\widehat{k}_j|^2}{(|\widehat{k}_j|^2 + \regparam^2)^3} - \frac{2\noiseSD^2}{n}\sum_{j = 0}^{n-1} \frac{|\widehat{k}_j|^2}{(|\widehat{k}_j|^2 + \regparam^2)^2}.
 \label{eq:SpectralUPREnDeriv2}
 \end{equation}
 Now the variance of \eqref{eq:SpectralUPREnDeriv2} will be determined. Fixing $\regparam$ and noting that the second sum in \eqref{eq:SpectralUPREnDeriv2} is deterministic,
 \begin{align*}
-\Var\left(V_n(\regparam)\right) &= \Var\left(\sum_{j = 0}^{n-1} \frac{|\widehat{\gnoise}_j|^2|\widehat{\kdis}_j|^2}{(|\widehat{\kdis}_j|^2 + \regparam^2)^3}\right) \\
-&= \sum_{j,\ell = 0}^{n-1} \frac{|\widehat{\kdis}_j|^2|\widehat{\kdis}_\ell|^2}{(|\widehat{\kdis}_j|^2 + \regparam^2)^3(|\widehat{\kdis}_\ell|^2 + \regparam^2)^3}\Cov\left(|\widehat{\gnoise}_j|^2,|\widehat{\gnoise}_\ell|^2\right). 
+\Var\left(V_n(\regparam)\right) &= \Var\left(\sum_{j = 0}^{n-1} \frac{|\widehat{\gnoise}_j|^2|\widehat{k}_j|^2}{(|\widehat{k}_j|^2 + \regparam^2)^3}\right) \\
+&= \sum_{j,\ell = 0}^{n-1} \frac{|\widehat{k}_j|^2|\widehat{k}_\ell|^2}{(|\widehat{k}_j|^2 + \regparam^2)^3(|\widehat{k}_\ell|^2 + \regparam^2)^3}\Cov\left(|\widehat{\gnoise}_j|^2,|\widehat{\gnoise}_\ell|^2\right). 
 \end{align*}
 
 
 \par 
-Now consider the case where multiple data sets are available, which can arise from repeated observations of some time-invariant event. As an alternative to finding a regularization parameter for each data set, a single regularization parameter can be obtained by constructing an averaged version of \eqref{eq:SpectralUPREn}, assuming that $n$ is constant across all data sets to be considered. It is reasonable to expect that this single regularization parameter will perform worse that each individual parameter with respect to their corresponding data sets. However, computational time/resources could be saved because the method would involved solving a single minimization problem instead of solving a minimization problem for each data set. To bring this idea to fruition, some notation will be expanded. Let $R$ be the number of available data sets, and denote the $j$th data set by $\gnoise^j$. Similarly, let $\U_n^j(\regparam)$ be the UPRE function associated with the $j$th data set.  The average of the UPRE functions is then 
+Now consider the case where multiple data sets are available, which can arise from repeated observations of some time-invariant event. As an alternative to finding a regularization parameter for each data set, a single regularization parameter can be obtained by constructing an averaged version of \eqref{eq:SpectralUPREn}, assuming that $n$ is constant across all data sets to be considered. It is reasonable to expect that this single regularization parameter will perform worse that each individual parameter with respect to their corresponding data sets. However, computational time/resources could be saved because the method would involved solving a single minimization problem instead of solving a minimization problem for each data set. To bring this idea to fruition, some notation will be expanded. Let $R$ be the number of available data sets, and denote the $j$th data set by $\gnoiseVec^j$. Similarly, let $\U_n^j(\regparam)$ be the UPRE function associated with the $j$th data set.  The average of the UPRE functions is then 
 \begin{align*}
-\frac{1}{R}\sum_{j=1}^R \U_n^j(\regparam) &= \frac{1}{R}\sum_{j=1}^R \left(\sum_{i = 0}^{n-1} |\widehat{\gnoise^j}_i|^2(\mfilt(\regparam,|\widehat{\kdis}_i|))^2 + \frac{2\noiseSD^2}{n}\sum_{i = 0}^{n-1} \filt(\regparam,|\widehat{\kdis}_i|)\right) \\
-&= \frac{1}{R}\sum_{j=1}^R \left(\sum_{i = 0}^{n-1} |\widehat{\gnoise^j}_i|^2(\mfilt(\regparam,|\widehat{\kdis}_i|))^2\right) + \frac{1}{R}\sum_{j=1}^R \left(\frac{2\noiseSD^2}{n}\sum_{i = 0}^{n-1} \filt(\regparam,|\widehat{\kdis}_i|)\right).
+\frac{1}{R}\sum_{j=1}^R \U_n^j(\regparam) &= \frac{1}{R}\sum_{j=1}^R \left(\sum_{i = 0}^{n-1} |\widehat{\gnoise^j}_i|^2(\mfilt(\regparam,|\widehat{k}_i|))^2 + \frac{2\noiseSD^2}{n}\sum_{i = 0}^{n-1} \filt(\regparam,|\widehat{k}_i|)\right) \\
+&= \frac{1}{R}\sum_{j=1}^R \left(\sum_{i = 0}^{n-1} |\widehat{\gnoise^j}_i|^2(\mfilt(\regparam,|\widehat{k}_i|))^2\right) + \frac{1}{R}\sum_{j=1}^R \left(\frac{2\noiseSD^2}{n}\sum_{i = 0}^{n-1} \filt(\regparam,|\widehat{k}_i|)\right).
 \end{align*}
 By factoring terms from the first sum and noting that the summand of the second sum does not depend upon $j$, the function simplifies to
 \begin{equation}
-\frac{1}{R}\sum_{j=1}^R \U_n^j(\regparam) =  \sum_{i = 0}^{n-1} \left(\frac{1}{R}\sum_{j=1}^R |\widehat{\gnoise^j}_i|^2\right)(\mfilt(\regparam,|\widehat{\kdis}_i|))^2 + \frac{2\noiseSD^2}{n}\sum_{i = 0}^{n-1} \filt(\regparam,|\widehat{\kdis}_i|).
+\frac{1}{R}\sum_{j=1}^R \U_n^j(\regparam) =  \sum_{i = 0}^{n-1} \left(\frac{1}{R}\sum_{j=1}^R |\widehat{\gnoise^j}_i|^2\right)(\mfilt(\regparam,|\widehat{k}_i|))^2 + \frac{2\noiseSD^2}{n}\sum_{i = 0}^{n-1} \filt(\regparam,|\widehat{k}_i|).
 \label{eq:SpectralUPREavg}
 \end{equation}
-Numerically, \eqref{eq:SpectralUPREavg} can be readily obtained by summing the DFT's of the data sets; note that $\widehat{\kdis}$ is unchanged across data sets. \par
+Numerically, \eqref{eq:SpectralUPREavg} can be readily obtained by summing the DFT's of the data sets; note that $\widehat{\kVec}$ is unchanged across data sets. \par
 In addition to the numerical savings that are possible from using $(1/R)\sum_{j=1}^R \U_n^j(\regparam)$, a statistical interpretation of \eqref{eq:SpectralUPREavg} can be derived. Using \eqref{eq:DFT}, the definition of the DFT,
-\[\frac{1}{R}\sum_{j=1}^R |\widehat{\gnoise}_i|^2 = \frac{1}{R}\sum_{j=1}^R |\widehat{\gdis}_i + \widehat{\noise}_i|^2 \leq \frac{1}{R}\sum_{j=1}^R |\widehat{\gdis}_i|^2  + \frac{1}{R}\sum_{j=1}^R |\widehat{\noise}_i|^2 \] 
+\[\frac{1}{R}\sum_{j=1}^R |\widehat{\gnoise}_i|^2 = \frac{1}{R}\sum_{j=1}^R |\widehat{g}_i + \widehat{\noise}_i|^2 \leq \frac{1}{R}\sum_{j=1}^R |\widehat{g}_i|^2  + \frac{1}{R}\sum_{j=1}^R |\widehat{\noise}_i|^2 \] 
 
 \subsection{Generalized Cross Validation} \label{sec:Generalized Cross Validation}
-The UPRE method requires knowledge of the variance $\noiseSD^2$ of the noise vector $\noise$. In contrast, the generalized cross validation (GCV) method does not require knowledge of $\noiseSD^2$. The GCV functional is
+The UPRE method requires knowledge of the variance $\noiseSD^2$ of the noise vector $\noiseVec$. In contrast, the generalized cross validation (GCV) method does not require knowledge of $\noiseSD^2$. The GCV functional is
 \begin{equation}
 \label{eq:GCV}
 \GCV(\regparam) = \frac{\frac{1}{n}\|\regres\|^2}{\left[\frac{1}{n}\trace(I-\A)\right]^2},
@@ -784,24 +879,24 @@ The UPRE method requires knowledge of the variance $\noiseSD^2$ of the noise vec
 where $\regres$ is the regularized residual defined in the derivation of the UPRE method. Similarities between the GCV and UPRE methods are that both functionals are estimators of the predictive risk, and the regularization parameter $\regparam$ is chosen as the minimizers of these functionals. \par 
 By the linearity of the trace operator, $\trace(I-\A) = \trace(I)-\trace(\A) = n - \trace(\A)$. Then by \eqref{eq:TikFiltPsi} and \eqref{eq:TraceUPRE},
 \begin{equation}
-\trace(I-\A) = n - \sum_{i = 0}^{n-1} \filt(\regparam,|\widehat{\kdis}_i|) = \sum_{i = 0}^{n-1} 1 - \filt(\regparam,|\widehat{\kdis}_i|) = \sum_{i = 0}^{n-1} \mfilt(\regparam,|\widehat{\kdis}_i|).
+\trace(I-\A) = n - \sum_{i = 0}^{n-1} \filt(\regparam,|\widehat{k}_i|) = \sum_{i = 0}^{n-1} 1 - \filt(\regparam,|\widehat{k}_i|) = \sum_{i = 0}^{n-1} \mfilt(\regparam,|\widehat{k}_i|).
 \label{eq:TraceGCV}
 \end{equation}
 Substituting \eqref{eq:RegResNorm} and \eqref{eq:TraceGCV} into \eqref{eq:GCV} produces the spectral form of the GCV function:
 \begin{equation}
-\GCV(\regparam) = \frac{\sum_{i = 0}^{n-1} |\widehat{\gnoise}_i|^2(\mfilt(\regparam,|\widehat{\kdis}_i|))^2}{(\frac{1}{n}\sum_{i = 0}^{n-1} \mfilt(\regparam,|\widehat{\kdis}_i|))^2} = \frac{n^2\sum_{i = 0}^{n-1} |\widehat{\gnoise}_i|^2(\mfilt(\regparam,|\widehat{\kdis}_i|))^2}{(\sum_{i = 0}^{n-1} \mfilt(\regparam,|\widehat{\kdis}_i|))^2}.
+\GCV(\regparam) = \frac{\sum_{i = 0}^{n-1} |\widehat{\gnoise}_i|^2(\mfilt(\regparam,|\widehat{k}_i|))^2}{(\frac{1}{n}\sum_{i = 0}^{n-1} \mfilt(\regparam,|\widehat{k}_i|))^2} = \frac{n^2\sum_{i = 0}^{n-1} |\widehat{\gnoise}_i|^2(\mfilt(\regparam,|\widehat{k}_i|))^2}{(\sum_{i = 0}^{n-1} \mfilt(\regparam,|\widehat{k}_i|))^2}.
 \label{eq:SpectralGCV}
 \end{equation} \par 
-The case where multiple data sets are available will now be considered using notation analogous to that introduced in Section \ref{sec:Unbiased Predictive Risk Estimator}; let $\GCV_n^j(\regparam)$ be the GCV function associated with the $j$th data set $\gnoise^j$ for $j = 1,\ldots,R$. Since the denominator in \eqref{eq:SpectralGCV} is independent of the data,
+The case where multiple data sets are available will now be considered using notation analogous to that introduced in Section \ref{sec:Unbiased Predictive Risk Estimator}; let $\GCV_n^j(\regparam)$ be the GCV function associated with the $j$th data set $\gnoiseVec^j$ for $j = 1,\ldots,R$. Since the denominator in \eqref{eq:SpectralGCV} is independent of the data,
 \begin{equation}
-\frac{1}{R}\sum_{j=1}^R \GCV_n^j(\regparam)  = \frac{n^2\sum_{i = 0}^{n-1} \left(\sum_{j=1}^R |\widehat{\gnoise^j}_i|^2\right)(\mfilt(\regparam,|\widehat{\kdis}_i|))^2}{R(\sum_{i = 0}^{n-1} \mfilt(\regparam,|\widehat{\kdis}_i|))^2}.
+\frac{1}{R}\sum_{j=1}^R \GCV_n^j(\regparam)  = \frac{n^2\sum_{i = 0}^{n-1} \left(\sum_{j=1}^R |\widehat{\gnoise^j}_i|^2\right)(\mfilt(\regparam,|\widehat{k}_i|))^2}{R(\sum_{i = 0}^{n-1} \mfilt(\regparam,|\widehat{k}_i|))^2}.
 \label{eq:SpectralGCVsum}
 \end{equation}
 
 \subsection{Discrepancy Principle} \label{sec:Discrepancy Principle}
-As a start to a stochastic derivation of the discrepancy principle method (for a deterministic derivation, see \cite{Vogel:2002}), consider the case where $\freg \approx \fdis$. In this case,
-\[\regres = \kmat\freg - \gnoise \approx \kmat\fdis - \gnoise = \noise.\]
-with a direct consequence being that $\E((1/n)\|\regres\|^2) \approx \E((1/n)\|\noise\|^2) =\noiseSD^2$. Thus the discrepancy principle is to choose $\regparam$ such that $(1/n)\|\regres\|^2 = \noiseSD^2$. A similarity exists between the discrepancy principle and the UPRE method in that the variance of the noise in the data must be known for both methods. \par 
+As a start to a stochastic derivation of the discrepancy principle method (for a deterministic derivation, see \cite{Vogel:2002}), consider the case where $\freg \approx \fVec$. In this case,
+\[\regres = \kMat\freg - \gnoiseVec \approx \kMat\fVec - \gnoiseVec = \noiseVec.\]
+with a direct consequence being that $\E((1/n)\|\regres\|^2) \approx \E((1/n)\|\noiseVec\|^2) =\noiseSD^2$. Thus the discrepancy principle is to choose $\regparam$ such that $(1/n)\|\regres\|^2 = \noiseSD^2$. A similarity exists between the discrepancy principle and the UPRE method in that the variance of the noise in the data must be known for both methods. \par 
 Implementation of this method requires finding a solution of $\D(\regparam) = 0$, where $\D(\regparam)$ is defined to be
 \begin{equation}
 \label{eq:DP}
@@ -809,17 +904,17 @@ Implementation of this method requires finding a solution of $\D(\regparam) = 0$
 \end{equation}
 In other words, implementation of the discepancy principle method is equivalent to finding a root of $\D(\regparam)$. The spectral form of the discrepancy principle function is obtained directly from \eqref{eq:RegResNorm} by substituting the regularized residual term:
 \begin{equation}
-\D(\regparam) = \sum_{j = 0}^{n-1} |\widehat{\gnoise}_j|^2(\mfilt(\regparam,|\widehat{\kdis}_j|))^2 - \noiseSD^2.
+\D(\regparam) = \sum_{j = 0}^{n-1} |\widehat{\gnoise}_j|^2(\mfilt(\regparam,|\widehat{k}_j|))^2 - \noiseSD^2.
 \label{eq:SpectralDP}
 \end{equation}
 The function $\D(\regparam)$ will be near zero when the sum in \eqref{eq:SpectralDP} is close to $\noiseSD^2$.  Furthermore, $\D(\regparam)$ is monotone increasing on $(0,\infty)$ because for all $\regparam > 0$,
-\[\frac{d}{d\regparam}\left\{\D(\regparam)\right\} = 4\sum_{j = 0}^{n-1} \frac{|\widehat{\gnoise}_j|^2|\widehat{\kdis}_j|^2\regparam^3}{\left(|\widehat{\kdis}_j|^2 + \regparam^2\right)^3} \geq 0\]
-If the range of $\regparam$ being considered for roots of \eqref{eq:SpectralDP} is not chosen carefully, it is possible that no regularization parameter will be obtained; see Section \ref{The MDP method} for further discussion. If \eqref{eq:SpectralDP} does not have a root in $[0,\infty)$ (recall that by definition, $\regparam \geq 0$), there is only one possibility because $\D(0) = -\noiseSD^2 < 0$. Since the function is monotone increasing, the function must have a root or approach some negative horizontal asymptote. By looking at \eqref{eq:TikFiltPsi}, it is clear that $(\mfilt(\regparam,|\widehat{\kdis}_i|))^2 \leq 1$ for all $\lambda \geq 0$. Thus,
-\[\sum_{j = 0}^{n-1} |\widehat{\gnoise}_j|^2(\mfilt(\regparam,|\widehat{\kdis}_j|))^2 - \noiseSD^2 \leq \sum_{j = 0}^{n-1} |\widehat{\gnoise}_j|^2 - \noiseSD^2,\]
+\[\frac{d}{d\regparam}\left\{\D(\regparam)\right\} = 4\sum_{j = 0}^{n-1} \frac{|\widehat{\gnoise}_j|^2|\widehat{k}_j|^2\regparam^3}{\left(|\widehat{k}_j|^2 + \regparam^2\right)^3} \geq 0\]
+If the range of $\regparam$ being considered for roots of \eqref{eq:SpectralDP} is not chosen carefully, it is possible that no regularization parameter will be obtained; see Section \ref{The MDP method} for further discussion. If \eqref{eq:SpectralDP} does not have a root in $[0,\infty)$ (recall that by definition, $\regparam \geq 0$), there is only one possibility because $\D(0) = -\noiseSD^2 < 0$. Since the function is monotone increasing, the function must have a root or approach some negative horizontal asymptote. By looking at \eqref{eq:TikFiltPsi}, it is clear that $(\mfilt(\regparam,|\widehat{k}_i|))^2 \leq 1$ for all $\lambda \geq 0$. Thus,
+\[\sum_{j = 0}^{n-1} |\widehat{\gnoise}_j|^2(\mfilt(\regparam,|\widehat{k}_j|))^2 - \noiseSD^2 \leq \sum_{j = 0}^{n-1} |\widehat{\gnoise}_j|^2 - \noiseSD^2,\]
 and so \eqref{eq:SpectralDP} will approach a negative horizontal asymptote if $\sum_{j = 0}^{n-1} |\widehat{\gnoise}_j|^2 < \noiseSD^2$. \par 
-Again adopting the notation introduced in Section \ref{sec:Unbiased Predictive Risk Estimator}, let $\D_n^j(\regparam)$ be the MDP function associated with the $j$th data set $\gnoise^j$ for $j = 1,\ldots,R$. Then 
+Again adopting the notation introduced in Section \ref{sec:Unbiased Predictive Risk Estimator}, let $\D_n^j(\regparam)$ be the MDP function associated with the $j$th data set $\gnoiseVec^j$ for $j = 1,\ldots,R$. Then 
 \begin{equation}
-\frac{1}{R}\sum_{j=1}^R \D_n^j(\regparam)  = \sum_{i = 0}^{n-1} \left(\frac{1}{R} \sum_{j=1}^R |\widehat{\gnoise^j}_i|^2\right)(\mfilt(\regparam,|\widehat{\kdis}_i|))^2 - \noiseSD^2. 
+\frac{1}{R}\sum_{j=1}^R \D_n^j(\regparam)  = \sum_{i = 0}^{n-1} \left(\frac{1}{R} \sum_{j=1}^R |\widehat{\gnoise^j}_i|^2\right)(\mfilt(\regparam,|\widehat{k}_i|))^2 - \noiseSD^2. 
 \label{eq:SpectralDPavg}
 \end{equation}
 As previously stated, the discrepancy function \eqref{eq:SpectralDP} is monotone increasing, and so the scaled sum \eqref{eq:SpectralDPavg} is monotone increasing as well. If there are data realizations that would otherwise result in discrepancy principle functions that prove difficult for finding a root, averaging these functions with better-behaved functions could provide a single function with a meaningful root (here ``better-behaved" means that the function has a root located within an interval that is not excessively large). The hope is that the poorly-behaved functions are outliers so that the average of the functions can be expected to have a root. If for some reason the better-behaved functions are themselves the outliers, then this averaging approach would not be expected to yield meaningful results. \par 
