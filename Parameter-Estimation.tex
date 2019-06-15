@@ -5,13 +5,13 @@
 \usepackage{color}
 
 % Discrete notation:
-\newcommand{\gVec}{\mathbf{g}}
+\newcommand{\gVec}{\mathbf{g}}	% Vector
 \newcommand{\gnoise}{\widetilde{g}}	% Component
 \newcommand{\gnoiseVec}{\widetilde{\mathbf{g}}}	% Vector
-\newcommand{\kVec}{\mathbf{k}}
+\newcommand{\kVec}{\mathbf{k}}	% Vector
 \newcommand{\kMat}{K}	% Matrix K
 \newcommand{\fVec}{\mathbf{f}}	% Vector
-\newcommand{\tVec}{\mathbf{t}}
+\newcommand{\tVec}{\mathbf{t}}	% Vector
 \newcommand{\ddis}{\mathbf{d}}	% Differential operator
 \newcommand{\trans}{\mathrm{T}}	% Matrix transpose
 \newcommand{\ctrans}{*}	% Conjugate transpose
@@ -42,7 +42,7 @@
 \newcommand{\E}{\operatorname{E}}	% Expected value
 \renewcommand{\Re}{\operatorname{Re}}	% Real part
 \renewcommand{\Im}{\operatorname{Im}}	% Imaginary part
-\newcommand{\NCchi}{\chi'\:}	
+\newcommand{\NCchi}{\chi'\:}	% Noncentral chi-squared
 
 % Singular values and vectors:
 \newcommand{\singular}{s}	% Singular values
@@ -225,7 +225,7 @@ n_{x*y} &= n_x + n_y - 1. \nonumber
 As an illustrative example, let $\mathbf{x} = [1,2,3]$ and $\mathbf{y} = [4,5,6,7]$ be row vectors. The vectors can be thought of as the bi-infinite sequences $(x_n) = (\ldots,0,1,2,3,0\ldots)$ and $(y_n) = (\ldots,0,4,5,6,7,0,\ldots)$. If the sequences are indexed so that $x_1 = 1$ and $y_1 = 4$, then $s_x = s_y = 1$, $e_x = n_x = 3$, and $e_y = n_y = 4$. Then by \eqref{eq:ConResults}, $s_{x*y} = 2$, $e_{x*y} = 8$, and $n_{x*y} = 6$. The bi-infinite sequence produced from the convolution is
 \[x*y = (\ldots,0,4,13,28,34,32,21,0,\ldots),\]
 where $(x*y)_2 = 4$ and $(x*y)_8 = 21$. \par 
-Since the numerical experiments for this report are conducted in MATLAB, a brief remark regarding discrete convolutions in MATLAB will be given. If the built-in function \texttt{conv} is used to evaluate the discrete convolution of row vectors $\mathbf{x}$ and $\mathbf{y}$ described in the previous example, the output is the row vector $[4,13,28,34,32,21]$.  All vectors in MATLAB have a starting index of 1, and the vector resulting from the convolution is no different: the component 4 has an index of 1. While this seems to conflict with \eqref{eq:ConResults} (recall that $s_{x*y} = 2$, not 1), from a practical standpoint there is little reason for concern; usually the components themselves are of interest and not the indexing of the bi-infinite sequence. If one wants to keep track of the indexing as the convolution is evaluated, index vectors can be defined for $\mathbf{x}$ and $\mathbf{y}$ and \eqref{eq:ConResults} can be applied to obtain an index vector for the resulting convolution. See \cite{BoggessAlbert2001Afci} for an explicit MATLAB example. \par 
+Since the numerical experiments for this report are conducted in MATLAB, a brief remark regarding discrete convolutions in MATLAB is be given. If the built-in function \texttt{conv} is used to evaluate the discrete convolution of row vectors $\mathbf{x}$ and $\mathbf{y}$ described in the previous example, the output is the row vector $[4,13,28,34,32,21]$.  All vectors in MATLAB have a starting index of 1, and the vector resulting from the convolution is no different: the component 4 has an index of 1. While this seems to conflict with \eqref{eq:ConResults} (recall that $s_{x*y} = 2$, not 1), from a practical standpoint there is little reason for concern; usually the components themselves are of interest and not the indexing of the bi-infinite sequence. If one wants to keep track of the indexing as the convolution is evaluated, index vectors can be defined for $\mathbf{x}$ and $\mathbf{y}$ and \eqref{eq:ConResults} can be applied to obtain an index vector for the resulting convolution. See \cite{BoggessAlbert2001Afci} for an explicit MATLAB example. \par 
 
 \subsection{Circulant matrices} \label{sec:Circulant matrices}
 In Section \ref{sec:Discrete convolution}, the discrete convolution and some of its variants were discussed. In this section, matrices will be discussed that have connections to discrete convolutions and other concepts. \par 
@@ -277,7 +277,7 @@ and $i = \sqrt{-1}$. The DFT of a vector $\mathbf{f}$ will be denoted by $\wideh
 \begin{equation}
 \mathcal{F}^{-1}(\widehat{\mathbf{f}})_k = \frac{1}{\sqrt{n}}\sum_{j=0}^{n-1} \widehat{f}_j\exp\left(\frac{2\pi{ijk}}{n}\right) = \mathbf{f}
 \end{equation}
-These definitions are nonstandard; typically the factors $1/\sqrt{n}$ in both the forward and inverse DFT definitions are combine as a single factor of $1/n$ in the definition of the forward DFT. The DFT can also be stated in terms of matrix-vector multiplication. Given an $\mathbf{f} \in \mathbb{C}^n$, $\widehat{\mathbf{f}}$ can be expressed as $F\mathbf{f}$ where the matrix $F\in\mathbb{C}^{n\times{n}}$ has components
+These definitions are nonstandard; typically the factors $1/\sqrt{n}$ in both the forward and inverse DFT definitions are combined as a single factor of $1/n$ in the definition of the forward DFT. The DFT can also be stated in terms of matrix-vector multiplication. Given an $\mathbf{f} \in \mathbb{C}^n$, $\widehat{\mathbf{f}}$ can be expressed as $F\mathbf{f}$ where the matrix $F\in\mathbb{C}^{n\times{n}}$ has components
 \begin{equation}
 F_{jk} = \frac{1}{\sqrt{n}}\exp\left(\frac{-2\pi{ijk}}{n}\right), \quad 0 \leq j,k \leq n-1.
 \label{eq:DFT-Matrix}
@@ -291,19 +291,26 @@ C = F^\ctrans\diag(\widehat{\mathbf{c}})F,
 where $C$ is any $n \times n$ circulant matrix and $\widehat{\mathbf{c}}$ is the DFT of the first row of $C$ (recall that the rows of a circulant matrix are circulant right shifts a single row vector of length $n$). The components of $\widehat{\mathbf{c}}$ and the columns of $F^\ctrans$ are the eigenvalues and eigenvectors, respectively, of $C$. For a proof of this property, see \cite{BoggessAlbert2001Afci} or \cite{Vogel:2002}. \par
 Now the properties of the DFT will be connected with the SVD of a circulant matrix, which will be the basis for the experiment design in Section \ref{sec:Experiment design}. Let $\fVec$ and $\kVec$ be the $N$-point discretizations of functions $f$ and $k$ on some interval $[a,b]$. Then the cyclic convolution $\gVec = \kVec * \fVec$ can be computed as a matrix-vector product by constructing an $N \times N$ circulant matrix $\kMat$ from $\kVec$. This construction is carried out by setting the first row of $\kMat$ to be $\kVec$, and each subsequent row to be a circular right shift of the preceding row (see \ref{sec:Circulant matrices}). In MATLAB, the command \texttt{toeplitz([k(1) fliplr(k(2:end))], k)} constructs the matrix $\kMat$. Then $\gVec = \kMat\fVec$, and after the addition of noise the equation \eqref{eq:DisNoise} is obtained. Then by using the property \eqref{eq:CircDiag} with the $N \times N$ unitary Fourier matrix $F$ and assuming that $\kMat$ is invertible, 
 \begin{equation}
-\kMat^{-1}\gnoiseVec = \fVec + (F^*\diag(\widehat{\kVec})F)^{-1}\noiseVec = \fVec + F^*\diag(\widehat{\kVec})^{-1}F\noiseVec = \fVec + \sum_{i = 0}^{n-1} [F^*]_i\left(\frac{\widehat{\noise}_i}{\widehat{k}_i}\right),
+\kMat^{-1}\gnoiseVec = \fVec + (F^*\diag(\widehat{\kVec})F)^{-1}\noiseVec = \fVec + F^*\diag(\widehat{\kVec})^{-1}F\noiseVec = \fVec + \sum_{\ell = 0}^{n-1} [F^*]_\ell\left(\frac{\widehat{\noise}_\ell}{\widehat{k}_\ell}\right),
 \label{eq:InvProdDFT}
 \end{equation}
 where $\widehat{\noise}_i$ and $\widehat{k}_i$ are the $i$th Fourier coefficients of $\noiseVec$ and $\kVec$, respectively, and $[F^*]_i$ is the $i$th column of the matrix $F^*$. Analogous to \eqref{eq:InvProd}, instabilities can arise if $\widehat{k}_i$ is small. By introducing filter factors to reduce possible instability, an approximate solution
 \begin{equation}
-\fVec(\regparam) = \sum_{i = 1}^n [F^*]_i\left(\frac{\filt(\regparam,\widehat{k}_i)\widehat{\gnoise}_i}{\widehat{k}_i}\right)
+\fVec(\regparam) = \sum_{\ell = 0}^{n-1} [F^*]_\ell\left(\frac{\filt(\regparam,\widehat{k}_\ell)\widehat{\gnoise}_\ell}{\widehat{k}_\ell}\right) = F^\ctrans\Phi\widehat{\kMat}^+F\gnoiseVec
 \label{eq:ApproxSolDFT}
 \end{equation}
-can be obtained analogous to \eqref{eq:ApproxSol}. 
+can be obtained analogous to \eqref{eq:ApproxSol}, where $\widehat{\kMat}^+ = \diag(1/\widehat{\kVec})$.
 Since $F^*$ is a matrix representation of the inverse DFT, the approximate solution can be rewritten as
 \[\fVec(\regparam) = F^* \frac{\filt(\regparam,\widehat{\kVec})\widehat{\gnoiseVec}}{\widehat{\kVec}}.\]
 Here $\filt(\regparam,\widehat{\kVec})\widehat{\gnoiseVec}/{\widehat{\kVec}}$ is a vector where the operations of multiplication and division are performed component-wise. This representation is useful for making a connection with the MATLAB implementation. \par
 As mentioned in Section \ref{sec:Introduction}, a Picard plot is often useful in analyzing the numerical instabilities of solutions obtained from either or \eqref{eq:InvProd} or \eqref{eq:InvProdDFT}. Figure \ref{PicardPlot} shows an example of a Picard plot. The terms $|\widehat{k}_i|$ decrease down to machine precision, though the $|\widehat{\gnoise}_i|$ decrease but then level off just above the variance in the noise. As a result, the terms $|\widehat{\gnoise}_i|/|\widehat{k}_i|$ only decrease so far and then begin increasing. The steady increase can produce a blow up of the approximate solution. While illustrating these relationships, a Picard plot is also useful in determining how to truncate the sum in \eqref{eq:ApproxSolDFT} to avoid blow up in the solution. For the plot in Figure \ref{PicardPlot}, the sum in \eqref{eq:ApproxSolDFT} should be truncated around index 8 to obtain a meaningful solution. \par 
+
+\begin{figure}[htb]
+	\centerline{\includegraphics[scale = 0.45]{Figures/PicardPlot1D_F2_S15_W200.eps}}
+\caption{(Left) A Picard plot generated from the second test function, a Gaussian blur with a width of 200, and an SNR of 15. The terms $|\widehat{\gnoise}_i|/|\widehat{k}_i|$ decrease until index 8, at which case the terms increase in magnitude. This is due to the fact that the $|\widehat{k}_i|$ steadily decrease, while the $|\widehat{\gnoise}_i|$ level off just below the variance in the noise. (Right) A zoom-in of the Picard plot is provided, showing that elements of the DFT of $\gnoiseVec$ decay only slightly below the variance of the noise in $\gnoiseVec$.}
+\label{PicardPlot}
+\end{figure}
+
 While the connection between lines \eqref{eq:InvProdDFT} and \eqref{eq:ApproxSolDFT} and the SVD have been noted in regard to the structure of the terms and equations, a complete connection can be made if another property about $\kMat$ is assumed. Until this point $\kMat$ is assumed to be an invertible $N \times N$ circulant matrix formed from a vector $\kVec$. If $\kMat$ is also assumed to be symmetric, then the SVD of $\kMat$ is the same as the diagonalization by the unitary DFT matrix $F$ and the singular values of $\kMat$ are also the eigenvalues. \par 
 
 Since the parameter estimation methods in Section \ref{sec:Parameter estimation methods} involve DFT's of the vector $\gnoiseVec = \gVec + \noiseVec$, some results regarding the distribution of the components of $\widehat{\noiseVec}$ will be presented. The first results will be in regard to the real and imaginary parts of the $\widehat{\noiseVec}$. Letting $A$ and $B$ be the real and imaginary parts, respectively, of the $n \times n$ DFT matrix, Euler's identity gives
@@ -320,16 +327,19 @@ Let $A$ and $B$ be the real and imaginary parts, respectively, of the $n \times 
 \item If $n$ is even, then 
 \begin{align*}
 \langle A_{j\cdot}, A_{k\cdot}\rangle &= \begin{cases}
-1 & j = k, j+k \equiv 0 \bmod n \\ 
-1/2 & j = k, j+k \not\equiv 0 \bmod n \\ 
-1/2 & j \neq k, j+k \equiv 0 \bmod n \\ 
+1 & j = k = 0 \text{ or } j = k = n/2 \\ 
+1/2 & j = k \neq 0 \text{ or } j = k \neq n/2 \\ 
+1/2 & j \neq k \text{ and } k = n - j \\ 
 0 & \text{otherwise} \end{cases}, \\
 \langle B_{j\cdot}, B_{k\cdot}\rangle &= \begin{cases}
-0 & j = k, j+k \equiv 0 \bmod n \\ 
-1/2 & j = k, j+k \not\equiv 0 \bmod n \\ 
--1/2 & j \neq k, j+k \equiv 0 \bmod n \\ 
+0 & j = k = 0 \text{ or } j = k = n/2 \\ 
+1/2 & j = k \neq 0 \text{ or } j = k \neq n/2 \\ 
+-1/2 &  j \neq k \text{ and } k = n - j \\ 
 0 & \text{otherwise} \end{cases}.
 \end{align*}
+Equivalently,
+\[AA^\trans = \frac{1}{2}I + \frac{1}{2}\left(\bm{e}_0^{}\bm{e}_0^\trans + \bm{e}_{n/2}^{}\bm{e}_{n/2}^\trans + \tilde{I}\right), \quad BB^\trans = \frac{1}{2}I - \frac{1}{2}\left(\bm{e}_0^{}\bm{e}_0^\trans + \bm{e}_{n/2}^{}\bm{e}_{n/2}^\trans + \tilde{I}\right),\]
+where $\tilde{I}$ denotes the exchange matrix.
 \item If $n$ is odd, then
 \[\langle A_{j\cdot}, A_{k\cdot}\rangle = \begin{cases}
 1 & j = k = 0 \\ 
@@ -341,56 +351,71 @@ Let $A$ and $B$ be the real and imaginary parts, respectively, of the $n \times 
 1/2 & j = k \neq 0 \\
 -1/2 & j+k = n \\
 0 & \text{otherwise} \end{cases}.\]
+Equivalently,
+\[AA^\trans = \frac{1}{2}I + \frac{1}{2}\left(\bm{e}_0^{}\bm{e}_0^\trans + \tilde{I}\right), \quad BB^\trans = \frac{1}{2}I - \frac{1}{2}\left(\bm{e}_0^{}\bm{e}_0^\trans + \tilde{I}\right).\]
 \end{enumerate}
+Notice that in both the even and odd cases, $AA^\trans + BB^\trans = I$.
+\end{lemma}
 \begin{proof}
 Property (i) will first be established. Letting $A$ and $B$ be as required, \eqref{eq:Components Re(F) and Im(F)} gives
 \begin{equation}
-\langle A_{j\cdot}, B_{k\cdot}\rangle = \frac{1}{n}\sum_{\ell=0}^{n-1}\cos\left(\frac{-2\pi{j\ell}}{n}\right)\sin\left(\frac{-2\pi{\ell{k}}}{n}\right).
+\langle A_{j\cdot}, B_{k\cdot}\rangle = \frac{1}{n}\sum_{\ell=0}^{n-1}\cos\left(\frac{-2\pi{j\ell}}{n}\right)\sin\left(\frac{-2\pi{\ell{k}}}{n}\right) = \frac{1}{n}\sum_{\ell=0}^{n-1}\cos\left(-\theta_{j\ell}\right)\sin\left(-\theta_{k\ell}\right),
 \label{eq: <Re(F),Im(F)>}
 \end{equation}
-Applying the appropriate product-to-sum trigonometric identity and using the fact that sine is an odd function allows for sum in \eqref{eq: <Re(F),Im(F)>} to be evaluated as
+where $\theta_{j\ell} = 2\pi{j\ell}/n$. Applying the appropriate product-to-sum trigonometric identity and using the fact that sine is an odd function allows for sum in \eqref{eq: <Re(F),Im(F)>} to be evaluated as
 \begin{align*}
-\frac{1}{n}\sum_{\ell=0}^{n-1}\cos\left(\frac{-2\pi{j\ell}}{n}\right)\sin\left(\frac{-2\pi{\ell{k}}}{n}\right) &= \frac{1}{2n}\sum_{\ell=0}^{n-1}\left[\sin\left(\frac{-2\pi{\ell(j+k)}}{n}\right) - \sin\left(\frac{-2\pi{\ell(k-j)}}{n}\right)\right] \\
-&= \frac{1}{2n}\sum_{\ell=0}^{n-1}\left[\sin\left(\frac{2\pi{\ell(k-j)}}{n}\right) - \sin\left(\frac{2\pi{\ell(j+k)}}{n}\right)\right] \\
+\frac{1}{n}\sum_{\ell=0}^{n-1}\cos\left(-\theta_{j\ell}\right)\sin\left(-\theta_{k\ell}\right) &= \frac{1}{2n}\sum_{\ell=0}^{n-1}\left[\sin\left(-\theta_{(j+k)\ell}\right) - \sin\left(-\theta_{(k-j)\ell}\right)\right] \\
+&= \frac{1}{2n}\sum_{\ell=0}^{n-1}\left[\sin\left(\theta_{(k-j)\ell}\right) - \sin\left(\theta_{(j+k)\ell}\right)\right] \\
 &= \frac{1}{2n}\left(s_1 - s_2\right),
 \end{align*}
 where
-\[s_1 = \sum_{\ell=0}^{n-1}\sin\left(\frac{2\pi{\ell(k-j)}}{n}\right), \quad s_2 = \sum_{\ell=0}^{n-1}\sin\left(\frac{2\pi{\ell(j+k)}}{n}\right).\]
-If $j = k$, then the summands for $s_1$ are zero and thus $s_1 = 0$. If $j \neq k$, then since the arguments of the sine terms are in arithmetic progression, $s_1$ can be expressed as
-\begin{equation}
-s_1 = \frac{\sin(\pi{(k-j)})\sin(\pi(n-1)(k-j)/n)}{\sin(\pi{(k-j)}/n)}.
-\label{eq:s1}
-\end{equation}
-Since $k-j$ is an integer, the first sine term in the numerator of \eqref{eq:s1} is zero, making $s_1 = 0$. Similarly, if $j + k = n$, then the summands for $s_2$ are zero and thus $s_2 = 0$. If $j + k \neq n$, then $s_2$ can be expressed as
-\begin{equation}
-s_2 = \frac{\sin(\pi(j+k))\sin(\pi(n-1)(j+k)/n)}{\sin(\pi{(j+k)}/n)}.
-\label{eq:s2}
-\end{equation}
-Again $j+k$ is an integer, so the first sine term in the numerator of \eqref{eq:s1} is zero and thus $s_2 = 0$.  Therefore $\langle A_{j\cdot}, B_{k\cdot}\rangle = 0$ for all $0 \leq j,k \leq n-1$. \par
+\[s_1 = \sum_{\ell=0}^{n-1}\sin\left(\theta_{(k-j)\ell}\right), \quad s_2 = \sum_{\ell=0}^{n-1}\sin\left(\theta_{(j+k)\ell}\right).\]
+Both $s_1$ and $s_2$ are of the form $\sum_{\ell=0}^{n-1} \sin(\theta_{p\ell})$, where $p$ is an integer (either $k-j$ or $j+k$). This form can be written as
+\[\sum_{\ell=0}^{n-1} \sin\left(\theta_{p\ell}\right) = \Im\left(\sum_{\ell=0}^{n-1} \exp\left(i\theta_{p\ell}\right)\right).\] 
+If $p$ is a multiple of $n$, then $p = mn$ for some $m \in \mathbb{Z}$. Thus $\exp(i\theta_{p\ell}) = \exp(i2\pi{mn}\ell/n) = \exp(i2\pi{m\ell}) = 1$, and so
+\[\Im\left(\sum_{\ell=0}^{n-1} \exp\left(i\theta_{p\ell}\right)\right) = \Im\left(\sum_{\ell=0}^{n-1} 1\right) = 0.\]
+If $p$ is not a multiple of $n$, then
+\[\Im\left(\sum_{\ell=0}^{n-1} \exp\left(i\theta_{p\ell}\right)\right) = \Im\left(\frac{1-\exp(i\theta_{np})}{1-\exp(i\theta_p)}\right).\]
+However, $\theta_{np} = 2\pi{np}/n = 2\pi{p}$. Since $p$ is an integer, $\exp(i\theta_{np})  =\exp(i2\pi{p}) = 1$, meaning that the preceding equation is equal to zero. Therefore
+\begin{align*}
+s_1 &= \sum_{\ell=0}^{n-1}\sin\left(\theta_{(k-j)\ell}\right) = \Im\left(\sum_{\ell=0}^{n-1}\exp\left(i\theta_{(k-j)\ell}\right)\right) = 0, \\
+s_2 &= \sum_{\ell=0}^{n-1}\sin\left(\theta_{(j+k)\ell}\right) = \Im\left(\sum_{\ell=0}^{n-1}\exp\left(i\theta_{(j+k)\ell}\right)\right) = 0
+\end{align*}
+for all $0 \leq j,k \leq n-1$, which implies $\langle A_j,B_k\rangle = (s_1 - s_2)/2n = 0$. \par 
 The results of properties (ii) and (iii) regarding $A$ will now be proved; the results regarding $B$ will be handled afterwards. Utilizing \eqref{eq:Components Re(F) and Im(F)} again,
-\begin{equation}
-\langle A_{j\cdot}, A_{k\cdot}\rangle = \frac{1}{n}\sum_{\ell=0}^{n-1}\cos\left(\frac{-2\pi{j\ell}}{n}\right)\cos\left(\frac{-2\pi{\ell{k}}}{n}\right).
-\label{eq: <A,A>}
-\end{equation}
+\[\langle A_{j\cdot}, A_{k\cdot}\rangle = \frac{1}{n}\sum_{\ell=0}^{n-1}\cos\left(\frac{-2\pi{j\ell}}{n}\right)\cos\left(\frac{-2\pi{\ell{k}}}{n}\right) = \frac{1}{n}\sum_{\ell=0}^{n-1}\cos\left(-\theta_{j\ell}\right)\cos\left(-\theta_{k\ell}\right).\]
 By the fact that cosine is an even function and applying another product-to-sum identity gives $\langle A_{j\cdot}, A_{k\cdot}\rangle = (c_1 + c_2)/2n$, where
-\[c_1 = \sum_{\ell=0}^{n-1}\cos\left(\frac{2\pi{(j-k)\ell}}{n}\right), \quad c_2 = \sum_{\ell=0}^{n-1}\cos\left(\frac{2\pi{(j+k)\ell}}{n}\right).\]
-\indent Assume that $n$ is even, and suppose that $j = k$. Certainly $c_1 = n$, but there are two cases for $c_2$. If $j + k$ is equal to zero or $n$, then $c_2 = n$ as well, so that $\langle A_{j\cdot}, A_{k\cdot}\rangle = (n+n)/2n = 1$. If $j + k$ is not equal to zero or $n$, then since the arguments of the cosines in $c_2$ are in arithmetic progression, $c_2$ can be rewritten as
 \begin{equation}
-c_2 = \frac{\sin(\pi(j+k))\cos(\pi(n-1)(j+k)/n)}{\sin(\pi(j+k)/n)}.
-\label{eq:c2}
-\end{equation}
-Since $j+k$ is an integer, \eqref{eq:c2} is reduced to $c_2 = 0$. Thus $\langle A_{j\cdot},A_{k\cdot}\rangle = (n+0)/2n = 1/2$ for $j = k$ and $j + k \not\equiv 0 \bmod n$. If $j \neq k$ but $j+k \equiv 0 \bmod n$, then $c_2 = 0$ and $c_1$ can be rewritten as
-\begin{equation}
-c_1 = \frac{\sin(\pi(j-k))\cos(\pi(n-1)(j-k)/n)}{\sin(\pi(j-k)/n)}.
-\label{eq:c1}
-\end{equation}
-Since $j-k$ is an integer, \eqref{eq:c1} reduces to $c_1 = 0$, and so $\langle A_{j\cdot},A_{k\cdot}\rangle = (0+n)/2n = 1/2$ for $j \neq k$ and $j + k \equiv 0 \bmod n$. Lastly, if $j \neq k$ and $j+k \not\equiv 0 \bmod n$ then \eqref{eq:c1} and \eqref{eq:c2} are both reduced to $c_1 = c_2 = 0$. Thus $\langle A_{j\cdot},A_{k\cdot}\rangle = 0$ for $j \neq k$ and $j+k \not\equiv 0 \bmod n$, which completes the result of property (ii) regarding $A$ when $n$ is even.  \par
-If $n$ is odd, then it is not possible for both $j = k$ and $j + k = n$ because this would imply that $n$ is even. Thus the conditions $j=k$ and $j+k \equiv 0 \bmod n$ become the condition that $j = k = 0$. If $j \neq k$, then the condition $j+k \equiv 0 \bmod n$ simplifies to $j + k = n$. \par 
-For the results regarding $B$, recall that the DFT matrix $F$ is unitary. Expanding the product $FF^\ctrans$ in terms of $A$ and $B$ gives
-\[I = FF^\ctrans = (A+iB)(A^\trans - iB^\trans) = AA^\trans - iAB^\trans + iBA^\trans + BB^\trans.\]
-Property (i) implies that $-iAB^\trans$ and $iBA^\trans$ are zero matrices, so $I = AA^\trans + BB^\trans$. Since the components of the matrix $BB^\trans$ are equal to the inner products of the rows of $B$, the results of properties (ii) and (iii) regarding $B$ then follow from subtracting the results about $A$ from the identity matrix.
+c_1 = \sum_{\ell=0}^{n-1}\cos\left(\theta_{(j-k)\ell}\right), \quad c_2 = \sum_{\ell=0}^{n-1}\cos\left(\theta_{(j+k)\ell}\right).
+\label{eq:c_1 and c_2}
+\end{equation} 
+Both $c_1$ and $c_2$ are of the form $\sum_{\ell=0}^{n-1} \cos(\theta_{p\ell})$, where $p$ is an integer (either $j-k$ or $j+k$). This form can be written as
+\[\sum_{\ell=0}^{n-1} \cos\left(\theta_{p\ell}\right) = \Re\left(\sum_{\ell=0}^{n-1} \exp\left(i\theta_{p\ell}\right)\right).\] 
+If $p$ is a multiple of $n$, then $p = mn$ for some $m \in \mathbb{Z}$. Thus $\exp(i\theta_{p\ell}) = \exp(i2\pi{mn}\ell/n) = \exp(i2\pi{m\ell}) = 1$, and so
+\[\Re\left(\sum_{\ell=0}^{n-1} \exp\left(i\theta_{p\ell}\right)\right) = \Re\left(\sum_{\ell=0}^{n-1} 1\right) = n.\]
+If $p$ is not a multiple of $n$, then
+\[\Re\left(\sum_{\ell=0}^{n-1} \exp\left(i\theta_{p\ell}\right)\right) = \Re\left(\frac{1-\exp(i\theta_{np})}{1-\exp(i\theta_p)}\right).\]
+However, $\theta_{np} = 2\pi{np}/n = 2\pi{p}$. Since $p$ is an integer, $\exp(i\theta_{np})  =\exp(i2\pi{p}) = 1$, meaning that the preceding equation is equal to zero. Thus 0 and $n$ are the two possible values of $c_1$ and $c_2$, which depend upon whether or not $j-k$ and $j+k$ are multiples of $n$. \par 
+First consider property (ii), the case where $n$ is even.
+\begin{itemize}
+\item If $j = k = 0$ or $j = k = n/2$, then $j-k = 0$ and $j+k$ is either 0 or $n$. In other words, both $j-k$ and $j+k$ are multiples of $n$, and so $c_1 = c_2 = n$. This implies that $\langle A_j,A_k \rangle = (c_1 + c_2)/2n = (n+n)/2n = 1$.
+\item If $j = k \neq 0$ or $j = k \neq n/2$, then $j-k = 0$ but $j+k$ is not a multiple of $n$. Thus $c_1 = n$ and $c_2 = 0$, and so $\langle A_j,A_k \rangle = (c_1 + c_2)/2n = (n+0)/2n = 1/2$.
+\item If $j \neq k$ and $k = n-j$, then $j-k$ is not a multiple of $n$ but $j+k = n$. Thus $c_1 = 0$ and $c_2 = n$, and so $\langle A_j,A_k \rangle = (c_1 + c_2)/2n = (0+n)/2n = 1/2$.
+\item If $j \neq k$ and $k \neq n-j$, then neither $j-k$ nor $j+k$ are multiples of $n$. Thus $c_1 = c_2 = 0$, and so $\langle A_j,A_k \rangle = (c_1 + c_2)/2n = (0+0)/2n = 0$.
+\end{itemize}
+For property (iii), the case where $n$ is odd, $n/2$ need not be considered and the preceding argument holds. \par 
+For the results regarding $B$,
+\[\langle B_j, B_k \rangle = \frac{1}{n}\sum_{\ell=0}^{n-1}\sin\left(\frac{-2\pi{j\ell}}{n}\right)\sin\left(\frac{-2\pi{\ell{k}}}{n}\right) = \frac{1}{n}\sum_{\ell=0}^{n-1}\sin\left(-\theta_{j\ell}\right)\sin\left(-\theta_{k\ell}\right).\]
+By the fact that sine is an odd function and applying another product-to-sum identity gives $\langle B_{j\cdot}, B_{k\cdot}\rangle = (c_1 - c_2)/2n$, where $c_1$ and $c_2$ are defined by \eqref{eq:c_1 and c_2}. Again 0 and $n$ are the two possible values of $c_1$ and $c_2$, which depend upon whether or not $j-k$ and $j+k$ are multiples of $n$. \par 
+First consider property (ii), the case where $n$ is even.
+\begin{itemize}
+\item If $j = k = 0$ or $j = k = n/2$, then $j-k = 0$ and $j+k$ is either 0 or $n$. In other words, both $j-k$ and $j+k$ are multiples of $n$, and so $c_1 = c_2 = n$. This implies that $\langle B_j,B_k \rangle = (c_1 - c_2)/2n = (n-n)/2n = 0$.
+\item If $j = k \neq 0$ or $j = k \neq n/2$, then $j-k = 0$ but $j+k$ is not a multiple of $n$. Thus $c_1 = n$ and $c_2 = 0$, and so $\langle B_j,B_k \rangle = (c_1 - c_2)/2n = (n-0)/2n = 1/2$.
+\item If $j \neq k$ and $k = n-j$, then $j-k$ is not a multiple of $n$ but $j+k = n$. Thus $c_1 = 0$ and $c_2 = n$, and so $\langle B_j,B_k \rangle = (c_1 - c_2)/2n = (0-n)/2n = -1/2$.
+\item If $j \neq k$ and $k \neq n-j$, then neither $j-k$ nor $j+k$ are multiples of $n$. Thus $c_1 = c_2 = 0$, and so $\langle B_j,B_k \rangle = (c_1 - c_2)/2n = (0+0)/2n = 0$.
+\end{itemize}
+For property (iii), the case where $n$ is odd, $n/2$ need not be considered and again the preceding argument holds.
 \end{proof}
-\end{lemma}
 
 There are some important consequences of this lemma. First, it shows that while the rows (columns) of $F$ form an orthonormal basis for $\mathbb{C}^n$, the orthogonality of the rows of $A$ and $B$ are limited by conditions on the row indices. Another consequence is that while $F$ is invertible and therefore has full rank, the matrices $A$ and $B$ are rank-deficient. Just how the components of $A$ and $B$ depend upon the parity of $n$, the next lemma illustrates that the rank of these matrices depend upon $n$ as well.
 
@@ -398,7 +423,7 @@ There are some important consequences of this lemma. First, it shows that while 
 \label{lem:Rank of A and B}
 Let $A$ and $B$ be the real and imaginary parts, respectively, of the $n \times n$ DFT matrix. If $n$ is even, then $\rank(A) = (n/2)+1$ and $\rank(B) = (n/2)-1$. If $n$ is odd, then $\rank(A) = (n+1)/2$ and $\rank(B) = (n-1)/2$. 
 \begin{proof}
-Let the matrices $A$, and $B$ be as required. By applying various properties of the rank of a matrix, all of the effort can be dedicated to finding the rank of $A$. Since the rank of a matrix is equal to the dimension of the row space, the approach that will be taken is to determine the dimension of the row space of $A$ using the preceding lemma. The dimension of the row space will be determined by counting the number of linearly independent rows of $A$. \par 
+Let the matrices $A$, and $B$ be as required. By applying various properties of the rank of a matrix, all of the effort can be dedicated to finding the rank of $A$. Since the rank of a matrix is equal to the dimension of the row space (or column space), the approach that will be taken is to determine the dimension of the row space of $A$ using the preceding lemma. The dimension of the row space will be determined by counting the number of linearly independent rows of $A$. \par 
 Assuming that $n$ is even, let $0 \leq j,\ell \leq n/2$ with $j \neq \ell$. From Lemma \ref{lem:Inner products},
 \[\langle A_{j\cdot},A_{\ell\cdot}\rangle = \begin{cases}
 1/2 & j+\ell \equiv 0 \bmod n \\
@@ -424,12 +449,12 @@ The rank deficiency of $A$ and $B$ have statistical significance as well.  Given
 However, the covariance matrices of $\Re(\widehat{\noiseVec})$ and $\Im(\widehat{\noiseVec})$ are rank-deficient, and therefore do not have density functions in the traditional sense; their density functions exist in $\rank(AA^\trans)$ and $\rank(BB^\trans)$-dimensional subspaces of $\mathbb{R}^n$. These density functions can be expressed using the psuedoinverses of the covariance matrices or, equivalently, by defining new transformations based on the rank of $AA^\trans$ and $BB^\trans$ \cite{Rao1973}. \par 
 Instead of dealing with density functions of multivariate distributions, the distribution of the components of $\Re(\widehat{\noiseVec})$ and $\Im(\widehat{\noiseVec})$ will be determined individually. As a step towards this goal, the independence of the components of $\Re(\widehat{\noiseVec})$ and $\Im\{\widehat{\noiseVec}\}$ can be established by applying the following result regarding independence of linear combinations of random variables \cite{LukacsKing}.
 
-\begin{theorem}
+\begin{theorem}[Lukacs \& King, 1954]
 \label{thm:Independence Theorem}
-Let $X_1,\ldots,X_n$ be $n$ independently distributed random variables, and assume that the $n$th moment of each $X_{\ell}$ $(\ell = 1,\ldots,n)$ exists. The necessary and sufficient conditions for the existence of two statistically independent linear forms $Y_1 = \sum_{\ell=1}^n a_{\ell}X_{\ell}$ and $Y_2 = \sum_{\ell=1}^n b_{\ell}X_{\ell}$ are:
+Let $Z_1,\ldots,Z_n$ be $n$ independently distributed random variables, and assume that the $n$th moment of each $Z_{\ell}$ exists, i.e. $\E(Z_\ell^n)$ exists for each $\ell = 1,\ldots,n$. The necessary and sufficient conditions for the existence of two statistically independent linear forms $\sum_{\ell=1}^n a_{\ell}Z_{\ell}$ and $\sum_{\ell=1}^n b_{\ell}Z_{\ell}$ are:
 \begin{enumerate}[label=(\roman*)]
 \item Each random variable which has a nonzero coefficient in both forms is normally distributed.
-\item $\sum_{\ell=1}^n a_{\ell}b_{\ell}\sigma_{\ell}^2 = 0$, where $\sigma_{\ell}^2$ denotes the variance of $X_{\ell}$ $(\ell = 1,\ldots,n)$.
+\item $\sum_{\ell=1}^n a_{\ell}b_{\ell}\sigma_{\ell}^2 = 0$, where $\sigma_{\ell}^2$ denotes the variance of $Z_{\ell}$ $(\ell = 1,\ldots,n)$.
 \end{enumerate}
 \end{theorem}
 
@@ -453,12 +478,12 @@ Having established the independence of the components of $\Re(\widehat{\noiseVec
 \label{lem:Component distributions}
 Let $X = \Re(\widehat{\noiseVec})$ and $Y = \Im(\widehat{\noiseVec})$, where $\noiseVec$ is a random $n$-vector with $\noiseVec \sim \mathcal{N}(\bm{0},\noiseSD^2 I)$. Then for $0 \leq j \leq n-1$, the distribution of $X_j$ and $Y_j$ is as follows.  
 \begin{enumerate}[label=(\roman*)]
-\item If $n$ is even, then the distribution of the components of $X$ is that
+\item If $n$ is even, then the distribution of the components of $X$ is
 \[X_j \sim \begin{cases}
 \mathcal{N}(0,\noiseSD^2), & j = 0,n/2 \\
 \mathcal{N}(0,\noiseSD^2/2), & \text{otherwise} \end{cases}.\]
 The distribution of the components of $Y$ is that $Y_j = 0$ for $j \in \{0,n/2\}$ and $Y_j \sim \mathcal{N}(0,\noiseSD^2/2)$ otherwise.
-\item If $n$ is odd, then the distribution of the components of $X$ is that
+\item If $n$ is odd, then the distribution of the components of $X$ is
 \[X_j \sim \begin{cases}
 \mathcal{N}(0,\noiseSD^2), & j = 0 \\
 \mathcal{N}(0,\noiseSD^2/2), & \text{otherwise} \end{cases}.\]
@@ -468,7 +493,7 @@ The distribution of the components of $Y$ is that $Y_j = 0$ for $j = 0$ and $Y_j
 Let $X$ and $Y$ be as required. Using \eqref{eq:Components Re(F) and Im(F)}, $X_j$ can be written as
 \[X_j = \sum_{k=0}^{n-1} \frac{1}{\sqrt{n}}\cos\left(\frac{-2\pi{jk}}{n}\right)\noise_k.\]
 Since the covariance matrix of $\noiseVec$ is $\noiseSD^2 I$, the components of $\noiseVec$ are independent and identically distributed $\mathcal{N}(0,\noiseSD^2)$. Thus by the properties of a sum of independent normal random variables \cite{CasellaBerger02},
-\[X_j \sim \mathcal{N}\left(0, \noiseSD^2\sum_{k=0}^{n-1} \left(\frac{1}{\sqrt{n}}\cos\left(\frac{-2\pi{jk}}{n}\right)\right)^2\right) = \mathcal{N}\left(0, \noiseSD^2 \langle A_{j\cdot},A_{j\cdot} \rangle\right).\]
+\[X_j \sim \mathcal{N}\left(0, \noiseSD^2\sum_{k=0}^{n-1} \left(\frac{1}{\sqrt{n}}\cos\left(\frac{-2\pi{jk}}{n}\right)\right)^2\right) = \mathcal{N}\left(0, \noiseSD^2 \langle A_{j\cdot},A_{j\cdot} \rangle\right) = \mathcal{N}\left(0, \noiseSD^2 (AA^\trans)_{jj}\right).\]
 Lemma \ref{lem:Inner products} then provides the cases for evaluation of the inner product. Determination of the distribution of $Y_k$ is similar.
 \end{proof}
 \end{lemma}
@@ -519,22 +544,22 @@ This is the density function of the exponential distribution with scale paramete
 \end{proof}
 \end{theorem}
 
-With the statistics of the DFT of white noise established, the combination $\gVec + \noiseVec = \gnoiseVec$ can be analyzed. By the properties of the multivariate normal distribution, if $\noiseVec \sim \mathcal{N}(\bm{0},\noiseSD^2 I)$ then $\gnoiseVec \sim \mathcal{N}(\gVec,\noiseSD^2 I)$ because $\gVec$ is a constant vector. Thus the distribution of the components of $\Re(\widehat{\gnoiseVec})$ and $\Im(\widehat{\gnoiseVec})$ are readily obtained be extending previous results.
+With the statistics of the DFT of white noise established, the combination $\gVec + \noiseVec = \gnoiseVec$ can be analyzed. By the properties of the multivariate normal distribution, if $\noiseVec \sim \mathcal{N}(\bm{0},\noiseSD^2 I)$ then $\gnoiseVec \sim \mathcal{N}(\gVec,\noiseSD^2 I)$ because $\gVec$ is a constant vector. Thus the distribution of the components of $\Re(\widehat{\gnoiseVec})$ and $\Im(\widehat{\gnoiseVec})$ are readily obtained by extending previous results.
 
 \begin{lemma}[Extension of Lemma \ref{lem:Component distributions}]
 \label{lem:Component distributions ext.}
 Let $\bm{X} = \Re(\widehat{\gnoiseVec})$ and $\bm{Y} = \Im(\widehat{\gnoiseVec})$, where $\gnoiseVec$ is a random $n$-vector with $\gnoiseVec \sim \mathcal{N}(\gVec,\noiseSD^2 I)$. Then for $0 \leq j \leq n-1$, the distribution of $X_j$ and $Y_j$ is as follows.  
 \begin{enumerate}[label=(\roman*)]
-\item If $n$ is even, then the distribution of the components of $\bm{X}$ is that
+\item If $n$ is even, then the distribution of the components of $\bm{X}$ is
 \[X_j \sim \begin{cases}
 \mathcal{N}(\Re(\widehat{g}_j),\noiseSD^2), & j = 0,n/2 \\
 \mathcal{N}(\Re(\widehat{g}_j),\noiseSD^2/2), & \text{otherwise} \end{cases}.\]
-The distribution of the components of $\bm{Y}$ is that $Y_j = 0$ for $j \in \{0,n/2\}$ and $Y_j \sim \mathcal{N}(\Im(\widehat{g}_j),\noiseSD^2/2)$ otherwise.
-\item If $n$ is odd, then the distribution of the components of $\bm{X}$ is that
+The distribution of the components of $\bm{Y}$ is $Y_j = 0$ for $j \in \{0,n/2\}$ and $Y_j \sim \mathcal{N}(\Im(\widehat{g}_j),\noiseSD^2/2)$ otherwise.
+\item If $n$ is odd, then the distribution of the components of $\bm{X}$ is
 \[X_j \sim \begin{cases}
 \mathcal{N}(\Re(\widehat{g}_j),\noiseSD^2), & j = 0 \\
 \mathcal{N}(\Re(\widehat{g}_j),\noiseSD^2/2), & \text{otherwise} \end{cases}.\]
-The distribution of the components of $\bm{Y}$ is that $Y_j = 0$ for $j = 0$ and \\ $Y_j \sim \mathcal{N}(\Im(\widehat{g}_j),\noiseSD^2/2)$ otherwise.
+The distribution of the components of $\bm{Y}$ is $Y_j = 0$ for $j = 0$ and \\ $Y_j \sim \mathcal{N}(\Im(\widehat{g}_j),\noiseSD^2/2)$ otherwise.
 \end{enumerate}
 \begin{proof}
 Let $X$ and $Y$ be as required. Using \eqref{eq:Components Re(F) and Im(F)}, $X_j$ can be written as
@@ -542,7 +567,8 @@ Let $X$ and $Y$ be as required. Using \eqref{eq:Components Re(F) and Im(F)}, $X_
 Since the covariance matrix of $\gnoiseVec$ is $\noiseSD^2 I$, the components $\gnoise_k$ are independent and distributed $\mathcal{N}(\gVec_k,\noiseSD^2)$ for all $0 \leq k \leq n-1$. Thus by the properties of a sum of independent normal random variables \cite{CasellaBerger02},
 \begin{align*}
 X_j &\sim \mathcal{N}\left(\sum_{k=0}^{n-1} \frac{1}{\sqrt{n}}\cos\left(\frac{-2\pi{jk}}{n}\right)g_k, \noiseSD^2\sum_{k=0}^{n-1} \left(\frac{1}{\sqrt{n}}\cos\left(\frac{-2\pi{jk}}{n}\right)\right)^2\right) \\
-&= \mathcal{N}\left(\Re(\widehat{g}_j), \noiseSD^2 \langle A_{j\cdot},A_{j\cdot} \rangle\right).
+&= \mathcal{N}\left(\Re(\widehat{g}_j), \noiseSD^2 \langle A_{j\cdot},A_{j\cdot} \rangle\right) \\
+&= \mathcal{N}\left(\Re(\widehat{g}_j), \noiseSD^2 (AA^\trans)_{jj} \right) 
 \end{align*}
 Lemma \ref{lem:Inner products} then provides the cases for evaluation of the inner product. Determination of the distribution of $Y_k$ is similar.
 \end{proof}
@@ -604,13 +630,6 @@ With the components of $\bm{X}^2$ examined, focus can directed towards the compo
 The final part of the proof is to establish the distribution of $X_j^2 + Y_j^2$ for the two cases of $j$. If $j = 0$, then $Y_j^2 = 0$ and so $X_j^2 + Y_j^2$ has the same distribution of $X_j^2$, which is $\NCchi^2(1,(\Re(\widehat{g}_j)/\noiseSD)^2/2)$. If $j \neq 0$, then $X_j^2$ and $Y_j^2$ are distributed $\NCchi^2(1,(\Re(\widehat{g}_j)/\noiseSD)^2)$ and $\NCchi^2(1,(\Im(\widehat{g}_j)/\noiseSD)^2)$, respectively. Thus by their independence and the reproductive property of the noncentral chi-squared distribution \cite[p.~182]{Rao1973},
 \[X_j^2 + Y_j^2 \sim \NCchi^2\left(1 + 1,\left(\frac{\Re(\widehat{g}_j)}{\noiseSD}\right)^2 + \left(\frac{\Im(\widehat{g}_j)}{\noiseSD}\right)^2\right) = \NCchi^2\left(2,\frac{|\widehat{g}_j|^2}{\noiseSD^2}\right).\]
 \end{proof}
-
-\begin{figure}
-	\centerline{\includegraphics[scale = 0.45]{Figures/PicardPlot1D_F2_S15_W200.eps}}
-\caption{(Left) A Picard plot generated from the second test function, a Gaussian blur with a width of 200, and an SNR of 15. The terms $|\widehat{\gnoise}_i|/|\widehat{k}_i|$ decrease until index 8, at which case the terms increase in magnitude. This is due to the fact that the $|\widehat{k}_i|$ steadily decrease, while the $|\widehat{\gnoise}_i|$ level off just below the variance in the noise. (Right) A zoom-in of the Picard plot is provided, showing that elements of the DFT of $\gnoiseVec$ decay only slightly below the variance of the noise in $\gnoiseVec$.}
-\label{PicardPlot}
-\end{figure}
-
 
 \subsection{The Sampling Theorem and Aliasing} \label{sec:The Sampling Theorem and Aliasing}
 Since the goal of this project is to determine the efficacy of downsampling for regularization parameter estimation, the effects of downsampling on the parameter estimation methods must be carefully examined. The parameter estimation methods are considered from the perspective of the DFT, and so downsampling must be viewed from the same perspective. \par 
