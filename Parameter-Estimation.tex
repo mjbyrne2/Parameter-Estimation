@@ -140,7 +140,10 @@ A primary consequence of $\kMat$ being ill-conditioned relates to the accuracy o
 \gnoiseVec = \kMat\fVec + \noiseVec
 \label{eq:DisNoise}
 \end{equation}
-where $\noiseVec$ is a vector that represents any errors in $\gVec$ (this is equivalent to the statement $\gnoiseVec = \gVec + \noiseVec$). For further simplicity, assume that $\noiseVec \sim \mathcal{N}(\bm{0},\noiseSD^2I)$, where $\bm{0}$ is the zero vector of length $n$ and $I$ is the $n \times n$ identity matrix. In other words, the error vector $\noiseVec$ is an $n$-dimension Gaussian random variable with mean zero and variance $\noiseSD^2$. \par
+where $\noiseVec$ is a vector that represents any errors in $\gVec$ (this is equivalent to the statement $\gnoiseVec = \gVec + \noiseVec$). For further simplicity, assume that $\noiseVec \sim \mathcal{N}(\bm{0},\noiseSD^2I)$, where $\bm{0}$ is the zero vector of length $n$ and $I$ is the $n \times n$ identity matrix. In other words, the error vector $\noiseVec$ is an $n$-dimension Gaussian random variable with mean zero and variance $\noiseSD^2$. 
+
+\subsection{The Singular Value Decomposition} \label{sec:SVD}
+
 Since direct matrix inversion is not practical, and at times not even possible since $\kMat$ can be singular, a singular value decomposition (SVD) of $\kMat$ can be an alternative. Assuming $\kMat$ is a real $m \times n$ matrix, the SVD of $\kMat$ is
 \begin{equation}
 \kMat = U\Sigma{V^\trans}
@@ -159,10 +162,7 @@ A common approach to overcome numerical instabilities is to multiply the summand
 \fVec(\regparam) = \sum_{\ell = 1}^n \RSV_\ell\filt(\regparam,\singular_\ell)\left(\frac{{\LSV^\trans_\ell}\gnoiseVec}{\singular_\ell}\right) = V\Phi\Sigma^+U^\trans\gnoiseVec,
 \label{eq:ApproxSol}
 \end{equation}
-where the matrix $\Phi$ is diagonal with $\Phi_{\ell\ell} = \filt(\regparam,\singular_\ell)$ for $\ell = 1,\ldots,n$. The most desired property of the filter functions is that $\filt(\singular_\ell)/\singular_\ell \approx 1$  for large values of $\singular_\ell$ and $\filt(\singular_\ell)/\singular_\ell \approx 0$ for small values of $\singular_\ell$. A brief overview of common filter functions will now be provided. 
-
-\subsection{Filter functions} \label{sec:Filter functions}
-Perhaps the simplest filter function is
+where the matrix $\Phi$ is diagonal with $\Phi_{\ell\ell} = \filt(\regparam,\singular_\ell)$ for $\ell = 1,\ldots,n$. The most desired property of the filter functions is that $\filt(\singular_\ell)/\singular_\ell \approx 1$  for large values of $\singular_\ell$ and $\filt(\singular_\ell)/\singular_\ell \approx 0$ for small values of $\singular_\ell$.  Perhaps the simplest filter function is
 \[\filt(\regparam,\singular_\ell) = \begin{cases}
 1, & \singular_\ell^2 > \regparam \\
 0, & \singular_\ell^2 \leq \regparam
@@ -170,6 +170,9 @@ Perhaps the simplest filter function is
 Using this function in (3) gives the approximate solution
 \[\fVec(\regparam) = \sum_{\singular_\ell^2 > \regparam} \frac{{\LSV^\trans_\ell}\gnoiseVec}{\singular_\ell}\RSV_\ell\]
 which actually corresponds to the solution obtained using a truncated singular value decomposition (TSVD) of the matrix $\kMat$ \cite{Vogel:2002}. \par
+
+\subsection{Tikhonov regularization} \label{sec:Tikhonov reg.}
+
 A less simple filter function is
 \begin{equation}
 \filt(\regparam,\singular_\ell)  = \frac{\singular_\ell^2}{\singular_\ell^2 + \regparam^2}
@@ -193,19 +196,80 @@ The use of the Tikhonov filter function to generate an approximate solution is k
 \fVec(\regparam) = \sum_{\ell = 1}^n \filt(\regparam,\singular_\ell)\frac{{\LSV^\trans_\ell}\gnoiseVec}{\singular_\ell}\RSV_\ell = \sum_{\ell = 1}^n \frac{\singular_\ell{\LSV^\trans_\ell}\gnoiseVec}{\singular_\ell^2 + \regparam^2}\RSV_\ell = V\Phi\Sigma^+U^\trans\gnoiseVec.
 \label{eq:TikSol}
 \end{equation}
-An alternative representation of the above Tikhonov solution is
+An alternative (and more general) representation of the above Tikhonov solution is
 \begin{equation}
 \fVec(\regparam) = \arg\min_{\fVec \in \mathbb{R}^n} \|\kMat\fVec - \gnoiseVec\|^2 + \regparam^2\|D\fVec\|^2,
 \label{eq:TikSol2}
 \end{equation}
-where $D$ is the matrix representation of a linear operator. The term $\|D\fVec\|^2$ is commonly called the penalty function \cite{Vogel:2002}. The representation \eqref{eq:TikSol} follows from selecting $D$ to be $I$, the $n \times n$ identity matrix. If the matrix $D$ in \eqref{eq:TikSol2} is non-singular, then the substitutions $\mathbf{y} = D\fVec$ and $A = \kMat{D}^{-1}$ give
+where $D$ is the matrix representation of a linear operator. The term $\|D\fVec\|^2$ is commonly called the penalty function \cite{Vogel:2002}. The representation \eqref{eq:TikSol} follows from selecting $D$ to be $I$, the $n \times n$ identity matrix. The solution \eqref{eq:TikSol2} can also be expressed in block form as
 \begin{equation}
-\mathbf{y}(\regparam) = \arg\min_{\mathbf{y} \in \mathbb{R}^n} \|A\mathbf{y} - \gnoiseVec\|^2 + \regparam^2\|\mathbf{y}\|^2.
+\fVec(\regparam) = \arg\min_{\fVec \in \mathbb{R}^n} \left\| \begin{bmatrix}
+\kMat \\
+\regparam D
+\end{bmatrix}\fVec - \begin{bmatrix}
+\gnoiseVec \\
+\bm{0}
+\end{bmatrix} \right\|^2.
+\label{eq:TikSol3}
+\end{equation}
+If the matrix $D$ in \eqref{eq:TikSol2} is non-singular, then the substitutions $\mathbf{y} = D\fVec$, $A = \kMat{D}^{-1}$, and $\mathbf{b} = \gnoiseVec$ give
+\begin{equation}
+\mathbf{y}(\regparam) = \arg\min_{\mathbf{y} \in \mathbb{R}^n} \|A\mathbf{y} - \mathbf{b}\|^2 + \regparam^2\|\mathbf{y}\|^2.
 \label{eq:TikSol Standard Form}
 \end{equation}
 This is known as standard form of the regularization problem. Once $\mathbf{y}$ is obtained from \eqref{eq:TikSol Standard Form}, the final solution is recovered by $\fVec = D^{-1}\mathbf{y}$.  \par 
-However, there are many examples of matrices $D$ that are singular, such as finite difference matrices that approximate derivative operators. In such cases, the regularization can still be recast in standard form as follows. 
-
+However, there are many examples of matrices $D$ that are singular, such as finite difference matrices that approximate derivative operators. In such cases, the regularization can still be recast in standard form, which relies upon the introduction of the generalized singular value decomposition (GSVD). To simply the derivation of the GSVD, it will be assumed that the matrix $[\kMat, \regparam D]^\trans$ in \eqref{eq:TikSol3} has full column rank, which ensures that the solution $\fVec(\regparam)$ is unique. Another simplifying assumption being that the $p \times n$ matrix $D$ has full row rank. Under these assumptions \cite[p.~104]{ABT}, the matrices $\kMat$ and $D$ can be expressed as
+\begin{equation}
+\label{eq:GSVD matrices}
+\kMat = U\Lambda X^\trans, \quad D = VMX^\trans
+\end{equation}
+where the matrices $U$, $V$, $\Lambda$, $M$, and $X$ satisfy the following: 
+\begin{itemize}
+\item $U$ is an orthogonal $m \times m$ matrix. 
+\item $V$ is an orthogonal $p \times p$ matrix.
+\item $\Lambda$ is an $m \times n$ matrix with the property that the nonzero entries satisfy
+\[0 \leq \Lambda_{1,k+1} \leq \ldots \leq \Lambda_{m,k+m} \leq 1,\]
+where $k = 0$ if $m > n$ and $k = n-m$ otherwise. 
+\item $M$ is a diagonal $p \times n$ matrix with $M_{1,1} \geq \ldots \geq M_{p,p} \geq 0.$
+\item $M^\trans M + \Lambda^\trans \Lambda = I$ (the dimension of the identity matrix being $n \times n$).
+\item $X$ is a nonsingular $n \times n$ matrix.
+\end{itemize}
+The generalized singular values of $\kMat$ and $D$ are defined as $\gamma_\ell = \lambda_{\ell}/\mu_{\ell}$, where
+\begin{equation}
+\label{eq:GSVD lambda}
+\lambda_\ell = \sqrt{(\Lambda^\trans \Lambda)_{\ell,\ell}}, \quad \mu_\ell = \sqrt{(M^\trans M)_{\ell,\ell}}
+\end{equation}
+for $\ell = 1,\ldots,n$. In contrast to the SVD, the generalized singular values are ordered $\gamma_1 \leq \ldots \leq \gamma_n$. It is also possible that $\mu_\ell = 0$ for some $\ell$, in which case $\gamma_\ell$ is not defined. Even when $\mu_\ell$ is small, the resulting value of $\gamma_\ell$ can be excessively large which again emphasizing the need for regularization. By applying the orthogonality properties of the GSVD matrices \cite[p.~105-106]{ABT}, the regularized solution \eqref{eq:TikSol3} can be expressed as
+\begin{equation}
+\label{eq:TikSol GSVD}
+\fVec(\regparam) = \sum_{\ell=1}^n \frac{\gamma_\ell^2}{\gamma_\ell^2 + \regparam^2} \frac{U_{\cdot,\ell+k}^\trans\gnoiseVec}{\lambda_\ell}Y_{\cdot,\ell}.
+\end{equation}
+The terms $\gamma_\ell^2/(\gamma_\ell^2 + \regparam^2)$ are known as the GSVD filter factors, which are identical in form to the filter factors \eqref{eq:TikFilt}. \par 
+With the derivation of the GSVD established, an extension the transformation that rendered \eqref{eq:TikSol Standard Form} is now stated \cite[p.~38]{Hansen:98}. First, a weighted version of the psuedoinverse $D^+$ is defined as
+\[D_{\kMat}^+ = \left(I - \left(\kMat\left(I - D^+D\right)\right)^+\kMat\right)D^+\]
+If $p \geq n$, then $D_{\kMat}^+$ is the same as $D^+$. We must also consider
+\[\fVec_0 \equiv \left(\kMat\left(I - D^+D\right)\right)^+\gnoiseVec,\]
+which is the component of the solution contained in $\nullspace(D)$.  Using the GSVD matrices from \eqref{eq:GSVD matrices}, $D_{\kMat}^+$ and $\fVec_0$ can be written as
+\begin{equation}
+\label{eq:Trans. 1}
+D_{\kMat}^+ = X \begin{bmatrix}
+M^{-1} \\
+\mathbf{0}
+\end{bmatrix}V^\trans, \quad \fVec_0 = \sum_{\ell=m+1}^{n} U_{\cdot,\ell}^\trans\gnoiseVec X_{\cdot,\ell}
+\end{equation}
+where $\bm{0}$ is the zero matrix of appropriate dimension. The form of the regularized solution can now be expressed as \eqref{eq:TikSol Standard Form} with substitutions $\mathbf{y} = D\fVec$, $A = \kMat{D_{\kMat}^+}$, and $\mathbf{b} = \gnoiseVec - \kMat\fVec_0$. This is shown by writing
+\begin{align*}
+\|A\mathbf{y} - \mathbf{b}\|^2 + \regparam^2\|\mathbf{y}\|^2 &= \|\kMat{D_{\kMat}^+}D\fVec - \gnoiseVec - \kMat\fVec_0\|^2 + \regparam^2\|D\fVec\|^2 \\
+&=  \|\kMat({D_{\kMat}^+}D\fVec - \fVec_0) - \gnoiseVec\|^2 + \regparam^2\|D\fVec\|^2
+\end{align*}
+as well as 
+\begin{align*}
+{D_{\kMat}^+}D\fVec - \fVec_0 &= \left(I - \left(\kMat\left(I - D^+D\right)\right)^+\kMat\right)D^+D\fVec - \left(\kMat\left(I - D^+D\right)\right)^+\gnoiseVec \\
+&= D^+D\fVec - \left(\kMat\left(I - D^+D\right)\right)^+\kMat D^+D\fVec - \left(\kMat\left(I - D^+D\right)\right)^+\gnoiseVec \\ 
+&= D^+D\fVec - \left(\kMat\left(I - D^+D\right)\right)^+\left[\kMat D^+D\fVec + \gnoiseVec\right] \\
+&= 
+\end{align*}
+The final solution is then recovered by $\fVec = D_{\kMat}^+\mathbf{y} + \fVec_0$. \newpage
 
 \section{Analytical tools} \label{sec:Analytical tools}
 
@@ -311,7 +375,9 @@ As mentioned in Section \ref{sec:Introduction}, a Picard plot is often useful in
 \label{PicardPlot}
 \end{figure}
 
-While the connection between lines \eqref{eq:InvProdDFT} and \eqref{eq:ApproxSolDFT} and the SVD have been noted in regard to the structure of the terms and equations, a complete connection can be made if another property about $\kMat$ is assumed. Until this point $\kMat$ is assumed to be an invertible $N \times N$ circulant matrix formed from a vector $\kVec$. If $\kMat$ is also assumed to be symmetric, then the SVD of $\kMat$ is the same as the diagonalization by the unitary DFT matrix $F$ and the singular values of $\kMat$ are also the eigenvalues. \par 
+While the connection between lines \eqref{eq:InvProdDFT} and \eqref{eq:ApproxSolDFT} and the SVD have been noted in regard to the structure of the terms and equations, a complete connection can be made if another property about $\kMat$ is assumed. Until this point $\kMat$ is assumed to be an invertible $N \times N$ circulant matrix formed from a vector $\kVec$. If $\kMat$ is also assumed to be symmetric, then the SVD of $\kMat$ is the same as the diagonalization by the unitary DFT matrix $F$ and the singular values of $\kMat$ are also the eigenvalues. \newpage
+
+\section{Statistical considerations} \label{sec:Stats.}
 
 Since the parameter estimation methods in Section \ref{sec:Parameter estimation methods} involve DFT's of the vector $\gnoiseVec = \gVec + \noiseVec$, some results regarding the distribution of the components of $\widehat{\noiseVec}$ will be presented. The first results will be in regard to the real and imaginary parts of the $\widehat{\noiseVec}$. Letting $A$ and $B$ be the real and imaginary parts, respectively, of the $n \times n$ DFT matrix, Euler's identity gives
 \begin{equation}
@@ -323,15 +389,15 @@ for $0 \leq j,k \leq n-1$. It is clear from \eqref{eq:Components Re(F) and Im(F)
 \label{lem:Inner products}
 Let $A$ and $B$ be the real and imaginary parts, respectively, of the $n \times n$ DFT matrix, and let $\langle\cdot,\cdot\rangle$ denote standard inner product (dot product) of $\mathbb{R}^n$. Then for $0 \leq j,k \leq n-1$:
 \begin{enumerate}[label=(\roman*)]
-\item $\langle A_{j\cdot}, B_{k\cdot}\rangle = 0$.
+\item $\langle A_{j,\cdot}, B_{k,\cdot}\rangle = 0$.
 \item If $n$ is even, then 
 \begin{align*}
-\langle A_{j\cdot}, A_{k\cdot}\rangle &= \begin{cases}
+\langle A_{j,\cdot}, A_{k,\cdot}\rangle &= \begin{cases}
 1 & j = k = 0 \text{ or } j = k = n/2 \\ 
 1/2 & j = k \neq 0 \text{ or } j = k \neq n/2 \\ 
 1/2 & j \neq k \text{ and } k = n - j \\ 
 0 & \text{otherwise} \end{cases}, \\
-\langle B_{j\cdot}, B_{k\cdot}\rangle &= \begin{cases}
+\langle B_{j,\cdot}, B_{k,\cdot}\rangle &= \begin{cases}
 0 & j = k = 0 \text{ or } j = k = n/2 \\ 
 1/2 & j = k \neq 0 \text{ or } j = k \neq n/2 \\ 
 -1/2 &  j \neq k \text{ and } k = n - j \\ 
@@ -341,12 +407,12 @@ Equivalently,
 \[AA^\trans = \frac{1}{2}I + \frac{1}{2}\left(\bm{e}_0^{}\bm{e}_0^\trans + \bm{e}_{n/2}^{}\bm{e}_{n/2}^\trans + \tilde{I}\right), \quad BB^\trans = \frac{1}{2}I - \frac{1}{2}\left(\bm{e}_0^{}\bm{e}_0^\trans + \bm{e}_{n/2}^{}\bm{e}_{n/2}^\trans + \tilde{I}\right),\]
 where $\tilde{I}$ denotes the exchange matrix.
 \item If $n$ is odd, then
-\[\langle A_{j\cdot}, A_{k\cdot}\rangle = \begin{cases}
+\[\langle A_{j,\cdot}, A_{k,\cdot}\rangle = \begin{cases}
 1 & j = k = 0 \\ 
 1/2 & j = k \neq 0 \\
 1/2 & j+k = n \\
 0 & \text{otherwise} \end{cases}, \quad 
-\langle B_{j\cdot}, B_{k\cdot}\rangle = \begin{cases}
+\langle B_{j,\cdot}, B_{k,\cdot}\rangle = \begin{cases}
 0 & j = k = 0 \\ 
 1/2 & j = k \neq 0 \\
 -1/2 & j+k = n \\
@@ -359,7 +425,7 @@ Notice that in both the even and odd cases, $AA^\trans + BB^\trans = I$.
 \begin{proof}
 Property (i) will first be established. Letting $A$ and $B$ be as required, \eqref{eq:Components Re(F) and Im(F)} gives
 \begin{equation}
-\langle A_{j\cdot}, B_{k\cdot}\rangle = \frac{1}{n}\sum_{\ell=0}^{n-1}\cos\left(\frac{-2\pi{j\ell}}{n}\right)\sin\left(\frac{-2\pi{\ell{k}}}{n}\right) = \frac{1}{n}\sum_{\ell=0}^{n-1}\cos\left(-\theta_{j\ell}\right)\sin\left(-\theta_{k\ell}\right),
+\langle A_{j,\cdot}, B_{k,\cdot}\rangle = \frac{1}{n}\sum_{\ell=0}^{n-1}\cos\left(\frac{-2\pi{j\ell}}{n}\right)\sin\left(\frac{-2\pi{\ell{k}}}{n}\right) = \frac{1}{n}\sum_{\ell=0}^{n-1}\cos\left(-\theta_{j\ell}\right)\sin\left(-\theta_{k\ell}\right),
 \label{eq: <Re(F),Im(F)>}
 \end{equation}
 where $\theta_{j\ell} = 2\pi{j\ell}/n$. Applying the appropriate product-to-sum trigonometric identity and using the fact that sine is an odd function allows for sum in \eqref{eq: <Re(F),Im(F)>} to be evaluated as
@@ -381,9 +447,9 @@ However, $\theta_{np} = 2\pi{np}/n = 2\pi{p}$. Since $p$ is an integer, $\exp(i\
 s_1 &= \sum_{\ell=0}^{n-1}\sin\left(\theta_{(k-j)\ell}\right) = \Im\left(\sum_{\ell=0}^{n-1}\exp\left(i\theta_{(k-j)\ell}\right)\right) = 0, \\
 s_2 &= \sum_{\ell=0}^{n-1}\sin\left(\theta_{(j+k)\ell}\right) = \Im\left(\sum_{\ell=0}^{n-1}\exp\left(i\theta_{(j+k)\ell}\right)\right) = 0
 \end{align*}
-for all $0 \leq j,k \leq n-1$, which implies $\langle A_j,B_k\rangle = (s_1 - s_2)/2n = 0$. \par 
+for all $0 \leq j,k \leq n-1$, which implies $\langle A_{j,\cdot},B_{k,\cdot}\rangle = (s_1 - s_2)/2n = 0$. \par 
 The results of properties (ii) and (iii) regarding $A$ will now be proved; the results regarding $B$ will be handled afterwards. Utilizing \eqref{eq:Components Re(F) and Im(F)} again,
-\[\langle A_{j\cdot}, A_{k\cdot}\rangle = \frac{1}{n}\sum_{\ell=0}^{n-1}\cos\left(\frac{-2\pi{j\ell}}{n}\right)\cos\left(\frac{-2\pi{\ell{k}}}{n}\right) = \frac{1}{n}\sum_{\ell=0}^{n-1}\cos\left(-\theta_{j\ell}\right)\cos\left(-\theta_{k\ell}\right).\]
+\[\langle A_{j,\cdot}, A_{k,\cdot}\rangle = \frac{1}{n}\sum_{\ell=0}^{n-1}\cos\left(\frac{-2\pi{j\ell}}{n}\right)\cos\left(\frac{-2\pi{\ell{k}}}{n}\right) = \frac{1}{n}\sum_{\ell=0}^{n-1}\cos\left(-\theta_{j\ell}\right)\cos\left(-\theta_{k\ell}\right).\]
 By the fact that cosine is an even function and applying another product-to-sum identity gives $\langle A_{j\cdot}, A_{k\cdot}\rangle = (c_1 + c_2)/2n$, where
 \begin{equation}
 c_1 = \sum_{\ell=0}^{n-1}\cos\left(\theta_{(j-k)\ell}\right), \quad c_2 = \sum_{\ell=0}^{n-1}\cos\left(\theta_{(j+k)\ell}\right).
@@ -398,21 +464,21 @@ If $p$ is not a multiple of $n$, then
 However, $\theta_{np} = 2\pi{np}/n = 2\pi{p}$. Since $p$ is an integer, $\exp(i\theta_{np})  =\exp(i2\pi{p}) = 1$, meaning that the preceding equation is equal to zero. Thus 0 and $n$ are the two possible values of $c_1$ and $c_2$, which depend upon whether or not $j-k$ and $j+k$ are multiples of $n$. \par 
 First consider property (ii), the case where $n$ is even.
 \begin{itemize}
-\item If $j = k = 0$ or $j = k = n/2$, then $j-k = 0$ and $j+k$ is either 0 or $n$. In other words, both $j-k$ and $j+k$ are multiples of $n$, and so $c_1 = c_2 = n$. This implies that $\langle A_j,A_k \rangle = (c_1 + c_2)/2n = (n+n)/2n = 1$.
-\item If $j = k \neq 0$ or $j = k \neq n/2$, then $j-k = 0$ but $j+k$ is not a multiple of $n$. Thus $c_1 = n$ and $c_2 = 0$, and so $\langle A_j,A_k \rangle = (c_1 + c_2)/2n = (n+0)/2n = 1/2$.
-\item If $j \neq k$ and $k = n-j$, then $j-k$ is not a multiple of $n$ but $j+k = n$. Thus $c_1 = 0$ and $c_2 = n$, and so $\langle A_j,A_k \rangle = (c_1 + c_2)/2n = (0+n)/2n = 1/2$.
-\item If $j \neq k$ and $k \neq n-j$, then neither $j-k$ nor $j+k$ are multiples of $n$. Thus $c_1 = c_2 = 0$, and so $\langle A_j,A_k \rangle = (c_1 + c_2)/2n = (0+0)/2n = 0$.
+\item If $j = k = 0$ or $j = k = n/2$, then $j-k = 0$ and $j+k$ is either 0 or $n$. In other words, both $j-k$ and $j+k$ are multiples of $n$, and so $c_1 = c_2 = n$. This implies that $\langle A_{j,\cdot},A_{k,\cdot} \rangle = (c_1 + c_2)/2n = (n+n)/2n = 1$.
+\item If $j = k \neq 0$ or $j = k \neq n/2$, then $j-k = 0$ but $j+k$ is not a multiple of $n$. Thus $c_1 = n$ and $c_2 = 0$, and so $\langle A_{j,\cdot},A_{k,\cdot} \rangle = (c_1 + c_2)/2n = (n+0)/2n = 1/2$.
+\item If $j \neq k$ and $k = n-j$, then $j-k$ is not a multiple of $n$ but $j+k = n$. Thus $c_1 = 0$ and $c_2 = n$, and so $\langle A_{j,\cdot},A_{k,\cdot} \rangle = (c_1 + c_2)/2n = (0+n)/2n = 1/2$.
+\item If $j \neq k$ and $k \neq n-j$, then neither $j-k$ nor $j+k$ are multiples of $n$. Thus $c_1 = c_2 = 0$, and so $\langle A_{j,\cdot},A_{k,\cdot} \rangle = (c_1 + c_2)/2n = (0+0)/2n = 0$.
 \end{itemize}
 For property (iii), the case where $n$ is odd, $n/2$ need not be considered and the preceding argument holds. \par 
 For the results regarding $B$,
-\[\langle B_j, B_k \rangle = \frac{1}{n}\sum_{\ell=0}^{n-1}\sin\left(\frac{-2\pi{j\ell}}{n}\right)\sin\left(\frac{-2\pi{\ell{k}}}{n}\right) = \frac{1}{n}\sum_{\ell=0}^{n-1}\sin\left(-\theta_{j\ell}\right)\sin\left(-\theta_{k\ell}\right).\]
-By the fact that sine is an odd function and applying another product-to-sum identity gives $\langle B_{j\cdot}, B_{k\cdot}\rangle = (c_1 - c_2)/2n$, where $c_1$ and $c_2$ are defined by \eqref{eq:c_1 and c_2}. Again 0 and $n$ are the two possible values of $c_1$ and $c_2$, which depend upon whether or not $j-k$ and $j+k$ are multiples of $n$. \par 
+\[\langle B_{j,\cdot}, B_{k,\cdot} \rangle = \frac{1}{n}\sum_{\ell=0}^{n-1}\sin\left(\frac{-2\pi{j\ell}}{n}\right)\sin\left(\frac{-2\pi{\ell{k}}}{n}\right) = \frac{1}{n}\sum_{\ell=0}^{n-1}\sin\left(-\theta_{j\ell}\right)\sin\left(-\theta_{k\ell}\right).\]
+By the fact that sine is an odd function and applying another product-to-sum identity gives $\langle B_{j,\cdot}, B_{k,\cdot}\rangle = (c_1 - c_2)/2n$, where $c_1$ and $c_2$ are defined by \eqref{eq:c_1 and c_2}. Again 0 and $n$ are the two possible values of $c_1$ and $c_2$, which depend upon whether or not $j-k$ and $j+k$ are multiples of $n$. \par 
 First consider property (ii), the case where $n$ is even.
 \begin{itemize}
-\item If $j = k = 0$ or $j = k = n/2$, then $j-k = 0$ and $j+k$ is either 0 or $n$. In other words, both $j-k$ and $j+k$ are multiples of $n$, and so $c_1 = c_2 = n$. This implies that $\langle B_j,B_k \rangle = (c_1 - c_2)/2n = (n-n)/2n = 0$.
-\item If $j = k \neq 0$ or $j = k \neq n/2$, then $j-k = 0$ but $j+k$ is not a multiple of $n$. Thus $c_1 = n$ and $c_2 = 0$, and so $\langle B_j,B_k \rangle = (c_1 - c_2)/2n = (n-0)/2n = 1/2$.
-\item If $j \neq k$ and $k = n-j$, then $j-k$ is not a multiple of $n$ but $j+k = n$. Thus $c_1 = 0$ and $c_2 = n$, and so $\langle B_j,B_k \rangle = (c_1 - c_2)/2n = (0-n)/2n = -1/2$.
-\item If $j \neq k$ and $k \neq n-j$, then neither $j-k$ nor $j+k$ are multiples of $n$. Thus $c_1 = c_2 = 0$, and so $\langle B_j,B_k \rangle = (c_1 - c_2)/2n = (0+0)/2n = 0$.
+\item If $j = k = 0$ or $j = k = n/2$, then $j-k = 0$ and $j+k$ is either 0 or $n$. In other words, both $j-k$ and $j+k$ are multiples of $n$, and so $c_1 = c_2 = n$. This implies that $\langle B_{j,\cdot},B_{k,\cdot} \rangle = (c_1 - c_2)/2n = (n-n)/2n = 0$.
+\item If $j = k \neq 0$ or $j = k \neq n/2$, then $j-k = 0$ but $j+k$ is not a multiple of $n$. Thus $c_1 = n$ and $c_2 = 0$, and so $\langle B_{j,\cdot},B_{k,\cdot} \rangle = (c_1 - c_2)/2n = (n-0)/2n = 1/2$.
+\item If $j \neq k$ and $k = n-j$, then $j-k$ is not a multiple of $n$ but $j+k = n$. Thus $c_1 = 0$ and $c_2 = n$, and so $\langle B_{j,\cdot},B_{k,\cdot} \rangle = (c_1 - c_2)/2n = (0-n)/2n = -1/2$.
+\item If $j \neq k$ and $k \neq n-j$, then neither $j-k$ nor $j+k$ are multiples of $n$. Thus $c_1 = c_2 = 0$, and so $\langle B_{j,\cdot},B_{k,\cdot} \rangle = (c_1 - c_2)/2n = (0+0)/2n = 0$.
 \end{itemize}
 For property (iii), the case where $n$ is odd, $n/2$ need not be considered and again the preceding argument holds.
 \end{proof}
@@ -425,14 +491,14 @@ Let $A$ and $B$ be the real and imaginary parts, respectively, of the $n \times 
 \begin{proof}
 Let the matrices $A$, and $B$ be as required. By applying various properties of the rank of a matrix, all of the effort can be dedicated to finding the rank of $A$. Since the rank of a matrix is equal to the dimension of the row space (or column space), the approach that will be taken is to determine the dimension of the row space of $A$ using the preceding lemma. The dimension of the row space will be determined by counting the number of linearly independent rows of $A$. \par 
 Assuming that $n$ is even, let $0 \leq j,\ell \leq n/2$ with $j \neq \ell$. From Lemma \ref{lem:Inner products},
-\[\langle A_{j\cdot},A_{\ell\cdot}\rangle = \begin{cases}
+\[\langle A_{j,\cdot},A_{\ell,\cdot}\rangle = \begin{cases}
 1/2 & j+\ell \equiv 0 \bmod n \\
 0 & j+\ell \not\equiv 0 \bmod n
 \end{cases}.\]
 However, $0 \leq j,\ell \leq n/2$ implies that $j+\ell \not\equiv 0 \bmod n$ because congruence is only achieved if both $j$ and $\ell$ are zero or $n/2$, and this would violate the condition that $j \neq \ell$. Thus the first $(n/2)+1$ rows of $A$ form an orthogonal set of vectors, and so they are linearly independent. \par 
 However, this only shows that $\rank(A) \geq (n/2)+1$. In order to show equality, it will now be shown that the remaining $(n/2)-1$ rows of $A$ are copies of preceding rows. Let $0 \leq j \leq n/2$, and consider row $\ell = n - j$. From \eqref{eq:Components Re(F) and Im(F)} and the parity of cosine, the components of row $\ell$ are
-\[A_{\ell{k}} = \frac{1}{\sqrt{n}}\cos\left(\frac{-2\pi{\ell{k}}}{n}\right) = \frac{1}{\sqrt{n}}\cos\left(\frac{-2\pi{(n-j){k}}}{n}\right) = \frac{1}{\sqrt{n}}\cos\left(\frac{-2\pi{jk}}{n} + 2\pi{k}\right).\]
-Since the column index $k$ is an integer, the periodicity of cosine gives $A_{\ell{k}} = A_{jk}$. Thus rows $j$ and $n-j$ of the matrix $A$ are the same for all $0 \leq j \leq n/2$, and therefore $\rank(A) = (n/2)+1$.  The argument that $\rank(A) = (n+1)/2$ for odd $n$ is identical with the exception that $j$ and $\ell$ are restricted so $j \neq \ell$ and $0 \leq j,\ell \leq (n-1)/2$. \par 
+\[A_{\ell,{k}} = \frac{1}{\sqrt{n}}\cos\left(\frac{-2\pi{\ell{k}}}{n}\right) = \frac{1}{\sqrt{n}}\cos\left(\frac{-2\pi{(n-j){k}}}{n}\right) = \frac{1}{\sqrt{n}}\cos\left(\frac{-2\pi{jk}}{n} + 2\pi{k}\right).\]
+Since the column index $k$ is an integer, the periodicity of cosine gives $A_{\ell,{k}} = A_{j,k}$. Thus rows $j$ and $n-j$ of the matrix $A$ are the same for all $0 \leq j \leq n/2$, and therefore $\rank(A) = (n/2)+1$.  The argument that $\rank(A) = (n+1)/2$ for odd $n$ is identical with the exception that $j$ and $\ell$ are restricted so $j \neq \ell$ and $0 \leq j,\ell \leq (n-1)/2$. \par 
 A similar argument for the rank of $B$ could be made, but for the sake of brevity a different approach can be taken which uses some matrix rank inequalities and  the result from Lemma \ref{lem:Inner products} that $AB^\trans$ is a zero matrix (regardless of the parity of $n$). Recalling that an invertible matrix has full rank and using the subadditive property of rank,
 \[n = \rank(F) = \rank(A + iB) \leq \rank(A) + \rank(iB) = \rank(A) + \rank(B).\] 
 Applying Sylvester's rank inequality to the product $AB^\trans$ gives
@@ -446,7 +512,7 @@ The rank deficiency of $A$ and $B$ have statistical significance as well.  Given
 \Re(\widehat{\noiseVec}) = A\noise \sim \mathcal{N}(\bm{0},\noiseSD^2 AA^\trans), \quad \Im(\widehat{\noiseVec}) = B\noiseVec \sim \mathcal{N}(\bm{0},\noiseSD^2 BB^\trans), \quad
 \label{eq:Real and imaginary distributions}
 \end{equation}
-However, the covariance matrices of $\Re(\widehat{\noiseVec})$ and $\Im(\widehat{\noiseVec})$ are rank-deficient, and therefore do not have density functions in the traditional sense; their density functions exist in $\rank(AA^\trans)$ and $\rank(BB^\trans)$-dimensional subspaces of $\mathbb{R}^n$. These density functions can be expressed using the psuedoinverses of the covariance matrices or, equivalently, by defining new transformations based on the rank of $AA^\trans$ and $BB^\trans$ \cite{Rao1973}. \par 
+However, the covariance matrices of $\Re(\widehat{\noiseVec})$ and $\Im(\widehat{\noiseVec})$ are rank-deficient, and therefore do not have density functions in the traditional sense; their density functions exist in $\rank(AA^\trans)$ and $\rank(BB^\trans)$-dimensional subspaces of $\mathbb{R}^n$. These density functions can be expressed using the psuedoinverses of the covariance matrices or, equivalently, by defining new transformations based on the rank of $AA^\trans$ and $BB^\trans$ \cite[p.~527-528]{Rao1973}. \par 
 Instead of dealing with density functions of multivariate distributions, the distribution of the components of $\Re(\widehat{\noiseVec})$ and $\Im(\widehat{\noiseVec})$ will be determined individually. As a step towards this goal, the independence of the components of $\Re(\widehat{\noiseVec})$ and $\Im\{\widehat{\noiseVec}\}$ can be established by applying the following result regarding independence of linear combinations of random variables \cite{LukacsKing}.
 
 \begin{theorem}[Lukacs \& King, 1954]
@@ -492,7 +558,7 @@ The distribution of the components of $Y$ is that $Y_j = 0$ for $j = 0$ and $Y_j
 \begin{proof}
 Let $X$ and $Y$ be as required. Using \eqref{eq:Components Re(F) and Im(F)}, $X_j$ can be written as
 \[X_j = \sum_{k=0}^{n-1} \frac{1}{\sqrt{n}}\cos\left(\frac{-2\pi{jk}}{n}\right)\noise_k.\]
-Since the covariance matrix of $\noiseVec$ is $\noiseSD^2 I$, the components of $\noiseVec$ are independent and identically distributed $\mathcal{N}(0,\noiseSD^2)$. Thus by the properties of a sum of independent normal random variables \cite{CasellaBerger02},
+Since the covariance matrix of $\noiseVec$ is $\noiseSD^2 I$, the components of $\noiseVec$ are independent and identically distributed $\mathcal{N}(0,\noiseSD^2)$. Thus by the properties of a sum of independent normal random variables \cite[p.~184]{CasellaBerger02},
 \[X_j \sim \mathcal{N}\left(0, \noiseSD^2\sum_{k=0}^{n-1} \left(\frac{1}{\sqrt{n}}\cos\left(\frac{-2\pi{jk}}{n}\right)\right)^2\right) = \mathcal{N}\left(0, \noiseSD^2 \langle A_{j\cdot},A_{j\cdot} \rangle\right) = \mathcal{N}\left(0, \noiseSD^2 (AA^\trans)_{jj}\right).\]
 Lemma \ref{lem:Inner products} then provides the cases for evaluation of the inner product. Determination of the distribution of $Y_k$ is similar.
 \end{proof}
@@ -514,7 +580,7 @@ Let $\noiseVec$ be a random $n$-vector with $\noiseVec \sim \mathcal{N}(\bm{0},\
 \emph{exponential}(\noiseSD^2), & \text{otherwise} \end{cases}.\]
 \end{enumerate}
 \begin{proof}
-Let $\noiseVec \sim \mathcal{N}(\bm{0},\noiseSD^2 I)$, $\bm{X} = \Re(\widehat{\noiseVec})$, and $\bm{Y} = \Im(\widehat{\noiseVec})$. The proof relies on determining the distribution of the components of $\bm{X}^2$ and $\bm{Y}^2$ (here the exponent indicates that the components are individually squared) and then looking at their sum. Determination of the distribution of the components of $\bm{X}^2$ and $\bm{Y}^2$ is carried out by applying a result regarding univariate one-to-one transformations \cite{CasellaBerger02}. Without loss of generality, we assume that $n$ is odd. \par
+Let $\noiseVec \sim \mathcal{N}(\bm{0},\noiseSD^2 I)$, $\bm{X} = \Re(\widehat{\noiseVec})$, and $\bm{Y} = \Im(\widehat{\noiseVec})$. The proof relies on determining the distribution of the components of $\bm{X}^2$ and $\bm{Y}^2$ (here the exponent indicates that the components are individually squared) and then looking at their sum. Determination of the distribution of the components of $\bm{X}^2$ and $\bm{Y}^2$ is carried out by applying a result regarding univariate one-to-one transformations \cite[p.~53]{CasellaBerger02}. Without loss of generality, we assume that $n$ is odd. \par
 First consider the components of $\bm{X}^2$. Since $n$ is odd, the two cases of $X^2_j$ to be considered are for $j = 0$ and $j \neq 0$, both of which are handled by Lemma \ref{lem:Component distributions}. If $j = 0$, then $X_j \sim \mathcal{N}(0,\noiseSD^2)$. Letting $g(x) = x^2$, the transformation $U = g(X_j) = X^2_j$ is not one-to-one on the entire sample space $\mathbb{R}$. However, $\mathbb{R}$ can be partitioned as $A_0 \cup A_1 \cup A_2$ with $A_0 = \{0\}$, $A_1 = (-\infty,0)$, and $A_2 = (0,\infty)$. Defining $g_1(x) = x^2$ and $g_2(x) = x^2$ with $g_1^{-1}(u) = -\sqrt{u}$ and $g_2^{-1}(u) = \sqrt{u}$,
 \begin{enumerate}
 \item $g(x) = g_1(x) = g_2(x)$ for all $x \in A_1 \cup A_2$,
@@ -529,7 +595,7 @@ f_U(u) &= \frac{1}{\sqrt{2\pi\noiseSD^2}}\exp\left(\frac{-(g_1^{-1}(u))^2}{2\noi
 &= \frac{1}{\sqrt{2\pi\noiseSD^2}} \frac{1}{\sqrt{u}} \exp\left(\frac{-u}{2\noiseSD^2}\right).
 \end{align*}
 This is probability density function of the gamma distribution with shape parameter $1/2$ and scale parameter $2\noiseSD^2$. The same argument holds for when $j \neq 0$, with scale parameter instead being $\noiseSD^2$. The argument can also be applied for $Y_j^2$ when $j \neq 0$ since $X_j$ and $Y_j$ are identically distributed in this case. When $j = 0$, $Y_j$ is a constant random variable with $Y_j = 0$, and so $Y_j^2 = 0$ as well. \par 
-Now that the distribution of $X_j^2$ and $Y_j^2$ is known, the distribution of their sum can be established. If $j = 0$, then $X_j^2 + Y_j^2$ has the same distribution as just $X_j^2$. The situation is more interesting when $j \neq 0$ since $Y_j^2$ is no longer a constant random variable. By Lemma \ref{lem:App of Ind Thm}, $X_j$ and $Y_j$ are independent for all $0 \leq j \leq n-1$. As a consequence, $X_j^2$ and $Y_j^2$ are independent for all $0 \leq j \leq n-1$. Let $f_{X_j^2}$ and $f_{Y_j^2}$ denotes the probability density functions of $X_j^2$ and $Y_j^2$, respectively. Since the probability density function of a sum of two independent continuous random variables is equal to the convolution of their individual density functions \cite{CasellaBerger02}, the density function of $V = X_j^2 + Y_j^2$ is given by 
+Now that the distribution of $X_j^2$ and $Y_j^2$ is known, the distribution of their sum can be established. If $j = 0$, then $X_j^2 + Y_j^2$ has the same distribution as just $X_j^2$. The situation is more interesting when $j \neq 0$ since $Y_j^2$ is no longer a constant random variable. By Lemma \ref{lem:App of Ind Thm}, $X_j$ and $Y_j$ are independent for all $0 \leq j \leq n-1$. As a consequence, $X_j^2$ and $Y_j^2$ are independent for all $0 \leq j \leq n-1$. Let $f_{X_j^2}$ and $f_{Y_j^2}$ denotes the probability density functions of $X_j^2$ and $Y_j^2$, respectively. Since the probability density function of a sum of two independent continuous random variables is equal to the convolution of their individual density functions \cite[p.~215]{CasellaBerger02}, the density function of $V = X_j^2 + Y_j^2$ is given by 
 \[f_V(v) = \int_{-\infty}^{\infty} f_{X_j^2}(w)f_{Y_j^2}(v-w) \: dw.\]
 Fortunately $X_j^2$ and $Y_j^2$ are non-negative, meaning that the interval of integration of the convolution can be reduced; $f_{X_j^2}(w) = 0$ for $w < 0$ and $f_{Y_j^2}(v-w) = 0$ for $w > v$ implies an of $[0,v]$. Using the density functions and the substitution $t = w/v$ then gives
 \begin{align*}
@@ -564,7 +630,7 @@ The distribution of the components of $\bm{Y}$ is $Y_j = 0$ for $j = 0$ and \\ $
 \begin{proof}
 Let $X$ and $Y$ be as required. Using \eqref{eq:Components Re(F) and Im(F)}, $X_j$ can be written as
 \[X_j = \sum_{k=0}^{n-1} \frac{1}{\sqrt{n}}\cos\left(\frac{-2\pi{jk}}{n}\right)\gnoise_k.\]
-Since the covariance matrix of $\gnoiseVec$ is $\noiseSD^2 I$, the components $\gnoise_k$ are independent and distributed $\mathcal{N}(\gVec_k,\noiseSD^2)$ for all $0 \leq k \leq n-1$. Thus by the properties of a sum of independent normal random variables \cite{CasellaBerger02},
+Since the covariance matrix of $\gnoiseVec$ is $\noiseSD^2 I$, the components $\gnoise_k$ are independent and distributed $\mathcal{N}(\gVec_k,\noiseSD^2)$ for all $0 \leq k \leq n-1$. Thus by the properties of a sum of independent normal random variables \cite[p.~184]{CasellaBerger02},
 \begin{align*}
 X_j &\sim \mathcal{N}\left(\sum_{k=0}^{n-1} \frac{1}{\sqrt{n}}\cos\left(\frac{-2\pi{jk}}{n}\right)g_k, \noiseSD^2\sum_{k=0}^{n-1} \left(\frac{1}{\sqrt{n}}\cos\left(\frac{-2\pi{jk}}{n}\right)\right)^2\right) \\
 &= \mathcal{N}\left(\Re(\widehat{g}_j), \noiseSD^2 \langle A_{j\cdot},A_{j\cdot} \rangle\right) \\
@@ -579,7 +645,7 @@ In contrast, however, to the results regarding the components of $|\widehat{\noi
 f_U(u) &= \frac{1}{\sqrt{2\pi\noiseSD^2}}\exp\left(\frac{-(-\sqrt{u} - \mu_0)^2}{2\noiseSD^2}\right)\left|\frac{-1}{2\sqrt{u}}\right| + \frac{1}{\sqrt{2\pi\noiseSD^2}}\exp\left(\frac{-(\sqrt{u} - \mu_0)^2}{2\noiseSD^2}\right)\left|\frac{1}{2\sqrt{u}}\right| \\
 &= \frac{1}{2\sqrt{2\pi\noiseSD^2}} \frac{1}{\sqrt{u}} \left[\exp\left(\frac{-(\sqrt{u} + \mu_0)^2}{2\noiseSD^2}\right) + \exp\left(\frac{-(\sqrt{u} - \mu_0)^2}{2\noiseSD^2}\right)\right].
 \end{align*}
-Unfortunately this density function is not easily identified. However, rescaling $X_0$ as $X_0/\noiseSD$ before applying the square transformation results in a random variable that has a more tractable density function. The density function of $V = (X_0/\noiseSD)^2$ can be equated to that of the noncentered chi-squared distribution with 1 degree of freedom and noncentrality parameter $\lambda = (\mu_0/\noiseSD)^2/2$.
+Unfortunately this density function is not easily identified. However, rescaling $X_0$ as $X_0/\noiseSD$ before applying the square transformation results in a random variable that has a more tractable density function. The density function of $V = (X_0/\noiseSD)^2$ can be equated to that of the noncentered chi-squared distribution with 1 degree of freedom and noncentrality parameter $\lambda = (\mu_0/\noiseSD)^2/2$. Here the notation for the noncentrality parameter is not to be confused with $\lambda$ defined by \eqref{eq:GSVD lambda} part of the GSVD in Section \ref{sec:Tikhonov reg.}.
 
 \begin{theorem}[Extension of Theorem \ref{thm:Mag. squared theorem}]
 Let $\gnoiseVec$ be a random $n$-vector with $\gnoiseVec \sim \mathcal{N}(\gVec,\noiseSD^2 I)$, and define the diagonal matrix $M$ by
@@ -603,7 +669,7 @@ where $\NCchi^2(k,\lambda)$ denotes the noncentral chi-squared distribution with
 \end{theorem}
 \begin{proof}
 Let $\gnoiseVec \sim \mathcal{N}(\gVec,\noiseSD^2 I)$, $\bm{X} = \Re(M\widehat{\gnoiseVec})$, and $\bm{Y} = \Im(M\widehat{\gnoiseVec})$. Again without loss of generality, we assume that $n$ is odd so that the two cases to be considered are $j = 0$ and $j \neq 0$. \par
-First, the components of $\bm{X}^2$ will be determined. If $j = 0$, then $\Re(\widehat{\gnoise}_j) \sim \mathcal{N}(\mu_j,\noiseSD^2)$ from Lemma \ref{lem:Component distributions ext.}, where $\bm{\mu} = \Re(\widehat{\gVec})$ for readability. Thus by the properties of the normal distribution \cite{CasellaBerger02}, $\Re(\widehat{\gnoise}_j/\noiseSD) = \Re((M\widehat{\gnoiseVec})_j) = X_j \sim \mathcal{N}(\sqrt{2\lambda},1)$ where $\lambda = (\mu_j/\noiseSD)^2/2$. Applying the transformation technique used in Theorem \ref{thm:Mag. squared theorem}, the probability density function of $V = X_j^2$ is
+First, the components of $\bm{X}^2$ will be determined. If $j = 0$, then $\Re(\widehat{\gnoise}_j) \sim \mathcal{N}(\mu_j,\noiseSD^2)$ from Lemma \ref{lem:Component distributions ext.}, where $\bm{\mu} = \Re(\widehat{\gVec})$ for readability. Thus by the properties of the normal distribution \cite[p.~184]{CasellaBerger02}, $\Re(\widehat{\gnoise}_j/\noiseSD) = \Re((M\widehat{\gnoiseVec})_j) = X_j \sim \mathcal{N}(\sqrt{2\lambda},1)$ where $\lambda = (\mu_j/\noiseSD)^2/2$. Applying the transformation technique used in Theorem \ref{thm:Mag. squared theorem}, the probability density function of $V = X_j^2$ is
 \[f_V(v) = \frac{1}{2\sqrt{2\pi}} \frac{1}{\sqrt{v}} \left[\exp\left(\frac{-(\sqrt{v} + \sqrt{2\lambda})^2}{2}\right) + \exp\left(\frac{-(\sqrt{v} - \sqrt{2\lambda})^2}{2}\right)\right].\]
 Expanding the arguments of the exponential terms allows for the function to be rewritten as
 \begin{align*}
@@ -630,6 +696,35 @@ With the components of $\bm{X}^2$ examined, focus can directed towards the compo
 The final part of the proof is to establish the distribution of $X_j^2 + Y_j^2$ for the two cases of $j$. If $j = 0$, then $Y_j^2 = 0$ and so $X_j^2 + Y_j^2$ has the same distribution of $X_j^2$, which is $\NCchi^2(1,(\Re(\widehat{g}_j)/\noiseSD)^2/2)$. If $j \neq 0$, then $X_j^2$ and $Y_j^2$ are distributed $\NCchi^2(1,(\Re(\widehat{g}_j)/\noiseSD)^2)$ and $\NCchi^2(1,(\Im(\widehat{g}_j)/\noiseSD)^2)$, respectively. Thus by their independence and the reproductive property of the noncentral chi-squared distribution \cite[p.~182]{Rao1973},
 \[X_j^2 + Y_j^2 \sim \NCchi^2\left(1 + 1,\left(\frac{\Re(\widehat{g}_j)}{\noiseSD}\right)^2 + \left(\frac{\Im(\widehat{g}_j)}{\noiseSD}\right)^2\right) = \NCchi^2\left(2,\frac{|\widehat{g}_j|^2}{\noiseSD^2}\right).\]
 \end{proof}
+
+From Theorem \ref{thm:Mag. squared theorem ext.}, there are conditions which the simplify the distribution of $|(M\widehat{\gnoiseVec})_j|^2$. If $j = 0$ (or $n/2$ when $n$ is even), the noncentrality parameter of the noncentral chi-squared distribution is $(\Re(\widehat{g}_0))^2/2\noiseSD^2$. By the definition of the DFT,
+\[\Re(\widehat{g}_0) = \frac{1}{\sqrt{n}}\sum_{\ell=0}^{n-1} \cos\left(\frac{-2\pi(0)\ell}{n}\right)g_\ell = \frac{1}{\sqrt{n}}\sum_{\ell=0}^{n-1} g_\ell.\]
+It is certainly possible that $\sum_{\ell=0}^{n-1} g_\ell = 0$. A situation that would lend itself to this possibility would be a function $g(t)$ whose integral over the interval being considered is zero, e.g. $\sin(2\pi{t})$ defined on the interval $[0,1]$. Even if $\Re(\widehat{g}_0)$ is nonzero, $\lambda = (\Re(\widehat{g}_0))^2/2\noiseSD^2$ can be near zero when $\Re(\widehat{g}_0)$ is small or the variance $\noiseSD^2$ is large. Extending these observations for general indices $j$, a zero noncentrality parameter means
+\begin{equation}
+\label{eq:Central chi}
+|(M\widehat{\gnoiseVec})_j|^2 \sim \begin{cases}
+\NCchi^2\left(1,0\right) = \chi^2(1), & j = 0 \\
+\NCchi^2\left(2,0\right) = \chi^2(2), & \text{otherwise} \end{cases},
+\end{equation}
+again for $n$ being even; the same holds for odd $n$, with the inclusion of the $n/2$ case.  Recalling that $M$ in Theorem \ref{thm:Mag. squared theorem ext.} is a diagonal matrix, \eqref{eq:Central chi} can be restated as
+\[|(M\widehat{\gnoiseVec})_j|^2 = \begin{cases}
+|\widehat{\tilde{g}}_j|^2/\noiseSD^2 \sim \chi^2(1), & j = 0 \\
+2|\widehat{\tilde{g}}_j|^2/\noiseSD^2 \sim \chi^2(2), & \text{otherwise} \end{cases}.\]
+Fortunately, this result agrees with Theorem \ref{thm:Mag. squared theorem}. The connection can be stated as a lemma.
+
+\begin{lemma}
+\label{lem:Thm connection}
+Let $\noiseSD^2 > 0$, $Z_1 \sim \chi^2(1)$, and $Z_2 \sim \chi^2(2)$. Then $V_1 = \noiseSD^2 Z_1 \sim \emph{gamma}(1/2,2\noiseSD^2)$ and $V_2 = \noiseSD^2 Z_1/2 \sim \emph{exponential}(\noiseSD^2)$. 
+\end{lemma}
+\begin{proof}
+Let $\noiseSD^2 > 0$, $Z_1 \sim \chi^2(1)$, $Z_2 \sim \chi^2(2)$, and define $V_1 = \noiseSD^2 Z_1$ and $V_2 = \noiseSD^2 Z_1/2$. In addition, let $g_1(z) = \noiseSD^2 z$ and $g_2(z) = \noiseSD^2 z/2$. Then $V_1 = g_1(Z_1)$ and $V_2 = g_2(Z_2)$, both $g_1$ and $g_2$ are monotone on the sample space $(0,\infty)$ of chi-squared random variables, and $g_1^{-1}(v) = v/\noiseSD^2$ and $g_2^{-1}(v) = 2v/\noiseSD^2$. Using $g_1^{-1}$ and the probability density function of the $\chi^2(1)$ distribution, the density function of $V_1$ is
+\[f_{V_1}(v) = \frac{1}{\Gamma(1/2)\sqrt{2}}\left(\frac{v}{\noiseSD^2}\right)^{-1/2}\exp\left(\frac{-v}{2\noiseSD^2}\right)\left|\frac{1}{\noiseSD^2}\right| = \frac{1}{\Gamma(1/2)\sqrt{2\noiseSD^2}}v^{-1/2}\exp\left(\frac{-v}{2\noiseSD^2}\right),\]
+which is the density function of the $\text{gamma}(1/2,2\noiseSD^2)$ distribution. Similarly using $g_2^{-1}$ and the probability density function of the $\chi^2(2)$ distribution, the density function of $V_2$ is
+\[f_{V_2}(v) = \frac{1}{\Gamma(1)2}\exp\left(\frac{-2v}{2\noiseSD^2}\right)\left|\frac{2}{\noiseSD^2}\right| = \frac{1}{\noiseSD^2}\exp\left(\frac{-v}{\noiseSD^2}\right),\]
+which is the density function of the $\text{exponential}(\noiseSD^2)$ distribution. An alternative method for showing $V_2 \sim \text{exponential}(\noiseSD^2)$ would be to note that the $\chi^2(2)$ distribution is the same as the $\text{exponential}(1/2)$ distribution and then perform the scalar transformation.
+\end{proof}
+
+Ultimately there is a trade-off between the frequency content of the function $g(t)$ and the variance in the added noise. If the function $g(t)$ has a small amount of high frequency content (relative to the variance of the noise), then the statistics of corresponding terms $|(M\widehat{\gnoiseVec})_j|^2$ will resemble those of chi-squared random variables. 
 
 \subsection{The Sampling Theorem and Aliasing} \label{sec:The Sampling Theorem and Aliasing}
 Since the goal of this project is to determine the efficacy of downsampling for regularization parameter estimation, the effects of downsampling on the parameter estimation methods must be carefully examined. The parameter estimation methods are considered from the perspective of the DFT, and so downsampling must be viewed from the same perspective. \par 
@@ -665,7 +760,7 @@ Certainly there does not exist an $\Omega > 0$ such that the expression in \eqre
 
 Now the $k$th complex Fourier coefficient will be computed for the second test function \eqref{eq:Test Function 2}. Since the function is defined
 
-
+\newpage
 
 \section{Experiment design} \label{sec:Experiment design}
 
@@ -752,9 +847,9 @@ Then $\tVec^4$ obtained by the product $E\tVec$ has equispaced components as des
 \indent Another property of the $N/2 \times N$ matrix $E$ defined in \eqref{eq:Downsampling matrix} is that $EE^{\trans} = I$, where $I$ is the $N/2 \times N/2$ identity matrix.  This is a direct consequence of $\mathbf{e}_j\mathbf{e}_j^\trans = 1$ for all $j$ with $1 \leq j \leq N/2$. Using the property in \eqref{eq:VarProp}, the variance of the  noise vector $\noiseVec^{N/2}$ downsampled from $\noiseVec$ is then
 \[\Var(\noiseVec^{N/2}) = \Var(E\noiseVec) = E\Var(\noiseVec)E^{\trans} = \noiseSD^2EE^{\trans} = \noiseSD^2I\]
 where $I$ is the $N/2 \times N/2$ identity matrix. Therefore, downsampling white noise vectors in this way produces white noise vectors of half length, theoretically preserving variance across downsamples. As a final remark, the process of downsampling described here can be used to obtain downsampled vectors of length $N/(2^2), N/(2^3), \ldots, N/N$, though the final resolution in this report has been chosen as $N/(2^8) = 16$. \par 
-While the variance of the noise is preserved across downsampling resolution in theory, numerically there is some fluctuation. As the downsampling resolutions decrease, i.e. the length of the downsampled vectors decreases, the sample variances more spread out. Figure \ref{VarPlot1D} demonstrates this phenomenon by showing boxplots of sample variance versus downsampling resolutions. 
+While the variance of the noise is preserved across downsampling resolution in theory, numerically there is some fluctuation. As the downsampling resolutions decrease, i.e. the length of the downsampled vectors decreases, the sample variances more spread out. Figure \ref{VarPlot1D} demonstrates this phenomenon by showing boxplots of sample variance versus downsampling resolutions. \newpage
 
-\begin{figure}
+\begin{figure}[htb]
 \centerline{\includegraphics[scale=0.45]{Figures/VarPlot1D_F1_S05_W100_R20.eps}}
 \caption{The boxplots were generated from the sample variances of downsampled noise vectors. The theoretical variance of the noise was set to 0.0327, which is indicated by the horizontal dotted line. This figure illustrates that as the lengths of the downsampled vectors decrease, the variance in the computed sample variances increases.}
 \label{VarPlot1D}
