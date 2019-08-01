@@ -588,15 +588,15 @@ Let $Z_1,\ldots,Z_n$ be $n$ independently distributed random variables, and assu
 
 \begin{lemma}
 \label{lem:App of Ind Thm}
-Let $\noiseVec$ be a random $n$-vector with $\noiseVec \sim \mathcal{N}(\bm{0},\noiseSD^2 I)$, $X = \Re(\widehat{\noiseVec})$ and $Y = \Im(\widehat{\noiseVec})$. Then $X_j$ and $Y_j$ are independent random variables for each $0 \leq j \leq n-1$.
+Let $\noiseVec$ be a random $n$-vector with $\noiseVec \sim \mathcal{N}(\bm{0},\noiseSD^2 I)$, $X = \Re(\widehat{\noiseVec})$ and $Y = \Im(\widehat{\noiseVec})$. Then $X_j$ and $Y_k$ are independent random variables for each $0 \leq j,k \leq n-1$.
 \begin{proof}
-Let $X$ and $Y$ be as required. For each $0 \leq j \leq n-1$, the components $X_j$ and $Y_j$ are linear combinations of the components of $\noiseVec$, with coefficients given by \eqref{eq:Components Re(F) and Im(F)}:
-\[X_j = \sum_{\ell=0}^{n-1} \frac{1}{\sqrt{n}}\cos\left(\frac{-2\pi{j\ell}}{n}\right)\noise_{\ell}, \quad Y_j = \sum_{\ell=0}^{n-1} \frac{1}{\sqrt{n}}\sin\left(\frac{-2\pi{j\ell}}{n}\right)\noise_{\ell}.\]
+Let $X$ and $Y$ be as required. For each $0 \leq j,k \leq n-1$, the components $X_j$ and $Y_k$ are linear combinations of the components of $\noiseVec$, with coefficients given by \eqref{eq:Components Re(F) and Im(F)}:
+\[X_j = \sum_{\ell=0}^{n-1} \frac{1}{\sqrt{n}}\cos\left(\frac{-2\pi{j\ell}}{n}\right)\noise_{\ell}, \quad Y_k = \sum_{\ell=0}^{n-1} \frac{1}{\sqrt{n}}\sin\left(\frac{-2\pi{k\ell}}{n}\right)\noise_{\ell}.\]
 Since the covariance matrix of $\noiseVec$ is $\noiseSD^2 I$, the components of $\noiseVec$ are independent. Furthermore, $\noise_{\ell} \sim \mathcal{N}(0,\noiseSD^2)$ and so each component has an $n$th moment. Thus the first condition of Theorem \ref{thm:Independence Theorem} is satisfied. As for the final condition, the following sum must be shown to be equal to zero:
-\[\sum_{\ell=0}^{n-1} \left[\frac{1}{\sqrt{n}}\cos\left(\frac{-2\pi{j\ell}}{n}\right)\right]\left[\frac{1}{\sqrt{n}}\sin\left(\frac{-2\pi{j\ell}}{n}\right)\right]\noiseSD_{\ell}^2.\]
+\[\sum_{\ell=0}^{n-1} \left[\frac{1}{\sqrt{n}}\cos\left(\frac{-2\pi{j\ell}}{n}\right)\right]\left[\frac{1}{\sqrt{n}}\sin\left(\frac{-2\pi{k\ell}}{n}\right)\right]\noiseSD_{\ell}^2.\]
 The $\noise_{\ell}$ are identically distributed with $\noiseSD_{\ell}^2 = \noiseSD^2$ for all $0 \leq \ell \leq n-1$. Thus
-\[\sum_{\ell=0}^{n-1} \left[\frac{1}{\sqrt{n}}\cos\left(\frac{-2\pi{j\ell}}{n}\right)\right]\left[\frac{1}{\sqrt{n}}\sin\left(\frac{-2\pi{j\ell}}{n}\right)\right]\noiseSD_\ell^2 = \noiseSD^2 \langle A_{j\cdot},B_{j\cdot}\rangle = 0,\]
-where the last equality follows from Lemma \ref{lem:Inner products}. Therefore $X_j$ and $Y_j$ are independent for each $0 \leq j \leq n-1$.
+\[\sum_{\ell=0}^{n-1} \left[\frac{1}{\sqrt{n}}\cos\left(\frac{-2\pi{j\ell}}{n}\right)\right]\left[\frac{1}{\sqrt{n}}\sin\left(\frac{-2\pi{k\ell}}{n}\right)\right]\noiseSD_\ell^2 = \noiseSD^2 \langle A_{j\cdot},B_{k\cdot}\rangle = 0,\]
+where the last equality follows from Lemma \ref{lem:Inner products}. Therefore $X_j$ and $Y_k$ are independent for each $0 \leq j,k \leq n-1$.
 \end{proof}
 \end{lemma}
 
@@ -714,7 +714,25 @@ In contrast, however, to the results regarding the components of $|\widehat{\noi
 f_U(u) &= \frac{1}{\sqrt{2\pi\noiseSD^2}}\exp\left(\frac{-(-\sqrt{u} - \mu_0)^2}{2\noiseSD^2}\right)\left|\frac{-1}{2\sqrt{u}}\right| + \frac{1}{\sqrt{2\pi\noiseSD^2}}\exp\left(\frac{-(\sqrt{u} - \mu_0)^2}{2\noiseSD^2}\right)\left|\frac{1}{2\sqrt{u}}\right| \\
 &= \frac{1}{2\sqrt{2\pi\noiseSD^2}} \frac{1}{\sqrt{u}} \left[\exp\left(\frac{-(\sqrt{u} + \mu_0)^2}{2\noiseSD^2}\right) + \exp\left(\frac{-(\sqrt{u} - \mu_0)^2}{2\noiseSD^2}\right)\right].
 \end{align*}
-Unfortunately this density function is not easily identified. However, rescaling $X_0$ as $X_0/\noiseSD$ before applying the square transformation results in a random variable that has a more tractable density function. The density function of $V = (X_0/\noiseSD)^2$ can be equated to that of the noncentered chi-squared distribution with 1 degree of freedom and noncentrality parameter $\lambda = (\mu_0/\noiseSD)^2/2$. 
+Unfortunately this density function is not easily identified. However, rescaling $X_0$ as $X_0/\noiseSD$ before applying the square transformation results in a random variable that has a more tractable density function. The density function of $V = (X_0/\noiseSD)^2$ can be equated to that of the noncentered chi-squared distribution with 1 degree of freedom and noncentrality parameter $\lambda = (\mu_0/\noiseSD)^2/2$. \par 
+Before the distribution of the scaled components of $\widehat{\gnoiseVec}$ is stated, Lemma \ref{lem:App of Ind Thm 2} establishes the independence of the (squared) real and imaginary parts.
+
+\begin{lemma}
+\label{lem:App of Ind Thm 2}
+Let $\gnoiseVec$ be a random $n$-vector with $\gnoiseVec \sim \mathcal{N}(\gVec,\noiseSD^2 I)$, $J = \{0,n/2\}$ if $n$ is even and $J = \{0\}$ if $n$ is odd. Define the diagonal matrix $M$ by
+\[M_{j,j} = \begin{cases}
+1/\noiseSD & j \in J \\
+\sqrt{2}/\noiseSD & j \not\in J
+\end{cases}.\]
+Then $\Re((M\widehat{\gnoiseVec})_j)^2$ and $\Im((M\widehat{\gnoiseVec})_k)^2$ are independent for all $0 \leq j,k \leq n-1$.
+\end{lemma}
+\begin{proof}
+Let $\gnoiseVec \sim \mathcal{N}(\gVec,\noiseSD^2 I)$, $\mathbf{X} = \Re(M\widehat{\gnoiseVec})$, and $\mathbf{Y} = \Im(M\widehat{\gnoiseVec})$. Since $\widehat{\gnoiseVec} = \widehat{\gVec} + \widehat{\noiseVec}$, $X_j^2$ and $Y_k^2$ can be expressed as 
+\[X_j^2 = [M_{j,j}(\Re(\widehat{g}_j) + \Re(\widehat{\noise}_j))]^2, \quad Y_k^2 = [M_{k,k}(\Im(\widehat{g}_k) + \Im(\widehat{\noise}_k))]^2.\]
+$X_j^2$ and $Y_k^2$ are thus functions of only the random variables $\Re(\widehat{\noise}_j)$ and $\Im(\widehat{\noise}_k)$, respectively. $\Re(\widehat{\noise}_j)$ and $\Im(\widehat{\noise}_k)$ are independent by Lemma \ref{lem:App of Ind Thm}, and therefore $X_j^2 = \Re((M\widehat{\gnoiseVec})_j)^2$ and $Y_k^2 = \Im((M\widehat{\gnoiseVec})_k)^2$ are independent as well.
+\end{proof}
+
+The distribution of the scaled components of $\widehat{\gnoiseVec}$ is can now be stated. 
 
 \begin{theorem}[Extension of Theorem \ref{thm:Mag. squared theorem}]
 Let $\gnoiseVec$ be a random $n$-vector with $\gnoiseVec \sim \mathcal{N}(\gVec,\noiseSD^2 I)$, $J = \{0,n/2\}$ if $n$ is even and $J = \{0\}$ if $n$ is odd. Define the diagonal matrix $M$ by
@@ -768,7 +786,7 @@ f_V(v) &= \frac{1}{\sqrt{2\pi}} \frac{1}{\sqrt{v}}\exp\left(\frac{-v}{2}-\lambda
 matching the probability density function \eqref{eq:NCchi^2 PDF} of the noncentral chi-squared distribution with 1 degree of freedom and noncentrality parameter $\lambda = (\mu_j/\noiseSD)^2/2 = (\Re(\widehat{g}_j)/\noiseSD)^2/2$. \par
 If $j \neq 0$, then Lemma \ref{lem:Component distributions ext.} gives that $\Re(\widehat{\gnoise}_j) \sim \mathcal{N}(\Re(\widehat{g}_j),\noiseSD^2/2)$. This implies that $\Re((\sqrt{2}\widehat{\gnoise}/\noiseSD)_j) = \Re((M\widehat{\gnoise})_j) = X_j \sim \mathcal{N}(\sqrt{2\lambda},1)$, now with $\lambda = (\mu_j/\noiseSD)^2$. Thus the same argument can be applied so that $X_j^2 \sim \NCchi^2(1,(\mu_j/\noiseSD)^2) = \NCchi^2(1,(\Re(\widehat{g}_j)/\noiseSD)^2)$. \par 
 With the components of $\bm{X}^2$ examined, focus can directed towards the components of $\bm{Y}^2$. If $j = 0$, then Lemma \ref{lem:Component distributions ext.} gives that $\Im(\widehat{\gnoise}_j) = 0$ (a constant random variable). This implies that $\Im(\widehat{\gnoise}_j/\noiseSD) = \Im((M\widehat{\gnoiseVec})_j) = Y_j = 0$, meaning $Y_j^2 = 0$ as well. If $j \neq 0$, then $\Im(\widehat{\gnoise}_j) \sim \mathcal{N}(\Im(\widehat{g}_j),\noiseSD^2/2)$. Thus by the argument for $X_j$, $Y_j^2 \sim \NCchi^2(1,(\Im(\widehat{g}_j)/\noiseSD)^2)$. \par 
-The final part of the proof is to establish the distribution of $X_j^2 + Y_j^2$ for the two cases of $j$. If $j = 0$, then $Y_j^2 = 0$ and so $X_j^2 + Y_j^2$ has the same distribution of $X_j^2$, which is $\NCchi^2(1,(\Re(\widehat{g}_j)/\noiseSD)^2/2)$. If $j \neq 0$, then $X_j^2$ and $Y_j^2$ are distributed $\NCchi^2(1,(\Re(\widehat{g}_j)/\noiseSD)^2)$ and $\NCchi^2(1,(\Im(\widehat{g}_j)/\noiseSD)^2)$, respectively. Thus by their independence and the reproductive property of the noncentral chi-squared distribution \cite[p.~182]{Rao1973},
+The final part of the proof is to establish the distribution of $X_j^2 + Y_j^2$ for the two cases of $j$. If $j = 0$, then $Y_j^2 = 0$ and so $X_j^2 + Y_j^2$ has the same distribution of $X_j^2$, which is $\NCchi^2(1,(\Re(\widehat{g}_j)/\noiseSD)^2/2)$. If $j \neq 0$, then $X_j^2$ and $Y_j^2$ are distributed $\NCchi^2(1,(\Re(\widehat{g}_j)/\noiseSD)^2)$ and $\NCchi^2(1,(\Im(\widehat{g}_j)/\noiseSD)^2)$, respectively. Their independence is given by Lemma \ref{lem:App of Ind Thm 2}, and so the reproductive property of the noncentral chi-squared distribution \cite[p.~182]{Rao1973} produces
 \[X_j^2 + Y_j^2 \sim \NCchi^2\left(1 + 1,\left(\frac{\Re(\widehat{g}_j)}{\noiseSD}\right)^2 + \left(\frac{\Im(\widehat{g}_j)}{\noiseSD}\right)^2\right) = \NCchi^2\left(2,\frac{|\widehat{g}_j|^2}{\noiseSD^2}\right).\]
 \end{proof}
 
@@ -833,6 +851,59 @@ and
 2\left(1 + \dfrac{|\widehat{g}_j|^2}{\noiseSD^2}\right), & j \in J \\
 4\left(1 + \dfrac{|\widehat{g}_j|^2}{\noiseSD^2}\right), & j \not\in J \end{cases}.\]
 \end{corollary}
+
+The final statistical result presented here is the covariance of $|M_j\widehat{\gnoise}_j|^2$ and $|M_k\widehat{\gnoise}_k|^2$, which will be used in Section \ref{sec:Parameter estimation methods}. 
+
+\begin{theorem}
+\label{thm:Cov of mag squared}
+Let $\gnoiseVec$ be a random $n$-vector with $\gnoiseVec \sim \mathcal{N}(\gVec,\noiseSD^2 I)$, $J = \{0,n/2\}$ if $n$ is even and $J = \{0\}$ if $n$ is odd. Define the diagonal matrix $M$ by
+\[M_{j,j} = \begin{cases}
+1/\noiseSD & j \in J \\
+\sqrt{2}/\noiseSD & j \not\in J
+\end{cases}.\]
+Then for $0 \leq j < k \leq n-1$,
+\[\Cov\left(|M_j\widehat{\gnoise}_j|^2,|M_k\widehat{\gnoise}_k|^2\right) = .\]
+\end{theorem}
+\begin{proof}
+By the linearity of covariance and rewriting the magnitudes squared in terms of real and imaginary parts,
+\begin{align*}
+\Cov\left(|M_j\widehat{\gnoise}_j|^2,|M_k\widehat{\gnoise}_k|^2\right) &= \Cov\left(\Re(M_j\widehat{\gnoise}_j)^2 + \Im(M_j\widehat{\gnoise}_j)^2, \Re(M_k\widehat{\gnoise}_k)^2 + \Im(M_k\widehat{\gnoise}_k)^2\right) \\
+&= \Cov\left(\Re(M_j\widehat{\gnoise}_j)^2 ,\Re(M_k\widehat{\gnoise}_k)^2\right) + \Cov\left(\Re(M_j\widehat{\gnoise}_j)^2 ,\Im(M_k\widehat{\gnoise}_k)^2\right) \\
+&+ \Cov\left(\Im(M_j\widehat{\gnoise}_j)^2 ,\Re(M_k\widehat{\gnoise}_k)^2\right) + \Cov\left(\Im(M_j\widehat{\gnoise}_j)^2 ,\Im(M_k\widehat{\gnoise}_k)^2\right).
+\end{align*}
+By Lemma \ref{lem:App of Ind Thm 2}, $\Re(M_j\widehat{\gnoise}_j)^2$ and $\Im(M_k\widehat{\gnoise}_k)^2$ are independent for all $0 \leq j,k \leq n-1$, meaning that their covariance is zero. Thus the covariance simplifies to
+\[\Cov\left(|M_j\widehat{\gnoise}_j|^2,|M_k\widehat{\gnoise}_k|^2\right) = \Cov\left(\Re(M_j\widehat{\gnoise}_j)^2 ,\Re(M_k\widehat{\gnoise}_k)^2\right) + \Cov\left(\Im(M_j\widehat{\gnoise}_j)^2 ,\Im(M_k\widehat{\gnoise}_k)^2\right).\]
+A further simplification can be made by using $\widehat{\gnoiseVec} = \widehat{\gVec} + \widehat{\noiseVec}$ and expanding the squared terms:
+\begin{align*}
+\Cov\left(\Re(M_j\widehat{\gnoise}_j)^2 ,\Re(M_k\widehat{\gnoise}_k)^2\right) &= \Cov\left([\Re(M_j\widehat{g}_j) + \Re(M_j\widehat{\noise}_j)]^2,[\Re(M_k\widehat{g}_k) + \Re(M_k\widehat{\noise}_k)]^2\right) \\
+&= \Cov\left(\Re(M_j\widehat{g}_j)^2,\Re(M_k\widehat{g}_k)^2\right) \\
+&+ \Cov\left(\Re(M_j\widehat{g}_j)^2, 2\Re(M_k\widehat{g}_k)\Re(M_k\widehat{\noise}_k)\right) \\
+&+ \Cov\left(\Re(M_j\widehat{g}_j)^2, \Re(M_k\widehat{\noise}_k)^2\right) \\
+&+ \Cov\left(2\Re(M_j\widehat{g}_j)\Re(M_j\widehat{\noise}_j), \Re(M_k\widehat{g}_k)^2 )\right) \\
+&+ \Cov\left(2\Re(M_j\widehat{g}_j)\Re(M_j\widehat{\noise}_j), 2\Re(M_k\widehat{g}_k)\Re(M_k\widehat{\noise}_k)\right) \\
+&+ \Cov\left(2\Re(M_j\widehat{g}_j)\Re(M_j\widehat{\noise}_j), \Re(M_k\widehat{\noise}_k)^2 )\right) \\
+&+ \Cov\left(\Re(M_j\widehat{\noise}_j)^2,\Re(M_k\widehat{g}_k)^2\right) \\
+&+ \Cov\left(\Re(M_j\widehat{\noise}_j)^2, 2\Re(M_k\widehat{g}_k)\Re(M_k\widehat{\noise}_k)\right) \\
+&+ \Cov\left(\Re(M_j\widehat{\noise}_j)^2,\Re(M_k\widehat{\noise}_k)^2\right).
+\end{align*}
+While this certainly appears to be the opposite of a simplification, any covariance term with an argument not containing $\widehat{\noise}_j$ or $\widehat{\noise}_k$ is zero. Five of the nine covariance terms are thus removed, leaving
+\begin{align*}
+\Cov\left(\Re(M_j\widehat{\gnoise}_j)^2 ,\Re(M_k\widehat{\gnoise}_k)^2\right) 
+&= \Cov\left(2\Re(M_j\widehat{g}_j)\Re(M_j\widehat{\noise}_j), 2\Re(M_k\widehat{g}_k)\Re(M_k\widehat{\noise}_k)\right) \\
+&+ \Cov\left(2\Re(M_j\widehat{g}_j)\Re(M_j\widehat{\noise}_j), \Re(M_k\widehat{\noise}_k)^2 )\right) \\
+&+ \Cov\left(\Re(M_j\widehat{\noise}_j)^2, 2\Re(M_k\widehat{g}_k)\Re(M_k\widehat{\noise}_k)\right) \\
+&+ \Cov\left(\Re(M_j\widehat{\noise}_j)^2,\Re(M_k\widehat{\noise}_k)^2\right).
+\end{align*}
+The constant coefficients can be factored and combined so that
+\begin{align*}
+\Cov\left(\Re(M_j\widehat{\gnoise}_j)^2 ,\Re(M_k\widehat{\gnoise}_k)^2\right) 
+&= 4\Re(M_j\widehat{g}_j)\Re(M_k\widehat{g}_k)\Cov\left(\Re(M_j\widehat{\noise}_j), \Re(M_k\widehat{\noise}_k)\right) \\
+&+ 2\Re(M_j\widehat{g}_j)\Cov\left(\Re(M_j\widehat{\noise}_j), \Re(M_k\widehat{\noise}_k)^2 )\right) \\
+&+ 2\Re(M_k\widehat{g}_k)\Cov\left(\Re(M_j\widehat{\noise}_j)^2, \Re(M_k\widehat{\noise}_k)\right) \\
+&+ \Cov\left(\Re(M_j\widehat{\noise}_j)^2,\Re(M_k\widehat{\noise}_k)^2\right).
+\end{align*}
+\end{proof}
+
 
 \subsection{The Sampling Theorem and Aliasing} \label{sec:The Sampling Theorem and Aliasing}
 Our goal is to determine the efficacy of downsampling for regularization parameter estimation, the effects of downsampling on the parameter estimation methods must be carefully examined. The parameter estimation methods are considered from the perspective of the DFT, and so downsampling must be viewed from the same perspective. \par 
@@ -1152,7 +1223,7 @@ Comparing the UPRE function $\U_n$ on \eqref{eq:SpectralUPREn} with $\D_n$, it c
 \D_n(\regparam) = \U_n(\regparam) - \frac{2\noiseSD^2}{n}\sum_{j = 0}^{n-1} \filt(\regparam,|\widehat{k}_j|).
 \end{equation}
 The function $\D_n(\regparam)$ will be near zero when the sum in \eqref{eq:SpectralDP} is close to $\noiseSD^2$.  Furthermore, $\D_n(\regparam)$ is monotone increasing on $(0,\infty)$ because for all $\regparam > 0$,
-\[\frac{d}{d\regparam}\left\{\D_n(\regparam)\right\} = 4\sum_{j = 0}^{n-1} \frac{|\widehat{\gnoise}_j|^2|\widehat{k}_j|^2\regparam^3}{\left(|\widehat{k}_j|^2 + \regparam^2\right)^3} \geq 0.\]
+\[\frac{d}{d\regparam}\left\{\D_n(\regparam)\right\} = 4\sum_{j = 0}^{n-1} |\widehat{\gnoise}_j|^2\frac{|\widehat{k}_j|^2\regparam^3}{\left(|\widehat{k}_j|^2 + \regparam^2\right)^3} \geq 0.\]
 If the range of $\regparam$ being considered for roots of \eqref{eq:SpectralDP} is not chosen carefully, it is possible that no regularization parameter will be obtained; see Section \ref{The MDP method} for further discussion. If \eqref{eq:SpectralDP} does not have a root in $[0,\infty)$ (recall that by definition, $\regparam \geq 0$), there is only one possibility because $\D_n(0) = -\noiseSD^2 < 0$. Since the function is monotone increasing, the function must have a root or approach some negative horizontal asymptote. By looking at \eqref{eq:TikFiltPsi}, it is clear that $(\mfilt(\regparam,|\widehat{k}_i|))^2 \leq 1$ for all $\regparam \geq 0$. Thus,
 \[\sum_{j = 0}^{n-1} |\widehat{\gnoise}_j|^2(\mfilt(\regparam,|\widehat{k}_j|))^2 - \noiseSD^2 \leq \sum_{j = 0}^{n-1} |\widehat{\gnoise}_j|^2 - \noiseSD^2,\]
 and so \eqref{eq:SpectralDP} will approach a negative horizontal asymptote if $\sum_{j = 0}^{n-1} |\widehat{\gnoise}_j|^2 < \noiseSD^2$. \par
@@ -1168,6 +1239,12 @@ Corollary \ref{cor:gnoise Mean and Var} then gives
 \E(\D_n(\regparam)) &= \sum_{j = 0}^{n-1} \frac{\noiseSD^2}{2}\left(2 + \frac{|\widehat{g}_j|^2}{\noiseSD^2}\right)(\mfilt(\regparam,|\widehat{k}_j|))^2 - \noiseSD^2 \\
 &= \frac{1}{2}\sum_{j = 0}^{n-1} |\widehat{\gnoise}_j|^2(\mfilt(\regparam,|\widehat{k}_j|))^2 + \noiseSD^2\sum_{j = 0}^{n-1} (\mfilt(\regparam,|\widehat{k}_j|))^2 - \noiseSD^2.
 \end{align*}
+The derivative of $\E(\D_n(\regparam))$ with respect to $\regparam$ is
+\begin{align*}
+\frac{d}{d\regparam}\left\{\E\left(\D_n(\regparam)\right)\right\} &= \frac{1}{2}\sum_{j = 0}^{n-1} |\widehat{\gnoise}_j|^2 \frac{d}{d\regparam}\left\{(\mfilt(\regparam,|\widehat{k}_j|))^2\right\} + \noiseSD^2\sum_{j = 0}^{n-1} \frac{d}{d\regparam}\left\{(\mfilt(\regparam,|\widehat{k}_j|))^2\right\} \\
+&= 2\sum_{j = 0}^{n-1} |\widehat{\gnoise}_j|^2\frac{|\widehat{k}_j|^2\regparam^3}{\left(|\widehat{k}_j|^2 + \regparam^2\right)^3} + 4\noiseSD^2 \sum_{j = 0}^{n-1} \frac{|\widehat{k}_j|^2\regparam^3}{\left(|\widehat{k}_j|^2 + \regparam^2\right)^3},
+\end{align*}
+which is nonnegative for all $\regparam > 0$. Thus $\E(\D_n(\regparam))$ is monotone increasing on $(0,\infty)$. \par
 Since the last term $-\noiseSD^2$ in \eqref{eq:SpectralDPModified} is deterministic, the variance of $\D_n(\regparam)$ is 
 \[\Var(\D_n(\regparam)) = \Var\left(\sum_{j = 0}^{n-1} |M_j\widehat{\gnoise}_j|^2\left(\frac{\mfilt(\regparam,|\widehat{k}_j|)}{M_j}\right)^2\right)\]
 which matches the variance of the UPRE function \eqref{eq:SpectralUPREnModified}. This is interesting since the functions  $\D_n(\regparam)$ and $\U_n(\regparam)$ have different properties; for example, $\D_n(\regparam)$ is monotone increasing while $\U_n(\regparam)$ is not. \par 
@@ -1183,7 +1260,7 @@ Let $f_1,\ldots,f_R$ be a family of continuous, monotone increasing functions on
 \end{lemma}
 \begin{proof}
 Let the family of functions $f_1,\ldots,f_R$ be as required. Relabel the functions so that their respective roots are such that $x_1 \leq \ldots \leq x_R$. Then $x_m = \min\{x_1,\ldots,x_R\} = x_1$ and $x_M = \max\{x_1,\ldots,x_R\} = x_R$. Thus it must be shown that $\overline{f} = (1/R)\sum_{j=1}^R f_i$ has a root in $[x_1,x_R]$. Since each $f_i$ is monotone increasing on $[a,b] \supseteq [x_1,x_R]$ and $x_1 \leq \ldots \leq x_R$, $f_\ell(x_1) \leq 0$ for $i = 1,\ldots,R$. Similarly, $f_\ell(x_R) \geq 0$ for $\ell = 1,\ldots,R$. Thus $\overline{f}(x_1) \leq 0$ and $\overline{f}(x_R) \geq 0$, with equality only when $x_1 = \ldots = x_R$. However if this were the case, $\overline{f}(x_1) = \overline{f}(x_R) = 0$ and so certainly $\overline{f}$ has a root in $[x_1,x_R] = \{x_1\} = \ldots = \{x_R\}$. \par 
-If roots are not equal, then $\overline{f}(x_1) < 0$ and $\overline{f}(x_R) > 0$ since there would exist some $ell = 1,\ldots,k$ such that $f_\ell(x_1) < 0$ or $f_\ell(x_R) > 0$, again following from the monotoncity of each function in the family. Since $\overline{f}$ is a linear combination of continuous functions, $\overline{f}$ itself is continuous. Thus having $\overline{f}(x_1) < 0$ and $\overline{f}(x_R) > 0$ implies that $\overline{f}$ has a root in $[x_1,x_R]$ by Bolzano's theorem (a corollary to the intermediate value theorem).
+If roots are not equal, then $\overline{f}(x_1) < 0$ and $\overline{f}(x_R) > 0$ since there would exist some $\ell = 1,\ldots,k$ such that $f_\ell(x_1) < 0$ or $f_\ell(x_R) > 0$, again following from the monotoncity of each function in the family. Since $\overline{f}$ is a linear combination of continuous functions, $\overline{f}$ itself is continuous. Thus having $\overline{f}(x_1) < 0$ and $\overline{f}(x_R) > 0$ implies that $\overline{f}$ has a root in $[x_1,x_R]$ by Bolzano's theorem (a corollary to the intermediate value theorem).
 \end{proof}
 
 \section{Effects of downsampling} \label{sec:Effects of downsampling}
