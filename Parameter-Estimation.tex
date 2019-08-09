@@ -15,11 +15,13 @@
 \newcommand{\dVec}{\mathbf{d}}	% Differential operator vector
 \newcommand{\trans}{\mathrm{T}}	% Matrix transpose
 \newcommand{\ctrans}{*}	% Conjugate transpose
-\newcommand{\trace}{\operatorname{trace}}	% Trace
-\newcommand{\diag}{\operatorname{diag}}	% Diagonal matrix
-\newcommand{\rank}{\operatorname{rank}}	% Rank of a matrix
-\newcommand{\range}{\operatorname{range}}	% Range (space) of a matrix
-\newcommand{\nullspace}{\operatorname{null}}	% Null space of a matrix
+\DeclareMathOperator{\trace}{trace}		% Trace
+\DeclareMathOperator{\diag}{diag}	% Diagonal matrix
+\DeclareMathOperator{\rank}{rank}	% Rank of a matrix
+\DeclareMathOperator{\range}{range}	% Range (space) of a matrix
+\DeclareMathOperator{\nullspace}{null}	% Null (space) of a matrix
+\DeclareMathOperator{\pdet}{det^\dagger}	
+\DeclareMathOperator{\sgn}{sgn}	% Signum function
 
 % Regularization notation:
 \newcommand{\regparam}{\alpha}
@@ -36,9 +38,9 @@
 \newcommand{\noise}{\eta}	% Noise (single component/variable)
 \newcommand{\noiseSD}{\sigma}	% Standard deviation
 \newcommand{\noiseVec}{\bm{\noise}}	% Noise vector
-\newcommand{\Var}{\operatorname{Var}}	% Variance
-\newcommand{\Cov}{\operatorname{Cov}}	% Covariance
-\newcommand{\E}{\operatorname{E}}	% Expected value
+\DeclareMathOperator{\Var}{Var}	% Variance
+\DeclareMathOperator{\Cov}{Cov}	% Covariance
+\DeclareMathOperator{\E}{E}	% Expected value
 \renewcommand{\Re}{\operatorname{Re}}	% Real part
 \renewcommand{\Im}{\operatorname{Im}}	% Imaginary part
 \newcommand{\NCchi}{\chi'\:}	% Noncentral chi-squared
@@ -444,7 +446,7 @@ and subtracting $c_j$ from both sides produces the desired result.
 
 Since the parameter estimation methods in Section \ref{sec:Parameter estimation methods} involve DFT's of the vector $\gnoiseVec = \gVec + \noiseVec$, some results regarding the distribution of the components of $\widehat{\noiseVec}$ will be presented. The first results will be in regard to the real and imaginary parts of the $\widehat{\noiseVec}$. Letting $A$ and $B$ be the real and imaginary parts, respectively, of the $n \times n$ DFT matrix, Euler's identity gives
 \begin{equation}
-A_{jk} = \frac{1}{\sqrt{n}}\cos\left(\frac{-2\pi{jk}}{n}\right), \quad B_{jk} = \frac{1}{\sqrt{n}}\sin\left(\frac{-2\pi{jk}}{n}\right),
+A_{j,k} = \frac{1}{\sqrt{n}}\cos\left(\frac{-2\pi{jk}}{n}\right), \quad B_{j,k} = \frac{1}{\sqrt{n}}\sin\left(\frac{-2\pi{jk}}{n}\right),
 \label{eq:Components Re(F) and Im(F)}
 \end{equation}
 for $0 \leq j,k \leq n-1$. It is clear from \eqref{eq:Components Re(F) and Im(F)} that the matrices $A$ and $B$ are symmetric. The rows (and by symmetry, columns) of $A$ and $B$ have the following orthogonality properties. For compactness, let $\mathbf{e}_j$ denote the $n$-vector with 1 as the $j$th component and zeros elsewhere and let $\tilde{I}$ denote the $n \times n$ exchange matrix, which is a $90^\circ$ rotation of the identity matrix $I$.
@@ -545,7 +547,23 @@ First consider property (ii), the case where $n$ is even.
 For property (iii), the case where $n$ is odd, $n/2$ need not be considered and again the preceding argument holds.
 \end{proof}
 
-There are some important consequences of this lemma. First, it shows that while the rows (columns) of $F$ form an orthonormal basis for $\mathbb{C}^n$, the orthogonality of the rows of $A$ and $B$ are limited by conditions on the row indices. Another consequence is that while $F$ is invertible and therefore has full rank, the matrices $A$ and $B$ are rank-deficient. Just as the components of $A$ and $B$ depend upon the parity of $n$, Lemma \ref{lem:Rank of A and B} illustrates that the rank of $A$ and $B$ depend upon $n$ as well.
+There are some important consequences of Lemma \ref{lem:Inner products}. First, it provides a means to visualize the structure of the matrices $A^2 = AA^\trans$ and $B^2 = BB^\trans$. For example, if $n = 6$ then the matrices $A^2$ and $B^2$ are
+\[A^2 = \begin{bmatrix}
+1 & 0 & 0 & 0 & 0 & 0 \\
+0 & \frac{1}{2} & 0 & 0 & 0 & \frac{1}{2} \\
+0 & 0 & \frac{1}{2} & 0 & \frac{1}{2} & 0 \\
+0 & 0 & 0 & 1 & 0 & 0 \\
+0 & 0 & \frac{1}{2} & 0 & \frac{1}{2} & 0 \\
+0 & \frac{1}{2} & 0 & 0 & 0 & \frac{1}{2} \\
+\end{bmatrix}, \quad B^2 = \begin{bmatrix}
+0 & 0 & 0 & 0 & 0 & 0 \\
+0 & \frac{1}{2} & 0 & 0 & 0 & -\frac{1}{2} \\
+0 & 0 & \frac{1}{2} & 0 & -\frac{1}{2} & 0 \\
+0 & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & -\frac{1}{2} & 0 & \frac{1}{2} & 0 \\
+0 & -\frac{1}{2} & 0 & 0 & 0 & \frac{1}{2} \\
+\end{bmatrix}.\]
+Second, Lemma \ref{lem:Inner products} shows that while the rows (columns) of $F$ form an orthonormal basis for $\mathbb{C}^n$, the orthogonality of the rows of $A$ and $B$ are limited by conditions on the row indices. Another consequence is that while $F$ is invertible and therefore has full rank, the matrices $A$ and $B$ are rank-deficient. Just as the components of $A$ and $B$ depend upon the parity of $n$, Lemma \ref{lem:Rank of A and B} illustrates that the rank of $A$ and $B$ depend upon $n$ as well.
 
 \begin{lemma}
 \label{lem:Rank of A and B}
@@ -852,7 +870,109 @@ and
 4\left(1 + \dfrac{|\widehat{g}_j|^2}{\noiseSD^2}\right), & j \not\in J \end{cases}.\]
 \end{corollary}
 
-The final statistical result presented here is the covariance of $|M_j\widehat{\gnoise}_j|^2$ and $|M_k\widehat{\gnoise}_k|^2$, which will be used in Section \ref{sec:Parameter estimation methods}. 
+The final statistical result presented here is the covariance of $|M_j\widehat{\gnoise}_j|^2$ and $|M_k\widehat{\gnoise}_k|^2$, which will be used in Section \ref{sec:Parameter estimation methods}.  A step in Theorem \ref{thm:Cov of mag squared} is to calculate the \textit{psuedo-determinant} of a covariance matrix $\Sigma$, which is defined as the product of its nonzero eigenvalues. Adopting the notation used for psuedo-inverses, the psuedo-determinant of a matrix $\Sigma$ will be denoted $\pdet(\Sigma)$. Theorem \ref{thm:Covariance eigenvalues} gives nonzero eigenvalues of the covariance matrices used in Theorem \ref{thm:Cov of mag squared}, which will then be used to evaluate the psuedo-determinants. The algebraic multiplicity of an eigenvalue $\lambda$ is denoted $\mu(\lambda)$.
+
+\begin{theorem}
+\label{thm:Covariance eigenvalues}
+Let $A$ and $B$ be the real and imaginary parts, respectively, of the $n \times n$ DFT matrix, $J = \{0,n/2\}$ if $n$ is even and $J = \{0\}$ if $n$ is odd, and let $\noiseSD^2 > 0$. Define the diagonal matrix $M$ by
+\[M_{j,j} = \begin{cases}
+1/\noiseSD & j \in J \\
+\sqrt{2}/\noiseSD & j \not\in J
+\end{cases}.\]
+The only nonzero eigenvalues of the matrix $\noiseSD^2 MA^2M$ are 1 and 2 with algebraic multiplicities
+\[\mu(1) = \begin{cases}
+1, & n \text{ odd} \\
+2, & n \text{ even}
+\end{cases},\quad \mu(2) = \rank(A) - \mu(1).\]
+The only nonzero eigenvalue of the matrix $\noiseSD^2 MB^2M$, existing only for $n \geq 3$, is 2 with algebraic multiplicity equal to $\rank(B)$.
+\end{theorem}
+\begin{proof}
+The nonzero eigenvalues of $\noiseSD^2MA^2M$ will be calculated first. For simplification, let $\Sigma = \noiseSD^2MA^2M$. Due to the structure of $\Sigma$, its characteristic polynomial $\det(\Sigma - \lambda I)$ can be expressed without much difficulty. Since $M$ is diagonal, pre-multiplication scales each row of $A^2$ by the corresponding diagonal entries of $M$; post-multiplication scales the columns of $A^2$ in the same way. $A^2$ is symmetric with elements given by Lemma \ref{lem:Inner products}, and so the matrix $\Sigma$ has the structure
+\[\Sigma_{j,k} = \begin{cases}
+1, & j = k \\ 
+1, & j \neq k \text{ and } j + k = n \\ 
+0, & \text{otherwise} \end{cases}, \qquad 0 \leq j,k \leq n-1.\]
+The structure of $\Sigma - \lambda I$ is then
+\[(\Sigma - \lambda I)_{j,k} = \begin{cases}
+1-\lambda, & j = k \\ 
+1, & j \neq k \text{ and } j + k = n \\ 
+0, & \text{otherwise} \end{cases}, \qquad 0 \leq j,k \leq n-1.\]
+The approach to finding the determinant of $\Sigma - \lambda I$ is to perform a cofactor expansion to reduce $\Sigma - \lambda I$ to expression involving a minor that has simpler structure and then uses combinatorial argument along with Leibniz's formula for matrix determinants. The cofactor expansion depends upon the parity of $n$. \par 
+If $n$ is odd, then every row (and by symmetry, column) of $\Sigma - \lambda I$ has exactly two nonzero elements except for the zeroth row, which has only $(\Sigma - \lambda I)_{0,0}$ as a nonzero element. Exploiting this observation, a cofactor expansion along the zeroth row results in
+\begin{equation}
+\label{eq:Cofactor expansion}
+\det(\Sigma - \lambda I) = (1 - \lambda)\det((1 - \lambda)I + \tilde{I}),
+\end{equation}
+where the identity $I$ and exchange matrix $\tilde{I}$ are dimension $m \times m$ with $m = n-1$. The minor $(1 - \lambda)I + \tilde{I}$ has the property that each row (column) has exactly two nonzero elements: $1 - \lambda$ and 1. Explicitly, the structure is
+\[((1 - \lambda)I + \tilde{I})_{j,k} = \begin{cases}
+1 - \lambda, & j = k \\
+1, & j \neq k \text{ and } j + k = m - 1 \\
+0, & \text{otherwise}
+\end{cases}, \qquad 0 \leq j,k \leq m-1,\]
+after relabeling the indices to agree with the dimension of the minor. To calculate $\det((1 - \lambda)I + \tilde{I})$, Leibniz's formula for matrix determinants can be utilized:
+\begin{equation}
+\label{eq:Leibniz}
+\det((1 - \lambda)I + \tilde{I}) = \sum_{\tau \in S_m} \left(\sgn(\tau) \prod_{j=0}^{m-1} ((1 - \lambda)I + \tilde{I})_{j,\tau(j)} \right).
+\end{equation}
+Here $S_m$ denotes the symmetric group on $m$ objects (in this case represented by the set of permuations of the elements of $\{0,\ldots,m-1\}$), $\tau$ is a specific permutation, $\sgn(\tau)$ is either 1 or $-1$ depending upon the parity of the permutation, and $\tau(j)$ is the element of $\{0,\ldots,m-1\}$ in the $j$th position of the permutation \cite[p.~106-110]{DummitFoote3}. While there are $m!$ (the order of $S_m$) summands in \eqref{eq:Leibniz}, the sparse structure of $(1 - \lambda)I + \tilde{I}$ reduces the number of summands to $2^{m/2} \cdot 1^{m/2} = 2^{m/2}$. This is because there are exactly two nonzero elements in each row of the minor and choosing a nonzero element in each of the first $m/2$ rows leaves only one choice of a nonzero element in each of the remaining rows. For example, a permutation $\tau$ with
+\[((1 - \lambda)I + \tilde{I})_{0,\tau(0)} = ((1 - \lambda)I + \tilde{I})_{0,0} = (1-\lambda)\]
+must be such that
+\[((1 - \lambda)I + \tilde{I})_{m-1,\tau(m-1)} = ((1 - \lambda)I + \tilde{I})_{m-1,m-1} = (1-\lambda)\]
+so that the product in \eqref{eq:Leibniz} is nonzero. Any permutation that results in a zero element from $(1 - \lambda)I + \tilde{I}$ causes the product in \eqref{eq:Leibniz} to be zero and can therefore be ignored in the sum. \par 
+The symmetry of $(1 - \lambda)I + \tilde{I}$ forces nonzero products in \eqref{eq:Leibniz} to take the form
+\[(1-\lambda)^{2((m/2)-\ell)}1^{2\ell}\]
+where $\ell$ is the number of the first $m/2$ rows where $1-\lambda$ and 1 have been transposed by given permutation. Of the $m/2$ rows, the number of ways to choose $\ell$ rows for the transposition of $1-\lambda$ and 1 is $\binom{m/2}{\ell}$. As for the $\sgn(\tau)$ term in \eqref{eq:Leibniz}, $\ell$ represents the number of transpositions in the cycle decomposition of $\tau$. Since the sign of a transposition is $-1$ and the sign of a permutation is multiplicative with respect to cycles (in this case, transpositions) in a cycle decomposition \cite[p.~109-110]{DummitFoote3}, $\sgn(\tau) = (-1)^{\ell}$. Thus \eqref{eq:Leibniz} simplifies to 
+\begin{equation}
+\label{eq:Leibniz simp.}
+\det((1 - \lambda)I + \tilde{I}) = \sum_{\ell=0}^{m/2} \binom{m/2}{\ell}(1-\lambda)^{2((m/2)-\ell)}1^{2\ell}(-1)^{\ell}.
+\end{equation}
+Notice that 
+\[\sum_{\ell=0}^{m/2} \binom{m/2}{\ell} = 2^{m/2},\]
+agreeing with the number of permutations that result in nonzero products in \eqref{eq:Leibniz}. By rearranging exponents, the binomial theorem allows for \eqref{eq:Leibniz simp.} to be rewritten as
+\[\det((1 - \lambda)I + \tilde{I}) = \sum_{\ell=0}^{m/2} \binom{m/2}{\ell}(1-\lambda)^{2((m/2)-\ell)}(-1^2)^{\ell} = \left((1-\lambda)^2 + (-1^2)\right)^{m/2}.\]
+Thus by \eqref{eq:Cofactor expansion}, the characteristic polynomial of $\Sigma$ is
+\[\det(\Sigma - \lambda I) = (1 - \lambda)\left((1-\lambda)^2 + (-1^2)\right)^{m/2} = \lambda^{m/2}(1-\lambda)(\lambda - 2)^{m/2}.\]
+The eigenvalues of $\Sigma$ and their algebraic multiplicities are now apparent. \par 
+If $n$ is even, then every row (column) of $\Sigma - \lambda I$ has exactly two nonzero elements except for the zeroth row and the $(n/2)$th row. These rows only have one nonzero element each, and so two cofactor expansions (along the zeroth and $(n/2)$th rows) yield
+\begin{equation}
+\label{eq:Cofactor expansion 2}
+\det(\Sigma - \lambda I) = (1 - \lambda)^2\det((1 - \lambda)I + \tilde{I}).
+\end{equation}
+The argument used for the odd $n$ case can now be used for the determinant of the $m \times m$ matrix minor $(1 - \lambda)I + \tilde{I}$, with the exception that $m = n-2$ instead of $n-1$. The resulting characteristic polynomial is then
+\[\det(\Sigma - \lambda I) = \lambda^{m/2}(1-\lambda)^2(\lambda - 2)^{m/2}.\]
+\indent Now let $\Sigma = \noiseSD^2 MB^2M$. The structure of $\Sigma$ is now more complicated. For simplicity, let $J = \{0,n/2\}$ if $n$ is even and $J  = \{0\}$ if $n$ is odd. $\Sigma$ has the structure
+\[\Sigma_{j,k} = \begin{cases}
+0, & j = k \text{ and } j,k \in J \\ 
+1, & j = k \text{ and } j,k \not\in J \\ 
+-1, & j + k = n \text{ and } j,k \not\in J \\
+0, & \text{otherwise} \end{cases}, \qquad 0 \leq j,k \leq n-1.\]
+When $n = 1$ or $n = 2$, $\Sigma$ is the zero matrix and has no nonzero eigenvalues. Fortunately the argument made for $\noiseSD^2 MA^2M$ can be applied for both even and odd $n$ when $n \geq 3$, with some differences. First, the zeroth row (as well as the $(n/2)$th row if $n$ is even) contains all zeros, and so cofactor expansions produce factors of $-\lambda$ instead of $1-\lambda$ such as in \eqref{eq:Cofactor expansion} and \eqref{eq:Cofactor expansion 2}.  Second, the matrix minor resulting from cofactor expansions is $(1-\lambda)I - \tilde{I}$ instead of $(1-\lambda)I + \tilde{I}$. Thus the nonzero products in Leibniz's formula take the form
+\[(1-\lambda)^{2((m/2)-\ell)}(-1)^{2\ell}.\]
+However, $(-1)^{2\ell} = 1^{2\ell}$ for all integers $\ell$, and so $\det((1-\lambda)I - \tilde{I})$ is equal to \eqref{eq:Leibniz simp.}. Therefore the characteristic polynomial of $\Sigma$ is
+\[\det((1-\lambda)I - \tilde{I}) = (-\lambda)\lambda^{m/2}(\lambda - 2)^{m/2}, \qquad m = n-1\]
+when $n$ is odd and 
+\[\det((1-\lambda)I - \tilde{I}) = (-\lambda)^{2}\lambda^{m/2}(\lambda - 2)^{m/2}, \qquad m = n-2\]
+when $n$ is even. Both polynomials confirm that $\lambda = 2$ is the only nonzero eigenvalue of $\Sigma = \noiseSD^2 MB^2M$ with algebraic multiplicity equal to $\rank(B)$.
+\end{proof}
+
+The psuedo-determinants of $\noiseSD^2 MA^2M$ and $\noiseSD^2 MB^2M$ follow as a corollary to Theorem \ref{thm:Covariance eigenvalues} in combination with Lemma \ref{lem:Rank of A and B}.
+
+\begin{corollary}
+\label{cor:Covariance eigenvalues}
+Let $A$ and $B$ be the real and imaginary parts, respectively, of the $n \times n$ DFT matrix, $J = \{0,n/2\}$ if $n$ is even and $J = \{0\}$ if $n$ is odd, and let $\noiseSD^2 > 0$. Define the diagonal matrix $M$ by
+\[M_{j,j} = \begin{cases}
+1/\noiseSD & j \in J \\
+\sqrt{2}/\noiseSD & j \not\in J
+\end{cases}.\]
+Then
+\[\pdet(\noiseSD^2 MA^2M) = \begin{cases}
+2^{(n/2)-1}, & n \text{ even} \\
+2^{(n-1)/2}, & n \text{ odd}
+\end{cases},\]
+and $\pdet(\noiseSD^2 MB^2M) = \pdet(\noiseSD^2 MA^2M)$ for $n \geq 3$.
+\end{corollary}
+
+The covariance of $|M_j\widehat{\gnoise}_j|^2$ and $|M_k\widehat{\gnoise}_k|^2$ for $0 \leq j < k \leq n-1$ can now be determined.
 
 \begin{theorem}
 \label{thm:Cov of mag squared}
@@ -897,11 +1017,17 @@ While this certainly appears to be the opposite of a simplification, any covaria
 The constant coefficients can be factored and combined so that
 \begin{align*}
 \Cov\left(\Re(M_j\widehat{\gnoise}_j)^2 ,\Re(M_k\widehat{\gnoise}_k)^2\right) 
-&= 4\Re(M_j\widehat{g}_j)\Re(M_k\widehat{g}_k)\Cov\left(\Re(M_j\widehat{\noise}_j), \Re(M_k\widehat{\noise}_k)\right) \\
-&+ 2\Re(M_j\widehat{g}_j)\Cov\left(\Re(M_j\widehat{\noise}_j), \Re(M_k\widehat{\noise}_k)^2 )\right) \\
-&+ 2\Re(M_k\widehat{g}_k)\Cov\left(\Re(M_j\widehat{\noise}_j)^2, \Re(M_k\widehat{\noise}_k)\right) \\
+&= [4\Re(M_j\widehat{g}_j)\Re(M_k\widehat{g}_k)]\Cov\left(\Re(M_j\widehat{\noise}_j), \Re(M_k\widehat{\noise}_k)\right) \\
+&+ [2\Re(M_j\widehat{g}_j)]\Cov\left(\Re(M_j\widehat{\noise}_j), \Re(M_k\widehat{\noise}_k)^2 )\right) \\
+&+ [2\Re(M_k\widehat{g}_k)]\Cov\left(\Re(M_j\widehat{\noise}_j)^2, \Re(M_k\widehat{\noise}_k)\right) \\
 &+ \Cov\left(\Re(M_j\widehat{\noise}_j)^2,\Re(M_k\widehat{\noise}_k)^2\right).
 \end{align*}
+
+% Looking at the joint distributions
+
+Let $A$ and $B$ be the real and imaginary parts, respectively, of the Fourier matrix \eqref{eq:DFT-Matrix}. Then $\Re(M_j\widehat{\noise}_j) = (MA\noiseVec)_j$ and $\Im(M_j\widehat{\noise}_j) = (MB\noiseVec)_j$ for all $0 \leq j \leq n-1$. Since $\noiseVec \sim \mathcal{N}(\mathbf{0},\noiseSD^2 I)$, the covariance matrices of $MA\noiseVec$ and $MB\noiseVec$ are $MA(\noiseSD^2 I)A^\trans M^\trans = \noiseSD^2 MA^2M$ and $\noiseSD^2 MB^2M$, respectively (because the matrices $M$, $A$, and $B$ are symmetric). \par 
+Unfortunately the matrices $\noiseSD^2 MA^2M$ and $\noiseSD^2 MB^2M$  are rank-deficient. In fact they have the same ranks as $A$ and $B$, respectively, which are given by Lemma \ref{lem:Rank of A and B}. To see this for $\noiseSD^2 MA^2M$, note that $\noiseSD^2 MA^2M = CC^\trans$ with $C = \noiseSD MA$. Since $\rank(CC^\trans) = \rank(C)$, it only has to be shown that $\rank(C) = \rank(A)$. However, $\rank(C) = \rank(A)$ because $C = MA$ and $M$ has full rank. Thus $\rank(CC^\trans) = \rank(\noiseSD^2 MA^2M) = \rank(A)$ and the same can be done for $B$. \par 
+As stated in the discussion following Lemma \ref{lem:Rank of A and B}, a consequence of the rank-deficiency of $\noiseSD^2 MA^2M$ and $\noiseSD^2 MB^2M$ is that the density functions of $MA\noiseVec$ and $MB\noiseVec$ do not exist in $\mathbb{R}^n$, but instead exists on subspaces. Specifically, the density functions of $MA\noiseVec$ and $MB\noiseVec$ exist on $\rank(A)$-dimensional and $\rank(B)$-dimensional subspaces of $\mathbb{R}^n$, respectively. 
 \end{proof}
 
 
