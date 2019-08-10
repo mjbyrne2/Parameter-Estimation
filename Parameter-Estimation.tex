@@ -1027,7 +1027,35 @@ The constant coefficients can be factored and combined so that
 
 Let $A$ and $B$ be the real and imaginary parts, respectively, of the Fourier matrix \eqref{eq:DFT-Matrix}. Then $\Re(M_j\widehat{\noise}_j) = (MA\noiseVec)_j$ and $\Im(M_j\widehat{\noise}_j) = (MB\noiseVec)_j$ for all $0 \leq j \leq n-1$. Since $\noiseVec \sim \mathcal{N}(\mathbf{0},\noiseSD^2 I)$, the covariance matrices of $MA\noiseVec$ and $MB\noiseVec$ are $MA(\noiseSD^2 I)A^\trans M^\trans = \noiseSD^2 MA^2M$ and $\noiseSD^2 MB^2M$, respectively (because the matrices $M$, $A$, and $B$ are symmetric). \par 
 Unfortunately the matrices $\noiseSD^2 MA^2M$ and $\noiseSD^2 MB^2M$  are rank-deficient. In fact they have the same ranks as $A$ and $B$, respectively, which are given by Lemma \ref{lem:Rank of A and B}. To see this for $\noiseSD^2 MA^2M$, note that $\noiseSD^2 MA^2M = CC^\trans$ with $C = \noiseSD MA$. Since $\rank(CC^\trans) = \rank(C)$, it only has to be shown that $\rank(C) = \rank(A)$. However, $\rank(C) = \rank(A)$ because $C = MA$ and $M$ has full rank. Thus $\rank(CC^\trans) = \rank(\noiseSD^2 MA^2M) = \rank(A)$ and the same can be done for $B$. \par 
-As stated in the discussion following Lemma \ref{lem:Rank of A and B}, a consequence of the rank-deficiency of $\noiseSD^2 MA^2M$ and $\noiseSD^2 MB^2M$ is that the density functions of $MA\noiseVec$ and $MB\noiseVec$ do not exist in $\mathbb{R}^n$, but instead exists on subspaces. Specifically, the density functions of $MA\noiseVec$ and $MB\noiseVec$ exist on $\rank(A)$-dimensional and $\rank(B)$-dimensional subspaces of $\mathbb{R}^n$, respectively. 
+As stated in the discussion following Lemma \ref{lem:Rank of A and B}, a consequence of the rank-deficiency of $\noiseSD^2 MA^2M$ and $\noiseSD^2 MB^2M$ is that the density functions of $MA\noiseVec$ and $MB\noiseVec$ do not exist in $\mathbb{R}^n$, but instead exists on subspaces. Specifically, the density functions of $MA\noiseVec$ and $MB\noiseVec$ exist on $\rank(A)$-dimensional and $\rank(B)$-dimensional subspaces of $\mathbb{R}^n$, respectively. \par 
+The approach in \cite[p.~527-528]{Rao1973} will be used to determine the density functions of $MA\noiseVec$ and $MB\noiseVec$. Starting with $MA\noiseVec$, let $\Sigma = \noiseSD^2 MA^2M$, $r = \rank(A)$, and define the $n \times r$ matrix $P$ by
+\[P_{j,k} = \begin{cases}
+1, & j = k \text{ and } j,k \in J \\ 
+\frac{1}{\sqrt{2}}, & j = k \text{ and } j,k \not\in J \\
+\frac{1}{\sqrt{2}}, & j \neq k \text{ and } j+k = n \\
+0, & \text{otherwise}
+\end{cases}, \qquad 0 \leq j \leq n, \quad 0 \leq k \leq r.\]
+In other words, the columns of $P$ are normalizations of the first $r$ columns of $\Sigma$. As such, the columns are $P$ are orthonormal vectors belonging to column space of $\Sigma$. Next, define the $n \times (n-r)$ matrix $Q$ by
+\[Q_{j,k} = \begin{cases}
+0, & j = k \text{ or } j+k = n \\ 
+1, & \text{otherwise}
+\end{cases}, \qquad 0 \leq j \leq n, \quad 0 \leq k \leq (n-r).\]
+Defining $Q$ in this way ensures that $\rank(Q) = (n - r)$ and $Q^\trans \Sigma$ is the $(n-r) \times n$ zero matrix. Let $\bm{\nu} = P^\trans MA\noiseVec$ and $\bm{\xi} = Q^\trans MA\noiseVec$, so that
+\[\begin{bmatrix}
+\bm{\nu} \\
+\bm{\xi}
+\end{bmatrix} = \begin{bmatrix}
+P^\trans MA\noiseVec \\ 
+Q^\trans MA\noiseVec
+\end{bmatrix} = \begin{bmatrix}
+P & Q
+\end{bmatrix}^\trans MA\noiseVec.\]
+Recalling that $\noiseVec \sim \mathcal{N}(\mathbf{0},\noiseSD^2 I)$, $\E(\bm{\xi}) = Q^\trans\mathbf{0} = \mathbf{0}$ (the dimension of the zero vector changes from $n \times 1$ to $(n-r) \times 1$). By the construction of $Q$, $\Var(\bm{\xi}) = Q^\trans \Sigma Q = \mathbf{0}$, which is the $(n-r) \times (n-r)$ zero matrix. Thus $\bm{\xi}$ is equal to the $(n-r) \times 1$ zero vector with probability 1. \par 
+In contrast, $\bm{\nu} \sim \mathcal{N}(P^\trans\bm{0},P^\trans \Sigma P) = \mathcal{N}(\bm{0},P^\trans \Sigma P)$; here the second zero vector $\bm{0}$ has dimension $r \times 1$. Since the columns of $P$ belonging in the columns space of $\Sigma$ are orthonormal, $\det(P^\trans \Sigma P) = \pdet(\Sigma) \neq 0$. Therefore $P^\trans \Sigma P$ is nonsingular, and so the probability density function of $\bm{\nu}$ is
+\begin{equation}
+\label{eq:Nu density}
+f(\bm{\nu}) = \frac{1}{(2\pi)^{r/2}\pdet(\Sigma)}\exp\left(-\bm{\nu}^\trans(P^\trans \Sigma P)^{-1}\bm{\nu}\right).
+\end{equation}
 \end{proof}
 
 
