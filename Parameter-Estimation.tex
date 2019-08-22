@@ -22,6 +22,7 @@
 \DeclareMathOperator{\nullspace}{null}	% Null (space) of a matrix
 \DeclareMathOperator{\pdet}{det^\dagger}	
 \DeclareMathOperator{\sgn}{sgn}	% Signum function
+\DeclareMathOperator{\alias}{A}	% Aliasing operator
 
 % Regularization notation:
 \newcommand{\regparam}{\alpha}
@@ -184,7 +185,7 @@ which is known as the Tikhonov filter function. For large values of $\regparam$,
 \mfilt(\regparam,\singular_\ell) = 1 - \filt(\regparam,\singular_\ell) = \frac{\regparam^2}{\singular_\ell^2 + \regparam^2}.
 \label{eq:TikFiltPsi}
 \end{equation}
-The expression $1 - \filt(\regparam,\singular_\ell)$ arises a number of time in the methods introduced in Section \ref{sec:Parameter estimation methods}, and so $\mfilt(\regparam,\singular_\ell)$ will be used to simplify notation. In contrast to \eqref{eq:TikFilt}, \eqref{eq:TikFiltPsi} is close to one for large values of $\regparam$ and monotone increasing in $\regparam$ for fixed $\singular_\ell$; see Figure \ref{fig:Phi Psi Plot}. \par 
+The expression $1 - \filt(\regparam,\singular_\ell)$ arises a number of times in the methods introduced in Section \ref{sec:Parameter estimation methods}, and so $\mfilt(\regparam,\singular_\ell)$ will be used to simplify notation. In contrast to \eqref{eq:TikFilt}, \eqref{eq:TikFiltPsi} is close to one for large values of $\regparam$ and monotone increasing in $\regparam$ for fixed $\singular_\ell$; see Figure \ref{fig:Phi Psi Plot}. \par 
 
 \begin{figure}
 	\centerline{\includegraphics[scale = 0.4]{Figures/Phi_Psi_Plot.eps}}
@@ -260,14 +261,14 @@ M^{-1} \\
 \end{equation}
 where $\bm{0}$ is the zero matrix of appropriate dimension. The form of the regularized solution can now be expressed as \eqref{eq:TikSol Standard Form} with substitutions $\mathbf{y} = D\fVec$, $A = \kMat{D_{\kMat}^\dagger}$, and $\mathbf{b} = \gnoiseVec - \kMat\fVec_0$. This is shown by writing
 \begin{align*}
-\|A\mathbf{y} - \mathbf{b}\|^2 + \regparam^2\|\mathbf{y}\|^2 &= \|\kMat{D_{\kMat}^\dagger}D\fVec - \gnoiseVec - \kMat\fVec_0\|^2 + \regparam^2\|D\fVec\|^2 \\
-&=  \|\kMat({D_{\kMat}^\dagger}D\fVec - \fVec_0) - \gnoiseVec\|^2 + \regparam^2\|D\fVec\|^2
+\|A\mathbf{y} - \mathbf{b}\|^2 + \regparam^2\|\mathbf{y}\|^2 &= \|\kMat{D_{\kMat}^\dagger}D\fVec - (\gnoiseVec - \kMat\fVec_0)\|^2 + \regparam^2\|D\fVec\|^2 \\
+&=  \|\kMat({D_{\kMat}^\dagger}D\fVec + \fVec_0) - \gnoiseVec\|^2 + \regparam^2\|D\fVec\|^2
 \end{align*}
 as well as 
 \begin{align*}
-{D_{\kMat}^\dagger}D\fVec - \fVec_0 &= \left(I - \left(\kMat\left(I - D^\dagger D\right)\right)^\dagger \kMat\right)D^\dagger D\fVec - \left(\kMat\left(I - D^\dagger D\right)\right)^\dagger \gnoiseVec \\
-&= D^\dagger D\fVec - \left(\kMat\left(I - D^\dagger D\right)\right)^\dagger \kMat D^\dagger D\fVec - \left(\kMat\left(I - D^\dagger D\right)\right)^\dagger \gnoiseVec \\ 
-&= D^\dagger D\fVec - \left(\kMat\left(I - D^\dagger D\right)\right)^\dagger \left[\kMat D^\dagger D\fVec + \gnoiseVec\right] \\
+{D_{\kMat}^\dagger}D\fVec + \fVec_0 &= \left(I - \left(\kMat\left(I - D^\dagger D\right)\right)^\dagger \kMat\right)D^\dagger D\fVec + \left(\kMat\left(I - D^\dagger D\right)\right)^\dagger \gnoiseVec \\
+&= D^\dagger D\fVec - \left(\kMat\left(I - D^\dagger D\right)\right)^\dagger \kMat D^\dagger D\fVec + \left(\kMat\left(I - D^\dagger D\right)\right)^\dagger \gnoiseVec \\ 
+&= D^\dagger D\fVec + \left(\kMat\left(I - D^\dagger D\right)\right)^\dagger \left[\gnoiseVec - \kMat D^\dagger D\fVec\right] \\
 &= 
 \end{align*}
 The final solution is then recovered by $\fVec = D_{\kMat}^\dagger \mathbf{y} + \fVec_0$. \newpage
@@ -870,107 +871,130 @@ and
 4\left(1 + \dfrac{|\widehat{g}_j|^2}{\noiseSD^2}\right), & j \not\in J \end{cases}.\]
 \end{corollary}
 
-The final statistical result presented here is the covariance of $|M_j\widehat{\gnoise}_j|^2$ and $|M_k\widehat{\gnoise}_k|^2$, which will be used in Section \ref{sec:Parameter estimation methods}.  A step in Theorem \ref{thm:Cov of mag squared} is to calculate the \textit{psuedo-determinant} of a covariance matrix $\Sigma$, which is defined as the product of its nonzero eigenvalues. Adopting the notation used for psuedo-inverses, the psuedo-determinant of a matrix $\Sigma$ will be denoted $\pdet(\Sigma)$. Theorem \ref{thm:Covariance eigenvalues} gives nonzero eigenvalues of the covariance matrices used in Theorem \ref{thm:Cov of mag squared}, which will then be used to evaluate the psuedo-determinants. The algebraic multiplicity of an eigenvalue $\lambda$ is denoted $\mu(\lambda)$.
+The final statistical result presented here is the covariance of $|M_j\widehat{\gnoise}_j|^2$ and $|M_k\widehat{\gnoise}_k|^2$, which will be used in Section \ref{sec:Parameter estimation methods}.  
 
-\begin{theorem}
-\label{thm:Covariance eigenvalues}
-Let $A$ and $B$ be the real and imaginary parts, respectively, of the $n \times n$ DFT matrix, $J = \{0,n/2\}$ if $n$ is even and $J = \{0\}$ if $n$ is odd, and let $\noiseSD^2 > 0$. Define the diagonal matrix $M$ by
+% Here is the univariate approach
+A step in Theorem \ref{thm:Cov of mag squared} is to determine covariances between components of $M\widehat{\gnoiseVec} = M\widehat{\gVec} + M\widehat{\noiseVec}$. Lemma \ref{lem:App of Ind Thm 2} establishes that the real and imaginary parts of $M\widehat{\noiseVec}$ are independent, but Lemma \ref{lem:App of Ind Thm 3} establishes the relationship between any two real or imaginary components of $M\widehat{\noiseVec}$.
+
+\begin{lemma}
+\label{lem:App of Ind Thm 3}
+Let $\noise \sim \mathcal{N}(\bm{0},\noiseSD^2 I)$, $A$ and $B$ be the real and imaginary parts, respectively, of the $n \times n$ DFT matrix, $J = \{0,n/2\}$ if $n$ is even and $J = \{0\}$ if $n$ is odd. Define the diagonal matrix $M$ by
 \[M_{j,j} = \begin{cases}
 1/\noiseSD & j \in J \\
 \sqrt{2}/\noiseSD & j \not\in J
 \end{cases}.\]
-The only nonzero eigenvalues of the matrix $\noiseSD^2 MA^2M$ are 1 and 2 with algebraic multiplicities
-\[\mu(1) = \begin{cases}
-1, & n \text{ odd} \\
-2, & n \text{ even}
-\end{cases},\quad \mu(2) = \rank(A) - \mu(1).\]
-The only nonzero eigenvalue of the matrix $\noiseSD^2 MB^2M$, existing only for $n \geq 3$, is 2 with algebraic multiplicity equal to $\rank(B)$.
-\end{theorem}
+Then $(MA\noiseVec)_j$ and $(MA\noiseVec)_k$ are independent for all $0 \leq j < k \leq n-1$ with $j + k \neq n$. When $j + k = n$, $(MA\noiseVec)_j = (MA\noiseVec)_k$. The same result holds for the components of $MB\noiseVec$.
+\end{lemma}
 \begin{proof}
-The nonzero eigenvalues of $\noiseSD^2MA^2M$ will be calculated first. For simplification, let $\Sigma = \noiseSD^2MA^2M$. Due to the structure of $\Sigma$, its characteristic polynomial $\det(\Sigma - \lambda I)$ can be expressed without much difficulty. Since $M$ is diagonal, pre-multiplication scales each row of $A^2$ by the corresponding diagonal entries of $M$; post-multiplication scales the columns of $A^2$ in the same way. $A^2$ is symmetric with elements given by Lemma \ref{lem:Inner products}, and so the matrix $\Sigma$ has the structure
-\[\Sigma_{j,k} = \begin{cases}
-1, & j = k \\ 
-1, & j \neq k \text{ and } j + k = n \\ 
-0, & \text{otherwise} \end{cases}, \qquad 0 \leq j,k \leq n-1.\]
-The structure of $\Sigma - \lambda I$ is then
-\[(\Sigma - \lambda I)_{j,k} = \begin{cases}
-1-\lambda, & j = k \\ 
-1, & j \neq k \text{ and } j + k = n \\ 
-0, & \text{otherwise} \end{cases}, \qquad 0 \leq j,k \leq n-1.\]
-The approach to finding the determinant of $\Sigma - \lambda I$ is to perform a cofactor expansion to reduce $\Sigma - \lambda I$ to expression involving a minor that has simpler structure and then uses combinatorial argument along with Leibniz's formula for matrix determinants. The cofactor expansion depends upon the parity of $n$. \par 
-If $n$ is odd, then every row (and by symmetry, column) of $\Sigma - \lambda I$ has exactly two nonzero elements except for the zeroth row, which has only $(\Sigma - \lambda I)_{0,0}$ as a nonzero element. Exploiting this observation, a cofactor expansion along the zeroth row results in
-\begin{equation}
-\label{eq:Cofactor expansion}
-\det(\Sigma - \lambda I) = (1 - \lambda)\det((1 - \lambda)I + \tilde{I}),
-\end{equation}
-where the identity $I$ and exchange matrix $\tilde{I}$ are dimension $m \times m$ with $m = n-1$. The minor $(1 - \lambda)I + \tilde{I}$ has the property that each row (column) has exactly two nonzero elements: $1 - \lambda$ and 1. Explicitly, the structure is
-\[((1 - \lambda)I + \tilde{I})_{j,k} = \begin{cases}
-1 - \lambda, & j = k \\
-1, & j \neq k \text{ and } j + k = m - 1 \\
-0, & \text{otherwise}
-\end{cases}, \qquad 0 \leq j,k \leq m-1,\]
-after relabeling the indices to agree with the dimension of the minor. To calculate $\det((1 - \lambda)I + \tilde{I})$, Leibniz's formula for matrix determinants can be utilized:
-\begin{equation}
-\label{eq:Leibniz}
-\det((1 - \lambda)I + \tilde{I}) = \sum_{\tau \in S_m} \left(\sgn(\tau) \prod_{j=0}^{m-1} ((1 - \lambda)I + \tilde{I})_{j,\tau(j)} \right).
-\end{equation}
-Here $S_m$ denotes the symmetric group on $m$ objects (in this case represented by the set of permuations of the elements of $\{0,\ldots,m-1\}$), $\tau$ is a specific permutation, $\sgn(\tau)$ is either 1 or $-1$ depending upon the parity of the permutation, and $\tau(j)$ is the element of $\{0,\ldots,m-1\}$ in the $j$th position of the permutation \cite[p.~106-110]{DummitFoote3}. While there are $m!$ (the order of $S_m$) summands in \eqref{eq:Leibniz}, the sparse structure of $(1 - \lambda)I + \tilde{I}$ reduces the number of summands to $2^{m/2} \cdot 1^{m/2} = 2^{m/2}$. This is because there are exactly two nonzero elements in each row of the minor and choosing a nonzero element in each of the first $m/2$ rows leaves only one choice of a nonzero element in each of the remaining rows. For example, a permutation $\tau$ with
-\[((1 - \lambda)I + \tilde{I})_{0,\tau(0)} = ((1 - \lambda)I + \tilde{I})_{0,0} = (1-\lambda)\]
-must be such that
-\[((1 - \lambda)I + \tilde{I})_{m-1,\tau(m-1)} = ((1 - \lambda)I + \tilde{I})_{m-1,m-1} = (1-\lambda)\]
-so that the product in \eqref{eq:Leibniz} is nonzero. Any permutation that results in a zero element from $(1 - \lambda)I + \tilde{I}$ causes the product in \eqref{eq:Leibniz} to be zero and can therefore be ignored in the sum. \par 
-The symmetry of $(1 - \lambda)I + \tilde{I}$ forces nonzero products in \eqref{eq:Leibniz} to take the form
-\[(1-\lambda)^{2((m/2)-\ell)}1^{2\ell}\]
-where $\ell$ is the number of the first $m/2$ rows where $1-\lambda$ and 1 have been transposed by given permutation. Of the $m/2$ rows, the number of ways to choose $\ell$ rows for the transposition of $1-\lambda$ and 1 is $\binom{m/2}{\ell}$. As for the $\sgn(\tau)$ term in \eqref{eq:Leibniz}, $\ell$ represents the number of transpositions in the cycle decomposition of $\tau$. Since the sign of a transposition is $-1$ and the sign of a permutation is multiplicative with respect to cycles (in this case, transpositions) in a cycle decomposition \cite[p.~109-110]{DummitFoote3}, $\sgn(\tau) = (-1)^{\ell}$. Thus \eqref{eq:Leibniz} simplifies to 
-\begin{equation}
-\label{eq:Leibniz simp.}
-\det((1 - \lambda)I + \tilde{I}) = \sum_{\ell=0}^{m/2} \binom{m/2}{\ell}(1-\lambda)^{2((m/2)-\ell)}1^{2\ell}(-1)^{\ell}.
-\end{equation}
-Notice that 
-\[\sum_{\ell=0}^{m/2} \binom{m/2}{\ell} = 2^{m/2},\]
-agreeing with the number of permutations that result in nonzero products in \eqref{eq:Leibniz}. By rearranging exponents, the binomial theorem allows for \eqref{eq:Leibniz simp.} to be rewritten as
-\[\det((1 - \lambda)I + \tilde{I}) = \sum_{\ell=0}^{m/2} \binom{m/2}{\ell}(1-\lambda)^{2((m/2)-\ell)}(-1^2)^{\ell} = \left((1-\lambda)^2 + (-1^2)\right)^{m/2}.\]
-Thus by \eqref{eq:Cofactor expansion}, the characteristic polynomial of $\Sigma$ is
-\[\det(\Sigma - \lambda I) = (1 - \lambda)\left((1-\lambda)^2 + (-1^2)\right)^{m/2} = \lambda^{m/2}(1-\lambda)(\lambda - 2)^{m/2}.\]
-The eigenvalues of $\Sigma$ and their algebraic multiplicities are now apparent. \par 
-If $n$ is even, then every row (column) of $\Sigma - \lambda I$ has exactly two nonzero elements except for the zeroth row and the $(n/2)$th row. These rows only have one nonzero element each, and so two cofactor expansions (along the zeroth and $(n/2)$th rows) yield
-\begin{equation}
-\label{eq:Cofactor expansion 2}
-\det(\Sigma - \lambda I) = (1 - \lambda)^2\det((1 - \lambda)I + \tilde{I}).
-\end{equation}
-The argument used for the odd $n$ case can now be used for the determinant of the $m \times m$ matrix minor $(1 - \lambda)I + \tilde{I}$, with the exception that $m = n-2$ instead of $n-1$. The resulting characteristic polynomial is then
-\[\det(\Sigma - \lambda I) = \lambda^{m/2}(1-\lambda)^2(\lambda - 2)^{m/2}.\]
-\indent Now let $\Sigma = \noiseSD^2 MB^2M$. The structure of $\Sigma$ is now more complicated. For simplicity, let $J = \{0,n/2\}$ if $n$ is even and $J  = \{0\}$ if $n$ is odd. $\Sigma$ has the structure
-\[\Sigma_{j,k} = \begin{cases}
-0, & j = k \text{ and } j,k \in J \\ 
-1, & j = k \text{ and } j,k \not\in J \\ 
--1, & j + k = n \text{ and } j,k \not\in J \\
-0, & \text{otherwise} \end{cases}, \qquad 0 \leq j,k \leq n-1.\]
-When $n = 1$ or $n = 2$, $\Sigma$ is the zero matrix and has no nonzero eigenvalues. Fortunately the argument made for $\noiseSD^2 MA^2M$ can be applied for both even and odd $n$ when $n \geq 3$, with some differences. First, the zeroth row (as well as the $(n/2)$th row if $n$ is even) contains all zeros, and so cofactor expansions produce factors of $-\lambda$ instead of $1-\lambda$ such as in \eqref{eq:Cofactor expansion} and \eqref{eq:Cofactor expansion 2}.  Second, the matrix minor resulting from cofactor expansions is $(1-\lambda)I - \tilde{I}$ instead of $(1-\lambda)I + \tilde{I}$. Thus the nonzero products in Leibniz's formula take the form
-\[(1-\lambda)^{2((m/2)-\ell)}(-1)^{2\ell}.\]
-However, $(-1)^{2\ell} = 1^{2\ell}$ for all integers $\ell$, and so $\det((1-\lambda)I - \tilde{I})$ is equal to \eqref{eq:Leibniz simp.}. Therefore the characteristic polynomial of $\Sigma$ is
-\[\det((1-\lambda)I - \tilde{I}) = (-\lambda)\lambda^{m/2}(\lambda - 2)^{m/2}, \qquad m = n-1\]
-when $n$ is odd and 
-\[\det((1-\lambda)I - \tilde{I}) = (-\lambda)^{2}\lambda^{m/2}(\lambda - 2)^{m/2}, \qquad m = n-2\]
-when $n$ is even. Both polynomials confirm that $\lambda = 2$ is the only nonzero eigenvalue of $\Sigma = \noiseSD^2 MB^2M$ with algebraic multiplicity equal to $\rank(B)$.
+Let $0 \leq j < k \leq n-1$ with $j + k \neq n$. The components $(MA\noiseVec)_j$ and $(MA\noiseVec)_k$ are
+\[(MA\noiseVec)_j = \sum_{\ell=0}^{n-1} \frac{M_{j,j}}{\sqrt{n}}\cos\left(\frac{-2\pi{j\ell}}{n}\right)\noise_{\ell}, \quad (MA\noiseVec)_k = \sum_{\ell=0}^{n-1} \frac{M_{k,k}}{\sqrt{n}}\cos\left(\frac{-2\pi{k\ell}}{n}\right)\noise_{\ell}.\]
+As stated in Lemma \ref{lem:App of Ind Thm}, the $\noise_\ell$ are independent and their $n$th moments exist for each $0 \leq \ell \leq n-1$. Thus the first condition of Theorem \ref{thm:Independence Theorem} is satisfied. The second condition follows from
+\[\sum_{\ell=0}^{n-1} \left[\frac{M_{j,j}}{\sqrt{n}}\cos\left(\frac{-2\pi{j\ell}}{n}\right)\right]\left[\frac{M_{k,k}}{\sqrt{n}}\cos\left(\frac{-2\pi{k\ell}}{n}\right)\right] = M_{j,j}M_{k,k} \langle A_{j,\cdot}A_{k,\cdot} \rangle = 0,\]
+where the last equality is given by Lemma \ref{lem:Inner products}. The proof of $(MA\noiseVec)_j = (MA\noiseVec)_k$ when $j+k = n$ is contained in the proof of Lemma \ref{lem:Rank of A and B}. The same argument applies to $(MB\noiseVec)_j$ and $(MB\noiseVec)_k$.
 \end{proof}
 
-The psuedo-determinants of $\noiseSD^2 MA^2M$ and $\noiseSD^2 MB^2M$ follow as a corollary to Theorem \ref{thm:Covariance eigenvalues} in combination with Lemma \ref{lem:Rank of A and B}.
-
-\begin{corollary}
-\label{cor:Covariance eigenvalues}
-Let $A$ and $B$ be the real and imaginary parts, respectively, of the $n \times n$ DFT matrix, $J = \{0,n/2\}$ if $n$ is even and $J = \{0\}$ if $n$ is odd, and let $\noiseSD^2 > 0$. Define the diagonal matrix $M$ by
-\[M_{j,j} = \begin{cases}
-1/\noiseSD & j \in J \\
-\sqrt{2}/\noiseSD & j \not\in J
-\end{cases}.\]
-Then
-\[\pdet(\noiseSD^2 MA^2M) = \begin{cases}
-2^{(n/2)-1}, & n \text{ even} \\
-2^{(n-1)/2}, & n \text{ odd}
-\end{cases},\]
-and $\pdet(\noiseSD^2 MB^2M) = \pdet(\noiseSD^2 MA^2M)$ for $n \geq 3$.
-\end{corollary}
+% Here is the start of the density function approach
+%A step in Theorem \ref{thm:Cov of mag squared} is to calculate the \textit{psuedo-determinant} of a covariance matrix $\Sigma$, which is defined as the product of its nonzero eigenvalues. Adopting the notation used for psuedo-inverses, the psuedo-determinant of a matrix $\Sigma$ will be denoted $\pdet(\Sigma)$. Theorem \ref{thm:Covariance eigenvalues} gives nonzero eigenvalues of the covariance matrices used in Theorem \ref{thm:Cov of mag squared}, which will then be used to evaluate the psuedo-determinants. The algebraic multiplicity of an eigenvalue $\lambda$ is denoted $\mu(\lambda)$.
+%
+%\begin{theorem}
+%\label{thm:Covariance eigenvalues}
+%Let $A$ and $B$ be the real and imaginary parts, respectively, of the $n \times n$ DFT matrix, $J = \{0,n/2\}$ if $n$ is even and $J = \{0\}$ if $n$ is odd, and let $\noiseSD^2 > 0$. Define the diagonal matrix $M$ by
+%\[M_{j,j} = \begin{cases}
+%1/\noiseSD & j \in J \\
+%\sqrt{2}/\noiseSD & j \not\in J
+%\end{cases}.\]
+%The only nonzero eigenvalues of the matrix $\noiseSD^2 MA^2M$ are 1 and 2 with algebraic multiplicities
+%\[\mu(1) = \begin{cases}
+%1, & n \text{ odd} \\
+%2, & n \text{ even}
+%\end{cases},\quad \mu(2) = \rank(A) - \mu(1).\]
+%The only nonzero eigenvalue of the matrix $\noiseSD^2 MB^2M$, existing only for $n \geq 3$, is 2 with algebraic multiplicity equal to $\rank(B)$.
+%\end{theorem}
+%\begin{proof}
+%The nonzero eigenvalues of $\noiseSD^2MA^2M$ will be calculated first. For simplification, let $\Sigma = \noiseSD^2MA^2M$. Due to the structure of $\Sigma$, its characteristic polynomial $\det(\Sigma - \lambda I)$ can be expressed without much difficulty. Since $M$ is diagonal, pre-multiplication scales each row of $A^2$ by the corresponding diagonal entries of $M$; post-multiplication scales the columns of $A^2$ in the same way. $A^2$ is symmetric with elements given by Lemma \ref{lem:Inner products}, and so the matrix $\Sigma$ has the structure
+%\[\Sigma_{j,k} = \begin{cases}
+%1, & j = k \\ 
+%1, & j \neq k \text{ and } j + k = n \\ 
+%0, & \text{otherwise} \end{cases}, \qquad 0 \leq j,k \leq n-1.\]
+%The structure of $\Sigma - \lambda I$ is then
+%\[(\Sigma - \lambda I)_{j,k} = \begin{cases}
+%1-\lambda, & j = k \\ 
+%1, & j \neq k \text{ and } j + k = n \\ 
+%0, & \text{otherwise} \end{cases}, \qquad 0 \leq j,k \leq n-1.\]
+%The approach to finding the determinant of $\Sigma - \lambda I$ is to perform a cofactor expansion to reduce $\Sigma - \lambda I$ to expression involving a minor that has simpler structure and then uses combinatorial argument along with Leibniz's formula for matrix determinants. The cofactor expansion depends upon the parity of $n$. \par 
+%If $n$ is odd, then every row (and by symmetry, column) of $\Sigma - \lambda I$ has exactly two nonzero elements except for the zeroth row, which has only $(\Sigma - \lambda I)_{0,0}$ as a nonzero element. Exploiting this observation, a cofactor expansion along the zeroth row results in
+%\begin{equation}
+%\label{eq:Cofactor expansion}
+%\det(\Sigma - \lambda I) = (1 - \lambda)\det((1 - \lambda)I + \tilde{I}),
+%\end{equation}
+%where the identity $I$ and exchange matrix $\tilde{I}$ are dimension $m \times m$ with $m = n-1$. The minor $(1 - \lambda)I + \tilde{I}$ has the property that each row (column) has exactly two nonzero elements: $1 - \lambda$ and 1. Explicitly, the structure is
+%\[((1 - \lambda)I + \tilde{I})_{j,k} = \begin{cases}
+%1 - \lambda, & j = k \\
+%1, & j \neq k \text{ and } j + k = m - 1 \\
+%0, & \text{otherwise}
+%\end{cases}, \qquad 0 \leq j,k \leq m-1,\]
+%after relabeling the indices to agree with the dimension of the minor. To calculate $\det((1 - \lambda)I + \tilde{I})$, Leibniz's formula for matrix determinants can be utilized:
+%\begin{equation}
+%\label{eq:Leibniz}
+%\det((1 - \lambda)I + \tilde{I}) = \sum_{\tau \in S_m} \left(\sgn(\tau) \prod_{j=0}^{m-1} ((1 - \lambda)I + \tilde{I})_{j,\tau(j)} \right).
+%\end{equation}
+%Here $S_m$ denotes the symmetric group on $m$ objects (in this case represented by the set of permuations of the elements of $\{0,\ldots,m-1\}$), $\tau$ is a specific permutation, $\sgn(\tau)$ is either 1 or $-1$ depending upon the parity of the permutation, and $\tau(j)$ is the element of $\{0,\ldots,m-1\}$ in the $j$th position of the permutation \cite[p.~106-110]{DummitFoote3}. While there are $m!$ (the order of $S_m$) summands in \eqref{eq:Leibniz}, the sparse structure of $(1 - \lambda)I + \tilde{I}$ reduces the number of summands to $2^{m/2} \cdot 1^{m/2} = 2^{m/2}$. This is because there are exactly two nonzero elements in each row of the minor and choosing a nonzero element in each of the first $m/2$ rows leaves only one choice of a nonzero element in each of the remaining rows. For example, a permutation $\tau$ with
+%\[((1 - \lambda)I + \tilde{I})_{0,\tau(0)} = ((1 - \lambda)I + \tilde{I})_{0,0} = (1-\lambda)\]
+%must be such that
+%\[((1 - \lambda)I + \tilde{I})_{m-1,\tau(m-1)} = ((1 - \lambda)I + \tilde{I})_{m-1,m-1} = (1-\lambda)\]
+%so that the product in \eqref{eq:Leibniz} is nonzero. Any permutation that results in a zero element from $(1 - \lambda)I + \tilde{I}$ causes the product in \eqref{eq:Leibniz} to be zero and can therefore be ignored in the sum. \par 
+%The symmetry of $(1 - \lambda)I + \tilde{I}$ forces nonzero products in \eqref{eq:Leibniz} to take the form
+%\[(1-\lambda)^{2((m/2)-\ell)}1^{2\ell}\]
+%where $\ell$ is the number of the first $m/2$ rows where $1-\lambda$ and 1 have been transposed by given permutation. Of the $m/2$ rows, the number of ways to choose $\ell$ rows for the transposition of $1-\lambda$ and 1 is $\binom{m/2}{\ell}$. As for the $\sgn(\tau)$ term in \eqref{eq:Leibniz}, $\ell$ represents the number of transpositions in the cycle decomposition of $\tau$. Since the sign of a transposition is $-1$ and the sign of a permutation is multiplicative with respect to cycles (in this case, transpositions) in a cycle decomposition \cite[p.~109-110]{DummitFoote3}, $\sgn(\tau) = (-1)^{\ell}$. Thus \eqref{eq:Leibniz} simplifies to 
+%\begin{equation}
+%\label{eq:Leibniz simp.}
+%\det((1 - \lambda)I + \tilde{I}) = \sum_{\ell=0}^{m/2} \binom{m/2}{\ell}(1-\lambda)^{2((m/2)-\ell)}1^{2\ell}(-1)^{\ell}.
+%\end{equation}
+%Notice that 
+%\[\sum_{\ell=0}^{m/2} \binom{m/2}{\ell} = 2^{m/2},\]
+%agreeing with the number of permutations that result in nonzero products in \eqref{eq:Leibniz}. By rearranging exponents, the binomial theorem allows for \eqref{eq:Leibniz simp.} to be rewritten as
+%\[\det((1 - \lambda)I + \tilde{I}) = \sum_{\ell=0}^{m/2} \binom{m/2}{\ell}(1-\lambda)^{2((m/2)-\ell)}(-1^2)^{\ell} = \left((1-\lambda)^2 + (-1^2)\right)^{m/2}.\]
+%Thus by \eqref{eq:Cofactor expansion}, the characteristic polynomial of $\Sigma$ is
+%\[\det(\Sigma - \lambda I) = (1 - \lambda)\left((1-\lambda)^2 + (-1^2)\right)^{m/2} = \lambda^{m/2}(1-\lambda)(\lambda - 2)^{m/2}.\]
+%The eigenvalues of $\Sigma$ and their algebraic multiplicities are now apparent. \par 
+%If $n$ is even, then every row (column) of $\Sigma - \lambda I$ has exactly two nonzero elements except for the zeroth row and the $(n/2)$th row. These rows only have one nonzero element each, and so two cofactor expansions (along the zeroth and $(n/2)$th rows) yield
+%\begin{equation}
+%\label{eq:Cofactor expansion 2}
+%\det(\Sigma - \lambda I) = (1 - \lambda)^2\det((1 - \lambda)I + \tilde{I}).
+%\end{equation}
+%The argument used for the odd $n$ case can now be used for the determinant of the $m \times m$ matrix minor $(1 - \lambda)I + \tilde{I}$, with the exception that $m = n-2$ instead of $n-1$. The resulting characteristic polynomial is then
+%\[\det(\Sigma - \lambda I) = \lambda^{m/2}(1-\lambda)^2(\lambda - 2)^{m/2}.\]
+%\indent Now let $\Sigma = \noiseSD^2 MB^2M$. The structure of $\Sigma$ is now more complicated. For simplicity, let $J = \{0,n/2\}$ if $n$ is even and $J  = \{0\}$ if $n$ is odd. $\Sigma$ has the structure
+%\[\Sigma_{j,k} = \begin{cases}
+%0, & j = k \text{ and } j,k \in J \\ 
+%1, & j = k \text{ and } j,k \not\in J \\ 
+%-1, & j + k = n \text{ and } j,k \not\in J \\
+%0, & \text{otherwise} \end{cases}, \qquad 0 \leq j,k \leq n-1.\]
+%When $n = 1$ or $n = 2$, $\Sigma$ is the zero matrix and has no nonzero eigenvalues. Fortunately the argument made for $\noiseSD^2 MA^2M$ can be applied for both even and odd $n$ when $n \geq 3$, with some differences. First, the zeroth row (as well as the $(n/2)$th row if $n$ is even) contains all zeros, and so cofactor expansions produce factors of $-\lambda$ instead of $1-\lambda$ such as in \eqref{eq:Cofactor expansion} and \eqref{eq:Cofactor expansion 2}.  Second, the matrix minor resulting from cofactor expansions is $(1-\lambda)I - \tilde{I}$ instead of $(1-\lambda)I + \tilde{I}$. Thus the nonzero products in Leibniz's formula take the form
+%\[(1-\lambda)^{2((m/2)-\ell)}(-1)^{2\ell}.\]
+%However, $(-1)^{2\ell} = 1^{2\ell}$ for all integers $\ell$, and so $\det((1-\lambda)I - \tilde{I})$ is equal to \eqref{eq:Leibniz simp.}. Therefore the characteristic polynomial of $\Sigma$ is
+%\[\det((1-\lambda)I - \tilde{I}) = (-\lambda)\lambda^{m/2}(\lambda - 2)^{m/2}, \qquad m = n-1\]
+%when $n$ is odd and 
+%\[\det((1-\lambda)I - \tilde{I}) = (-\lambda)^{2}\lambda^{m/2}(\lambda - 2)^{m/2}, \qquad m = n-2\]
+%when $n$ is even. Both polynomials confirm that $\lambda = 2$ is the only nonzero eigenvalue of $\Sigma = \noiseSD^2 MB^2M$ with algebraic multiplicity equal to $\rank(B)$.
+%\end{proof}
+%
+%The psuedo-determinants of $\noiseSD^2 MA^2M$ and $\noiseSD^2 MB^2M$ follow as a corollary to Theorem \ref{thm:Covariance eigenvalues} in combination with Lemma \ref{lem:Rank of A and B}.
+%
+%\begin{corollary}
+%\label{cor:Covariance eigenvalues}
+%Let $A$ and $B$ be the real and imaginary parts, respectively, of the $n \times n$ DFT matrix, $J = \{0,n/2\}$ if $n$ is even and $J = \{0\}$ if $n$ is odd, and let $\noiseSD^2 > 0$. Define the diagonal matrix $M$ by
+%\[M_{j,j} = \begin{cases}
+%1/\noiseSD & j \in J \\
+%\sqrt{2}/\noiseSD & j \not\in J
+%\end{cases}.\]
+%Then
+%\[\pdet(\noiseSD^2 MA^2M) = \begin{cases}
+%2^{(n/2)-1}, & n \text{ even} \\
+%2^{(n-1)/2}, & n \text{ odd}
+%\end{cases},\]
+%and $\pdet(\noiseSD^2 MB^2M) = \pdet(\noiseSD^2 MA^2M)$ for $n \geq 3$.
+%\end{corollary}
 
 The covariance of $|M_j\widehat{\gnoise}_j|^2$ and $|M_k\widehat{\gnoise}_k|^2$ for $0 \leq j < k \leq n-1$ can now be determined.
 
@@ -982,7 +1006,10 @@ Let $\gnoiseVec$ be a random $n$-vector with $\gnoiseVec \sim \mathcal{N}(\gVec,
 \sqrt{2}/\noiseSD & j \not\in J
 \end{cases}.\]
 Then for $0 \leq j < k \leq n-1$,
-\[\Cov\left(|M_j\widehat{\gnoise}_j|^2,|M_k\widehat{\gnoise}_k|^2\right) = .\]
+\[\Cov\left(|M_j\widehat{\gnoise}_j|^2,|M_k\widehat{\gnoise}_k|^2\right) = \begin{cases}
+4\left(1 + \dfrac{|\widehat{g}_j|^2}{\noiseSD^2}\right), & j + k = n \\
+0, & j + k \neq 0
+\end{cases}.\]
 \end{theorem}
 \begin{proof}
 By the linearity of covariance and rewriting the magnitudes squared in terms of real and imaginary parts,
@@ -1022,42 +1049,43 @@ The constant coefficients can be factored and combined so that
 &+ [2\Re(M_k\widehat{g}_k)]\Cov\left(\Re(M_j\widehat{\noise}_j)^2, \Re(M_k\widehat{\noise}_k)\right) \\
 &+ \Cov\left(\Re(M_j\widehat{\noise}_j)^2,\Re(M_k\widehat{\noise}_k)^2\right).
 \end{align*}
+Let $A$ be the real part of the Fourier matrix \eqref{eq:DFT-Matrix}. Then $\Re(M_j\widehat{\noise}_j) = (MA\noiseVec)_j$ for all $0 \leq j \leq n-1$. Lemma \ref{lem:App of Ind Thm 2} states that $(MA\noiseVec)_j$ and $(MA\noiseVec)_k$ are independent for all $0 \leq j < k \leq n-1$ with $j+k \neq n$ and $(MA\noiseVec)_j = (MA\noiseVec)_k$ when $j+k = n$. Thus all of the covariance terms above are zero when $j + k \neq n$. As for the $j + k = n$ case, Theorem \ref{thm:Mag. squared theorem ext.} yields the final result:
+\[\Cov\left(|M_j\widehat{\gnoise}_j|^2,|M_k\widehat{\gnoise}_k|^2\right) = \Var\left(|M_j\widehat{\gnoise}_j|^2\right) = 4\left(1 + \frac{|\widehat{g}_j|^2}{\noiseSD^2}\right), \qquad j+k = n.\]
 
-% Looking at the joint distributions
+% Looking at the joint distributions:
 
-Let $A$ and $B$ be the real and imaginary parts, respectively, of the Fourier matrix \eqref{eq:DFT-Matrix}. Then $\Re(M_j\widehat{\noise}_j) = (MA\noiseVec)_j$ and $\Im(M_j\widehat{\noise}_j) = (MB\noiseVec)_j$ for all $0 \leq j \leq n-1$. Since $\noiseVec \sim \mathcal{N}(\mathbf{0},\noiseSD^2 I)$, the covariance matrices of $MA\noiseVec$ and $MB\noiseVec$ are $MA(\noiseSD^2 I)A^\trans M^\trans = \noiseSD^2 MA^2M$ and $\noiseSD^2 MB^2M$, respectively (because the matrices $M$, $A$, and $B$ are symmetric). \par 
-Unfortunately the matrices $\noiseSD^2 MA^2M$ and $\noiseSD^2 MB^2M$  are rank-deficient. In fact they have the same ranks as $A$ and $B$, respectively, which are given by Lemma \ref{lem:Rank of A and B}. To see this for $\noiseSD^2 MA^2M$, note that $\noiseSD^2 MA^2M = CC^\trans$ with $C = \noiseSD MA$. Since $\rank(CC^\trans) = \rank(C)$, it only has to be shown that $\rank(C) = \rank(A)$. However, $\rank(C) = \rank(A)$ because $C = MA$ and $M$ has full rank. Thus $\rank(CC^\trans) = \rank(\noiseSD^2 MA^2M) = \rank(A)$ and the same can be done for $B$. \par 
-As stated in the discussion following Lemma \ref{lem:Rank of A and B}, a consequence of the rank-deficiency of $\noiseSD^2 MA^2M$ and $\noiseSD^2 MB^2M$ is that the density functions of $MA\noiseVec$ and $MB\noiseVec$ do not exist in $\mathbb{R}^n$, but instead exists on subspaces. Specifically, the density functions of $MA\noiseVec$ and $MB\noiseVec$ exist on $\rank(A)$-dimensional and $\rank(B)$-dimensional subspaces of $\mathbb{R}^n$, respectively. \par 
-The approach in \cite[p.~527-528]{Rao1973} will be used to determine the density functions of $MA\noiseVec$ and $MB\noiseVec$. Starting with $MA\noiseVec$, let $\Sigma = \noiseSD^2 MA^2M$, $r = \rank(A)$, and define the $n \times r$ matrix $P$ by
-\[P_{j,k} = \begin{cases}
-1, & j = k \text{ and } j,k \in J \\ 
-\frac{1}{\sqrt{2}}, & j = k \text{ and } j,k \not\in J \\
-\frac{1}{\sqrt{2}}, & j \neq k \text{ and } j+k = n \\
-0, & \text{otherwise}
-\end{cases}, \qquad 0 \leq j \leq n, \quad 0 \leq k \leq r.\]
-In other words, the columns of $P$ are normalizations of the first $r$ columns of $\Sigma$. As such, the columns are $P$ are orthonormal vectors belonging to column space of $\Sigma$. Next, define the $n \times (n-r)$ matrix $Q$ by
-\[Q_{j,k} = \begin{cases}
-0, & j = k \text{ or } j+k = n \\ 
-1, & \text{otherwise}
-\end{cases}, \qquad 0 \leq j \leq n, \quad 0 \leq k \leq (n-r).\]
-Defining $Q$ in this way ensures that $\rank(Q) = (n - r)$ and $Q^\trans \Sigma$ is the $(n-r) \times n$ zero matrix. Let $\bm{\nu} = P^\trans MA\noiseVec$ and $\bm{\xi} = Q^\trans MA\noiseVec$, so that
-\[\begin{bmatrix}
-\bm{\nu} \\
-\bm{\xi}
-\end{bmatrix} = \begin{bmatrix}
-P^\trans MA\noiseVec \\ 
-Q^\trans MA\noiseVec
-\end{bmatrix} = \begin{bmatrix}
-P & Q
-\end{bmatrix}^\trans MA\noiseVec.\]
-Recalling that $\noiseVec \sim \mathcal{N}(\mathbf{0},\noiseSD^2 I)$, $\E(\bm{\xi}) = Q^\trans\mathbf{0} = \mathbf{0}$ (the dimension of the zero vector changes from $n \times 1$ to $(n-r) \times 1$). By the construction of $Q$, $\Var(\bm{\xi}) = Q^\trans \Sigma Q = \mathbf{0}$, which is the $(n-r) \times (n-r)$ zero matrix. Thus $\bm{\xi}$ is equal to the $(n-r) \times 1$ zero vector with probability 1. \par 
-In contrast, $\bm{\nu} \sim \mathcal{N}(P^\trans\bm{0},P^\trans \Sigma P) = \mathcal{N}(\bm{0},P^\trans \Sigma P)$; here the second zero vector $\bm{0}$ has dimension $r \times 1$. Since the columns of $P$ belonging in the columns space of $\Sigma$ are orthonormal, $\det(P^\trans \Sigma P) = \pdet(\Sigma) \neq 0$. Therefore $P^\trans \Sigma P$ is nonsingular, and so the probability density function of $\bm{\nu}$ is
-\begin{equation}
-\label{eq:Nu density}
-f(\bm{\nu}) = \frac{1}{(2\pi)^{r/2}\pdet(\Sigma)}\exp\left(-\bm{\nu}^\trans(P^\trans \Sigma P)^{-1}\bm{\nu}\right).
-\end{equation}
+%Since $\noiseVec \sim \mathcal{N}(\mathbf{0},\noiseSD^2 I)$, the covariance matrices of $MA\noiseVec$ and $MB\noiseVec$ are $MA(\noiseSD^2 I)A^\trans M^\trans = \noiseSD^2 MA^2M$ and $\noiseSD^2 MB^2M$, respectively (because the matrices $M$, $A$, and $B$ are symmetric). \par 
+%Unfortunately the matrices $\noiseSD^2 MA^2M$ and $\noiseSD^2 MB^2M$  are rank-deficient. In fact they have the same ranks as $A$ and $B$, respectively, which are given by Lemma \ref{lem:Rank of A and B}. To see this for $\noiseSD^2 MA^2M$, note that $\noiseSD^2 MA^2M = CC^\trans$ with $C = \noiseSD MA$. Since $\rank(CC^\trans) = \rank(C)$, it only has to be shown that $\rank(C) = \rank(A)$. However, $\rank(C) = \rank(A)$ because $C = MA$ and $M$ has full rank. Thus $\rank(CC^\trans) = \rank(\noiseSD^2 MA^2M) = \rank(A)$ and the same can be done for $B$. \par 
+%As stated in the discussion following Lemma \ref{lem:Rank of A and B}, a consequence of the rank-deficiency of $\noiseSD^2 MA^2M$ and $\noiseSD^2 MB^2M$ is that the density functions of $MA\noiseVec$ and $MB\noiseVec$ do not exist in $\mathbb{R}^n$, but instead exists on subspaces. Specifically, the density functions of $MA\noiseVec$ and $MB\noiseVec$ exist on $\rank(A)$-dimensional and $\rank(B)$-dimensional subspaces of $\mathbb{R}^n$, respectively. \par 
+%The approach in \cite[p.~527-528]{Rao1973} will be used to determine the density functions of $MA\noiseVec$ and $MB\noiseVec$. Starting with $MA\noiseVec$, let $\Sigma = \noiseSD^2 MA^2M$, $r = \rank(A)$, and define the $n \times r$ matrix $P$ by
+%\[P_{j,k} = \begin{cases}
+%1, & j = k \text{ and } j,k \in J \\ 
+%\frac{1}{\sqrt{2}}, & j = k \text{ and } j,k \not\in J \\
+%\frac{1}{\sqrt{2}}, & j \neq k \text{ and } j+k = n \\
+%0, & \text{otherwise}
+%\end{cases}, \qquad 0 \leq j \leq n, \quad 0 \leq k \leq r.\]
+%In other words, the columns of $P$ are normalizations of the first $r$ columns of $\Sigma$. As such, the columns are $P$ are orthonormal vectors belonging to column space of $\Sigma$. Next, define the $n \times (n-r)$ matrix $Q$ by
+%\[Q_{j,k} = \begin{cases}
+%0, & j = k \text{ or } j+k = n \\ 
+%1, & \text{otherwise}
+%\end{cases}, \qquad 0 \leq j \leq n, \quad 0 \leq k \leq (n-r).\]
+%Defining $Q$ in this way ensures that $\rank(Q) = (n - r)$ and $Q^\trans \Sigma$ is the $(n-r) \times n$ zero matrix. Let $\bm{\nu} = P^\trans MA\noiseVec$ and $\bm{\xi} = Q^\trans MA\noiseVec$, so that
+%\[\begin{bmatrix}
+%\bm{\nu} \\
+%\bm{\xi}
+%\end{bmatrix} = \begin{bmatrix}
+%P^\trans MA\noiseVec \\ 
+%Q^\trans MA\noiseVec
+%\end{bmatrix} = \begin{bmatrix}
+%P & Q
+%\end{bmatrix}^\trans MA\noiseVec.\]
+%Recalling that $\noiseVec \sim \mathcal{N}(\mathbf{0},\noiseSD^2 I)$, $\E(\bm{\xi}) = Q^\trans\mathbf{0} = \mathbf{0}$ (the dimension of the zero vector changes from $n \times 1$ to $(n-r) \times 1$). By the construction of $Q$, $\Var(\bm{\xi}) = Q^\trans \Sigma Q = \mathbf{0}$, which is the $(n-r) \times (n-r)$ zero matrix. Thus $\bm{\xi}$ is equal to the $(n-r) \times 1$ zero vector with probability 1. \par 
+%In contrast, $\bm{\nu} \sim \mathcal{N}(P^\trans\bm{0},P^\trans \Sigma P) = \mathcal{N}(\bm{0},P^\trans \Sigma P)$; here the second zero vector $\bm{0}$ has dimension $r \times 1$. Since the columns of $P$ belonging in the columns space of $\Sigma$ are orthonormal, $\det(P^\trans \Sigma P) = \pdet(\Sigma) \neq 0$. Therefore $P^\trans \Sigma P$ is nonsingular, and so the probability density function of $\bm{\nu}$ is
+%\begin{equation}
+%\label{eq:Nu density}
+%f(\bm{\nu}) = \frac{1}{(2\pi)^{r/2}\pdet(\Sigma)}\exp\left(-\bm{\nu}^\trans(P^\trans \Sigma P)^{-1}\bm{\nu}\right).
+%\end{equation}
 \end{proof}
-
 
 \subsection{The Sampling Theorem and Aliasing} \label{sec:The Sampling Theorem and Aliasing}
 Our goal is to determine the efficacy of downsampling for regularization parameter estimation, the effects of downsampling on the parameter estimation methods must be carefully examined. The parameter estimation methods are considered from the perspective of the DFT, and so downsampling must be viewed from the same perspective. \par 
@@ -1091,102 +1119,7 @@ In contrast, the second test function \eqref{eq:Test Function 2} is not band-lim
 \end{equation}
 Certainly there does not exist an $\Omega > 0$ such that the expression in \eqref{eq:Test Function 2 FT} is zero for all $|\omega| > \Omega$. 
 
-Now the $k$th complex Fourier coefficient will be computed for the second test function \eqref{eq:Test Function 2}. Since the function is defined
-
 \newpage
-
-\section{Numerical examples} \label{sec:Numerical examples}
-
-For the numerical examples, three test functions are considered. While these functions vary in the extent of smoothness, all three functions are selected to be 1-periodic and the interval selected is [0,1], though this interval can be mapped to any other interval using a linear transformation. In general, the transformation from $[a,b]$ to $[c,d]$ such that $a \mapsto c$ and $b \mapsto d$ has a point-slope representation
-\[y - c = \left(\frac{d-c}{b-a}\right)(x - a)\]
-where $y \in [c,d]$ is the image of $x \in [a,b]$. \par
-The first test function is $f(t) = \cos(4\pi{t})\sin(6\pi{t})$, which is infinitely differentiable on all of $\mathbb{R}$. The second test function \eqref{eq:Test Function 2} is piecewise-smooth. The third and final test function is
-\begin{equation}
-f(t) = \cos(8\pi{t})\exp(\sin(10\pi{t})-1)
-\label{eq:Test Function 3}
-\end{equation}
-which is also infinitely differentiable on $\mathbb{R}$; the third function was selected to be more interesting than the first test function. Graphs of all three test functions are found in Figure \ref{TestFunctions}.  \par
-
-\begin{figure}
-	\centerline{\includegraphics[scale = 0.45]{Figures/TestFunctions1D.eps}}
-\caption{The three test functions considered in the numerical examples. Note that the second test function is only piecewise-smooth, while the first and second functions are smooth. All three functions are 1-periodic.}
-\label{TestFunctions}
-\end{figure}
-
-The interval $[0,1]$ is discretized as equispaced points $0, 1/N, 2/N, \ldots, (N-1)/N$ for $N = 4096$. In other words, the interval is discretized as the vector $\tVec = [t_1,t_2,\ldots,t_N]$ with $t_\ell = (\ell-1)/N$. The selected test function $f$ is then sampled at these points so that the discrete version $\fVec = [f_1,f_2,\ldots,f_N]$ has elements $f_\ell = f(t_\ell)$. For the discrete version of $k(x,t)$ to be used in the convolution with $\fVec$, the periodic extension of $k(x,t)$ is sampled in the same way that was used to construct $\fVec$. However, it is important to remember that unextended $k(x,t)$ was assumed to be centered at the origin and compactly supported on the interval $[-1/2,1/2]$. As such, a plot of $\kVec$ will not resemble the traditional graph of a Gaussian bump but instead be a depiction of a trough between bumps in the periodic extension of $k$; see Figure \ref{RegAndTroughGaussian}. In the numerical examples, the width of the Gaussian kernels are chosen to be 100 and 200.  \par
-
-\begin{figure}
-	\centerline{\includegraphics[scale = 0.45]{Figures/RegAndTroughGaussian.eps}}
-\caption{Plots of different discretizations of the kernel $k(t)$. The discretization on the left reflects the compact support of $k(t)$ on the interval $[-1/2,1/2]$. The discretization on the right represents the periodic extension of $k(t)$ on the interval $[0,1]$.}
-\label{RegAndTroughGaussian}
-\end{figure}
-
-With the discretizations $\fVec$ and $\kVec$ determined, the discretization $\gVec$ of $g(t)$ can be evaluation using either a circular convolution or a linear convolution with appropriate vector padding. Ultimately the vectors $\fVec$, $\kVec$, and $\gVec$ are vector discretizations of $f(t)$, $k(t)$, and $g(t)$, respectively. \par
-Overall, two selections for the width of the Gaussian kernel, two selections 5 and 25 for SNR value, and three test functions lead to a total of 12 configurations. For each configuration, 20 noise realizations were generated and tested. The full resolution problem was constructed using $N = 4096$ points. The downsamped resolutions were selected as $n \in \{16,32,\ldots,2048\}$ for a total of nine resolutions (eight values of $n$).
-
-\subsection{Construction of noise} \label{sec:Construction of noise}
-
-Though the definition of SNR varies, the definition chosen for this investigation is
-\begin{equation}
-\label{eq:SNR}
-\text{SNR} = 10\log_{10}\left(\frac{P_{\text{signal}}}{P_{\text{noise}}}\right)
-\end{equation}
-where $P$ denotes average power. In the discrete setting, the average power of a signal $\mathbf{f}$ of length $N$ is defined as $\|\mathbf{f}\|^2/N$. Using this definition, $P_{\text{signal}} = \|\gVec\|^2/N$ and $P_{\text{noise}} = \|\noiseVec\|^2/N$ and so the quotient in the logarithm is $\|\gVec\|^2/\|\noiseVec\|^2$. The quotient can also be expressed as $(\|\gVec\|/\|\gnoiseVec - \gVec\|)^2$, which is the square of the multiplicative inverse of the relative error of $\gnoiseVec$. \par
-In MATLAB, the noise vector $\noiseVec$ can be constructed by first taking an $N$-vector $\mathbf{e}$ drawn from the multivariate standard normal distribution and multiplying the vector by a constant $\noiseSD$. Doing so ensures that $\noiseVec$ has variance $\noiseSD^2$ because $\Var(\noise) = \Var(\noiseSD\:\mathbf{e}) = \noiseSD^2\:\Var(\mathbf{e})$ and $\mathbf{e}$ has unit variance. Thus it is useful to rearrange the equation defining SNR into an equation that provides a way of finding the necessary variance for a given SNR value. The rearrangement is shown below, with $\|\noiseVec\|^2$ replaced by $\E(\|\noiseVec\|^2)$.
-\[\E(\|\noiseVec\|^2) = \frac{\|\gVec\|^2}{10^{(\text{SNR}/10)}}\]
-Using the properties of expected value and the fact that $\E(\|\noiseVec\|^2) = \E(\|\noiseSD\:\mathbf{e}\|^2)$, the term on the left hand side of the equation can be changed as
-\[\E(\|\noiseVec\|^2) = \E(\|\noiseSD\:\mathbf{e}\|^2) = \noiseSD^2 \sum_{j=1}^N \E(\mathbf{e}_i^2) = \noiseSD^2 \sum_{j=1}^N \left(\E(\mathbf{e}_i)^2 + \Var(\mathbf{e}_i)\right) = \noiseSD^2 \sum_{j=1}^N \left(0^2 + 1\right) = \noiseSD^2\:N.\]
-Utilizing this change, the following equation for variance is obtained.
-\begin{equation}
-\label{eq:Var}
-\noiseSD^2 = \frac{\|\gVec\|^2}{N \cdot 10^{(\text{SNR}/10)}}
-\end{equation}
-This equation is used for the numerical construction of the noise vectors. SNR values of 5 and 25 are used to generate the white noise added to $\gVec$, and one such data realization is shown in Figure \ref{NoisePlot1D_F2_S05_W200}. \par
-
-\begin{figure}
-	\centerline{\includegraphics[scale = 0.45]{Figures/NoisePlot1D_F2_S05_W200.eps}}
-\caption{The plot shows one data realization of $\gVec$ with noise, where the original function $f$ was the second test function. The SNR value is 5 and the width of the Gaussian PSF is 200.}
-\label{NoisePlot1D_F2_S05_W200}
-\end{figure}
-
-For an accurate evaluation of the numerical examples and their results, multiple realizations of noise are used. A primary advantage of multiple noise realizations is that the sample variance of noise vectors approaches the desired variance as the number of realizations increases. More rigorously, the mean of the sample variances of the noise vectors converges almost surely to the expected value of the sample variance, which is the desired variance $\noiseSD^2$; this is a direct consequence of the (strong) law of large numbers and the fact that the noise vectors are independent and identically distributed with standard normal distribution.  \par
-Another numerical consideration regarding noise is how the sample variance changes across downsampling resolutions. To formalize the concept of downsampling, consider $\mathbf{z} = [z_1,z_2,\ldots,z_n]$. Then a vector $\mathbf{y}$ is called a downsampling of $\mathbf{z}$ if $\mathbf{y} = [z_{n_1},z_{n_2},\ldots,z_{n_m}]$, where $m \leq n$ and $n_j:\{1,2,\ldots,m\}\rightarrow\{1,2,\ldots,n\}$ is a strictly increasing function. This definition is analogous to the definition of a subsequence except with a finite number of terms. \par
-Theoretically, the variance of the noise vector does not change when a vector is downsampled because of the properties of variance. For any $m\times n$ matrix $M$ and $n$-vector $\noiseVec \sim \mathcal{N}(\bm{0},\noiseSD^2I)$
-\begin{equation}
-\Var(M\noiseVec) = M\Var(\noiseVec)M^{\trans} = \noiseSD^2MIM^{\trans} = \noiseSD^2MM^{\trans}
-\label{eq:VarProp}
-\end{equation}
-where $MM^\trans$ is an $m \times m$ matrix. Certainly for arbitrary $M$, $MM^\trans$ can differ from an $m \times m$ identity matrix, which would mean that the new noise vector $M\noiseVec$ no longer represents white noise. However, given an $n$-vector $\noiseVec \sim \mathcal{N}(\bm{0},\noiseSD^2I)$ and the goal of obtaining a downsampled version of $\noiseVec$, a matrix $E$ can be found such that $E\noiseVec$ is the downsampled vector. Since DFT's are utilized in the regularization process, a downsampled vector whose components are still equidistant from adjacent components is desirable. Since the finest sampling $\tVec$ of the interval $[0,1]$ has $N = 4096 = 2^{12}$ points, a natural downsampling with this property would be to select every other component of $\tVec$. The resulting downsampled vector would then have length $N/2 = 2048 = 2^{11}$. The matrix $E$ that accomplishes this downsampling is the $N/2 \times N$ matrix defined as
-\begin{equation}
-E = [\mathbf{e}_1 \: \mathbf{0} \: \mathbf{e}_2 \: \mathbf{0} \: \mathbf{e}_3 \: \mathbf{0} \ldots \mathbf{e}_N]
-\label{eq:Downsampling matrix}
-\end{equation}
-where $\mathbf{0}$ is the $N/2$-vector of all zeros and $\mathbf{e}_j$ is the $N/2$-vector of all zeros except for 1 as the $j\text{th}$ component, $1 \leq j \leq N/2$. Another explanation of how to construct $E$ is to concatenate every other row of an $N \times N$ identity matrix. In an effort to clarify this downsampling process, let $\tVec^{n}$ denote the $n$-point downsampling of $\tVec$. Then with this new notation, $\tVec^{2046} = E\tVec$. \par
-As a smaller example, consider the vector
-\[\tVec = \begin{bmatrix}
-0 & \dfrac{1}{8} & \dfrac{1}{4} & \dfrac{3}{8} & \dfrac{1}{2} & \dfrac{5}{8} & \dfrac{3}{4} & \dfrac{7}{8}
-\end{bmatrix}^{\trans},\]
-which is an equispaced 8-point discretization of $[0,1]$. The $4 \times 8$ matrix $E$ used to obtain downsampling $\tVec^{4}$ is
-\[E = \begin{bmatrix}
-1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
-0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 \\
-0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 \\
-0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 \\
-\end{bmatrix}.\]
-Then $\tVec^4$ obtained by the product $E\tVec$ has equispaced components as desired:
-\[\tVec^4 = E\tVec = \begin{bmatrix}
-0 & \dfrac{1}{4} & \dfrac{1}{2} & \dfrac{3}{4}
-\end{bmatrix}^{\trans}.\]
-\indent Another property of the $N/2 \times N$ matrix $E$ defined in \eqref{eq:Downsampling matrix} is that $EE^{\trans} = I$, where $I$ is the $N/2 \times N/2$ identity matrix.  This is a direct consequence of $\mathbf{e}_j\mathbf{e}_j^\trans = 1$ for all $j$ with $1 \leq j \leq N/2$. Using the property in \eqref{eq:VarProp}, the variance of the  noise vector $\noiseVec^{N/2}$ downsampled from $\noiseVec$ is then
-\[\Var(\noiseVec^{N/2}) = \Var(E\noiseVec) = E\Var(\noiseVec)E^{\trans} = \noiseSD^2EE^{\trans} = \noiseSD^2I\]
-where $I$ is the $N/2 \times N/2$ identity matrix. Therefore, downsampling white noise vectors in this way produces white noise vectors of half length, theoretically preserving variance across downsamples. As a final remark, the process of downsampling described here can be used to obtain downsampled vectors of length $N/(2^2), N/(2^3), \ldots, N/N$, though the final resolution has been chosen as $N/(2^8) = 16$. \par 
-While the variance of the noise is preserved across downsampling resolution in theory, numerically there is some fluctuation. As the downsampling resolutions decrease, i.e. the length of the downsampled vectors decreases, the sample variances more spread out. Figure \ref{VarPlot1D} demonstrates this phenomenon by showing boxplots of sample variance versus downsampling resolutions. \newpage
-
-\begin{figure}[htb]
-\centerline{\includegraphics[scale=0.45]{Figures/VarPlot1D_F1_S05_W100_R20.eps}}
-\caption{The boxplots were generated from the sample variances of downsampled noise vectors. The theoretical variance of the noise was set to 0.0327, which is indicated by the horizontal dotted line. This figure illustrates that as the lengths of the downsampled vectors decrease, the variance in the computed sample variances increases.}
-\label{VarPlot1D}
-\end{figure}
 
 \section{Parameter estimation methods} \label{sec:Parameter estimation methods}
 
@@ -1306,11 +1239,24 @@ Corollary \ref{cor:gnoise Mean and Var} then gives
 &= \frac{1}{2}\sum_{j = 0}^{n-1} |\widehat{\gnoise}_j|^2(\mfilt(\regparam,|\widehat{k}_j|))^2 + \noiseSD^2\sum_{j = 0}^{n-1} (\mfilt(\regparam,|\widehat{k}_j|))^2 + \frac{2\noiseSD^2}{n}\sum_{j = 0}^{n-1} \filt(\regparam,|\widehat{k}_j|) - \noiseSD^2.
 \end{align*}
 The variance of $\U_n$ can be determined as well. The second and third terms in both \eqref{eq:SpectralUPREn} and \eqref{eq:SpectralUPREnModified} are deterministic, and so
-\begin{align*}
+\begin{equation}
+\label{eq:UPRE Var Sum}
+\begin{split}
 \Var\left(\U_n(\regparam)\right) &= \Var\left(\sum_{j = 0}^{n-1} |M_j\widehat{\gnoise}_j|^2\left(\frac{\mfilt(\regparam,|\widehat{k}_j|)}{M_j}\right)^2\right) \\
-&= \sum_{j=0}^{n-1} \left(\frac{\mfilt(\regparam,|\widehat{k}_j|)}{M_j}\right)^4 \Var\left(|M_j\widehat{\gnoise}_j|^2\right) \\
-&+ \sum_{0 \leq j< \ell \leq n-1} \left(\frac{\mfilt(\regparam,|\widehat{k}_j|)\mfilt(\regparam,|\widehat{k}_\ell|)}{M_j M_\ell}\right)^2 \Cov\left(|M_j\widehat{\gnoise}_j|^2,|M_j\widehat{\gnoise}_\ell|^2\right).
-\end{align*}
+&= \sum_{j=0}^{n-1} \sum_{\ell=0}^{n-1} \left(\frac{\mfilt(\regparam,|\widehat{k}_j|)\mfilt(\regparam,|\widehat{k}_\ell|)}{M_jM_\ell}\right)^2 \Cov\left(|M_j\widehat{\gnoise}_j|^2,|M_\ell\widehat{\gnoise}_\ell|^2\right).
+\end{split}
+\end{equation}
+By Theorem \ref{thm:Cov of mag squared}, the covariance terms are only nonzero when $j = \ell$ or $j + \ell = n$. In either case,
+\[\left(\frac{\mfilt(\regparam,|\widehat{k}_j|)\mfilt(\regparam,|\widehat{k}_\ell|)}{M_jM_\ell}\right)^2 \Cov\left(|M_j\widehat{\gnoise}_j|^2,|M_\ell\widehat{\gnoise}_\ell|^2\right) = \left(\frac{\mfilt(\regparam,|\widehat{k}_j|)}{M_j}\right)^4 \Var\left(|M_j\widehat{\gnoise}_j|^2\right),\]
+Let $J = \{0,n/2\}$ if $n$ is even and $J = \{0\}$ if $n$ is odd. Corollary \ref{cor:gnoise Mean and Var} states that
+\[\left(\frac{\mfilt(\regparam,|\widehat{k}_j|)}{M_j}\right)^4 \Var\left(|M_j\widehat{\gnoise}_j|^2\right) = 2\noiseSD^4\left(1 + \dfrac{|\widehat{g}_j|^2}{\noiseSD^2}\right)\left(\mfilt(\regparam,|\widehat{k}_j|)\right)^4, \qquad j \in J\]
+and similarly
+\[\left(\frac{\mfilt(\regparam,|\widehat{k}_j|)}{M_j}\right)^4 \Var\left(|M_j\widehat{\gnoise}_j|^2\right) = \noiseSD^4\left(1 + \dfrac{|\widehat{g}_j|^2}{\noiseSD^2}\right)\left(\mfilt(\regparam,|\widehat{k}_j|)\right)^4, \qquad j \not\in J\]
+If $j \in J$, $\ell = j$ is the only $0 \leq \ell \leq n-1$ such that $j + \ell = n$. On the other hand, if $j \not\in J$ then there are two values of $\ell$ such that $j + \ell = n$: $\ell = j$ and $\ell = n - j$. Thus \eqref{eq:UPRE Var Sum} is
+\begin{equation}
+\label{eq:UPRE Var Sum Simple}
+\Var\left(\U_n(\regparam)\right) = 2\noiseSD^4\sum_{j=0}^{n-1} \left(1 + \dfrac{|\widehat{g}_j|^2}{\noiseSD^2}\right)\left(\mfilt(\regparam,|\widehat{k}_j|)\right)^4.
+\end{equation}
 
 %The problem of finding a minimizer of \eqref{eq:SpectralUPREn} can be recast as a root-finding problem by using the derivative of the UPRE function, which is
 %\begin{equation}
@@ -1399,9 +1345,9 @@ The derivative of $\E(\D_n(\regparam))$ with respect to $\regparam$ is
 &= 2\sum_{j = 0}^{n-1} |\widehat{\gnoise}_j|^2\frac{|\widehat{k}_j|^2\regparam^3}{\left(|\widehat{k}_j|^2 + \regparam^2\right)^3} + 4\noiseSD^2 \sum_{j = 0}^{n-1} \frac{|\widehat{k}_j|^2\regparam^3}{\left(|\widehat{k}_j|^2 + \regparam^2\right)^3},
 \end{align*}
 which is nonnegative for all $\regparam > 0$. Thus $\E(\D_n(\regparam))$ is monotone increasing on $(0,\infty)$. \par
-Since the last term $-\noiseSD^2$ in \eqref{eq:SpectralDPModified} is deterministic, the variance of $\D_n(\regparam)$ is 
-\[\Var(\D_n(\regparam)) = \Var\left(\sum_{j = 0}^{n-1} |M_j\widehat{\gnoise}_j|^2\left(\frac{\mfilt(\regparam,|\widehat{k}_j|)}{M_j}\right)^2\right)\]
-which matches the variance of the UPRE function \eqref{eq:SpectralUPREnModified}. This is interesting since the functions  $\D_n(\regparam)$ and $\U_n(\regparam)$ have different properties; for example, $\D_n(\regparam)$ is monotone increasing while $\U_n(\regparam)$ is not. \par 
+Since the last term $-\noiseSD^2$ in \eqref{eq:SpectralDPModified} is deterministic, the variance of $\D_n(\regparam)$ is reduced to
+\[\Var(\D_n(\regparam)) = \Var\left(\sum_{j = 0}^{n-1} |M_j\widehat{\gnoise}_j|^2\left(\frac{\mfilt(\regparam,|\widehat{k}_j|)}{M_j}\right)^2\right),\]
+and so the variance is the same as the UPRE function given by \eqref{eq:UPRE Var Sum Simple}. This is interesting since the functions  $\D_n(\regparam)$ and $\U_n(\regparam)$ have different properties; for example, $\D_n(\regparam)$ is monotone increasing while $\U_n(\regparam)$ is not. \par 
 Again adopting the notation introduced in Section \ref{sec:Unbiased Predictive Risk Estimator}, let $\D_n^j(\regparam)$ be the MDP function associated with the $j$th data set $\gnoiseVec^j$ for $j = 1,\ldots,R$. Then 
 \begin{equation}
 \frac{1}{R}\sum_{j=1}^R \D_n^j(\regparam)  = \sum_{\ell = 0}^{n-1} \left(\frac{1}{R} \sum_{j=1}^R |\widehat{\gnoise^j}_\ell|^2\right)(\mfilt(\regparam,|\widehat{k}_\ell|))^2 - \noiseSD^2. 
@@ -1417,8 +1363,114 @@ Let the family of functions $f_1,\ldots,f_R$ be as required. Relabel the functio
 If roots are not equal, then $\overline{f}(x_1) < 0$ and $\overline{f}(x_R) > 0$ since there would exist some $\ell = 1,\ldots,k$ such that $f_\ell(x_1) < 0$ or $f_\ell(x_R) > 0$, again following from the monotoncity of each function in the family. Since $\overline{f}$ is a linear combination of continuous functions, $\overline{f}$ itself is continuous. Thus having $\overline{f}(x_1) < 0$ and $\overline{f}(x_R) > 0$ implies that $\overline{f}$ has a root in $[x_1,x_R]$ by Bolzano's theorem (a corollary to the intermediate value theorem).
 \end{proof}
 
+\section{Numerical examples} \label{sec:Numerical examples}
+
+For the numerical examples, three test functions are considered. While these functions vary in the extent of smoothness, all three functions are selected to be 1-periodic and the interval selected is [0,1], though this interval can be mapped to any other interval using a linear transformation. In general, the transformation from $[a,b]$ to $[c,d]$ such that $a \mapsto c$ and $b \mapsto d$ has a point-slope representation
+\[y - c = \left(\frac{d-c}{b-a}\right)(x - a)\]
+where $y \in [c,d]$ is the image of $x \in [a,b]$. \par
+The first test function is $f(t) = \cos(4\pi{t})\sin(6\pi{t})$, which is infinitely differentiable on all of $\mathbb{R}$. The second test function \eqref{eq:Test Function 2} is piecewise-smooth. The third and final test function is
+\begin{equation}
+f(t) = \cos(8\pi{t})\exp(\sin(10\pi{t})-1)
+\label{eq:Test Function 3}
+\end{equation}
+which is also infinitely differentiable on $\mathbb{R}$; the third function was selected to be more interesting than the first test function. Graphs of all three test functions are found in Figure \ref{TestFunctions}.  \par
+
+\begin{figure}
+	\centerline{\includegraphics[scale = 0.45]{Figures/TestFunctions1D.eps}}
+\caption{The three test functions considered in the numerical examples. Note that the second test function is only piecewise-smooth, while the first and second functions are smooth. All three functions are 1-periodic.}
+\label{TestFunctions}
+\end{figure}
+
+The interval $[0,1]$ is discretized as equispaced points $0, 1/N, 2/N, \ldots, (N-1)/N$ for $N = 4096$. In other words, the interval is discretized as the vector $\tVec = [t_1,t_2,\ldots,t_N]$ with $t_\ell = (\ell-1)/N$. The selected test function $f$ is then sampled at these points so that the discrete version $\fVec = [f_1,f_2,\ldots,f_N]$ has elements $f_\ell = f(t_\ell)$. For the discrete version of $k(x,t)$ to be used in the convolution with $\fVec$, the periodic extension of $k(x,t)$ is sampled in the same way that was used to construct $\fVec$. However, it is important to remember that unextended $k(x,t)$ was assumed to be centered at the origin and compactly supported on the interval $[-1/2,1/2]$. As such, a plot of $\kVec$ will not resemble the traditional graph of a Gaussian bump but instead be a depiction of a trough between bumps in the periodic extension of $k$; see Figure \ref{RegAndTroughGaussian}. In the numerical examples, the width of the Gaussian kernels are chosen to be 100 and 200.  \par
+
+\begin{figure}
+	\centerline{\includegraphics[scale = 0.45]{Figures/RegAndTroughGaussian.eps}}
+\caption{Plots of different discretizations of the kernel $k(t)$. The discretization on the left reflects the compact support of $k(t)$ on the interval $[-1/2,1/2]$. The discretization on the right represents the periodic extension of $k(t)$ on the interval $[0,1]$.}
+\label{RegAndTroughGaussian}
+\end{figure}
+
+With the discretizations $\fVec$ and $\kVec$ determined, the discretization $\gVec$ of $g(t)$ can be evaluation using either a circular convolution or a linear convolution with appropriate vector padding. Ultimately the vectors $\fVec$, $\kVec$, and $\gVec$ are vector discretizations of $f(t)$, $k(t)$, and $g(t)$, respectively. \par
+Overall, two selections for the width of the Gaussian kernel, two selections 5 and 25 for SNR value, and three test functions lead to a total of 12 configurations. For each configuration, 20 noise realizations were generated and tested. The full resolution problem was constructed using $N = 4096$ points. The downsamped resolutions were selected as $n \in \{16,32,\ldots,2048\}$ for a total of nine resolutions (eight values of $n$).
+
+\subsection{Construction of noise} \label{sec:Construction of noise}
+
+Though the definition of SNR varies, the definition chosen for this investigation is
+\begin{equation}
+\label{eq:SNR}
+\text{SNR} = 10\log_{10}\left(\frac{P_{\text{signal}}}{P_{\text{noise}}}\right)
+\end{equation}
+where $P$ denotes average power. In the discrete setting, the average power of a signal $\mathbf{f}$ of length $N$ is defined as $\|\mathbf{f}\|^2/N$. Using this definition, $P_{\text{signal}} = \|\gVec\|^2/N$ and $P_{\text{noise}} = \|\noiseVec\|^2/N$ and so the quotient in the logarithm is $\|\gVec\|^2/\|\noiseVec\|^2$. The quotient can also be expressed as $(\|\gVec\|/\|\gnoiseVec - \gVec\|)^2$, which is the square of the multiplicative inverse of the relative error of $\gnoiseVec$. \par
+In MATLAB, the noise vector $\noiseVec$ can be constructed by first taking an $N$-vector $\mathbf{e}$ drawn from the multivariate standard normal distribution and multiplying the vector by a constant $\noiseSD$. Doing so ensures that $\noiseVec$ has variance $\noiseSD^2$ because $\Var(\noise) = \Var(\noiseSD\:\mathbf{e}) = \noiseSD^2\:\Var(\mathbf{e})$ and $\mathbf{e}$ has unit variance. Thus it is useful to rearrange the equation defining SNR into an equation that provides a way of finding the necessary variance for a given SNR value. The rearrangement is shown below, with $\|\noiseVec\|^2$ replaced by $\E(\|\noiseVec\|^2)$.
+\[\E(\|\noiseVec\|^2) = \frac{\|\gVec\|^2}{10^{(\text{SNR}/10)}}\]
+Using the properties of expected value and the fact that $\E(\|\noiseVec\|^2) = \E(\|\noiseSD\:\mathbf{e}\|^2)$, the term on the left hand side of the equation can be changed as
+\[\E(\|\noiseVec\|^2) = \E(\|\noiseSD\:\mathbf{e}\|^2) = \noiseSD^2 \sum_{j=1}^N \E(\mathbf{e}_i^2) = \noiseSD^2 \sum_{j=1}^N \left(\E(\mathbf{e}_i)^2 + \Var(\mathbf{e}_i)\right) = \noiseSD^2 \sum_{j=1}^N \left(0^2 + 1\right) = \noiseSD^2\:N.\]
+Utilizing this change, the following equation for variance is obtained.
+\begin{equation}
+\label{eq:Var}
+\noiseSD^2 = \frac{\|\gVec\|^2}{N \cdot 10^{(\text{SNR}/10)}}
+\end{equation}
+This equation is used for the numerical construction of the noise vectors. SNR values of 5 and 25 are used to generate the white noise added to $\gVec$, and one such data realization is shown in Figure \ref{NoisePlot1D_F2_S05_W200}. \par
+
+\begin{figure}
+	\centerline{\includegraphics[scale = 0.45]{Figures/NoisePlot1D_F2_S05_W200.eps}}
+\caption{The plot shows one data realization of $\gVec$ with noise, where the original function $f$ was the second test function. The SNR value is 5 and the width of the Gaussian PSF is 200.}
+\label{NoisePlot1D_F2_S05_W200}
+\end{figure}
+
+For an accurate evaluation of the numerical examples and their results, multiple realizations of noise are used. A primary advantage of multiple noise realizations is that the sample variance of noise vectors approaches the desired variance as the number of realizations increases. More rigorously, the mean of the sample variances of the noise vectors converges almost surely to the expected value of the sample variance, which is the desired variance $\noiseSD^2$; this is a direct consequence of the (strong) law of large numbers and the fact that the noise vectors are independent and identically distributed with standard normal distribution.  \par
+Another numerical consideration regarding noise is how the sample variance changes across downsampling resolutions. To formalize the concept of downsampling, consider $\mathbf{z} = [z_1,z_2,\ldots,z_n]$. Then a vector $\mathbf{y}$ is called a downsampling of $\mathbf{z}$ if $\mathbf{y} = [z_{n_1},z_{n_2},\ldots,z_{n_m}]$, where $m \leq n$ and $n_j:\{1,2,\ldots,m\}\rightarrow\{1,2,\ldots,n\}$ is a strictly increasing function. This definition is analogous to the definition of a subsequence except with a finite number of terms. \par
+Theoretically, the variance of the noise vector does not change when a vector is downsampled because of the properties of variance. For any $m\times n$ matrix $M$ and $n$-vector $\noiseVec \sim \mathcal{N}(\bm{0},\noiseSD^2I)$
+\begin{equation}
+\Var(M\noiseVec) = M\Var(\noiseVec)M^{\trans} = \noiseSD^2MIM^{\trans} = \noiseSD^2MM^{\trans}
+\label{eq:VarProp}
+\end{equation}
+where $MM^\trans$ is an $m \times m$ matrix. Certainly for arbitrary $M$, $MM^\trans$ can differ from an $m \times m$ identity matrix, which would mean that the new noise vector $M\noiseVec$ no longer represents white noise. However, given an $n$-vector $\noiseVec \sim \mathcal{N}(\bm{0},\noiseSD^2I)$ and the goal of obtaining a downsampled version of $\noiseVec$, a matrix $E$ can be found such that $E\noiseVec$ is the downsampled vector. Since DFT's are utilized in the regularization process, a downsampled vector whose components are still equidistant from adjacent components is desirable. Since the finest sampling $\tVec$ of the interval $[0,1]$ has $N = 4096 = 2^{12}$ points, a natural downsampling with this property would be to select every other component of $\tVec$. The resulting downsampled vector would then have length $N/2 = 2048 = 2^{11}$. The matrix $E$ that accomplishes this downsampling is the $N/2 \times N$ matrix defined as
+\begin{equation}
+E = [\mathbf{e}_1 \: \mathbf{0} \: \mathbf{e}_2 \: \mathbf{0} \: \mathbf{e}_3 \: \mathbf{0} \ldots \mathbf{e}_N]
+\label{eq:Downsampling matrix}
+\end{equation}
+where $\mathbf{0}$ is the $N/2$-vector of all zeros and $\mathbf{e}_j$ is the $N/2$-vector of all zeros except for 1 as the $j\text{th}$ component, $1 \leq j \leq N/2$. Another explanation of how to construct $E$ is to concatenate every other row of an $N \times N$ identity matrix. In an effort to clarify this downsampling process, let $\tVec^{n}$ denote the $n$-point downsampling of $\tVec$. Then with this new notation, $\tVec^{2046} = E\tVec$. \par
+As a smaller example, consider the vector
+\[\tVec = \begin{bmatrix}
+0 & \dfrac{1}{8} & \dfrac{1}{4} & \dfrac{3}{8} & \dfrac{1}{2} & \dfrac{5}{8} & \dfrac{3}{4} & \dfrac{7}{8}
+\end{bmatrix}^{\trans},\]
+which is an equispaced 8-point discretization of $[0,1]$. The $4 \times 8$ matrix $E$ used to obtain downsampling $\tVec^{4}$ is
+\[E = \begin{bmatrix}
+1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 \\
+\end{bmatrix}.\]
+Then $\tVec^4$ obtained by the product $E\tVec$ has equispaced components as desired:
+\[\tVec^4 = E\tVec = \begin{bmatrix}
+0 & \dfrac{1}{4} & \dfrac{1}{2} & \dfrac{3}{4}
+\end{bmatrix}^{\trans}.\]
+\indent Another property of the $N/2 \times N$ matrix $E$ defined in \eqref{eq:Downsampling matrix} is that $EE^{\trans} = I$, where $I$ is the $N/2 \times N/2$ identity matrix.  This is a direct consequence of $\mathbf{e}_j\mathbf{e}_j^\trans = 1$ for all $j$ with $1 \leq j \leq N/2$. Using the property in \eqref{eq:VarProp}, the variance of the  noise vector $\noiseVec^{N/2}$ downsampled from $\noiseVec$ is then
+\[\Var(\noiseVec^{N/2}) = \Var(E\noiseVec) = E\Var(\noiseVec)E^{\trans} = \noiseSD^2EE^{\trans} = \noiseSD^2I\]
+where $I$ is the $N/2 \times N/2$ identity matrix. Therefore, downsampling white noise vectors in this way produces white noise vectors of half length, theoretically preserving variance across downsamples. As a final remark, the process of downsampling described here can be used to obtain downsampled vectors of length $N/(2^2), N/(2^3), \ldots, N/N$, though the final resolution has been chosen as $N/(2^8) = 16$. \par 
+While the variance of the noise is preserved across downsampling resolution in theory, numerically there is some fluctuation. As the downsampling resolutions decrease, i.e. the length of the downsampled vectors decreases, the sample variances more spread out. Figure \ref{VarPlot1D} demonstrates this phenomenon by showing boxplots of sample variance versus downsampling resolutions. \newpage
+
+\begin{figure}[htb]
+\centerline{\includegraphics[scale=0.45]{Figures/VarPlot1D_F1_S05_W100_R20.eps}}
+\caption{The boxplots were generated from the sample variances of downsampled noise vectors. The theoretical variance of the noise was set to 0.0327, which is indicated by the horizontal dotted line. This figure illustrates that as the lengths of the downsampled vectors decrease, the variance in the computed sample variances increases.}
+\label{VarPlot1D}
+\end{figure}
+
 \section{Effects of downsampling} \label{sec:Effects of downsampling}
-While analysis has been conducted regarding the convergence of predictive and estimation error for Tikhonov regularization as the number of sample points becomes large \cite{Vogel:2002}, the effects of reducing the number of sample points must be explored. To begin, results about aliasing and DFT components will be presented, followed by an analysis of each parameter estimation method in relation to downsampling. 
+While analysis has been conducted regarding the convergence of predictive and estimation error for Tikhonov regularization as the number of sample points becomes large \cite{Vogel:2002}, the effects of reducing the number of sample points must be explored. To begin, results about aliasing and DFT components will be presented, followed by an analysis of each parameter estimation method in relation to downsampling. \par 
+Given a vector $\mathbf{x} \in \mathbb{C}^N$, where $N = LM$ for positive integers $L$ and $M$. Furthermore let $\mathbf{x}[j:k]$ denote the vector $[x_j, x_{j+1},\ldots,x_k]$. The \textit{aliasing operator} $\alias_L(\cdot)$ is defined as
+\[\alias_L(\mathbf{x}) = \sum_{\ell=0}^{L-1} \mathbf{x}[\ell{M}:(\ell+1)M-1].\]
+In other words, $\alias_L(\mathbf{x})$ is the result of partitioning the vector $\mathbf{x}$ into $L$ vectors of length $M$ and summing them. The notation $\mathbf{x}[j:k]$ can be extended to recast the concept of downsampling introduced in Section \ref{sec:Construction of noise}; let $\mathbf{x}[j:k:\ell] := [x_{j},x_{j+k},x_{j+2k},\ldots,x_\ell]$. The downsampled vector $\mathbf{x}^{N/L}$ formed by taking every $L$th element of the original vector $\mathbf{x}$, starting with element $x_0$, is then given by
+\[\mathbf{x}^{N/L} = \mathbf{x}[0:L:(M-1)L].\]
+As a remark, the aliasing operator is linear and thus could be defined using a matrix representation. \par 
+With this new notation in mind, Theorem \ref{thm:Downsampling thm}, which is called the Downsampling Theorem in \cite{AudioDFT}, connects the concepts of aliasing and downsampling.
+
+\begin{theorem}
+\label{thm:Downsampling thm}
+Let $\mathbf{x} \in \mathbb{C}^N$, where $N = LM$ for positive integers $L$ and $M$, and let $F$ be the $N/L \times N/L$ DFT matrix. Then
+\[F\mathbf{x}^{N/L} = \frac{1}{L}\alias_L(F\mathbf{x}).\]
+\end{theorem}
+
 
 \section{Numerical Results} \label{Numerical results}
 
