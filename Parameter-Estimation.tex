@@ -23,6 +23,7 @@
 \DeclareMathOperator{\pdet}{det^\dagger}	
 \DeclareMathOperator{\sgn}{sgn}	% Signum function
 \DeclareMathOperator{\alias}{A}	% Aliasing operator
+\newcommand{\dct}[1]{\breve{#1}}	% DCT of vector
 
 % Regularization notation:
 \newcommand{\regparam}{\alpha}
@@ -442,6 +443,46 @@ The now innermost sum is geometric and is thus equal to $n$ only when $k - j \eq
 and subtracting $c_j$ from both sides produces the desired result.
 \end{proof}
 
+\subsection{The Discrete Cosine Transform} \label{sec:The Discrete Cosine Transform}
+
+Given an $N$-vector $\mathbf{x}$ of real numbers, the discrete cosine transform (DCT) of $\mathbf{x}$, denoted $\dct{x}$, is defined as
+\begin{equation}
+\label{eq:DCT definition}
+\dct{x}_j = \sqrt{\frac{2 - \delta_{j,0}}{N}} \sum_{k=0}^{N-1} \cos\left(\frac{\pi{j}(2k + 1)}{2N}\right) x_k.
+\end{equation}
+Here $\delta_{j,0}$ is the Kronecker delta function, which in \eqref{eq:DCT definition} has the effect of introducing a factor of $1/\sqrt{N}$ in the zeroth component of $\dct{x}$ instead of $\sqrt{2}/\sqrt{N}$. The DCT matrix, denoted by $C$, has entries
+\begin{equation}
+\label{eq:DCT matrix}
+C_{j,k} = \sqrt{\frac{2 - \delta_{j,0}}{N}} \cos\left(\frac{\pi{j}(2k + 1)}{2N}\right).
+\end{equation}
+By switching $j$ and $k$, it is clear that $C$ is not symmetric. However, $C$ is orthogonal which is analogous to the DFT matrix being unitary. Fortunately, many of the statistical results in \ref{sec:Results on distributions} are simplified by using the DCT instead of the DFT. For example, if $\gnoiseVec \sim \mathcal{N}(\gVec,\noiseSD^2 I)$, then $C\noiseVec \sim \mathcal{N}(C\gnoiseVec,\noiseSD^2 CC^\trans) = \mathcal{N}(\dct{\gnoiseVec},\noiseSD^2 I)$ using the properties of multivariate normal distributions and the orthogonality of $C$. In contrast, the covariance matrices of $A\gnoiseVec$ and $B\gnoiseVec$ ($A$ and $B$ representing the real and imaginary parts of the DFT matrix, respectively) are singular. \par 
+As with the DFT, there is a DCT relationship between aliasing and downsampling a signal; this relationship is expressed in Theorem \ref{thm:DCT and Aliasing} as a modified version of the Downsampling Theorem in \cite{AudioDFT}.
+
+\begin{theorem}
+\label{thm:DCT and Aliasing}
+Let $N = 2M$ for $N,M \in \mathbb{Z}^+$, let $\mathbf{x} \in \mathbb{R}^N$, and let $\mathbf{y} \in \mathbb{R}^M$ be the vector formed by taking every other element of $\mathbf{x}$. Then
+\[\dct{\mathbf{y}} = \frac{1}{2}\left(\begin{bmatrix}
+\dct{x}_0 \\
+\dct{x}_1 \\
+\vdots \\
+\dct{x}_{M-1}
+\end{bmatrix}
+ + \begin{bmatrix}
+\dct{x}_M \\
+\dct{x}_{M+1} \\
+\vdots \\
+\dct{x}_{N-1}\end{bmatrix}
+\right).\]
+\end{theorem}
+\begin{proof}
+It suffices to show that $\dct{y}_j = (\dct{x}_j + \dct{x}_{j+M})/2$ for arbitrary $j \in \{0,1,\ldots,M-1\}$. First, the sum $\dct{x}_j + \dct{x}_{j+M}$ can be written using summation notation as
+\[\dct{x}_j + \dct{x}_{j+M} = \sum_{\ell=0}^1 \dct{x}_{j + \ell{M}}.\]
+Then by the definition of the DCT,
+\begin{align*}
+\sum_{\ell=0}^1 \dct{x}_{j + \ell{M}} &= \sum_{\ell=0}^1 \left(\sqrt{\frac{2 - \delta_{j+\ell{M},0}}{N}} \sum_{k=0}^{N-1} \cos\left(\frac{\pi(j+\ell{M})(2k + 1)}{2N}\right) x_k\right) \\
+&= 
+\end{align*}
+\end{proof}
 
 \section{Statistical considerations} \label{sec:Stats.}
 
