@@ -1,0 +1,361 @@
+\documentclass{beamer}
+\usetheme{Madrid}
+\usepackage{amsmath,amsfonts,amssymb}
+\usepackage{graphicx,xcolor}
+\setbeamertemplate{bibliography item}{\insertbiblabel}
+
+\newcommand{\ToDo}[1]{\textcolor{red}{[#1]}}
+
+% Statistical notation:
+\newcommand{\noise}{\eta}	% Noise (single component/variable)
+\newcommand{\noiseSD}{\sigma}	% Standard deviation
+
+% Discrete notation:
+\newcommand{\gVec}{\mathbf{g}}	% Vector
+\newcommand{\gnoise}{\widetilde{g}}	% Component
+\newcommand{\gnoiseVec}{\widetilde{\mathbf{g}}}	% Vector
+\newcommand{\kVec}{\mathbf{k}}	% Vector
+\newcommand{\kMat}{K}	% Matrix K
+\newcommand{\fVec}{\mathbf{f}}	% Vector
+\newcommand{\tVec}{\mathbf{t}}	% Vector
+\newcommand{\trans}{\mathrm{T}}	% Matrix transpose
+\newcommand{\ctrans}{*}	% Conjugate transpose
+\DeclareMathOperator{\diag}{diag}	% Diagonal matrix
+\DeclareMathOperator{\rank}{rank}	% Rank of a matrix
+\newcommand{\noiseVec}{\mathbf{\noise}}	% Noise vector
+\newcommand{\singular}{s}	% Singular values
+\DeclareMathOperator{\trace}{trace}		% Trace
+\newcommand{\dct}[1]{\breve{#1}}	% DCT of vector
+
+% Regularization notation:
+\newcommand{\regparam}{\alpha}
+\newcommand{\R}{R_{\regparam}}	% Regularization matrix
+\newcommand{\freg}{\fVec_{\regparam}}	% Regularized solution
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\newcommand{\filt}{\phi}
+\newcommand{\mfilt}{\psi}
+
+% UPRE derivation notation:
+\newcommand{\PE}{\mathbf{p}_{\regparam}}	% Predictive error
+\newcommand{\regres}{\mathbf{r}_{\regparam}}	% Regularized residual
+\newcommand{\A}{A_{\regparam}}	% Influence matrix
+\newcommand{\U}{U}	% UPRE function
+
+% GCV derivation notation:
+\newcommand{\GCV}{G}	% GCV function
+
+% Discrepancy principle derivation notation:
+\newcommand{\D}{D}	% Discrepancy principle function
+
+\author{Michael Byrne}
+\title{Resolution analyses and estimation of regularization parameters for the inversion of integral equations}
+%\setbeamercovered{transparent} 
+%\setbeamertemplate{navigation symbols}{} 
+%\logo{} 
+\institute{Arizona State University} 
+\date{December 3, 2019} 
+%\subject{} 
+\begin{document}
+
+% Title page:
+\begin{frame}
+\titlepage
+\end{frame}
+
+% Table of contents:
+\begin{frame}
+\tableofcontents
+\end{frame}
+
+\section{Introduction}
+
+\begin{frame}
+\frametitle{Inverse problems}
+\begin{itemize}
+\item Inverse problems are concerned with determining model parameters/characteristics from observed data
+\item Historical example is the detection of Neptune (1821-1846; see \cite{Airy1847})
+\item Modern examples include to deconvolution, tomography, and subsurface mapping from gravitational measurements
+\end{itemize}
+\begin{block}{Fredholm equation of the first kind}
+Given functions $k(x,t)$ and $g(x)$, the Fredholm equation of the first kind is
+\[g(x) = \int_a^b k(x,t)f(t)~dt,\]
+where the function $f(t)$ is unknown. The function $k$ is called the kernel of the integral equation.
+\end{block}
+\end{frame}
+
+\begin{frame}
+\frametitle{Convolution of functions}
+When the kernel has the form $k(x,t) = k(x-t)$ and the limits of integration are infinite, the integral equation represents the convolution of $k$ and $f$:
+\[(k * f)(x) := g(x) = \int_{-\infty}^{\infty} k(x-t)f(t)~dt.\]
+\begin{itemize}
+\item Convolution is a ``smoothing" operation: if $k$ has compact support and $f$ is locally integrable, then $g$ exists and is continuous \cite{DebnathLokenath1999ItHs}
+\item \ToDo{Insert a convolution animation here}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Continuous to discrete setting (1D)}
+In many applications, data are finite (i.e. samples of functions)
+\[\gVec = \begin{bmatrix}
+g_0 \\
+\vdots \\
+g_{n-1}
+\end{bmatrix}, \quad g_j = \sum_{\ell=-\infty}^{\infty} k_{j-\ell}f_{\ell}\]
+\[(\ldots,f_{-m+1},\ldots,f_0,f_1,\ldots,f_{n-1},f_n,\ldots,f_{n+m},\ldots)\]
+\[(\ldots,0,0,k_{-m+1},k_{-m+2},\ldots,k_0,\ldots,k_{m-2},k_{m-1},0,0,\ldots)\]
+\ToDo{be able to explain this i.e. weighting, existence ($\ell^1$), infinite vs finite matrix, discrete convolution} \\
+\ToDo{talk about the indices in relation to sample points (colocation etc.)}
+\ToDo{Insert two pictures: one of sampled $f$ and one for sampled $k$}
+\end{frame}
+
+\begin{frame}
+\frametitle{Continuous to discrete setting (1D)}
+Assuming the kernel $k$ has compact support, the resulting discrete system is finite and $\gVec$ can be expressed as the following matrix product:
+\[\resizebox{.9 \textwidth}{!}{$
+\begin{bmatrix}
+k_{m-1} & \cdots & k_0 & \cdots & k_{-m+1} & & & & & \\
+ & k_{m-1} & & k_0 & & k_{-m+1} & & & 0 & \\
+ & & \ddots & \ddots & \ddots & \ddots & \ddots & & & \\
+ & & & \ddots & \ddots & \ddots & \ddots & \ddots & & \\
+ & 0 & & & k_{m-1} & & k_0 & & k_{-m+1} & \\
+ & & & & & k_{m-1} & \cdots & k_0 & \cdots & k_{-m+1}
+\end{bmatrix}\begin{bmatrix}
+f_{-m} \\
+\vdots \\
+f_{-1} \\
+f_0 \\
+\vdots \\
+f_{n-1} \\
+f_n \\
+\vdots \\
+f_{n+m-1}
+\end{bmatrix}$}\]
+However, this system is underdetermined without imposing some boundary conditions on $f$.
+\end{frame}
+
+\begin{frame}
+\frametitle{Singular value decomposition (SVD)}
+Given a system $\gnoiseVec = \kMat\fVec + \noiseVec$ where $\kMat$ is an $m \times n$ matrix and $\rank(\kMat) = r$, direct matrix inversion is impractical/impossible. A theoretical alternative is to express $\kMat$ using the (compact) SVD.
+\[\kMat = U\Sigma{V^\ctrans}\]
+\begin{itemize}
+\item $U$ is $m \times r$, $V^\ctrans$ is $r \times n$, and both $U$ and $V$ are column orthonormal.
+\item $\Sigma = \diag(\singular_0,\ldots,\singular_{r-1})$ where $s_0 \geq \ldots \geq \singular_{r-1} > 0$ (the singular values)
+\item If $\kMat$ is singular, the pseudoinverse $K^\dagger = V\Sigma^\dagger{U}^\ctrans$ with $\Sigma^\dagger = \diag\left(\frac{1}{\singular_0},\ldots,\frac{1}{\singular_{r-1}}\right)$ can be used for obtain a solution:
+\[\kMat^\dagger{\gVec} = (V\Sigma^\dagger{U}^\ctrans)(\kMat\fVec + \noiseVec) = \fVec + \sum_{\ell=0}^{r-1} \frac{(U_{\cdot,\ell})^\ctrans{\noiseVec}}{\singular_{\ell}}V_{\cdot,\ell}\]
+\end{itemize}
+However, division by small singular values results in numerical instability. \\
+\ToDo{The noise vector should be bold}
+\end{frame}
+
+\begin{frame}
+\frametitle{Regularization}
+\[\fVec_\regparam = \sum_{\ell=0}^{r-1} \filt(\regparam,\singular_\ell)\frac{(U_{\cdot,\ell})^\ctrans{\noiseVec}}{\singular_{\ell}}V_{\cdot,\ell}\]
+To prevent numerical instability, the summands can be multiplied by \textit{filter functions} $\filt(\regparam,\singular_{\ell})$, dependent upon a non-negative \textit{regularization parameter} $\regparam$.
+\begin{itemize}
+\item Desireable to have $\filt(\regparam,\singular_\ell)/\singular_\ell \approx 1$ for large $\singular_\ell$ and $\filt(\regparam,\singular_\ell)/\singular_\ell \approx 0$ for small $\singular_\ell$
+\item Simple example is 
+\[\filt(\regparam,\singular_\ell) = \begin{cases}
+1, & \singular^2_\ell > \regparam \\
+0, & \singular^2_\ell \leq \regparam
+\end{cases},\]
+which corresponds to the truncated singular value decomposition (TSVD) \cite{Vogel:2002}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Tikhonov regularization}
+Choosing the following filter function corresponds to \textit{Tikhonov regularization} \cite{Tikh1963}
+\[\filt(\regparam,\singular_\ell) = \frac{\singular^2_\ell}{\singular^2_\ell + \regparam}\]
+Tikhonov regularization can stated as a minimization problem:
+\begin{block}{Tikhonov regularization}
+The solution obtained by Tikhonov regularization is
+\[\fVec_\regparam = \argmin_{\fVec\in\mathbb{R}^n} \left\{\|\kMat\fVec - \gnoiseVec\|^2 + \regparam^2\|D\fVec\|^2\right\},\]
+where $D$ is the matrix representation of a linear operator and $\|\cdot\|$ is the 2-norm. The term $\|D\fVec\|^2$ is an example of a \textit{penalty function} \cite{Vogel:2002}.
+\end{block}
+\end{frame}
+
+\begin{frame}
+\frametitle{Goals and overview of remaining presentation}
+\textcolor{red}{The primary goal is to determine the effects of downsampling on the efficacy of regularization parameters selected using a variety of methods.} \\
+\begin{itemize}
+\item Continue transition from continuous to discrete setting (1D)
+\item Methodology of downsampling
+\item Parameter selection methods
+\begin{itemize}
+\item Unbiased predictive risk estimator
+\item Generalized cross validation
+\item Discrepancy principle
+\end{itemize}
+\item DCT and DFT approach
+\begin{itemize}
+\item Discussion of boundary conditions
+\item Discrete system/matrix structure
+\item Statistical results and numerical examples
+\end{itemize}
+\item Maching learning approach
+\item Conclusion and future work
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Continuous to discrete setting (1D)}
+The discrete system can be rewritten as
+\[\gVec = T_{l}\fVec_{l} + T\fVec + T_{r}\fVec_{r}\]
+where matrices/vectors come from the following partition \cite{NeumannDCT}:
+\[\resizebox{1 \textwidth}{!}{$
+\left[\begin{array}{cc|cccccc|cc}
+k_{m-1} & \cdots & k_0 & \cdots & k_{-m+1} & & & & & \\
+ & k_{m-1} & & k_0 & & k_{-m+1} & & & 0 & \\
+ & & \ddots & \ddots & \ddots & \ddots & \ddots & & & \\
+ & & & \ddots & \ddots & \ddots & \ddots & \ddots & & \\
+ & 0 & & & k_{m-1} & & k_0 & & k_{-m+1} & \\
+ & & & & & k_{m-1} & \cdots & k_0 & \cdots & k_{-m+1} 
+\end{array}\right]\left[\begin{array}{c}
+f_{-m} \\
+\vdots \\
+f_{-1} \\
+\hline 
+f_0 \\
+\vdots \\
+f_{n-1} \\
+\hline
+f_n \\
+\vdots \\
+f_{n+m-1}
+\end{array}\right]\begin{array}{c}
+\vspace*{0.25 in} \\
+\leftarrow \fVec_l \\
+\vspace*{0.25 in} \\
+\leftarrow \fVec \\
+\vspace*{0.25 in} \\
+\leftarrow \fVec_r \\
+\vspace*{0.25 in} 
+\end{array}$}\]
+\ToDo{Expand on the shape of $T_l$ and $T_r$ on the whiteboard}
+\end{frame}
+
+\begin{frame}
+\frametitle{Downsampling}
+For two natural numbers $B$ and $N$, let $n = B^N$. The map $\downarrow_B:\mathbb{C}^n \rightarrow \mathbb{C}^{n/B}$ is defined by $\mathbf{y} = \downarrow_B(\mathbf{x})$, where $\mathbf{y}$ is the vector formed by concatenating every $B$th element of $\mathbf{x}$ \cite{AudioDFT}.
+\begin{itemize}
+\item For example, $\downarrow_2([1,2,3,4,5,6]) = [1,3,5]$
+\item $B$-downsampling has a matrix representation
+\item $B = 2$ is advantageous for FFT-type algorithms \ToDo{cite this}
+\end{itemize}
+\ToDo{including animation of this process for $B = 2$}
+\end{frame}
+
+\begin{frame}
+\frametitle{Numerical examples}
+Assuming $g$ is sampled over $[0,1]$ and the support of $k$ is $[-\frac{1}{2},\frac{1}{2}]$, $f$ must be defined on $[-\frac{1}{2},\frac{3}{2}]$:
+\[g(x) = \int_{-\infty}^{\infty} k(x-t)f(t)~dt = \int_{x+\frac{1}{2}}^{x-\frac{1}{2}} k(x-t)f(t)~dt\]
+\ToDo{be able to explain this} \\
+The assumption regarding noise is that $\noiseVec \sim \mathcal{N}(\mathbf{0},\noiseSD^2I)$.
+\end{frame}
+
+\section{Parameter estimation methods}
+
+\begin{frame}
+\frametitle{Unbiased prodictive risk estimator (UPRE)}
+The UPRE method is to choose $\regparam$ as a minimizer of the function
+\[\U(\regparam) = \frac{1}{n}\|\regres\|^2 + \frac{2\noiseSD^2}{n}\trace(\A) - \noiseSD^2,\]
+where $\A = \kMat(\kMat^\ctrans{\kMat} + \regparam{D^\ctrans}D)^{-1}\kMat^\ctrans$ is the Tikhonov influence matrix and $\regres = (\A - I)\gnoiseVec$ is the \textit{regularized residual}.
+\begin{itemize}
+\item Requires knowledge of the noise variance $\noiseSD^2$
+\item $\U(\regparam)$ can have more than one minimizer
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Generalized cross validation (GCV)}
+The GCV method is to choose $\regparam$ as a minimizer of the function
+\[\GCV(\regparam) = \frac{\dfrac{1}{n}\|\regres\|^2}{\left[\dfrac{1}{n}\trace(I-\A)\right]^2} = \frac{n\|\regres\|^2}{\left[\trace(I-\A)\right]^2},\]
+where $\A$ is the Tikhonov influence matrix and $\regres$ is the regularized residual.
+\begin{itemize}
+\item In contrast to the UPRE method, the GCV method does not require knowledge of $\noiseSD^2$
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{The discrepancy principle}
+The discrepancy principle says to choose $\regparam$ as a root of the function
+\[\D(\regparam) = \frac{1}{n}\|\regres\|^2 - \noiseSD^2\]
+where $\regres$ is the regularized residual.
+\begin{itemize}
+\item Similar to the UPRE method, applying the discrepancy principle requires knowledge of $\noiseSD^2$
+\item In contrast* to the UPRE and GCV methods, the discrepancy principle relies on finding a root of a function instead of finding a minimizer
+\item Unlike $\U(\regparam)$ and $\GCV(\regparam)$, $\D(\regparam)$ is monotone increasing for all $\regparam > 0$
+\end{itemize}
+\end{frame}
+
+\section{DCT approach}
+
+\begin{frame}
+\frametitle{Neumann boundary condition}
+\ToDo{Insert visual representation of what the condition does to a graph} \\
+Letting $J$ be the reversal matrix, the system $\gVec = T_{l}\fVec_{l} + T\fVec + T_{r}\fVec_{r}$ becomes
+\[\gVec = [(\mathbf{0}~|~T_{l})J + T + (T_{r}~|~\mathbf{0})J]\fVec = A\fVec,\]
+where $\mathbf{0}$ is a zero matrix and $A$ is a Toeplitz-plus-Hankel matrix.
+\begin{itemize}
+\item When the kernel $\kVec$ is symmetric (meaning that $k_j = k_{-j}$ for all $j \in \{-m+1,\ldots,m-1\}$), Toeplitz-plus-Hankel matrices are diagonalized by the DCT \cite{Martucci1994,NeumannDCT}
+\item The DCT only requires real operation and is thus about twice as fast as using the DFT \cite{RaoYip2014} \ToDo{find page range}
+\item For 2D problems, the corresponding system matrices are block Toeplitz-plus-Hankel with Toeplitz-plus-Hankel blocks
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Definition of the DCT}
+There are eight version of the DCT, each corresponding to how the left and right endpoints of an interval are handled.
+\begin{block}{DCT-II}
+Given $\mathbf{x}$, the DCT-II of $\mathbf{x}$, denoted $\dct{\mathbf{x}}$, is defined as
+\[\dct{x}_j = \sqrt{\frac{2 - \delta_{j,0}}{N}} \sum_{k=0}^{N-1} \cos\left(\frac{\pi{j}(2k + 1)}{2N}\right) x_k.\]
+\end{block}
+\end{frame}
+
+\section{DFT approach}
+
+\begin{frame}
+\frametitle{Periodic boundary condition}
+\ToDo{Insert visual representation of what the condition does to a graph} \\
+Letting $J$ be the reversal matrix, the system $\gVec = T_{l}\fVec_{l} + T\fVec + T_{r}\fVec_{r}$ becomes
+\[\gVec = [(\mathbf{0}~|~T_{l}) + T + (T_{r}~|~\mathbf{0})]\fVec = C\fVec,\]
+where $\mathbf{0}$ is a zero matrix and $C$ is a circulant matrix.
+\begin{itemize}
+\item Circulant matrices are diagonlized by the DFT
+\item Due to the fast Fourier transform (FFT), the cost of using the DFT is $O(n\log(n))$ instead of $O(n^2)$ \cite{CooleyTukey}
+\item For 2D problems, the corresponding system matrices are block circulant with circulant blocks
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Definition of the DFT}
+
+\end{frame}
+
+\section{Machine learning approach}
+
+\begin{frame}
+\frametitle{Machine learning approach}
+
+\end{frame}
+
+\section{Conclusion}
+
+\begin{frame}
+\frametitle{Summary of presentation}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Future work}
+3D gravity problems
+\end{frame}
+
+\begin{frame}[allowframebreaks]
+\frametitle{References}
+\bibliographystyle{siam}
+\bibliography{Parameter-Estimation}
+\end{frame}
+
+\end{document}
