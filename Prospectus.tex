@@ -64,7 +64,7 @@
 \newcommand{\D}{D}	% Discrepancy principle function
 % Rosie's commands
 \newcommand{\comment}[1]{\textcolor{red}{ \textbf{Comment}: #1}}
-\newcommand{\Todo}[1]{\textcolor{green}{\textbf{#1}}}
+\newcommand{\ToDo}[1]{\textcolor{green}{\textbf{#1}}}
 % Defining Trace Lemma
 \newtheorem*{TL}{Trace Lemma}
 % General Lemma
@@ -169,7 +169,7 @@ Lastly, some conclusions and observations are made in Chapter \ref{sec:Conclusio
 
 \chapter{Analytical tools} \label{sec:Analytical tools}
 
-A number of analytic tools will be utilized. \Todo{Write an appropriate intro paragraph.}
+A number of analytic tools will be utilized. \ToDo{Write an appropriate intro paragraph.}
 
 \section{The Singular Value Decomposition} \label{sec:SVD}
 
@@ -185,7 +185,7 @@ By using $\kMat^{-1} = V\Sigma^{-1}U^\trans$ when $\kMat$ is nonsingular, the pr
 \kMat^{-1}\gnoiseVec = \kMat^{-1}\left(\kMat\fVec + \noiseVec\right) = \fVec + \kMat^{-1}\noiseVec = \fVec + V\Sigma^{-1}{U^\trans}\noiseVec = \fVec + \sum_{\ell = 1}^n \frac{{U^\trans_\ell}\noiseVec}{\singular_\ell}V_{\cdot,\ell}. 
 \label{eq:InvProd}
 \end{equation}
-Even if $\kMat$ is singular, a solution can still be obtained by using the psuedoinverse $\kMat^\dagger = V{\Sigma^\dagger}U^\trans$, where $\Sigma^\dagger = \diag(1/\singular_1,\ldots,1/\singular_r)$, and the upper bound of summation in \eqref{eq:InvProd} becomes $r$. In either the nonsingular or singular case for $\kMat$, however, the summands in \eqref{eq:InvProd} are numerically unstable for small $\singular_\ell$. For a visual representation of this instability, a Picard plot can be constructed. A Picard plot is a graph showing the terms $|U^\trans_{\cdot,\ell}\noiseVec|/\singular_\ell$ in decreasing order with respect to the singular values. If the terms $|U^\trans_{\cdot,\ell}\noise|$ decay faster than $\singular_\ell$ as $\ell$ increases, then the terms $|U^\trans_{\cdot,\ell}\noiseVec|/\singular_\ell$ do not become excessively large; this is the discrete Picard condition \cite{ABT}. The discrete Picard condition is thus a measure of instability. If the discrete Picard condition is not met, then the terms $|U^\trans_{\cdot,\ell}\noiseVec|/\singular_\ell$ blow up as $\ell$ increases, often resulting in worthless solutions. In this report, the discrete Fourier transform will be used to obtain solutions analogous to those obtained by \eqref{eq:InvProd}. In Chapter \ref{sec:DFT} a Picard plot is provided that demonstrates the relationship between the noise, the width of the Gaussian blur, and the resulting numerical instabilities related to obtaining meaningful solutions. See \cite{Hansen1990} for more information on Picard plots and the associated discrete Picard condition. \par 
+Even if $\kMat$ is singular, a solution can still be obtained by using the pseudoinverse $\kMat^\dagger = V{\Sigma^\dagger}U^\trans$, where $\Sigma^\dagger = \diag(1/\singular_1,\ldots,1/\singular_r)$, and the upper bound of summation in \eqref{eq:InvProd} becomes $r$. In either the nonsingular or singular case for $\kMat$, however, the summands in \eqref{eq:InvProd} are numerically unstable for small $\singular_\ell$. For a visual representation of this instability, a Picard plot can be constructed. A Picard plot is a graph showing the terms $|U^\trans_{\cdot,\ell}\noiseVec|/\singular_\ell$ in decreasing order with respect to the singular values. If the terms $|U^\trans_{\cdot,\ell}\noise|$ decay faster than $\singular_\ell$ as $\ell$ increases, then the terms $|U^\trans_{\cdot,\ell}\noiseVec|/\singular_\ell$ do not become excessively large; this is the discrete Picard condition \cite{ABT}. The discrete Picard condition is thus a measure of instability. If the discrete Picard condition is not met, then the terms $|U^\trans_{\cdot,\ell}\noiseVec|/\singular_\ell$ blow up as $\ell$ increases, often resulting in worthless solutions. In this report, the discrete Fourier transform will be used to obtain solutions analogous to those obtained by \eqref{eq:InvProd}. In Chapter \ref{sec:DFT} a Picard plot is provided that demonstrates the relationship between the noise, the width of the Gaussian blur, and the resulting numerical instabilities related to obtaining meaningful solutions. See \cite{Hansen1990} for more information on Picard plots and the associated discrete Picard condition. \par 
 A common approach to overcome numerical instabilities is to multiply the summands in \eqref{eq:InvProd} by \textit{filter functions} $\filt$ that depend upon $\singular_\ell$ and a non-negative \textit{regularization parameter} $\regparam$. By doing so, an approximate solution is obtained:
 \begin{equation}
 \fVec(\regparam) = \sum_{\ell = 1}^n V_{\cdot,\ell}\filt(\regparam,\singular_\ell)\left(\frac{{U^\trans_\ell}\gnoiseVec}{\singular_\ell}\right) = V\Phi\Sigma^\dagger U^\trans\gnoiseVec,
@@ -274,7 +274,7 @@ for $\ell = 1,\ldots,n$. In contrast to the SVD, the generalized singular values
 \fVec(\regparam) = \sum_{\ell=1}^n \frac{\gamma_\ell^2}{\gamma_\ell^2 + \regparam^2} \frac{U_{\cdot,\ell+k}^\trans\gnoiseVec}{\lambda_\ell}Y_{\cdot,\ell}
 \end{equation}
 where $Y = X^{-\trans}$ (the inverse of $X^\trans$). The terms $\gamma_\ell^2/(\gamma_\ell^2 + \regparam^2)$ are known as the GSVD filter factors, which are identical in form to the filter factors \eqref{eq:TikFilt}. \par 
-With the derivation of the GSVD established, an extension of the transformation that rendered \eqref{eq:TikSol Standard Form} is now stated \cite[p.~38]{Hansen:98}. First, a weighted version of the psuedoinverse $D^\dagger$ is defined as
+With the derivation of the GSVD established, an extension of the transformation that rendered \eqref{eq:TikSol Standard Form} is now stated \cite[p.~38]{Hansen:98}. First, a weighted version of the pseudoinverse $D^\dagger$ is defined as
 \[D_{\kMat}^\dagger = \left(I - \left(\kMat\left(I - D^\dagger D\right)\right)^\dagger \kMat\right)D^\dagger.\]
 If $p \geq n$, then $D_{\kMat}^\dagger$ is the same as $D^\dagger$. We must also consider
 \[\fVec_0 \equiv \left(\kMat\left(I - D^\dagger D\right)\right)^\dagger \gnoiseVec,\]
@@ -292,7 +292,7 @@ where $\bm{0}$ is the zero matrix of appropriate dimension. The form of the regu
 &=  \|\kMat({D_{\kMat}^\dagger}D\fVec + \fVec_0) - \gnoiseVec\|^2 + \regparam^2\|D\fVec\|^2
 \end{align*}
 as well as 
-\Todo{
+\ToDo{
 \begin{align*}
 {D_{\kMat}^\dagger}D\fVec + \fVec_0 &= \left(I - \left(\kMat\left(I - D^\dagger D\right)\right)^\dagger \kMat\right)D^\dagger D\fVec + \left(\kMat\left(I - D^\dagger D\right)\right)^\dagger \gnoiseVec \\
 &= D^\dagger D\fVec - \left(\kMat\left(I - D^\dagger D\right)\right)^\dagger \kMat D^\dagger D\fVec + \left(\kMat\left(I - D^\dagger D\right)\right)^\dagger \gnoiseVec \\ 
@@ -483,7 +483,8 @@ k_{-m+1} & & \\
 \vdots & \ddots &  \\
 k_{-1} & \cdots & k_{-m+1} \\
 \end{bmatrix}.\]
-The goal is the same: obtain a solution $\fVec = [f_0,\ldots,f_{n-1}]^\trans$. However, it is clear that $\fVec$ depends not only upon the choice of kernel $k$ but on the boundaries of $\fVec$, i.e. the terms $f_j$ of $(f_n)$ where $j \not\in \{0,1,n-1\}$. There are a number of ways in which the boundaries can be handled; Dirichlet, periodic, and Neumann boundary conditions are considered in \cite{NeumannDCT}. The boundary condition that will be considered is the Neumann boundary condition, defined by setting
+The goal is the same: obtain a solution $\fVec = [f_0,\ldots,f_{n-1}]^\trans$. However, it is clear that $\fVec$ depends not only upon the choice of kernel $k$ but on the boundaries of $\fVec$, i.e. the terms $f_j$ of $(f_n)$ where $j \not\in \{0,1,n-1\}$. There are a number of ways in which the boundaries can be handled; Dirichlet, periodic, and Neumann boundary conditions are considered in \cite{NeumannDCT}. The most-simplyfing condition in terms of the result system is the Dirichlet condition, which assumed that $\fVec_l = \fVec_r = \bm{0}$. The resulting system \eqref{eq: Tf = g} is $T\fVec = \gVec$. The matrix $T$ is Toeplitz, and methods such as those prsented in \cite{Vogel:2002} can be used to obtain solutions. The situation becomes more complicated in higher dimensions: for 2D problems, the system matrix is block-Toeplitz with Toeplitz blocks and solving such a system requires $O(n^4)$ operations \ToDo{cite this: see 17 in Neumann paper}. \par 
+The first boundary condition that will be considered is the Neumann boundary condition, defined by setting
 \[\begin{cases}
 f_{-1} = f_0 \\
 f_{-2} = f_1 \\
@@ -524,7 +525,9 @@ Therefore $K = T(\mathbf{u}) + H\left(\shift(\mathbf{u})\right)$, and Theorem \r
 
 \chapter{The DFT approach} \label{sec:DFT}
 As stated in Chapter \ref{sec:DCT}, the DFT is well-suited for situations in which the boundary conditions are assumed to be periodic. For 1-dimensional problem, the resulting kernel matrix $\kMat$ is circulant and is therefore diagonalized by the DFT. For 2-dimensional problems, $\kMat$ is a block-circulant matrix with circulant blocks; adopting the notation from \cite{Vogel:2002}, such matrices will be referred to as BCCB matrices. Analogously, BCCB matrices can be diagonalized with 2-dimensional DFTs. \par 
-Focusing on the 1-dimension case, imposing periodic boundary conditions on $f$ means that $f_j = f_{n-j}$ in \eqref{eq:Conv. Prod.}. \par 
+Focusing on the 1-dimension case, imposing periodic boundary conditions on $f$ means that $f_j = f_{n-j}$ in \eqref{eq:Conv. Prod.} The result is that \eqref{eq: Tf = g} becomes
+\[ C\fVec = [(\bm{0} ~|~ T_l) + T + (T_r ~|~ \bm{0})]\fVec = \gVec,\]
+where $C$ is a circulant matrix. \par 
 The discrete Fourier transform will be introduced from the perspective of approximating coefficients of the Fourier series of a $2\pi$-periodic function $f$. On the interval $[0,2\pi]$, the $j$th complex Fourier coefficient of $f$ is given by
 \[c_j = \frac{1}{2\pi}\int_0^{2\pi} f(t)\exp(-ijt)\:dt,\]
 where $i = \sqrt{-1}$.  Applying the trapezoidal rule for approximating this integral with $n$ points then produces
@@ -784,7 +787,7 @@ The rank deficiency of $A$ and $B$ have statistical significance as well.  Given
 \Re(\widehat{\noiseVec}) = A\noise \sim \mathcal{N}(\bm{0},\noiseSD^2 AA^\trans), \quad \Im(\widehat{\noiseVec}) = B\noiseVec \sim \mathcal{N}(\bm{0},\noiseSD^2 BB^\trans), \quad
 \label{eq:Real and imaginary distributions}
 \end{equation}
-However, the covariance matrices of $\Re(\widehat{\noiseVec})$ and $\Im(\widehat{\noiseVec})$ are rank-deficient, and therefore do not have density functions in the traditional sense; their density functions exist in $\rank(AA^\trans)$ and $\rank(BB^\trans)$-dimensional subspaces of $\mathbb{R}^n$. These density functions can be expressed using the psuedoinverses of the covariance matrices or, equivalently, by defining new transformations based on the rank of $AA^\trans$ and $BB^\trans$ \cite[p.~527-528]{Rao1973}. \par 
+However, the covariance matrices of $\Re(\widehat{\noiseVec})$ and $\Im(\widehat{\noiseVec})$ are rank-deficient, and therefore do not have density functions in the traditional sense; their density functions exist in $\rank(AA^\trans)$ and $\rank(BB^\trans)$-dimensional subspaces of $\mathbb{R}^n$. These density functions can be expressed using the pseudoinverses of the covariance matrices or, equivalently, by defining new transformations based on the rank of $AA^\trans$ and $BB^\trans$ \cite[p.~527-528]{Rao1973}. \par 
 Instead of dealing with density functions of multivariate distributions, the distribution of the components of $\Re(\widehat{\noiseVec})$ and $\Im(\widehat{\noiseVec})$ will be determined individually. As a step towards this goal, the independence of the components of $\Re(\widehat{\noiseVec})$ and $\Im\{\widehat{\noiseVec}\}$ can be established by applying the following result regarding independence of linear combinations of random variables \cite{LukacsKing}.
 
 \begin{theorem}[Lukacs \& King, 1954]
@@ -1085,7 +1088,7 @@ where the last equality is given by Lemma \ref{lem:Inner products}. The proof of
 \end{proof}
 
 % Here is the start of the density function approach
-%A step in Theorem \ref{thm:Cov of mag squared} is to calculate the \textit{psuedo-determinant} of a covariance matrix $\Sigma$, which is defined as the product of its nonzero eigenvalues. Adopting the notation used for psuedo-inverses, the psuedo-determinant of a matrix $\Sigma$ will be denoted $\pdet(\Sigma)$. Theorem \ref{thm:Covariance eigenvalues} gives nonzero eigenvalues of the covariance matrices used in Theorem \ref{thm:Cov of mag squared}, which will then be used to evaluate the psuedo-determinants. The algebraic multiplicity of an eigenvalue $\lambda$ is denoted $\mu(\lambda)$.
+%A step in Theorem \ref{thm:Cov of mag squared} is to calculate the \textit{pseudo-determinant} of a covariance matrix $\Sigma$, which is defined as the product of its nonzero eigenvalues. Adopting the notation used for pseudo-inverses, the pseudo-determinant of a matrix $\Sigma$ will be denoted $\pdet(\Sigma)$. Theorem \ref{thm:Covariance eigenvalues} gives nonzero eigenvalues of the covariance matrices used in Theorem \ref{thm:Cov of mag squared}, which will then be used to evaluate the pseudo-determinants. The algebraic multiplicity of an eigenvalue $\lambda$ is denoted $\mu(\lambda)$.
 %
 %\begin{theorem}
 %\label{thm:Covariance eigenvalues}
@@ -1170,7 +1173,7 @@ where the last equality is given by Lemma \ref{lem:Inner products}. The proof of
 %when $n$ is even. Both polynomials confirm that $\lambda = 2$ is the only nonzero eigenvalue of $\Sigma = \noiseSD^2 MB^2M$ with algebraic multiplicity equal to $\rank(B)$.
 %\end{proof}
 %
-%The psuedo-determinants of $\noiseSD^2 MA^2M$ and $\noiseSD^2 MB^2M$ follow as a corollary to Theorem \ref{thm:Covariance eigenvalues} in combination with Lemma \ref{lem:Rank of A and B}.
+%The pseudo-determinants of $\noiseSD^2 MA^2M$ and $\noiseSD^2 MB^2M$ follow as a corollary to Theorem \ref{thm:Covariance eigenvalues} in combination with Lemma \ref{lem:Rank of A and B}.
 %
 %\begin{corollary}
 %\label{cor:Covariance eigenvalues}
@@ -1556,7 +1559,7 @@ If roots are not equal, then $\overline{f}(x_1) < 0$ and $\overline{f}(x_R) > 0$
 
 \chapter{Numerical examples} \label{sec:Numerical examples}
 
-For the numerical examples, three test functions are considered. While these functions vary in the extent of smoothness, all three functions are selected to be 1-periodic and the interval selected is [0,1], though this interval can be mapped to any other interval using a linear transformation. In general, the transformation from $[a,b]$ to $[c,d]$ such that $a \mapsto c$ and $b \mapsto d$ has a point-slope representation
+For the numerical examples, three test functions are considered. While these functions vary in the extent of smoothness, it is assumed that the information about the measured function $g(t)$ is only known over the $[0,1]$; this will also be the initial domain of definition for $f(t)$. However, the interval $[0,1]$ can be mapped to any other interval using an affine transformation. In general, the transformation from $[a,b]$ to $[c,d]$ such that $a \mapsto c$ and $b \mapsto d$ has a point-slope representation
 \[y - c = \left(\frac{d-c}{b-a}\right)(x - a)\]
 where $y \in [c,d]$ is the image of $x \in [a,b]$. \par
 The first test function is $f(t) = \cos(4\pi{t})\sin(6\pi{t})$, which is infinitely differentiable on all of $\mathbb{R}$. The second test function \eqref{eq:Test Function 2} is piecewise-smooth. The third and final test function is
@@ -1568,20 +1571,23 @@ which is also infinitely differentiable on $\mathbb{R}$; the third function was 
 
 \begin{figure}
 	\centerline{\includegraphics[scale = 0.45]{Figures/TestFunctions1D.eps}}
-\caption{The three test functions considered in the numerical examples. Note that the second test function is only piecewise-smooth, while the first and second functions are smooth. All three functions are 1-periodic.}
+\caption{The three test functions considered in the numerical examples. Note that the second test function is only piecewise-smooth, while the first and second functions are smooth.}
 \label{TestFunctions}
 \end{figure}
 
-The interval $[0,1]$ is discretized as equispaced points $0, 1/N, 2/N, \ldots, (N-1)/N$ for $N = 4096$. In other words, the interval is discretized as the vector $\tVec = [t_1,t_2,\ldots,t_N]$ with $t_\ell = (\ell-1)/N$. The selected test function $f$ is then sampled at these points so that the discrete version $\fVec = [f_1,f_2,\ldots,f_N]$ has elements $f_\ell = f(t_\ell)$. For the discrete version of $k(x,t)$ to be used in the convolution with $\fVec$, the periodic extension of $k(x,t)$ is sampled in the same way that was used to construct $\fVec$. However, it is important to remember that unextended $k(x,t)$ was assumed to be centered at the origin and compactly supported on the interval $[-1/2,1/2]$. As such, a plot of $\kVec$ will not resemble the traditional graph of a Gaussian bump but instead be a depiction of a trough between bumps in the periodic extension of $k$; see Figure \ref{RegAndTroughGaussian}. In the numerical examples, the width of the Gaussian kernels are chosen to be 100 and 200.  \par
+The interval $[0,1]$ is discretized as equispaced points $0, 1/N, 2/N, \ldots, (N-1)/N$ for $N = 4096$. In other words, the interval is discretized as the vector $\tVec = [t_0,t_1,\ldots,t_{N-1}]$ with $t_\ell = \ell/N$. Samples of $g$ are given at these points so that the discrete date $\gVec = [g_0,g_1,\ldots,g_{N-1}]$ has elements $g_\ell = g(t_\ell)$. The truncated Gaussian kernel $k(x,t)$ is assumed to be centered at the origin and compactly supported on the interval $[-\frac{1}{2},\frac{1}{2}]$. In the numerical examples, the width of the Gaussian kernels are chosen to be 100 and 200. With a support of $[-\frac{1}{2},\frac{1}{2}]$, the test functions $f(t)$ must be defined on the interval $[-\frac{1}{2},\frac{3}{2}]$ for the convolution to be defined; see Chapter \ref{sec:Introduction}. As stated at the beginning of this chapter, $f$ is initially defined over the interval $[0,1]$ and so the extensions of $f$ on $[-\frac{1}{2},0)$ and $(1,\frac{3}{2}]$ will reflect the boundary condition being imposed. \par
+If the periodic boundary conditions from Chapter \ref{sec:DFT} are imposed, then in the continuous setting we define $f(t) = f(t+1)$ on $[-\frac{1}{2},0)$ and $f(t) = f(t-1)$ on $(1,\frac{3}{2}]$. \par 
+If the Neumann boundary conditions from Chapter \ref{sec:DCT} are imposed, then in the continuous setting we define $f(t) = f(-t)$ on $[-\frac{1}{2},0)$ and $f(t) = f(-t+2)$ on $(1,\frac{3}{2}]$.
 
-\begin{figure}
-	\centerline{\includegraphics[scale = 0.45]{Figures/RegAndTroughGaussian.eps}}
-\caption{Plots of different discretizations of the kernel $k(t)$. The discretization on the left reflects the compact support of $k(t)$ on the interval $[-1/2,1/2]$. The discretization on the right represents the periodic extension of $k(t)$ on the interval $[0,1]$.}
-\label{RegAndTroughGaussian}
-\end{figure}
+%\begin{figure}
+%	\centerline{\includegraphics[scale = 0.45]{Figures/RegAndTroughGaussian.eps}}
+%\caption{Plots of different discretizations of the kernel $k(t)$. The discretization on the left reflects the compact support of $k(t)$ on the interval $[-1/2,1/2]$. The discretization on the right represents the periodic extension of $k(t)$ on the interval $[0,1]$.}
+%\label{RegAndTroughGaussian}
+%\end{figure}
 
 With the discretizations $\fVec$ and $\kVec$ determined, the discretization $\gVec$ of $g(t)$ can be evaluation using either a circular convolution or a linear convolution with appropriate vector padding. Ultimately the vectors $\fVec$, $\kVec$, and $\gVec$ are vector discretizations of $f(t)$, $k(t)$, and $g(t)$, respectively. \par
-Overall, two selections for the width of the Gaussian kernel, two selections 5 and 25 for SNR value, and three test functions lead to a total of 12 configurations. For each configuration, 20 noise realizations were generated and tested. The full resolution problem was constructed using $N = 4096$ points. The downsamped resolutions were selected as $n \in \{16,32,\ldots,2048\}$ for a total of nine resolutions (eight values of $n$).
+Overall, two selections for the width of the Gaussian kernel, two selections 5 and 25 for SNR value, and three test functions lead to a total of 12 configurations. For each configuration, 20 noise realizations were generated and tested. The full resolution problem was constructed using $N = 4096$ points. The downsamped resolutions were selected as $n \in \{16,32,\ldots,2048\}$ for a total of nine resolutions (eight values of $n$). \par 
+Since both Neumann and periodic boundary conditions are considered for the boundaries of $f(t)$, connection between the continuous system \eqref{eq:Con 2} and discrete system \eqref{eq: Tf = g} is handled thoroughly. 
 
 \section{Construction of noise} \label{sec:Construction of noise}
 
