@@ -18,6 +18,7 @@
 \newcommand{\kMat}{K}	% Matrix K
 \newcommand{\fVec}{\mathbf{f}}	% Vector
 \newcommand{\tVec}{\mathbf{t}}	% Vector
+\newcommand{\dVec}{\mathbf{d}}	% Differential operator vector
 \newcommand{\trans}{\mathrm{T}}	% Matrix transpose
 \newcommand{\ctrans}{*}	% Conjugate transpose
 \DeclareMathOperator{\diag}{diag}	% Diagonal matrix
@@ -30,7 +31,7 @@
 % Regularization notation:
 \newcommand{\regparam}{\alpha}
 \newcommand{\R}{R_{\regparam}}	% Regularization matrix
-\newcommand{\freg}{\fVec_{\regparam}}	% Regularized solution
+\newcommand{\regf}{\fVec_{\regparam}}	% Regularized solution
 \DeclareMathOperator*{\argmax}{arg\,max}
 \DeclareMathOperator*{\argmin}{arg\,min}
 \newcommand{\filt}{\phi}
@@ -50,6 +51,7 @@
 
 \author{Michael Byrne}
 \title{Resolution analyses and estimation of regularization parameters for the inversion of integral equations}
+\subtitle{Prospectus for Applied Mathematics PhD}
 %\setbeamercovered{transparent} 
 %\setbeamertemplate{navigation symbols}{} 
 %\logo{} 
@@ -105,7 +107,7 @@ g_{n-1}
 \[(\ldots,f_{-m+1},\ldots,f_0,f_1,\ldots,f_{n-1},f_n,\ldots,f_{n+m},\ldots)\]
 \[(\ldots,0,0,k_{-m+1},k_{-m+2},\ldots,k_0,\ldots,k_{m-2},k_{m-1},0,0,\ldots)\]
 \ToDo{be able to explain this i.e. weighting, existence ($\ell^1$), infinite vs finite matrix, discrete convolution} \\
-\ToDo{talk about the indices in relation to sample points (colocation etc.)}
+\ToDo{talk about the indices in relation to sample points (collocation etc.)}
 \ToDo{Insert two pictures: one of sampled $f$ and one for sampled $k$}
 \end{frame}
 
@@ -153,7 +155,7 @@ However, division by small singular values results in numerical instability. \\
 \[\fVec_\regparam = \sum_{\ell=0}^{r-1} \filt(\regparam,\singular_\ell)\frac{(U_{\cdot,\ell})^\ctrans{\noiseVec}}{\singular_{\ell}}V_{\cdot,\ell}\]
 To prevent numerical instability, the summands can be multiplied by \textit{filter functions} $\filt(\regparam,\singular_{\ell})$, dependent upon a non-negative \textit{regularization parameter} $\regparam$.
 \begin{itemize}
-\item Desireable to have $\filt(\regparam,\singular_\ell)/\singular_\ell \approx 1$ for large $\singular_\ell$ and $\filt(\regparam,\singular_\ell)/\singular_\ell \approx 0$ for small $\singular_\ell$
+\item Desirable to have $\filt(\regparam,\singular_\ell)/\singular_\ell \approx 1$ for large $\singular_\ell$ and $\filt(\regparam,\singular_\ell)/\singular_\ell \approx 0$ for small $\singular_\ell$
 \item Simple example is 
 \[\filt(\regparam,\singular_\ell) = \begin{cases}
 1, & \singular^2_\ell > \regparam \\
@@ -171,8 +173,9 @@ Tikhonov regularization can stated as a minimization problem:
 \begin{block}{Tikhonov regularization}
 The solution obtained by Tikhonov regularization is
 \[\fVec_\regparam = \argmin_{\fVec\in\mathbb{R}^n} \left\{\|\kMat\fVec - \gnoiseVec\|^2 + \regparam^2\|D\fVec\|^2\right\},\]
-where $D$ is the matrix representation of a linear operator and $\|\cdot\|$ is the 2-norm. The term $\|D\fVec\|^2$ is an example of a \textit{penalty function} \cite{Vogel:2002}.
+where $D$ is the matrix representation of a linear operator and $\|\cdot\|$ is the 2-norm. The term $\|D\fVec\|^2$ is an example of a \textit{penalty function} \cite{Vogel:2002}. In matrix form, $\regf = (\kMat^\ctrans{\kMat} + \regparam{D^\ctrans}D)^{-1}\kMat^\ctrans\gnoiseVec$.
 \end{block}
+Using the generalized SVD, the problem can be recast so that $D$ is ``absorbed" into the matrix $\kMat$ \ToDo{cite ABT chapter and Hansen}
 \end{frame}
 
 \begin{frame}
@@ -193,7 +196,7 @@ where $D$ is the matrix representation of a linear operator and $\|\cdot\|$ is t
 \item Discrete system/matrix structure
 \item Statistical results and numerical examples
 \end{itemize}
-\item Maching learning approach
+\item Machine learning approach
 \item Conclusion and future work
 \end{itemize}
 \end{frame}
@@ -251,14 +254,15 @@ For two natural numbers $B$ and $N$, let $n = B^N$. The map $\downarrow_B:\mathb
 Assuming $g$ is sampled over $[0,1]$ and the support of $k$ is $[-\frac{1}{2},\frac{1}{2}]$, $f$ must be defined on $[-\frac{1}{2},\frac{3}{2}]$:
 \[g(x) = \int_{-\infty}^{\infty} k(x-t)f(t)~dt = \int_{x+\frac{1}{2}}^{x-\frac{1}{2}} k(x-t)f(t)~dt\]
 \ToDo{be able to explain this} \\
-The assumption regarding noise is that $\noiseVec \sim \mathcal{N}(\mathbf{0},\noiseSD^2I)$.
+Further assume that $g_j = g(x_j)$ with $x_j = jh$ for $h = 1/n$ and $j = 0,\ldots,n-1$. Extending the collocation points to serve as quadrature points in $t$ provides the setup for the discrete linear system. Under the above assumptions (\ToDo{$n$ even}), $m = n/2$ and the quadrature points are $t_j = jh$ for $j = -m+1,\ldots,n+m-1$
+\[g_j \approx \sum_{k=-m+1}^{n+m-2} k_{j-k}f_{k} = \sum_{\ell=m-1}^{m+1} k_{\ell}f_{j-\ell}, \quad j = 0,\ldots,n-1\]
 \end{frame}
 
 \section{Parameter estimation methods}
 
 \begin{frame}
-\frametitle{Unbiased prodictive risk estimator (UPRE)}
-The UPRE method is to choose $\regparam$ as a minimizer of the function
+\frametitle{Unbiased predictive risk estimator (UPRE)}
+The UPRE method \cite{Mallows1973} is to choose $\regparam$ as a minimizer of the function
 \[\U(\regparam) = \frac{1}{n}\|\regres\|^2 + \frac{2\noiseSD^2}{n}\trace(\A) - \noiseSD^2,\]
 where $\A = \kMat(\kMat^\ctrans{\kMat} + \regparam{D^\ctrans}D)^{-1}\kMat^\ctrans$ is the Tikhonov influence matrix and $\regres = (\A - I)\gnoiseVec$ is the \textit{regularized residual}.
 \begin{itemize}
@@ -269,7 +273,7 @@ where $\A = \kMat(\kMat^\ctrans{\kMat} + \regparam{D^\ctrans}D)^{-1}\kMat^\ctran
 
 \begin{frame}
 \frametitle{Generalized cross validation (GCV)}
-The GCV method is to choose $\regparam$ as a minimizer of the function
+The GCV method \cite{Wahba1977,Wahba1990} is to choose $\regparam$ as a minimizer of the function
 \[\GCV(\regparam) = \frac{\dfrac{1}{n}\|\regres\|^2}{\left[\dfrac{1}{n}\trace(I-\A)\right]^2} = \frac{n\|\regres\|^2}{\left[\trace(I-\A)\right]^2},\]
 where $\A$ is the Tikhonov influence matrix and $\regres$ is the regularized residual.
 \begin{itemize}
@@ -279,7 +283,7 @@ where $\A$ is the Tikhonov influence matrix and $\regres$ is the regularized res
 
 \begin{frame}
 \frametitle{The discrepancy principle}
-The discrepancy principle says to choose $\regparam$ as a root of the function
+The discrepancy principle \cite{Morozov1966} says to choose $\regparam$ as a root of the function
 \[\D(\regparam) = \frac{1}{n}\|\regres\|^2 - \noiseSD^2\]
 where $\regres$ is the regularized residual.
 \begin{itemize}
@@ -313,6 +317,21 @@ Given $\mathbf{x}$, the DCT-II of $\mathbf{x}$, denoted $\dct{\mathbf{x}}$, is d
 \end{block}
 \end{frame}
 
+\begin{frame}
+\frametitle{DCT-version of UPRE}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{DCT-version of GCV}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{DCT-version of the discrepancy principle}
+
+\end{frame}
+
 \section{DFT approach}
 
 \begin{frame}
@@ -322,7 +341,7 @@ Letting $J$ be the reversal matrix, the system $\gVec = T_{l}\fVec_{l} + T\fVec 
 \[\gVec = [(\mathbf{0}~|~T_{l}) + T + (T_{r}~|~\mathbf{0})]\fVec = C\fVec,\]
 where $\mathbf{0}$ is a zero matrix and $C$ is a circulant matrix.
 \begin{itemize}
-\item Circulant matrices are diagonlized by the DFT
+\item Circulant matrices are diagonalized by the DFT
 \item Due to the fast Fourier transform (FFT), the cost of using the DFT is $O(n\log(n))$ instead of $O(n^2)$ \cite{CooleyTukey}
 \item For 2D problems, the corresponding system matrices are block circulant with circulant blocks
 \end{itemize}
@@ -330,6 +349,44 @@ where $\mathbf{0}$ is a zero matrix and $C$ is a circulant matrix.
 
 \begin{frame}
 \frametitle{Definition of the DFT}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{DFT-version of UPRE}
+If $D = F^\ctrans\Lambda{F}$ \ToDo{have an example of an operator that is diagonalized by the DFT} with $\Lambda = \diag(\widehat{\dVec})$, then
+\[\frac{1}{n}\|\regres\|^2 = \frac{1}{n}\|F\regres\|^2 = \frac{1}{n}\|F(F^\ctrans\Delta{F})\regf - F\gnoiseVec\|^2 = \frac{1}{n}\|\Delta\widehat{\regf} - \widehat{\gnoiseVec}\|^2.\]
+Thus the product $\Delta\widehat{\regf}$ can be written as
+\[\Delta\widehat{\regf} = \Delta{F}[(C^\ctrans{C} + \regparam{D^\ctrans}D)^{-1}C^\ctrans\gnoiseVec] = \Delta(\Delta^\ctrans{\Delta} + \regparam\Lambda^\ctrans{\Lambda})^{-1}\Delta^\ctrans\widehat{\gnoiseVec}.\]
+Therefore
+\begin{align*}
+\frac{1}{n}\|\regres\|^2 &= \frac{1}{n}\|\Delta(\Delta^\ctrans{\Delta} + \regparam\Lambda^\ctrans{\Lambda})^{-1}\Delta^\ctrans\widehat{\gnoiseVec} - \widehat{\gnoiseVec}\|^2 \\
+&= \frac{1}{n}\|(\Delta(\Delta^\ctrans{\Delta} + \regparam\Lambda^\ctrans{\Lambda})^{-1}\Delta^\ctrans - I)\widehat{\gnoiseVec}\|^2.
+\end{align*}
+If $D = I$, then
+\[\frac{1}{n}\|\regres\|^2 = \frac{1}{n}\sum_{j=0}^{n-1}|\widehat{\gnoise}_j|^2\left(\mfilt(\regparam,|\widehat{k}_j|^2)\right)^2.\]
+\end{frame}
+
+\begin{frame}
+\frametitle{DFT-version of UPRE}
+The Tikhonov influence matrix $\A$ can be expressed as
+\[\A = C(C^\ctrans{C} + \regparam{D^\ctrans}D)^{-1}C^\ctrans = F^\ctrans\Delta(\Delta^\ctrans{D} + \regparam\Lambda^\ctrans{\Lambda})^{-1}\Delta^\ctrans{F}.\]
+Since $\Delta(\Delta^\ctrans{D} + \regparam\Lambda^\ctrans{\Lambda})^{-1}\Delta^\ctrans$ is diagonal,
+\[\trace(\A) = \sum_{j = 0}^{n-1} \frac{|\widehat{k}_j|^2}{|\widehat{k}_j|^2 + \regparam|\widehat{d}_j|^2} = \sum_{j = 0}^{n-1} \filt(\regparam,|\widehat{k}_j|),\]
+where the last equality is obtained when $D = I$.
+\begin{block}{DFT-version of the UPRE function}
+Under the assumptions that $C$ is circulant and $D = I$,
+\[\U(\regparam) = .\]
+\end{block}
+\end{frame}
+
+\begin{frame}
+\frametitle{DFT-version of GCV}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{DFT-version of the discrepancy principle}
 
 \end{frame}
 
