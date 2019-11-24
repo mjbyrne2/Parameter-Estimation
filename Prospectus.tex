@@ -91,12 +91,12 @@ Prospectus for Applied Mathematics PhD
 \maketitle
 
 \begin{abstract}
-Integral equations and their solutions have been studied since the development of integral calculus. A specific class of integral equations are the Fredholm equations of the first kind, where the desired solution is contained in the integrand. In a discrete setting, numerical quadrature can be utilized to approximate finite values of the integral equation. Methods such as the singular value decomposition can be used to find approximate discrete solutions. However, applications involving integral equations often result in data that are corrupted by additive noise inherent in the collecting physical measurements. During the inversion process, this noise can be amplified which results in solutions that are of severely poor quality. The intractability of this phenomenon can be mitigated using regularization, in which assumptions about desired solution properties are mathematically implemented during the inversion process. The influence of these properties are controlled by a regularization parameter $\regparam$. The determination of an appropriate value of $\regparam$ involves additional mathematical methods. Thus for large scale problems it would be beneficial to reduce the computational cost of such methods. In this prospectus, Tikhonov regularization is considered for the solution of convolution-type integral equations in one and two dimensions. The unbiased predictive risk estimator method, the generalized cross validation method, and the discrepancy principle are the methods selected to determine regularization parameters. The generated data are downsampled and the efficacy of the resulting regularization parameters is evaluated. The discrete cosine and Fourier transforms are used during the implementation of the methods used to select the regularization parameters; these transforms also serve as possible means for analyzing the effects of downsampling. Lastly, a machine learning approach is considered that does not involve downsampling the data.
+Integral equations and their solutions have been studied since the development of integral calculus. A specific class of integral equations are the Fredholm equations of the first kind, where the desired solution is contained in the integrand. In a discrete setting, numerical quadrature can be utilized to approximate finite values of the integral equation. Methods such as the singular value decomposition can be used to find approximate discrete solutions. However, applications involving integral equations often result in data that are corrupted by additive noise inherent in the collecting physical measurements. During the inversion process, this noise can be amplified which results in solutions that are of severely poor quality. The intractability of this phenomenon can be mitigated using regularization, in which assumptions about desired solution properties are mathematically implemented during the inversion process. The influence of these properties are controlled by a regularization parameter $\regparam$. The determination of an appropriate value of $\regparam$ involves additional mathematical methods. Thus for large scale problems it would be beneficial to reduce the computational cost of such methods. In this prospectus, Tikhonov regularization is considered for the solution of convolution-type integral equations in one and two dimensions. The unbiased predictive risk estimator method, the generalized cross validation method, and the discrepancy principle are the methods selected to determine regularization parameters. The generated data are downsampled and the efficacy of the resulting regularization parameters is evaluated. The discrete cosine and Fourier transforms are used during the implementation of the methods used to select the regularization parameters; these transforms also serve as possible means for analyzing the effects of downsampling.
 \end{abstract} 
 
 \tableofcontents
 
-\chapter{Introduction} \label{sec:Introduction}
+\chapter{Introduction} \label{ch:Introduction}
 Given functions $g(x)$ and $k(x,t)$, the \textit{Fredholm equation of the first kind} is
 \begin{equation}
 g(x) = \int_a^b k(x,t)f(t)\:dt,
@@ -118,12 +118,15 @@ f(t) = \begin{cases}
 \end{equation}
 The kernel $k(x-t)$ is smooth and bounded on $[0,1]$, and the function $f(t)$ is 1-periodic and bounded. Plots of $f(t)$ and $k(t)$ are shown in Figure \ref{FunctionKernelPlot}. \par
 The kernel $k(t) = \exp(-200(t-\frac{1}{2})^2)$ is an example of a Gaussian kernel. The form of a Gaussian kernel comes from the probability density function of the Gaussian distribution,
-\[p(t) = \frac{1}{\sqrt{2\pi\noiseSD^2}}\exp\left(\frac{-(t-\mu)^2}{2\noiseSD^2}\right),\]
-where $\mu$ is the mean and $\noiseSD^2$ is the variance. The mean is the center of the Gaussian distribution, as well as the abscissa of the absolute maximum of the probability density function $p(t)$. The variance $\noiseSD^2$ is a measure of dispersion of the distribution; as $\noiseSD^2$ increases, the width of the graph of $p(t)$ increases. The standard deviation $\noiseSD$ is also a measure of dispersion. The scale factor $1/\sqrt{2\pi\noiseSD^2}$ ensures that $\int_{\mathbb{R}} p(t) \: dt = 1$, an essential property of a continuous probability distribution defined on the entire real line. For Gaussian kernels, however, this scale factor may be dropped since having a unitary integral is not required of kernels in general.  For the Gaussian kernel example $k(t) = \exp(-200(t-\frac{1}{2})^2)$, the mean is 1/2 and $-1/2\noiseSD^2 = -200$ implies that $\noiseSD = 1/20$. Figure \ref{GaussianDistributions} illustrates the relationship between variance and width of the Gaussian distribution. As a last remark, we use the kernel $k(x,t)$, function $f(t)$ \eqref{eq:Test Function 2}, and resulting function $g(x)$ repeatedly for the numerical examples.
+\begin{equation}
+p(t) = \frac{1}{\sqrt{2\pi\noiseSD^2}}\exp\left(\frac{-(t-\mu)^2}{2\noiseSD^2}\right),
+\label{eq:Gaussian kernel}
+\end{equation}
+where $\mu$ is the mean and $\noiseSD^2$ is the variance. The mean is the center of the Gaussian distribution, as well as the abscissa of the absolute maximum of the probability density function $p(t)$. The variance $\noiseSD^2$ is a measure of dispersion of the distribution; as $\noiseSD^2$ increases, the width of the graph of $p(t)$ increases. The standard deviation $\noiseSD$ is also a measure of dispersion. The scale factor $1/\sqrt{2\pi\noiseSD^2}$ ensures that $\int_{\mathbb{R}} p(t) \: dt = 1$, an essential property of a continuous probability distribution defined on the entire real line. For Gaussian kernels, however, this scale factor may be dropped since having a unitary integral is not required of kernels in general.  For the Gaussian kernel example $k(t) = \exp(-200(t-\frac{1}{2})^2)$, the mean is 1/2 and $-1/2\noiseSD^2 = -200$ implies that $\noiseSD = 1/20$. For the sake of convenience, the width parameter of a Gaussian kernel will refer to the value of $1/2\noiseSD^2$. Figure \ref{GaussianDistributions} illustrates the relationship between variance and width of the Gaussian distribution. As a last remark, we use the kernel $k(x,t)$, function $f(t)$ \eqref{eq:Test Function 2}, and resulting function $g(x)$ repeatedly for the numerical examples.
 
 \begin{figure}
 	\centerline{\includegraphics[scale=0.4]{Figures/FunctionKernelPlot.eps}}
-\caption{Left: The graphs of the piecewise-smooth function $f(t)$. Right: The Gaussian kernel $k(t)$.}
+\caption{Left: The graphs of the piecewise-smooth function $f(t)$ given by \eqref{eq:Test Function 2}. Center: The Gaussian kernel $k(t)$. Right: The function $g(x) = (f * g)(x)$. Notice that the corners of the graph of $f(t)$ have been smoothed over as a result of the convolution.}
 \label{FunctionKernelPlot}
 \end{figure}
 
@@ -140,7 +143,7 @@ g(x) = \int_{-\infty}^{\infty} k(x-t)f(t) ~dt = \int_{x-\beta_k}^{x-\alpha_k} k(
 \end{equation} 
 More rigorously, if $k(x-t)$ is compactly supported and $f(t)$ is locally integrable, then $g(x) = (k*f)(x)$ exists and is continuous. Existence follows directly from the condition of local integrability, which means that $\int_a^b f(t) ~dt$ exists for every $-\infty < a < b < \infty$; the space of locally integrable functions is a subspace of $L^1(\mathbb{R})$ \cite[p.~63]{DebnathMikusinski2005}. In real-world applications, data is finite and in the context of \eqref{eq:FIE}, this means that information about $g(x)$ is only known over a finite interval. Suppose information about $g(x)$ is only known over the interval $[\alpha_g,\beta_g]$. Then using \eqref{eq:FIE 2}, $g(\alpha_g)$ and $g(\beta_g)$ are given by
 \[g(\alpha_g) = \int_{\alpha_g-\beta_k}^{\alpha_g-\alpha_k} k(\alpha_g - t)f(t) ~dt, \quad g(\beta_g) = \int_{\beta_g - \beta_k}^{\beta_g - \alpha_k} k(\beta_g-t)f(t) ~dt.\]
-Without loss of generality, suppose $[\alpha_k,\beta_k] = [-\frac{1}{2},\frac{1}{2}]$ and $[\alpha_g,\beta_g] = [0,1]$. Then $\alpha_g-\beta_k = -\frac{1}{2}$ and $\beta_g - \alpha_k = \frac{3}{2}$, meaning that the support of $f(t)$ affecting the given data about $g(x)$ is $[-\frac{1}{2},\frac{3}{2}]$. In other words, if a solution $f(t)$ is only desired over the support of $g(x)$, then boundary conditions must be imposed on $f(t)$ so that the corresponding discrete system will not be underdetermined; this is addressed in Chapters \ref{sec:DCT} and \ref{sec:DFT}. \par 
+Without loss of generality, suppose $[\alpha_k,\beta_k] = [-\frac{1}{2},\frac{1}{2}]$ and $[\alpha_g,\beta_g] = [0,1]$. Then $\alpha_g-\beta_k = -\frac{1}{2}$ and $\beta_g - \alpha_k = \frac{3}{2}$, meaning that the support of $f(t)$ affecting the given data about $g(x)$ is $[-\frac{1}{2},\frac{3}{2}]$. In other words, if a solution $f(t)$ is only desired over the support of $g(x)$, then boundary conditions must be imposed on $f(t)$ so that the corresponding discrete system will not be underdetermined; this is addressed in Chapters \ref{ch:DCT} and \ref{ch:DFT}. \par 
 To find a solution to the forward problem, which is the evaluation of $g(x) = (k * f)(x)$, a quadrature method can be used to find a numerical approximation to the convolution integral. In the discrete setting, (1) can be stated as
 \begin{equation}
 \gVec = \kMat\fVec,
@@ -152,7 +155,7 @@ If a left Riemann sum is used with $t_k = k/n$ for $k \in \{0,1,\ldots,n-1\}$, r
 \[g(x_j) \approx \sum_{k=1}^n \frac{1}{n}\exp\left(\frac{-(x_j - t_k)^2}{2\noiseSD^2}\right)f(t_j).\]
 For approximations to $g(x)$ at the same points that make up the equispaced discretization of $[0,1]$, i.e. at the points $x_j = j/n$ for $j \in \{0,1,\ldots,n-1\}$, then \eqref{eq:Dis} is exactly the system that provides these approximations with $\fVec = [f(t_0),f(t_1),\ldots,f(t_{n-1})]$, $\gVec = [g(x_0),g(x_1),\ldots,g(x_{n-1})]$, and the elements of $\kMat$ being
 \[K_{j,k} = \frac{1}{n}\exp\left(\frac{-(j - k)^2}{2\noiseSD^2}\right), \quad 0 \leq j,k \leq n-1.\]
-Note that taking the collocation and quadrature points as the same ensures that the matrix $\kMat$ is square. Changing the number of collocation points, or the quadrature method, can change $\kMat$ from square to rectangular; see Chapter \ref{sec:Analytical tools}. \ToDo{make sure this is correct} \par
+Note that taking the collocation and quadrature points as the same ensures that the matrix $\kMat$ is square. Changing the number of collocation points, or the quadrature method, can change $\kMat$ from square to rectangular; see Section \ref{sec:Numerical results (DFT)}. \par
 If the matrix $\kMat$ is nonsingular, then the solution to the inverse problem \eqref{eq:Dis} is $\fVec = \kMat^{-1}\gVec$. As with many linear systems, however, direct matrix inversion is discouraged and usually impractical since the matrix $\kMat$ can become increasingly ill-conditioned as the size of the system grows \cite[p.~2]{Vogel:2002}. Unfortunately, large systems are often necessary to adequately approximate the continuous problem, and so other methods of solving for $\fVec$ must be considered. \par
 Before discussing the consequences of ill-conditioning, the concept of a well-posed problem will be introduced, which is due to Hadamard \cite{Hadamard1904}. Given an operator $A : \mathcal{H}_1 \rightarrow \mathcal{H}_2$, where $\mathcal{H}_1$ and $\mathcal{H}_1$ are Hilbert spaces, the equation $Af = g$ is said to be well-posed if
 \begin{enumerate}
@@ -168,14 +171,13 @@ A primary consequence of $\kMat$ being ill-conditioned relates to the accuracy o
 \end{equation}
 where $\noiseVec$ is a vector that represents any errors in $\gVec$ (this is equivalent to the statement $\gnoiseVec = \gVec + \noiseVec$). For further simplicity, assume that $\noiseVec \sim \mathcal{N}(\bm{0},\noiseSD^2I)$, where $\bm{0}$ is the zero vector of length $n$ and $I$ is the $n \times n$ identity matrix. In other words, the error vector $\noiseVec$ is a realization of an $n$-dimension Gaussian random variable with mean zero and variance $\noiseSD^2$. 
 
-\section{Main contributions and overview of the remaining chapters}
-The contributions of this research are twofold. First, the regularization parameter estimation functions pertaining to the unbiased predictive risk estimator, the generalized cross validation method, and the discrepancy principle are formulated from the perspective of the discrete Fourier and cosine transform. In other words, the functions use the discrete Fourier and cosine transform components as opposed to singular values. Second, the effects of downsampling on parameter estimation are evaluated both qualitatively and quantitatively. The qualitative characteristics of these effects can be analyzed by using empirical statistics obtained from numerical examples in conjunction with multiple realizations of noise (see Chapter \ref{sec:Numerical examples}). The quantitative characteristics are currently incomplete and are one of the goals of future research.  As a final remark, a machine learning approach to the unbiased predictive risk estimator method is explored and shows some promise with regard to improvement of parameter estimation. \par
-Chapter \ref{sec:Analytical tools} will present tools and ideas that are commonly used for the solution of inverse problems. Two primary tools, the discrete  Fourier and cosine transforms, are discussed in Chapters \ref{sec:DFT} and \ref{sec:DCT}, respectively. These transforms have direct connections to the ideas presented in Chapter \ref{sec:Analytical tools}. \par 
-Since the assumed model problem \eqref{eq:DisNoise} contains random noise, a discussion of statistical results is included in Chapter \ref{sec:Stats.}. The statistical results pertain not only to the nature of the noise under various transformations but also serve as a motivation for the parameter estimation methods contained in Chapter \ref{sec:Parameter estimation methods}. In addition to introducing the parameter estimation methods, Chapter \ref{sec:Parameter estimation methods} also presents new formulations of the parameter estimation functions which are based on the DCT. Chapter \ref{ch:2D problems} presents a possible machine learning approach to improving estimation by the unbiased predictive risk estimator method. This approach relies on the assumption that multiple data sets are available.  \par 
-Moving from theoretical to experimental results, Chapter \ref{sec:Numerical examples} discusses the numerical examples that are used to demonstrate the effects of downsampling on parameter estimation. In particular, the downsampling process is described in a rigorous manner that is tied in with the design of the numerical examples. The results of the numerical examples are presented in Chapter \ref{sec:Numerical examples} \ToDo{fix the chapter references}. \par 
-Lastly, some conclusions and observations are made in Chapter \ref{sec:Conclusion}. The observations are used to motivate the goals of future work, which include consideration of three-dimensional numerical examples and quantitative descriptions of the effects of downsampling.
+\section{Main contributions and overview}
+The contributions of this research are twofold. First, the regularization parameter estimation functions pertaining to the unbiased predictive risk estimator, the generalized cross validation method, and the discrepancy principle are formulated from the perspective of the discrete Fourier and cosine transform. In other words, the functions use the discrete Fourier and cosine transform components as opposed to singular values. Second, the effects of downsampling on parameter estimation are evaluated both qualitatively and quantitatively. The qualitative characteristics of these effects can be analyzed by using empirical statistics obtained from numerical examples in conjunction with multiple realizations of noise (see Section \ref{sec:Downsampling and white noise}). The quantitative characteristics are currently incomplete and are one of the goals of future research. \par
+Chapter \ref{ch:Analytical tools} will present tools and ideas that are commonly used for the solution of inverse problems. Two primary tools, the discrete  Fourier and cosine transforms, are discussed in Section \ref{sec:Discrete trig. transforms}. The numerical examples considered in conjunction with these transforms are explained in Chapters \ref{ch:DFT} and \ref{ch:DFT}. \par 
+Since the assumed model problem \eqref{eq:DisNoise} contains random noise, a discussion of statistical results is included in Chapter \ref{ch:Stats}. The statistical results pertain not only to the nature of the noise under various transformations but also serve as a motivation for the parameter estimation methods contained in Chapter \ref{ch:Parameter estimation methods}. In addition to introducing the parameter estimation methods, Chapter \ref{ch:Parameter estimation methods} also presents new formulations of the parameter estimation functions which are based on the DFT and DCT. Versions of the the parameter estimation functions which assume the availability multiple data sets are available are also provided.  \par  
+A two-dimension problem is considered in Chapter \ref{ch:2D problems}, which presents some of the interesting extensions of the one-dimensional concepts. Lastly, some conclusions and observations are made in Chapter \ref{ch:Conclusion}. The observations are used to motivate the goals of future work, which include consideration of three-dimensional numerical examples and quantitative descriptions of the effects of downsampling.
 
-\chapter{Analytical tools} \label{sec:Analytical tools}
+\chapter{Analytical tools} \label{ch:Analytical tools}
 
 A number of analytic tools will be utilized. The singular value decomposition and the numerical difficulties of direct inversion are covered in Section \ref{sec:SVD}; these numerical difficulties will motivate the need for regularization. Section \ref{sec:Tikhonov reg.} introduces Tikhonov regularization, as well as a discussion regarding the forms in which Tikhonov regularization can be stated.  To conclude the chapter, Section \ref{sec:Classes of matrices} presents some of the properties of a number of classes of matrices that will be used in later chapters.
 
@@ -193,7 +195,7 @@ By using $\kMat^{-1} = V\Sigma^{-1}U^\trans$ when $\kMat$ is nonsingular, the pr
 \kMat^{-1}\gnoiseVec = \kMat^{-1}\left(\kMat\fVec + \noiseVec\right) = \fVec + \kMat^{-1}\noiseVec = \fVec + V\Sigma^{-1}{U^\trans}\noiseVec = \fVec + \sum_{\ell = 0}^{n-1} \frac{{U^\trans_\ell}\noiseVec}{\singular_\ell}V_{\cdot,\ell}. 
 \label{eq:InvProd}
 \end{equation}
-Even if $\kMat$ is singular, a solution can still be obtained by using the pseudoinverse $\kMat^\dagger = V{\Sigma^\dagger}U^\trans$, where $\Sigma^\dagger = \diag(1/\singular_0,\ldots,1/\singular_{r-1})$, and the upper bound of summation in \eqref{eq:InvProd} becomes $r-1$. In either the nonsingular or singular case for $\kMat$, however, the summands in \eqref{eq:InvProd} are numerically unstable for small $\singular_\ell$. For a visual representation of this instability, a Picard plot can be constructed. A Picard plot is a graph showing the terms $|U^\trans_{\cdot,\ell}\noiseVec|/\singular_\ell$ in decreasing order with respect to the singular values. If the terms $|U^\trans_{\cdot,\ell}\noiseVec|$ decay faster than $\singular_\ell$ as $\ell$ increases, then the terms $|U^\trans_{\cdot,\ell}\noiseVec|/\singular_\ell$ do not become excessively large; this is the discrete Picard condition \cite{ABT}. The discrete Picard condition is thus a measure of instability. If the discrete Picard condition is not met, then the terms $|U^\trans_{\cdot,\ell}\noiseVec|/\singular_\ell$ blow up as $\ell$ increases, often resulting in worthless solutions. In this report, the discrete Fourier and cosine transforms will be used to obtain solutions analogous to those obtained by \eqref{eq:InvProd}. Figure \ref{PicardPlot} in Chapter \ref{sec:DFT} is an example of a Picard plot is provided that demonstrates the relationship between the noise, the width of the Gaussian blur, and the resulting numerical instabilities related to obtaining meaningful solutions. See \cite{Hansen1990} for more information on Picard plots and the associated discrete Picard condition. \par 
+Even if $\kMat$ is singular, a solution can still be obtained by using the pseudoinverse $\kMat^\dagger = V{\Sigma^\dagger}U^\trans$, where $\Sigma^\dagger = \diag(1/\singular_0,\ldots,1/\singular_{r-1})$, and the upper bound of summation in \eqref{eq:InvProd} becomes $r-1$. In either the nonsingular or singular case for $\kMat$, however, the summands in \eqref{eq:InvProd} are numerically unstable for small $\singular_\ell$. For a visual representation of this instability, a Picard plot can be constructed. A Picard plot is a graph showing the terms $|U^\trans_{\cdot,\ell}\noiseVec|/\singular_\ell$ in decreasing order with respect to the singular values. If the terms $|U^\trans_{\cdot,\ell}\noiseVec|$ decay faster than $\singular_\ell$ as $\ell$ increases, then the terms $|U^\trans_{\cdot,\ell}\noiseVec|/\singular_\ell$ do not become excessively large; this is the discrete Picard condition \cite{ABT}. The discrete Picard condition is thus a measure of instability. If the discrete Picard condition is not met, then the terms $|U^\trans_{\cdot,\ell}\noiseVec|/\singular_\ell$ blow up as $\ell$ increases, often resulting in worthless solutions. In this report, the discrete Fourier and cosine transforms will be used to obtain solutions analogous to those obtained by \eqref{eq:InvProd}. Figure \ref{PicardPlot} in Chapter \ref{ch:DFT} is an example of a Picard plot is provided that demonstrates the relationship between the noise, the width of the Gaussian blur, and the resulting numerical instabilities related to obtaining meaningful solutions. See \cite{Hansen1990} for more information on Picard plots and the associated discrete Picard condition. \par 
 A common approach to overcome numerical instabilities is to multiply the summands in \eqref{eq:InvProd} by \textit{filter functions} $\filt$ that depend upon $\singular_\ell$ and a non-negative \textit{regularization parameter} $\regparam$. By doing so, an approximate solution is obtained:
 \begin{equation}
 \fVec_\regparam = \sum_{\ell = 0}^{n-1} V_{\cdot,\ell}\filt(\regparam,\singular_\ell)\left(\frac{{U^\trans_\ell}\gnoiseVec}{\singular_\ell}\right) = V\Phi\Sigma^\dagger U^\trans\gnoiseVec,
@@ -215,7 +217,7 @@ A less simple filter function is
 \filt(\regparam,\singular_\ell)  = \frac{\singular_\ell^2}{\singular_\ell^2 + \regparam^2}
 \label{eq:TikFilt}
 \end{equation}
-which is known as the Tikhonov filter function. For large values of $\regparam$, \eqref{eq:TikFilt} is close to zero and for small values of $\regparam$ (and nonzero values of $\singular_\ell$), it is close to one. Another property of \eqref{eq:TikFilt} is that for fixed nonzero $\singular_\ell$, it is monotone decreasing in $\regparam$. Since the expression $1 - \filt(\regparam,\singular_\ell)$ arises a number of times in the methods introduced in Chapter \ref{sec:Parameter estimation methods}, let
+which is known as the Tikhonov filter function. For large values of $\regparam$, \eqref{eq:TikFilt} is close to zero and for small values of $\regparam$ (and nonzero values of $\singular_\ell$), it is close to one. Another property of \eqref{eq:TikFilt} is that for fixed nonzero $\singular_\ell$, it is monotone decreasing in $\regparam$. Since the expression $1 - \filt(\regparam,\singular_\ell)$ arises a number of times in the methods introduced in Chapter \ref{ch:Parameter estimation methods}, let
 \begin{equation}
 \mfilt(\regparam,\singular_\ell) = 1 - \filt(\regparam,\singular_\ell) = \frac{\regparam^2}{\singular_\ell^2 + \regparam^2}.
 \label{eq:TikFiltPsi}
@@ -294,23 +296,24 @@ M^{-1} \\
 \mathbf{0}
 \end{bmatrix}V^\trans, \quad \fVec_0 = \sum_{\ell=m+1}^{n} U_{\cdot,\ell}^\trans\gnoiseVec X_{\cdot,\ell}
 \end{equation}
-where $\bm{0}$ is the zero matrix of appropriate dimension. The form of the regularized solution can now be expressed as \eqref{eq:TikSol Standard Form} with substitutions $\mathbf{y} = D\fVec$, $A = \kMat{D_{\kMat}^\dagger}$, and $\mathbf{b} = \gnoiseVec - \kMat\fVec_0$. This is shown by writing
-\begin{align*}
-\|A\mathbf{y} - \mathbf{b}\|^2 + \regparam^2\|\mathbf{y}\|^2 &= \|\kMat{D_{\kMat}^\dagger}D\fVec - (\gnoiseVec - \kMat\fVec_0)\|^2 + \regparam^2\|D\fVec\|^2 \\
-&=  \|\kMat({D_{\kMat}^\dagger}D\fVec + \fVec_0) - \gnoiseVec\|^2 + \regparam^2\|D\fVec\|^2
-\end{align*}
-as well as 
-\ToDo{
-\begin{align*}
-{D_{\kMat}^\dagger}D\fVec + \fVec_0 &= \left(I - \left(\kMat\left(I - D^\dagger D\right)\right)^\dagger \kMat\right)D^\dagger D\fVec + \left(\kMat\left(I - D^\dagger D\right)\right)^\dagger \gnoiseVec \\
-&= D^\dagger D\fVec - \left(\kMat\left(I - D^\dagger D\right)\right)^\dagger \kMat D^\dagger D\fVec + \left(\kMat\left(I - D^\dagger D\right)\right)^\dagger \gnoiseVec \\ 
-&= D^\dagger D\fVec + \left(\kMat\left(I - D^\dagger D\right)\right)^\dagger \left[\gnoiseVec - \kMat D^\dagger D\fVec\right] \\
-&= 
-\end{align*}}
+where $\bm{0}$ is the zero matrix of appropriate dimension. The form of the regularized solution can be expressed as \eqref{eq:TikSol Standard Form} with substitutions $\mathbf{y} = D\fVec$, $A = \kMat{D_{\kMat}^\dagger}$, and $\mathbf{b} = \gnoiseVec - \kMat\fVec_0$. 
+%This is shown by writing
+%\begin{align*}
+%\|A\mathbf{y} - \mathbf{b}\|^2 + \regparam^2\|\mathbf{y}\|^2 &= \|\kMat{D_{\kMat}^\dagger}D\fVec - (\gnoiseVec - \kMat\fVec_0)\|^2 + \regparam^2\|D\fVec\|^2 \\
+%&=  \|\kMat({D_{\kMat}^\dagger}D\fVec + \fVec_0) - \gnoiseVec\|^2 + \regparam^2\|D\fVec\|^2
+%\end{align*}
+%as well as 
+%\ToDo{
+%\begin{align*}
+%{D_{\kMat}^\dagger}D\fVec + \fVec_0 &= \left(I - \left(\kMat\left(I - D^\dagger D\right)\right)^\dagger \kMat\right)D^\dagger D\fVec + \left(\kMat\left(I - D^\dagger D\right)\right)^\dagger \gnoiseVec \\
+%&= D^\dagger D\fVec - \left(\kMat\left(I - D^\dagger D\right)\right)^\dagger \kMat D^\dagger D\fVec + \left(\kMat\left(I - D^\dagger D\right)\right)^\dagger \gnoiseVec \\ 
+%&= D^\dagger D\fVec + \left(\kMat\left(I - D^\dagger D\right)\right)^\dagger \left[\gnoiseVec - \kMat D^\dagger D\fVec\right] \\
+%&= 
+%\end{align*}}
 The final solution is then recovered by $\fVec = D_{\kMat}^\dagger \mathbf{y} + \fVec_0$. 
 
 %\section{Discrete convolution} \label{sec:Discrete convolution}
-%As described in the Chapter \ref{sec:Introduction}, the operation of convolution arises in various settings pertaining to inverse problems. Discrete convolution will first be described  in a general setting, followed by specific instances and connections to appropriate numerical examples. \par
+%As described in the Chapter \ref{ch:Introduction}, the operation of convolution arises in various settings pertaining to inverse problems. Discrete convolution will first be described  in a general setting, followed by specific instances and connections to appropriate numerical examples. \par
 %Let $(x_n)$ and $(y_n)$ be sequences of complex numbers indexed by the integers. Then the discrete convolution of $(x_n)$ and $(y_n)$, denoted $x*y$, is defined by
 %\[(x*y)_n = \sum_{\ell=-\infty}^\infty x_{n-\ell}y_\ell.\]
 %The series in the definition of discrete convolution is bi-infinite, meaning that the discrete convolution might not be well-defined for any two arbitrary sequences. For example, if $x_n = y_n = 1$ for all $n \in \mathbb{Z}$, then the series defining $(x*y)_n$ is $\sum_{j=-\infty}^\infty 1$, which does not converge. In various cases, however, the discrete convolution is well-defined. These cases include sequences having only finitely-many nonzero terms and sequences in $\ell^1$. (In fact, the set of sequences having finitely-many nonzero terms is a linear subspace of $\ell^1$).  \par 
@@ -338,7 +341,7 @@ B = \begin{bmatrix}
 1 & 7 & 4
 \end{bmatrix}.\]
 By definition, Toeplitz matrices need not be square. However if a Toeplitz matrix is square with dimension $n \times n$, then it is uniquely determined by $2n-1$ entries. If a Toeplitz matrix is symmetric, then it is determined by $n$ entries. \par
-Some notation for symmetric Toeplitz matrices will be introduced that will be used in Chapter \ref{sec:DCT}. Given a column vector $\mathbf{v}$ of length $n$, let $T(\mathbf{v})$ denote the $n \times n$ symmetric Toeplitz matrix with $\mathbf{v}$ as its first column. As example, the matrix $T(\mathbf{v})$ where $\mathbf{v} = [1,2,3,4]^\trans$ is
+Some notation for symmetric Toeplitz matrices will be introduced that will be used in Chapter \ref{ch:DCT}. Given a column vector $\mathbf{v}$ of length $n$, let $T(\mathbf{v})$ denote the $n \times n$ symmetric Toeplitz matrix with $\mathbf{v}$ as its first column. As example, the matrix $T(\mathbf{v})$ where $\mathbf{v} = [1,2,3,4]^\trans$ is
 \[T(\mathbf{v}) = \begin{bmatrix}
 1 & 2 & 3 & 4 \\
 2 & 1 & 2 & 3 \\
@@ -392,14 +395,219 @@ is a circulant matrix generated by circular right shifts of the vector $[1,2,3,4
 \label{eq:Circulant indexing}
 C_{j,k} = c_{k-j \bmod n}
 \end{equation}
-for all $0 \leq j,k \leq n-1$. A significant property of square circulant matrices discussed in Chapter \ref{sec:DFT} is that they are diagonalized by the discrete Fourier transform; \eqref{eq:Circulant indexing} can be used to prove this property.
+for all $0 \leq j,k \leq n-1$. A significant property of square circulant matrices discussed in Chapter \ref{ch:DFT} is that they are diagonalized by the discrete Fourier transform; \eqref{eq:Circulant indexing} can be used to prove this property.
 
 \section{Discrete trigonometric transforms} \label{sec:Discrete trig. transforms}
-\ToDo{Introduce transforms here}
 
-\chapter{Statistical considerations} \label{sec:Stats.}
+The discrete Fourier transform will be introduced from the perspective of approximating coefficients of the Fourier series of a $2\pi$-periodic function $f$ \cite[p.~132-134]{BoggessNarcowich2009}. On the interval $[0,2\pi]$, the $j$th complex Fourier coefficient of $f(t)$ is given by
+\[c_j = \frac{1}{2\pi}\int_0^{2\pi} f(t)\exp(-ijt)\:dt,\]
+where $i = \sqrt{-1}$.  Applying the trapezoidal rule for approximating this integral with $n$ points then produces
+\[c_j \approx \frac{1}{n}\sum_{\ell = 0}^{n-1} f\left(\frac{2\pi{\ell}}{n}\right)\exp\left(\frac{-2\pi{ij\ell}}{n}\right).\]
+The \textit{discrete Fourier transform} (DFT) is a mapping $\mathcal{F}:\mathbb{C}^n \rightarrow \mathbb{C}^n$ defined by
+\begin{equation}
+\mathcal{F}(\mathbf{f})_j = \frac{1}{\sqrt{n}}\sum_{\ell=0}^{n-1} f_{\ell}\exp\left(\frac{-2\pi{ij\ell}}{n}\right), \quad \mathbf{f}\in\mathbb{C}^n, \quad 0 \leq k \leq n-1.
+\label{eq:DFT}
+\end{equation}
+The DFT of a vector $\mathbf{f}$ will be denoted by $\widehat{\mathbf{f}}$. The inverse DFT of a vector $\widehat{\mathbf{f}}$ is given by
+\begin{equation}
+\mathcal{F}^{-1}(\widehat{\mathbf{f}})_j = \frac{1}{\sqrt{n}}\sum_{\ell=0}^{n-1} \widehat{f}_\ell\exp\left(\frac{2\pi{ij\ell}}{n}\right) = f_j.
+\end{equation}
+These definitions are nonstandard; typically the factors $1/\sqrt{n}$ in both the forward and inverse DFT definitions are combined as a single factor of $1/n$ in the definition of the forward DFT. The DFT can also be stated in terms of matrix-vector multiplication. Given an $\mathbf{f} \in \mathbb{C}^n$, $\widehat{\mathbf{f}}$ can be expressed as $F\mathbf{f}$ where the matrix $F\in\mathbb{C}^{n\times{n}}$ has components
+\begin{equation}
+F_{j,k} = \frac{1}{\sqrt{n}}\exp\left(\frac{-2\pi{ijk}}{n}\right), \quad 0 \leq j,k \leq n-1.
+\label{eq:DFT-Matrix}
+\end{equation}
+The matrix representing the inverse DFT is then $F^\ctrans$, where $\ctrans$ denotes conjugate transposition. A property of $F$ is that $F^\ctrans F = FF^\ctrans = (1/n)\diag(n) = I$, and so splitting the factor of $1/n$ as $(1/\sqrt{n})(1/\sqrt{n})$ for the definition of the DFT provides the benefit of $F$ being a unitary matrix. A direct consequence of the DFT being unitary is Parseval's theorem: $\|\mathbf{f}\| = \|F\mathbf{f}\|$ for any $\mathbf{f} \in \mathbb{C}^n$. Parseval's theorem follows directly from \eqref{eq:DFT} because
+\begin{align*}
+\|F\mathbf{f}\|^2 &= \sum_{\ell=0}^{n-1} |\mathcal{F}(\mathbf{f})_\ell |^2 \\
+&= \sum_{\ell=0}^{n-1} \left(\frac{1}{\sqrt{n}}\sum_{j=0}^{n-1} f_{j}\exp\left(\frac{-2\pi{ij\ell}}{n}\right)\right)\overline{\left(\frac{1}{\sqrt{n}}\sum_{j'=0}^{n-1} f_{j'}\exp\left(\frac{-2\pi{ij'\ell}}{n}\right)\right)} \\
+&= \frac{1}{n} \sum_{\ell=0}^{n-1} \left(\sum_{j=0}^{n-1} f_{j}\exp\left(\frac{-2\pi{ij\ell}}{n}\right)\right) \left(\sum_{j'=0}^{n-1} \overline{f_{j'}}\exp\left(\frac{2\pi{ij'\ell}}{n}\right)\right) \\
+&= \frac{1}{n} \sum_{\ell=0}^{n-1} \left(\sum_{j=0}^{n-1} f_{j} \sum_{j'=0}^{n-1} \overline{f_{j'}} \exp\left(\frac{2\pi{i(j'-j)\ell}}{n}\right)\right) \\
+&= \frac{1}{n} \sum_{j=0}^{n-1} f_j \sum_{j'=0}^{n-1} \overline{f_{j'}} \sum_{\ell=0}^{n-1} \exp\left(\frac{2\pi{i(j'-j)\ell}}{n}\right).
+\end{align*}
+Since the innermost sum is geometric,
+\[\sum_{\ell=0}^{n-1} \exp\left(\frac{2\pi{i(j'-j)\ell}}{n}\right) = \begin{cases}
+\frac{\exp(2\pi{i}(j-j')) - 1}{\exp(2\pi{i}(j-j')/n) - 1} = 0, & j \neq j' \\
+n, & j = j'
+\end{cases}.\]
+Therefore
+\[\|F\mathbf{f}\|^2 = \frac{1}{n} \sum_{j=0}^{n-1} f_j \sum_{j'=0}^{n-1} \overline{f_{j'}} \sum_{\ell=0}^{n-1} \exp\left(\frac{2\pi{i(j'-j)\ell}}{n}\right) = \sum_{j=0}^{n-1} f_j\overline{f_j} = \|\mathbf{f}\|^2,\]
+which proves Parseval's theorem. \par
+As stated previously, a significant property of circulant matrices is that they are diagonalized by the DFT. Using the definition of the $n \times n$ unitary Fourier matrix $F$, the property can be stated as
+\begin{equation}
+C = F^\ctrans\diag(\sqrt{n}\widehat{\mathbf{c}})F,
+\label{eq:CircDiag}
+\end{equation}
+where $C$ is any $n \times n$ circulant matrix and $\widehat{\mathbf{c}}$ is the DFT of the first row of $C$ (recall that the rows of a circulant matrix are circulant right shifts of a single row vector of length $n$). This property can be shown directly by showing that $C_{j,k} = (F^\ctrans\diag(\widehat{\mathbf{c}})F)_{j,k}$ for any $0 \leq j,k \leq n-1$. Using the definition of the DFT and \eqref{eq:Circulant indexing}, the component of $F^\ctrans\diag(\sqrt{n}\widehat{\mathbf{c}})F$ in $j$th row and $k$th column is given by
+\begin{align*}
+\sum_{\ell=0}^{n-1} \left[\frac{1}{\sqrt{n}}  \exp\left(\frac{2\pi{i}k\ell}{n}\right)\right] \left[\sqrt{n}\widehat{c}_\ell\right] \left[\frac{1}{\sqrt{n}} \exp\left(\frac{-2\pi{i}j\ell}{n}\right)\right] &= \frac{1}{\sqrt{n}} \sum_{\ell=0}^{n-1} \widehat{c}_\ell \exp\left(\frac{2\pi{i}(k-j)\ell}{n}\right) \\
+&= c_{k-j \bmod n} \\
+&= C_{j,k}.
+\end{align*}
+It should be noted that by defining the DFT with the factor of $1/n$ as part of the inverse transformation (while keeping the factor split as $(1/\sqrt{n})(1/\sqrt{n})$ in the matrix form) would allow the property to be stated simply as $C = F^\ctrans\diag(\widehat{\mathbf{c}})F$. \par 
+Now the properties of the DFT will be connected with the SVD of a circulant matrix, which will be the basis for the design of the numerical examples in \ref{sec:Numerical results (DFT)}. Let $\fVec$ and $\kVec$ be the $N$-point discretizations of functions $f$ and $k$ on some interval $[a,b]$. Then the cyclic convolution $\gVec = \kVec * \fVec$ can be computed as a matrix-vector product by constructing an $N \times N$ circulant matrix $\kMat$ from $\kVec$. This construction is carried out by setting the first row of $\kMat$ to be $\kVec$, and each subsequent row to be a circular right shift of the preceding row (see \ref{sec:Classes of matrices}). In MATLAB, the command \texttt{toeplitz([k(1) fliplr(k(2:end))], k)} constructs the matrix $\kMat$. Then $\gVec = \kMat\fVec$, and after the addition of noise the equation \eqref{eq:DisNoise} is obtained. Then by using the property \eqref{eq:CircDiag} with the $N \times N$ unitary Fourier matrix $F$ and assuming that $\kMat$ is invertible, 
+\begin{equation}
+\kMat^{-1}\gnoiseVec = \fVec + (F^\ctrans\diag(\widehat{\kVec})F)^{-1}\noiseVec = \fVec + F^\ctrans\diag(\widehat{\kVec})^{-1}F\noiseVec = \fVec + \sum_{\ell = 0}^{n-1} F^\ctrans_{\ell,\cdot}\left(\frac{\widehat{\noise}_\ell}{\widehat{k}_\ell}\right),
+\label{eq:InvProdDFT}
+\end{equation}
+where $\widehat{\noise}_\ell$ and $\widehat{k}_\ell$ are the $\ell$th Fourier coefficients of $\noiseVec$ and $\kVec$, respectively, and $F^\ctrans_{\ell,\cdot}$ is the conjugate transpose of the $\ell$th row of $F$ (i.e. the $\ell$th column of the matrix $F^\ctrans$). Analogous to \eqref{eq:InvProd}, instabilities can arise if $\widehat{k}_\ell$ is small. By introducing filter factors to reduce possible instability, an approximate solution
+\begin{equation}
+\fVec_\regparam = \sum_{\ell = 0}^{n-1} F^\ctrans_{\ell,\cdot}\left(\frac{\filt(\regparam,\widehat{k}_\ell)\widehat{\gnoise}_\ell}{\widehat{k}_\ell}\right) = F^\ctrans\Phi\widehat{\kMat}^\dagger F\gnoiseVec
+\label{eq:ApproxSolDFT}
+\end{equation}
+can be obtained analogous to \eqref{eq:ApproxSol}, where $\widehat{\kMat}^\dagger = \diag(1/\widehat{\kVec})$.
+Since $F^\ctrans$ is a matrix representation of the inverse DFT, the approximate solution can be rewritten as
+\[\fVec_\regparam = F^\ctrans \frac{\filt(\regparam,\widehat{\kVec})\widehat{\gnoiseVec}}{\widehat{\kVec}}.\]
+Here $\filt(\regparam,\widehat{\kVec})\widehat{\gnoiseVec}/{\widehat{\kVec}}$ is a vector where the operations of multiplication and division are performed component-wise. This representation is useful for making a connection with the MATLAB implementation. \par
+As mentioned in Chapter \ref{ch:Introduction}, a Picard plot is often useful in analyzing the numerical instabilities of solutions obtained from either or \eqref{eq:InvProd} or \eqref{eq:InvProdDFT}. Figure \ref{PicardPlot} shows an example of a Picard plot. The terms $|\widehat{k}_\ell|$ decrease down to machine precision, though the $|\widehat{\gnoise}_\ell|$ decrease but then level off just above the variance in the noise. As a result, the terms $|\widehat{\gnoise}_\ell|/|\widehat{k}_\ell|$ only decrease so far and then begin increasing. The steady increase can produce a blow up of the approximate solution. While illustrating these relationships, a Picard plot is also useful in determining how to truncate the sum in \eqref{eq:ApproxSolDFT} to avoid blow up in the solution. For the plot in Figure \ref{PicardPlot}, the sum in \eqref{eq:ApproxSolDFT} should be truncated around index 8 to obtain a meaningful solution. \par 
 
-Since the parameter estimation methods in Chapter \ref{sec:Parameter estimation methods} involve DFT's of the vector $\gnoiseVec = \gVec + \noiseVec$, some results regarding the distribution of the components of $\widehat{\noiseVec}$ will be presented. The first results will be in regard to the real and imaginary parts of the $\widehat{\noiseVec}$. Letting $A$ and $B$ be the real and imaginary parts, respectively, of the $n \times n$ DFT matrix, Euler's identity gives
+\begin{figure}[htb]
+	\centerline{\includegraphics[scale = 0.45]{Figures/PicardPlot1D_F2_S15_W200.eps}}
+\caption{(Left) A Picard plot generated from the second test function, a Gaussian blur with a width of 200, and an SNR of 15. The terms $|\widehat{\gnoise}_\ell|/|\widehat{k}_\ell|$ decrease until index 8, at which case the terms increase in magnitude. This is due to the fact that the $|\widehat{k}_\ell|$ steadily decrease, while the $|\widehat{\gnoise}_\ell|$ level off just below the variance in the noise. (Right) A zoom-in of the Picard plot is provided, showing that elements of the DFT of $\gnoiseVec$ decay only slightly below the variance of the noise in $\gnoiseVec$.}
+\label{PicardPlot}
+\end{figure}
+
+While the connection between lines \eqref{eq:InvProdDFT} and \eqref{eq:ApproxSolDFT} and the SVD have been noted in regard to the structure of the terms and equations, a complete connection can be made if another property about $\kMat$ is assumed. Until this point $\kMat$ is assumed to be an invertible $N \times N$ circulant matrix formed from a vector $\kVec$. If $\kMat$ is also assumed to be symmetric, then the SVD of $\kMat$ is the same as the diagonalization by the unitary DFT matrix $F$ and the singular values of $\kMat$ are also the eigenvalues. \par 
+Analogous to the DFT, the discrete cosine transform (DCT) can be introduced from the perspective of approximating the coefficients of a cosine series. Given a function $f(t)$ defined on the interval $[0,1]$, consider the even extension of $f_e(t)$ defined by
+\[f_e(t) = \begin{cases}
+f(t), & 0 \leq t \leq 1 \\
+f(-t), & -1 \leq t < 0
+\end{cases}.\]
+From \cite[p.~49]{BoggessNarcowich2009}, the Fourier series expansion of $f_e(t)$ will only contain cosine terms and the coefficients of these terms are
+\begin{align*}
+a_0 &= \int_0^1 f(t)~dt, \\
+a_j &= 2\int_0^1 f(t) \cos(j\pi{t})~dt, \quad j \leq 1.
+\end{align*}
+Approximating the integral for $a_j$ with $j \geq 1$ using the midpoint rule with $N$ subintervals of $[0,1]$ gives
+\[a_j \approx \frac{2}{N}\sum_{k=0}^{N-1} f\left(\frac{1}{N}\left(k+\frac{1}{2}\right)\right)\cos\left(\frac{j\pi}{N}\left(k+\frac{1}{2}\right)\right).\]
+Adjusting the scale factor and rewriting the argument of cosine yields the discrete transform. Given an $N$-vector $\mathbf{x}$ of real numbers, the discrete cosine transform (DCT) of $\mathbf{x}$, denoted $\dct{x}$, is defined as
+\begin{equation}
+\label{eq:DCT definition}
+\dct{x}_j = \sqrt{\frac{2 - \delta_{j,0}}{N}} \sum_{k=0}^{N-1} x_k\cos\left(\frac{j\pi(2k + 1)}{2N}\right).
+\end{equation}
+Here $\delta_{j,0}$ is the Kronecker delta function, which in \eqref{eq:DCT definition} has the effect of introducing a factor of $1/\sqrt{N}$ in the zeroth component of $\dct{x}$ instead of $\sqrt{2}/\sqrt{N}$. The DCT matrix, denoted by $C$, has entries
+\begin{equation}
+\label{eq:DCT matrix}
+C_{j,k} = \sqrt{\frac{2 - \delta_{j,0}}{N}} \cos\left(\frac{\pi{j}(2k + 1)}{2N}\right).
+\end{equation}
+By switching $j$ and $k$, it is clear that $C$ is not symmetric. However, $C$ is orthogonal which is analogous to the DFT matrix being unitary. Fortunately, many of the statistical results in Section \ref{ch:DCT of white noise} demonstrate that the statistics of the DCT of white noise are simpler that those of the DFT. Another benefit of the DCT is that the implied even boundary conditions ensure continuity at the endpoints in the continuous setting. \par
+To fully describe the set of matrices diagonalized by the DCT, let the shift operator $\shift: \mathbb{R}^n \rightarrow \mathbb{R}^n$ be defined as
+\[\shift(\mathbf{v}) = [v_1,v_2,\ldots,v_{n-1},0]^\trans, \quad \mathbf{v} = [v_0,v_1,\ldots,v_{n-1}]^\trans \in \mathbb{R}^n.\] 
+The class of matrices diagonalization by the DCT can now be described.
+\begin{theorem}[{{\cite{ChanChanWong,KailathOlshevsky1996,Martucci1994,Sanchez_et_al}}}]
+\label{thm:DCT Diagonalization}
+Let $\mathcal{C}$ be the class of matrices that can be diagonalized by the DCT matrix $C$. Then
+\[\mathcal{C} = \{T(\mathbf{v}) + H\left(\shift(\mathbf{v})\right) ~|~ \mathbf{v} \in \mathbb{R}^n\}.\]
+\end{theorem}
+The diagonalization properties of the DCT in relation to Neumann boundary conditions can now be described.
+\begin{theorem}
+\label{thm:Neumann Diagonalization}
+Let the kernel sequence \eqref{eq:Kernel seq.} satisfy $k_j = k_{-j}$ for all $j \in \mathbb{Z}$. Then the matrix $K$ in \eqref{eq:Neumann Kf = g} can be expressed as
+\[K = T(\mathbf{u}) + H\left(\shift(\mathbf{u})\right),\]
+where $\mathbf{u} = [k_0,k_1,\ldots,k_{m-1},0,\ldots,0]^\trans$. In other words, $K$ can be diagonalized by the DCT.
+\end{theorem}
+\begin{proof}
+Equation \eqref{eq:Neumann Kf = g} gives $K = [(0~|~T_{l})J + T + (T_{r}~|~0)J]$. Then $T = T(\mathbf{u})$ by the definition of $T$, and so it remains to show that $[(0~|~T_{l}) + (T_{r}~|~0)]J = H\left(\shift(\mathbf{u})\right)$. From the definitions of $T_{l}$ and $T_{r}$, the sum $(0~|~T_{l}) + (T_{r}~|~0)$ is equal to $T\left(J\shift(\mathbf{u})\right)$. Thus by Lemma \ref{lem:TJ = H},
+\[[(0~|~T_{l}) + (T_{r}~|~0)]J = T\left(J\shift(\mathbf{u})\right)J = H\left(\shift(\mathbf{u})\right).\]
+Therefore $K = T(\mathbf{u}) + H\left(\shift(\mathbf{u})\right)$, and Theorem \ref{thm:DCT Diagonalization} states that $K$ can be diagonalized by the DCT. 
+\end{proof}
+
+To conclude this section, the discrete sine transform (DST) will be briefly discussed. Given a function $f(t)$ defined on the interval $[0,1]$, consider the odd extension of $f_o(t)$ defined by
+\[f_o(t) = \begin{cases}
+f(t), & 0 \leq t \leq 1 \\
+-f(-t), & -1 \leq t < 0
+\end{cases}.\]
+The Fourier series expansion of $f_o(t)$ will only contain sine terms and the coefficients of these terms are
+\[b_j = 2\int_0^1 f(t) \sin((j+1)\pi{t})~dt, \quad j \geq 0.\]
+The factor $j+1$ is so that the series does not always begin with a zero term; in other words, $b_0$ is not identically zero. Using the midpoint rule with $N$ subintervals gives
+\[b_j \approx \frac{2}{N}\sum_{k=0}^{N-1} f\left(\frac{1}{N}\left(k+\frac{1}{2}\right)\right)\sin\left(\frac{(j+1)\pi}{N}\left(k+\frac{1}{2}\right)\right).\]
+Again a modification of the scale factor and rewriting the argument of sine produces the discrete transform; the factor $j+1$ in the discrete transform ensures that the first DCT component $\dct{b}_0$ is not guaranteed to be zero. Unlike the DCT, however, the DST implies odd boundary conditions can produce discontinuities at the boundaries in the continuous setting. For this reason the DST will not be considered for the numerical examples.
+
+\section{Downsampling and white noise} \label{sec:Downsampling and white noise}
+While analysis has been conducted regarding the convergence of predictive and estimation error for Tikhonov regularization as the number of sample points becomes large \cite[p.~109-126]{Vogel:2002}, the effects of reducing the number of sample points must be explored. \par  
+To formalize the concept of downsampling, consider $\mathbf{z} = [z_0,z_2,\ldots,z_{n-1}]$. Then a vector $\mathbf{y}$ is called a downsampling of $\mathbf{z}$ if $\mathbf{y} = [z_{n_0},z_{n_1},\ldots,z_{n_{m-1}}]$, where $m \leq n$ and $n_j:\{0,1,\ldots,{m-1}\}\rightarrow\{0,1,\ldots,{n-1}\}$ is a strictly increasing function. This definition is analogous to the definition of a subsequence except with a finite number of terms. \par
+Theoretically, the variance of the noise vector does not change when a vector is downsampled because of the properties of variance. For any $m\times n$ matrix $M$ and $n$-vector $\noiseVec \sim \mathcal{N}(\bm{0},\noiseSD^2I)$
+\begin{equation}
+\Var(M\noiseVec) = M\Var(\noiseVec)M^{\trans} = \noiseSD^2MIM^{\trans} = \noiseSD^2MM^{\trans}
+\label{eq:VarProp}
+\end{equation}
+where $MM^\trans$ is an $m \times m$ matrix. Certainly for arbitrary $M$, $MM^\trans$ can differ from an $m \times m$ identity matrix, which would mean that the new noise vector $M\noiseVec$ no longer represents white noise. However, given an $n$-vector $\noiseVec \sim \mathcal{N}(\bm{0},\noiseSD^2I)$ and the goal of obtaining a downsampled version of $\noiseVec$, a matrix $E$ can be found such that $E\noiseVec$ is the downsampled vector. Since the DFT and DCT are utilized in the regularization process, a downsampled vector whose components are still equidistant from adjacent components is desirable. If the finest sampling $\tVec$ of the interval $[0,1]$ has $N = 2^L$ points, a natural downsampling with this property would be to select every other component of $\tVec$. The resulting downsampled vector would then have length $N/2 = 2^{L-1}$. A matrix $E$ that accomplishes this downsampling is the $N/2 \times N$ matrix defined as
+\begin{equation}
+E = [\mathbf{e}_0 \: \mathbf{0} \: \mathbf{e}_1 \: \mathbf{0} \: \mathbf{e}_2 \: \mathbf{0} \ldots \mathbf{e}_{N-2} \: \mathbf{0}]
+\label{eq:Downsampling matrix}
+\end{equation}
+where $\mathbf{0}$ is the $N/2$-vector of all zeros and $\mathbf{e}_j$ is the $N/2$-vector of all zeros except for 1 as the $j\text{th}$ component, $0 \leq j \leq (N/2)-1$. Another explanation of how to construct $E$ is to concatenate every other row of an $N \times N$ identity matrix. In an effort to clarify this downsampling process, let $\tVec^{n}$ denote the $n$-point downsampling of $\tVec$. Then with this new notation, $\tVec^{N/2} = E\tVec$. \par
+As an example, consider the vector
+\[\tVec = \begin{bmatrix}
+0 & \dfrac{1}{8} & \dfrac{1}{4} & \dfrac{3}{8} & \dfrac{1}{2} & \dfrac{5}{8} & \dfrac{3}{4} & \dfrac{7}{8}
+\end{bmatrix}^{\trans},\]
+which is an equispaced 8-point discretization of $[0,1]$. The $4 \times 8$ matrix $E$ used to obtain downsampling $\tVec^{4}$ is
+\[E = \begin{bmatrix}
+1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 \\
+\end{bmatrix}.\]
+Then $\tVec^4$ obtained by the product $E\tVec$ has equispaced components as desired:
+\[\tVec^4 = E\tVec = \begin{bmatrix}
+0 & \dfrac{1}{4} & \dfrac{1}{2} & \dfrac{3}{4}
+\end{bmatrix}^{\trans}.\]
+\indent Another property of the $N/2 \times N$ matrix $E$ defined in \eqref{eq:Downsampling matrix} is that $EE^{\trans} = I$, where $I$ is the $N/2 \times N/2$ identity matrix.  This is a direct consequence of $\mathbf{e}_j\mathbf{e}_j^\trans = 1$ for all $j$ with $0 \leq j \leq (N/2)-1$. Using the property in \eqref{eq:VarProp}, the variance of the  noise vector $\noiseVec^{N/2}$ downsampled from $\noiseVec$ is then
+\[\Var(\noiseVec^{N/2}) = \Var(E\noiseVec) = E\Var(\noiseVec)E^{\trans} = \noiseSD^2EE^{\trans} = \noiseSD^2I\]
+where $I$ is the $N/2 \times N/2$ identity matrix. Therefore, downsampling white noise vectors in this way produces white noise vectors of half length, theoretically preserving variance across downsamples. As a final remark, the process of downsampling described here can be used to obtain downsampled vectors of length $N/(2^2), N/(2^3), \ldots, N/N$, though the final resolution has been chosen as $N/(2^8) = 16$. \par
+
+%Given a vector $\mathbf{x} \in \mathbb{C}^N$, where $N = LM$ for positive integers $L$ and $M$. Furthermore let $\mathbf{x}[j:k]$ denote the vector $[x_j, x_{j+1},\ldots,x_k]$. The \textit{aliasing operator} $\alias_L(\cdot)$ is defined as
+%\[\alias_L(\mathbf{x}) = \sum_{\ell=0}^{L-1} \mathbf{x}[\ell{M}:(\ell+1)M-1].\]
+%In other words, $\alias_L(\mathbf{x})$ is the result of partitioning the vector $\mathbf{x}$ into $L$ vectors of length $M$ and summing them. The notation $\mathbf{x}[j:k]$ can be extended to recast the concept of downsampling introduced in Section \ref{sec:Construction of noise}; let $\mathbf{x}[j:k:\ell] := [x_{j},x_{j+k},x_{j+2k},\ldots,x_\ell]$. The downsampled vector $\mathbf{x}^{N/L}$ formed by taking every $L$th element of the original vector $\mathbf{x}$, starting with element $x_0$, is then given by
+%\[\mathbf{x}^{N/L} = \mathbf{x}[0:L:(M-1)L].\]
+%As a remark, the aliasing operator is linear and thus could be defined using a matrix representation. \par 
+%With this new notation in mind, Theorem \ref{thm:Downsampling thm}, which is called the Downsampling Theorem in \cite{AudioDFT}, connects the concepts of aliasing and downsampling.
+%
+%\begin{theorem}
+%\label{thm:Downsampling thm}
+%Let $\mathbf{x} \in \mathbb{C}^N$, where $N = LM$ for positive integers $L$ and $M$, and let $F$ be the $N/L \times N/L$ DFT matrix. Then
+%\[F\mathbf{x}^{N/L} = \frac{1}{L}\alias_L(F\mathbf{x}).\]
+%\end{theorem}
+
+While the variance of the noise is preserved across downsampling resolution in theory, numerically there is some fluctuation. As the downsampling resolutions decrease, i.e. the length of the downsampled vectors decreases, the sample variances more spread out. Figure \ref{VarPlot1D} demonstrates this phenomenon by showing boxplots of sample variance versus downsampling resolutions. %\newpage
+
+\begin{figure}[htb]
+\centerline{\includegraphics[scale=0.45]{Figures/VarPlot1D_F1_S05_W100_R20.eps}}
+\caption{The boxplots were generated from the sample variances of downsampled noise vectors. The theoretical variance of the noise was set to 0.0327, which is indicated by the horizontal dotted line. This figure illustrates that as the lengths of the downsampled vectors decrease, the variance in the computed sample variances increases.}
+\label{VarPlot1D}
+\end{figure}
+
+Though the definition of SNR varies, the definition chosen for this investigation is
+\begin{equation}
+\label{eq:SNR}
+\text{SNR} = 10\log_{10}\left(\frac{P_{\text{signal}}}{P_{\text{noise}}}\right)
+\end{equation}
+where $P$ denotes average power. In the discrete setting, the average power of a signal $\mathbf{f}$ of length $N$ is defined as $\|\mathbf{f}\|^2/N$. Using this definition, $P_{\text{signal}} = \|\gVec\|^2/N$ and $P_{\text{noise}} = \|\noiseVec\|^2/N$ and so the quotient in the logarithm is $\|\gVec\|^2/\|\noiseVec\|^2$. The quotient can also be expressed as $(\|\gVec\|/\|\gnoiseVec - \gVec\|)^2$, which is the square of the multiplicative inverse of the relative error of $\gnoiseVec$. \par
+In MATLAB, the noise vector $\noiseVec$ can be constructed by first taking an $N$-vector $\mathbf{e}$ drawn from the multivariate standard normal distribution and multiplying the vector by a constant $\noiseSD$. Doing so ensures that $\noiseVec$ has variance $\noiseSD^2$ because $\Var(\noise) = \Var(\noiseSD\:\mathbf{e}) = \noiseSD^2\:\Var(\mathbf{e})$ and $\mathbf{e}$ has unit variance. Thus it is useful to rearrange the equation defining SNR into an equation that provides a way of finding the necessary variance for a given SNR value. The rearrangement is shown below, with $\|\noiseVec\|^2$ replaced by $\E(\|\noiseVec\|^2)$.
+\[\E(\|\noiseVec\|^2) = \frac{\|\gVec\|^2}{10^{(\text{SNR}/10)}}\]
+Using the properties of expected value and the fact that $\E(\|\noiseVec\|^2) = \E(\|\noiseSD\:\mathbf{e}\|^2)$, the term on the left hand side of the equation can be changed as
+\[\E(\|\noiseVec\|^2) = \E(\|\noiseSD\:\mathbf{e}\|^2) = \noiseSD^2 \sum_{j=1}^N \E(\mathbf{e}_i^2) = \noiseSD^2 \sum_{j=1}^N \left(\E(\mathbf{e}_i)^2 + \Var(\mathbf{e}_i)\right) = \noiseSD^2 \sum_{j=1}^N \left(0^2 + 1\right) = \noiseSD^2\:N.\]
+Utilizing this change, the following equation for variance is obtained.
+\begin{equation}
+\label{eq:Var}
+\noiseSD^2 = \frac{\|\gVec\|^2}{N \cdot 10^{(\text{SNR}/10)}}
+\end{equation}
+This equation is used for the numerical construction of the noise vectors. SNR values of 5 and 25 are used to generate the white noise added to $\gVec$, and one such data realization is shown in Figure \ref{NoisePlot1D_F2_S05_W200}. \par
+
+\begin{figure}
+	\centerline{\includegraphics[scale = 0.45]{Figures/NoisePlot1D_F2_S05_W200.eps}}
+\caption{The plot shows one data realization of $\gVec$ with noise, where the original function $f$ was the second test function. The SNR value is 5 and the width of the Gaussian kernel is 200.}
+\label{NoisePlot1D_F2_S05_W200}
+\end{figure}
+
+For an accurate evaluation of the numerical examples and their results, multiple realizations of noise are used. A primary advantage of multiple noise realizations is that the sample variance of noise vectors approaches the desired variance as the number of realizations increases. More rigorously, the mean of the sample variances of the noise vectors converges almost surely to the expected value of the sample variance, which is the desired variance $\noiseSD^2$; this is a direct consequence of the (strong) law of large numbers and the fact that the noise vectors are independent and identically distributed with standard normal distribution. 
+
+\chapter{Statistical considerations} \label{ch:Stats}
+
+Since the parameter estimation methods in Chapter \ref{ch:Parameter estimation methods} involve DFT's and DCT's of the vector $\gnoiseVec = \gVec + \noiseVec$, some results regarding the distribution of the components of $\widehat{\noiseVec}$ and $\dct{\noiseVec}$ will be presented. Since the DFT is a map from $\mathbb{C}^n$ to $\mathbb{C}^n$ and $\noiseVec$ is assumed to be a realization of a real random vector, some effort is necessary to carefully examine the distribution of the components of $\widehat{\noiseVec}$. In contrast, the DCT (and DST) is a map from $\mathbb{R}^n$ to $\mathbb{R}^n$, so the statistics regarding the DCT of white noise are more straightforward.
+
+\section{DFT of white noise} \label{ch:DFT of white noise}
+The first results will be in regard to the real and imaginary parts of the $\widehat{\noiseVec}$. Letting $A$ and $B$ be the real and imaginary parts, respectively, of the $n \times n$ DFT matrix, Euler's identity gives
 \begin{equation}
 A_{j,k} = \frac{1}{\sqrt{n}}\cos\left(\frac{-2\pi{jk}}{n}\right), \quad B_{j,k} = \frac{1}{\sqrt{n}}\sin\left(\frac{-2\pi{jk}}{n}\right),
 \label{eq:Components Re(F) and Im(F)}
@@ -572,8 +780,6 @@ The $\noise_{\ell}$ are identically distributed with $\noiseSD_{\ell}^2 = \noise
 where the last equality follows from Lemma \ref{lem:Inner products}. Therefore $X_j$ and $Y_k$ are independent for each $0 \leq j,k \leq n-1$.
 \end{proof}
 \end{lemma}
-
-\section{Results on distributions} \label{sec:Results on distributions}
 
 Having established the independence of the components of $\Re(\widehat{\noiseVec})$ and $\Im(\widehat{\noiseVec})$, their individual distributions will be determined. 
 
@@ -825,7 +1031,7 @@ and
 4\left(1 + \dfrac{|\widehat{g}_j|^2}{\noiseSD^2}\right), & j \not\in J \end{cases}.\]
 \end{corollary}
 
-The final statistical result presented here is the covariance of $|M_j\widehat{\gnoise}_j|^2$ and $|M_k\widehat{\gnoise}_k|^2$, which will be used in Chapter \ref{sec:Parameter estimation methods}.  
+The final statistical result presented here is the covariance of $|M_j\widehat{\gnoise}_j|^2$ and $|M_k\widehat{\gnoise}_k|^2$, which will be used in Chapter \ref{ch:Parameter estimation methods}.  
 
 % Here is the univariate approach
 A step in Theorem \ref{thm:Cov of mag squared} is to determine covariances between components of $M\widehat{\gnoiseVec} = M\widehat{\gVec} + M\widehat{\noiseVec}$. Lemma \ref{lem:App of Ind Thm 2} establishes that the real and imaginary parts of $M\widehat{\noiseVec}$ are independent, but Lemma \ref{lem:App of Ind Thm 3} establishes the relationship between any two real or imaginary components of $M\widehat{\noiseVec}$.
@@ -1041,7 +1247,39 @@ Let $A$ be the real part of the Fourier matrix \eqref{eq:DFT-Matrix}. Then $\Re(
 %\end{equation}
 \end{proof}
 
-\chapter{Parameter estimation methods} \label{sec:Parameter estimation methods}
+\section{DCT of white noise} \label{ch:DCT of white noise}
+
+The primary challenge in dealing with statistics of the DFT applied to white noise is that the covariance matrices of $A\gnoiseVec$ and $B\gnoiseVec$ ($A$ and $B$ representing the real and imaginary parts of the DFT matrix $F$, respectively) are singular. Fortunately, this is not the case for the DCT. \par 
+Let $C$ be the $n \times n$ DCT matrix defined by \eqref{eq:DCT matrix}, $\noiseVec \sim \mathcal{N}(\mathbf{0},\noiseSD^2 I)$, and $\dct{\noiseVec} = C\noiseVec$. By the orthogonality of $C$ and properties of the multivariate normal distribution, 
+\begin{equation}
+\dct{\noiseVec} \sim \mathcal{N}(C\mathbf{0},\noiseSD^2 C^\trans{C}) = \mathcal{N}\left(\mathbf{0},\noiseSD^2 I\right).
+\label{eq:DCT Noise}
+\end{equation}
+Thus the distribution of $\noiseVec$ is preserved under the DCT. More generally,
+\[\dct{\gnoiseVec} \sim \mathcal{N}\left(\dct{\gnoiseVec},\noiseSD^2 I\right)\]
+where $\gnoiseVec = \gVec + \noiseVec$. Therefore the DCT-version of Theorem \ref{thm:Mag. squared theorem ext.} is more simple.
+\begin{theorem}
+Let $\gnoiseVec$ be a random $n$-vector with $\gnoiseVec \sim \mathcal{N}(\gVec,\noiseSD^2 I)$ and let $\dct{\gnoiseVec}$ denote the DCT of $\gnoiseVec$. Then for all $0 \leq j \leq n-1$,
+\[\frac{1}{\noiseSD^2}\left|\dct{\gnoise}_j\right|^2 \sim \NCchi\left(1,\frac{1}{2\noiseSD^2}\left(\dct{g}_j\right)^2\right)\]
+where $\NCchi^2(k,\lambda)$ denotes the noncentral chi-squared distribution with $k$ degrees of freedom and noncentrality parameter $\lambda$.
+\label{thm:DCT Dist}
+\end{theorem}
+\begin{proof}
+For $0 \leq j \leq n-1$, the properties of the univariate normal distribution give
+\[\frac{1}{\noiseSD}\dct{g}_j \sim \mathcal{N}\left(\sqrt{2\lambda},1\right), \quad \lambda = \frac{1}{2\noiseSD^2}\left(\dct{g}_j\right)^2.\]
+The techniques utilized in the proof of Theorem \ref{thm:Mag. squared theorem} can now be applied to yield
+\[\frac{1}{\noiseSD^2}\left(\dct{g}_j\right)^2 \sim \NCchi\left(1,\lambda\right) = \NCchi\left(1,\frac{1}{2\noiseSD^2}\left(\dct{g}_j\right)^2\right).\]
+\end{proof}
+
+The expected value and variance then follow directly from Theorem \ref{thm:NCchi Mean and Var}.
+
+\begin{lemma}
+Let $\gnoiseVec$ be a random $n$-vector with $\gnoiseVec \sim \mathcal{N}(\gVec,\noiseSD^2 I)$ and let $\dct{\gnoiseVec}$ denote the DCT of $\gnoiseVec$. Then for all $0 \leq j \leq n-1$,
+\[\E\left(\frac{1}{\noiseSD^2}\left(\dct{g}_j\right)^2\right) = 1 + \frac{1}{2\noiseSD^2}\left(\dct{g}_j\right)^2, \quad \Var\left(\frac{1}{\noiseSD^2}\left(\dct{g}_j\right)^2\right) = 2 + \frac{2}{\noiseSD^2}\left(\dct{g}_j\right)^2.\]
+\label{lem:DCT Exp and Var}
+\end{lemma}
+
+\chapter{Parameter estimation methods} \label{ch:Parameter estimation methods}
 
 Perhaps the simplest method of selecting a regularization parameter is to use
 \begin{equation}
@@ -1185,7 +1423,12 @@ Applying the DFT version of the Trace Lemma produces
 Thus the $\E(\|\dft{\PE}\|^2/n)$ can be expressed as
 \[\E\left(\frac{1}{n}\left\|\dft{\PE}\right\|^2\right) = \E\left(\frac{1}{n}\left\|\dft{\regres}\right\|^2\right) + \frac{2\noiseSD^2}{n}\trace\left(\Re(\A)\right) - \noiseSD^2.\]
 The last step needed to obtain \eqref{eq:SpectralUPRE} to use the fact that the Tikhonov regularization matrix $\A$ is real and the assumption that $\A$ can be written as $\A = \kMat(\kMat^\ctrans\kMat + \regparam{D^\ctrans}D)^{-1}\kMat^\ctrans$. \par
-In order to apply Corollary \ref{cor:gnoise Mean and Var}, the UPRE function must be modified. Let the factors $M_j$ for $j = 0,\ldots,n-1$ be defined by
+The same derivation can be applied for the DCT-version of the UPRE function under the assumption that $\kMat$ can be diagonalized by the DCT. Since the DCT maps real vectors to real vectors, the standard Trace Lemma can be utilized. The DCT-version of the UPRE function is
+\begin{equation}
+\U(\regparam) = \frac{1}{n}\sum_{j = 0}^{n-1} |\dct{\gnoise}_j|^2(\mfilt(\regparam,|\dct{k}_j|))^2 + \frac{2\noiseSD^2}{n}\sum_{j = 0}^{n-1} \filt(\regparam,|\dct{k}_j|) - \noiseSD^2.
+\label{eq:UPRE DCT}
+\end{equation}
+In order to apply Corollary \ref{cor:gnoise Mean and Var} to \eqref{eq:SpectralUPRE}, the UPRE function must be modified. Let the factors $M_j$ for $j = 0,\ldots,n-1$ be defined by
 \[M_j = \begin{cases}
 1/\noiseSD & j = 0, n/2 \\
 \sqrt{2}/\noiseSD & \text{otherwise}
@@ -1201,10 +1444,13 @@ By the properties of expected value,
 &= \sum_{j = 0}^{n-1} \E\left(|M_j\widehat{\gnoise}_j|^2\right)\left(\frac{\mfilt(\regparam,|\widehat{k}_j|)}{M_j}\right)^2 + \frac{2\noiseSD^2}{n}\sum_{j = 0}^{n-1} \filt(\regparam,|\widehat{k}_j|) - \noiseSD^2.
 \end{align*}
 Corollary \ref{cor:gnoise Mean and Var} then gives
-\begin{align*}
+\begin{equation}
+\begin{split}
 \E(\U_n(\regparam)) &= \sum_{j = 0}^{n-1} \frac{\noiseSD^2}{2}\left(2 + \frac{|\widehat{g}_j|^2}{\noiseSD^2}\right)(\mfilt(\regparam,|\widehat{k}_j|))^2 + \frac{2\noiseSD^2}{n}\sum_{j = 0}^{n-1} \filt(\regparam,|\widehat{k}_j|) - \noiseSD^2 \\
 &= \frac{1}{2}\sum_{j = 0}^{n-1} |\widehat{\gnoise}_j|^2(\mfilt(\regparam,|\widehat{k}_j|))^2 + \noiseSD^2\sum_{j = 0}^{n-1} (\mfilt(\regparam,|\widehat{k}_j|))^2 + \frac{2\noiseSD^2}{n}\sum_{j = 0}^{n-1} \filt(\regparam,|\widehat{k}_j|) - \noiseSD^2.
-\end{align*}
+\end{split}
+\label{eq:UPRE Expected Value}
+\end{equation}
 The variance of $\U_n$ can be determined as well. The second and third terms in both \eqref{eq:SpectralUPRE} and \eqref{eq:SpectralUPREnModified} are deterministic, and so
 \begin{equation}
 \label{eq:UPRE Var Sum}
@@ -1254,7 +1500,7 @@ The UPRE method requires knowledge of the variance $\noiseSD^2$ of the noise vec
 \GCV(\regparam) = \frac{\frac{1}{n}\|\regres\|^2}{\left[\frac{1}{n}\trace(I-\A)\right]^2},
 \end{equation}
 where $\regres$ is the regularized residual defined in the derivation of the UPRE method. Similarities between the GCV and UPRE methods are that both functions are estimators of the predictive risk, and the regularization parameter $\regparam$ is chosen as the minimizers of these functions. \par 
-By the linearity of the trace operator, $\trace(I-\A) = \trace(I)-\trace(\A) = n - \trace(\A)$. Then by \eqref{eq:TikFiltPsi} and \eqref{eq:TraceUPRE},
+By the linearity of the trace operator, $\trace(I-\A) = \trace(I)-\trace(\A) = n - \trace(\A)$. Then by \eqref{eq:TikFiltPsi} and \eqref{eq:TraceUPRE} and assuming that $\kMat$ can be diagonalized by the DFT,
 \begin{equation}
 \trace(I-\A) = n - \sum_{j = 0}^{n-1} \filt(\regparam,|\widehat{k}_j|) = \sum_{j = 0}^{n-1} 1 - \filt(\regparam,|\widehat{k}_j|) = \sum_{j = 0}^{n-1} \mfilt(\regparam,|\widehat{k}_j|).
 \label{eq:TraceGCV}
@@ -1263,7 +1509,13 @@ Substituting \eqref{eq:RegResNorm} and \eqref{eq:TraceGCV} into \eqref{eq:GCV} p
 \begin{equation}
 \GCV(\regparam) = \frac{\sum_{j = 0}^{n-1} |\widehat{\gnoise}_j|^2(\mfilt(\regparam,|\widehat{k}_j|))^2}{(\frac{1}{n}\sum_{j = 0}^{n-1} \mfilt(\regparam,|\widehat{k}_j|))^2} = \frac{n^2\sum_{j = 0}^{n-1} |\widehat{\gnoise}_j|^2(\mfilt(\regparam,|\widehat{k}_j|))^2}{(\sum_{j = 0}^{n-1} \mfilt(\regparam,|\widehat{k}_j|))^2}.
 \label{eq:SpectralGCV}
-\end{equation} \par 
+\end{equation}
+If $\kMat$ can be diagonalized by the DCT, the DCT-version of the GCV function is
+\begin{equation}
+\GCV(\regparam) = \frac{\sum_{j = 0}^{n-1} |\dct{\gnoise}_j|^2(\mfilt(\regparam,|\dct{k}_j|))^2}{(\frac{1}{n}\sum_{j = 0}^{n-1} \mfilt(\regparam,|\dct{k}_j|))^2} = \frac{n^2\sum_{j = 0}^{n-1} |\dct{\gnoise}_j|^2(\mfilt(\regparam,|\dct{k}_j|))^2}{(\sum_{j = 0}^{n-1} \mfilt(\regparam,|\dct{k}_j|))^2}.
+\label{eq:GCV DCT}
+\end{equation}
+
 The case where multiple data sets are available will now be considered using notation analogous to that introduced in Section \ref{sec:Unbiased Predictive Risk Estimator}; let $\GCV_n^j(\regparam)$ be the GCV function associated with the $j$th data set $\gnoiseVec^j$ for $j = 1,\ldots,R$. Since the denominator in \eqref{eq:SpectralGCV} is independent of the data,
 \begin{equation}
 \frac{1}{R}\sum_{j=1}^R \GCV_n^j(\regparam)  = \frac{n^2\sum_{j = 0}^{n-1} \left(\sum_{j=1}^R |\widehat{\gnoise^j}_j|^2\right)(\mfilt(\regparam,|\widehat{k}_j|))^2}{R(\sum_{j = 0}^{n-1} \mfilt(\regparam,|\widehat{k}_j|))^2}.
@@ -1279,7 +1531,7 @@ Implementation of this method requires finding a solution of $\D_n(\regparam) = 
 \label{eq:DP}
 \D_n(\regparam) = \frac{1}{n}\|\regres\|^2 - \noiseSD^2.
 \end{equation}
-In other words, implementation of the discepancy principle method is equivalent to finding a root of $\D_n(\regparam)$. The spectral form of the discrepancy principle function is obtained directly from \eqref{eq:RegResNorm} by substituting the regularized residual term:
+In other words, implementation of the discrepancy principle method is equivalent to finding a root of $\D_n(\regparam)$. The spectral form of the discrepancy principle function is obtained directly from \eqref{eq:RegResNorm} by substituting the regularized residual term:
 \begin{equation}
 \D_n(\regparam) = \sum_{j = 0}^{n-1} |\widehat{\gnoise}_j|^2(\mfilt(\regparam,|\widehat{k}_j|))^2 - \noiseSD^2.
 \label{eq:SpectralDP}
@@ -1289,6 +1541,12 @@ Comparing the UPRE function $\U_n$ on \eqref{eq:SpectralUPRE} with $\D_n(\regpar
 \label{eq:UPRE DP Comp}
 \D_n(\regparam) = \U_n(\regparam) - \frac{2\noiseSD^2}{n}\sum_{j = 0}^{n-1} \filt(\regparam,|\widehat{k}_j|).
 \end{equation}
+If $\kMat$ can be diagonalized by the DCT, then the DCT-version of the discrepancy principle function is
+\begin{equation}
+\D_n(\regparam) = \sum_{j = 0}^{n-1} |\dct{\gnoise}_j|^2(\mfilt(\regparam,|\dct{k}_j|))^2 - \noiseSD^2.
+\label{eq:DP DCT}
+\end{equation}
+
 The function $\D_n(\regparam)$ will be near zero when the sum in \eqref{eq:SpectralDP} is close to $\noiseSD^2$.  Furthermore, $\D_n(\regparam)$ is monotone increasing on $(0,\infty)$ because for all $\regparam > 0$,
 \[\frac{d}{d\regparam}\left\{\D_n(\regparam)\right\} = 4\sum_{j = 0}^{n-1} |\widehat{\gnoise}_j|^2\frac{|\widehat{k}_j|^2\regparam^3}{\left(|\widehat{k}_j|^2 + \regparam^2\right)^3} \geq 0.\]
 If the range of $\regparam$ being considered for roots of \eqref{eq:SpectralDP} is not chosen carefully, it is possible that no regularization parameter will be obtained. If \eqref{eq:SpectralDP} does not have a root in $[0,\infty)$ (recall that by definition, $\regparam \geq 0$), there is only one possibility because $\D_n(0) = -\noiseSD^2 < 0$. Since the function is monotone increasing, the function must have a root or approach some negative horizontal asymptote. By looking at \eqref{eq:TikFiltPsi}, it is clear that $(\mfilt(\regparam,|\widehat{k}_i|))^2 \leq 1$ for all $\regparam \geq 0$. Thus,
@@ -1331,132 +1589,8 @@ As previously stated, the discrepancy function \eqref{eq:SpectralDP} is monotone
 %If roots are not equal, then $\overline{f}(x_1) < 0$ and $\overline{f}(x_R) > 0$ since there would exist some $\ell = 1,\ldots,k$ such that $f_\ell(x_1) < 0$ or $f_\ell(x_R) > 0$, again following from the monotoncity of each function in the family. Since $\overline{f}$ is a linear combination of continuous functions, $\overline{f}$ itself is continuous. Thus having $\overline{f}(x_1) < 0$ and $\overline{f}(x_R) > 0$ implies that $\overline{f}$ has a root in $[x_1,x_R]$ by Bolzano's theorem (a corollary to the intermediate value theorem).
 %\end{proof}
 
-\chapter{The DFT approach} \label{sec:DFT}
-As stated in Chapter \ref{sec:DCT}, the DFT is well-suited for situations in which the boundary conditions are assumed to be periodic. For one-dimensional problem, the resulting kernel matrix $\kMat$ is circulant and is therefore diagonalized by the DFT. For two-dimensional problems, $\kMat$ is a block-circulant matrix with circulant blocks; adopting the notation from \cite[p.~71-72]{Vogel:2002}, such matrices will be referred to as BCCB matrices. Analogously, BCCB matrices can be diagonalized with two-dimensional DFTs. \par 
-Focusing on the one-dimension case, imposing periodic boundary conditions on $\fVec$ means that $f_j = f_{n-j}$ in \eqref{eq:FIEv. Prod.} The result is that \eqref{eq: Tf = g} becomes
-\[ C\fVec = [(\bm{0} ~|~ T_l) + T + (T_r ~|~ \bm{0})]\fVec = \gVec,\]
-where $C$ is a circulant matrix. \par 
-The discrete Fourier transform will be introduced from the perspective of approximating coefficients of the Fourier series of a $2\pi$-periodic function $f$. On the interval $[0,2\pi]$, the $j$th complex Fourier coefficient of $f(t)$ is given by
-\[c_j = \frac{1}{2\pi}\int_0^{2\pi} f(t)\exp(-ijt)\:dt,\]
-where $i = \sqrt{-1}$.  Applying the trapezoidal rule for approximating this integral with $n$ points then produces
-\[c_j \approx \frac{1}{n}\sum_{\ell = 0}^{n-1} f\left(\frac{2\pi{\ell}}{n}\right)\exp\left(\frac{-2\pi{ij\ell}}{n}\right).\]
-The accuracy of this approximation is discussed in Section \ref{sec:Accuracy of DFT}. \par 
-The \textit{discrete Fourier transform} (DFT) is a mapping $\mathcal{F}:\mathbb{C}^n \rightarrow \mathbb{C}^n$ defined by
-\begin{equation}
-\mathcal{F}(\mathbf{f})_j = \frac{1}{\sqrt{n}}\sum_{\ell=0}^{n-1} f_{\ell}\exp\left(\frac{-2\pi{ij\ell}}{n}\right), \quad \mathbf{f}\in\mathbb{C}^n, \quad 0 \leq k \leq n-1.
-\label{eq:DFT}
-\end{equation}
-The DFT of a vector $\mathbf{f}$ will be denoted by $\widehat{\mathbf{f}}$. The inverse DFT of a vector $\widehat{\mathbf{f}}$ is given by
-\begin{equation}
-\mathcal{F}^{-1}(\widehat{\mathbf{f}})_j = \frac{1}{\sqrt{n}}\sum_{\ell=0}^{n-1} \widehat{f}_\ell\exp\left(\frac{2\pi{ij\ell}}{n}\right) = f_j.
-\end{equation}
-These definitions are nonstandard; typically the factors $1/\sqrt{n}$ in both the forward and inverse DFT definitions are combined as a single factor of $1/n$ in the definition of the forward DFT. The DFT can also be stated in terms of matrix-vector multiplication. Given an $\mathbf{f} \in \mathbb{C}^n$, $\widehat{\mathbf{f}}$ can be expressed as $F\mathbf{f}$ where the matrix $F\in\mathbb{C}^{n\times{n}}$ has components
-\begin{equation}
-F_{j,k} = \frac{1}{\sqrt{n}}\exp\left(\frac{-2\pi{ijk}}{n}\right), \quad 0 \leq j,k \leq n-1.
-\label{eq:DFT-Matrix}
-\end{equation}
-The matrix representing the inverse DFT is then $F^\ctrans$, where $\ctrans$ denotes conjugate transposition. A property of $F$ is that $F^\ctrans F = FF^\ctrans = (1/n)\diag(n) = I$, and so splitting the factor of $1/n$ as $(1/\sqrt{n})(1/\sqrt{n})$ for the definition of the DFT provides the benefit of $F$ being a unitary matrix. A direct consequence of the DFT being unitary is Parseval's theorem: $\|\mathbf{f}\| = \|F\mathbf{f}\|$ for any $\mathbf{f} \in \mathbb{C}^n$. Parseval's theorem follows directly from \eqref{eq:DFT} because
-\begin{align*}
-\|F\mathbf{f}\|^2 &= \sum_{\ell=0}^{n-1} |\mathcal{F}(\mathbf{f})_\ell |^2 \\
-&= \sum_{\ell=0}^{n-1} \left(\frac{1}{\sqrt{n}}\sum_{j=0}^{n-1} f_{j}\exp\left(\frac{-2\pi{ij\ell}}{n}\right)\right)\overline{\left(\frac{1}{\sqrt{n}}\sum_{j'=0}^{n-1} f_{j'}\exp\left(\frac{-2\pi{ij'\ell}}{n}\right)\right)} \\
-&= \frac{1}{n} \sum_{\ell=0}^{n-1} \left(\sum_{j=0}^{n-1} f_{j}\exp\left(\frac{-2\pi{ij\ell}}{n}\right)\right) \left(\sum_{j'=0}^{n-1} \overline{f_{j'}}\exp\left(\frac{2\pi{ij'\ell}}{n}\right)\right) \\
-&= \frac{1}{n} \sum_{\ell=0}^{n-1} \left(\sum_{j=0}^{n-1} f_{j} \sum_{j'=0}^{n-1} \overline{f_{j'}} \exp\left(\frac{2\pi{i(j'-j)\ell}}{n}\right)\right) \\
-&= \frac{1}{n} \sum_{j=0}^{n-1} f_j \sum_{j'=0}^{n-1} \overline{f_{j'}} \sum_{\ell=0}^{n-1} \exp\left(\frac{2\pi{i(j'-j)\ell}}{n}\right).
-\end{align*}
-Since the innermost sum is geometric,
-\[\sum_{\ell=0}^{n-1} \exp\left(\frac{2\pi{i(j'-j)\ell}}{n}\right) = \begin{cases}
-\frac{\exp(2\pi{i}(j-j')) - 1}{\exp(2\pi{i}(j-j')/n) - 1} = 0, & j \neq j' \\
-n, & j = j'
-\end{cases}.\]
-Therefore
-\[\|F\mathbf{f}\|^2 = \frac{1}{n} \sum_{j=0}^{n-1} f_j \sum_{j'=0}^{n-1} \overline{f_{j'}} \sum_{\ell=0}^{n-1} \exp\left(\frac{2\pi{i(j'-j)\ell}}{n}\right) = \sum_{j=0}^{n-1} f_j\overline{f_j} = \|\mathbf{f}\|^2,\]
-which proves Parseval's theorem. \par
-As stated previously, a significant property of circulant matrices is that they are diagonalized by the DFT. Using the definition of the $n \times n$ unitary Fourier matrix $F$, the property can be stated as
-\begin{equation}
-C = F^\ctrans\diag(\sqrt{n}\widehat{\mathbf{c}})F,
-\label{eq:CircDiag}
-\end{equation}
-where $C$ is any $n \times n$ circulant matrix and $\widehat{\mathbf{c}}$ is the DFT of the first row of $C$ (recall that the rows of a circulant matrix are circulant right shifts of a single row vector of length $n$). This property can be shown directly by showing that $C_{j,k} = (F^\ctrans\diag(\widehat{\mathbf{c}})F)_{j,k}$ for any $0 \leq j,k \leq n-1$. Using the definition of the DFT and \eqref{eq:Circulant indexing}, the component of $F^\ctrans\diag(\sqrt{n}\widehat{\mathbf{c}})F$ in $j$th row and $k$th column is given by
-\begin{align*}
-\sum_{\ell=0}^{n-1} \left[\frac{1}{\sqrt{n}}  \exp\left(\frac{2\pi{i}k\ell}{n}\right)\right] \left[\sqrt{n}\widehat{c}_\ell\right] \left[\frac{1}{\sqrt{n}} \exp\left(\frac{-2\pi{i}j\ell}{n}\right)\right] &= \frac{1}{\sqrt{n}} \sum_{\ell=0}^{n-1} \widehat{c}_\ell \exp\left(\frac{2\pi{i}(k-j)\ell}{n}\right) \\
-&= c_{k-j \bmod n} \\
-&= C_{j,k}.
-\end{align*}
-It should be noted that by defining the DFT with the factor of $1/n$ as part of the inverse transformation (while keeping the factor split as $(1/\sqrt{n})(1/\sqrt{n})$ in the matrix form) would allow the property to be stated simply as $C = F^\ctrans\diag(\widehat{\mathbf{c}})F$. \par 
-Now the properties of the DFT will be connected with the SVD of a circulant matrix, which will be the basis for the design of the numerical examples in Chapter \ref{sec:Numerical examples}. Let $\fVec$ and $\kVec$ be the $N$-point discretizations of functions $f$ and $k$ on some interval $[a,b]$. Then the cyclic convolution $\gVec = \kVec * \fVec$ can be computed as a matrix-vector product by constructing an $N \times N$ circulant matrix $\kMat$ from $\kVec$. This construction is carried out by setting the first row of $\kMat$ to be $\kVec$, and each subsequent row to be a circular right shift of the preceding row (see \ref{sec:Classes of matrices}). In MATLAB, the command \texttt{toeplitz([k(1) fliplr(k(2:end))], k)} constructs the matrix $\kMat$. Then $\gVec = \kMat\fVec$, and after the addition of noise the equation \eqref{eq:DisNoise} is obtained. Then by using the property \eqref{eq:CircDiag} with the $N \times N$ unitary Fourier matrix $F$ and assuming that $\kMat$ is invertible, 
-\begin{equation}
-\kMat^{-1}\gnoiseVec = \fVec + (F^\ctrans\diag(\widehat{\kVec})F)^{-1}\noiseVec = \fVec + F^\ctrans\diag(\widehat{\kVec})^{-1}F\noiseVec = \fVec + \sum_{\ell = 0}^{n-1} F^\ctrans_{\ell,\cdot}\left(\frac{\widehat{\noise}_\ell}{\widehat{k}_\ell}\right),
-\label{eq:InvProdDFT}
-\end{equation}
-where $\widehat{\noise}_\ell$ and $\widehat{k}_\ell$ are the $\ell$th Fourier coefficients of $\noiseVec$ and $\kVec$, respectively, and $F^\ctrans_{\ell,\cdot}$ is the conjugate transpose of the $\ell$th row of $F$ (i.e. the $\ell$th column of the matrix $F^\ctrans$). Analogous to \eqref{eq:InvProd}, instabilities can arise if $\widehat{k}_\ell$ is small. By introducing filter factors to reduce possible instability, an approximate solution
-\begin{equation}
-\fVec_\regparam = \sum_{\ell = 0}^{n-1} F^\ctrans_{\ell,\cdot}\left(\frac{\filt(\regparam,\widehat{k}_\ell)\widehat{\gnoise}_\ell}{\widehat{k}_\ell}\right) = F^\ctrans\Phi\widehat{\kMat}^\dagger F\gnoiseVec
-\label{eq:ApproxSolDFT}
-\end{equation}
-can be obtained analogous to \eqref{eq:ApproxSol}, where $\widehat{\kMat}^\dagger = \diag(1/\widehat{\kVec})$.
-Since $F^\ctrans$ is a matrix representation of the inverse DFT, the approximate solution can be rewritten as
-\[\fVec_\regparam = F^\ctrans \frac{\filt(\regparam,\widehat{\kVec})\widehat{\gnoiseVec}}{\widehat{\kVec}}.\]
-Here $\filt(\regparam,\widehat{\kVec})\widehat{\gnoiseVec}/{\widehat{\kVec}}$ is a vector where the operations of multiplication and division are performed component-wise. This representation is useful for making a connection with the MATLAB implementation. \par
-As mentioned in Chapter \ref{sec:Introduction}, a Picard plot is often useful in analyzing the numerical instabilities of solutions obtained from either or \eqref{eq:InvProd} or \eqref{eq:InvProdDFT}. Figure \ref{PicardPlot} shows an example of a Picard plot. The terms $|\widehat{k}_\ell|$ decrease down to machine precision, though the $|\widehat{\gnoise}_\ell|$ decrease but then level off just above the variance in the noise. As a result, the terms $|\widehat{\gnoise}_\ell|/|\widehat{k}_\ell|$ only decrease so far and then begin increasing. The steady increase can produce a blow up of the approximate solution. While illustrating these relationships, a Picard plot is also useful in determining how to truncate the sum in \eqref{eq:ApproxSolDFT} to avoid blow up in the solution. For the plot in Figure \ref{PicardPlot}, the sum in \eqref{eq:ApproxSolDFT} should be truncated around index 8 to obtain a meaningful solution. \par 
-
-\begin{figure}[htb]
-	\centerline{\includegraphics[scale = 0.45]{Figures/PicardPlot1D_F2_S15_W200.eps}}
-\caption{(Left) A Picard plot generated from the second test function, a Gaussian blur with a width of 200, and an SNR of 15. The terms $|\widehat{\gnoise}_\ell|/|\widehat{k}_\ell|$ decrease until index 8, at which case the terms increase in magnitude. This is due to the fact that the $|\widehat{k}_\ell|$ steadily decrease, while the $|\widehat{\gnoise}_\ell|$ level off just below the variance in the noise. (Right) A zoom-in of the Picard plot is provided, showing that elements of the DFT of $\gnoiseVec$ decay only slightly below the variance of the noise in $\gnoiseVec$.}
-\label{PicardPlot}
-\end{figure}
-
-While the connection between lines \eqref{eq:InvProdDFT} and \eqref{eq:ApproxSolDFT} and the SVD have been noted in regard to the structure of the terms and equations, a complete connection can be made if another property about $\kMat$ is assumed. Until this point $\kMat$ is assumed to be an invertible $N \times N$ circulant matrix formed from a vector $\kVec$. If $\kMat$ is also assumed to be symmetric, then the SVD of $\kMat$ is the same as the diagonalization by the unitary DFT matrix $F$ and the singular values of $\kMat$ are also the eigenvalues.
-
-\section{Accuracy of the DFT components} \label{sec:Accuracy of DFT}
-
-As stated at the start of Chapter \ref{sec:DFT}, the DFT can be derived as an approximation of the Fourier coefficients of a given function. The relationships between the DFT and Fourier coefficients will now be discussed. \par 
-Let $\Pi$ denote the vector space of integrable complex-valued functions defined on $\mathbb{R}$ with period 1. We only consider function that are integrable real-valued and defined on $[0,1]$, though their periodic extensions are contained in $\Pi$.  The Fourier coefficients of a function $f \in \Pi$ are given by 
-\begin{equation}
-\label{eq:Fourier coefficients}
-c_j = \int_0^1 f(t)\exp(-2\pi{i}jt) \: dt, j \in \mathbb{Z}
-\end{equation}
-so that the $f$ can be expanded as the Fourier series
-\begin{equation}
-\label{eq:Fourier series}
-f(x) = \sum_{j=-\infty}^{\infty} c_j \exp(2\pi{i}jx).
-\end{equation}
-The expansion of functions as Fourier series relies on the fact that the set $\{\exp(2\pi{i}jx)\:|\:j\in\mathbb{Z}\}$ forms is an orthonormal basis for $\Pi$; the Fourier coefficients \eqref{eq:Fourier coefficients} are inner products of the function $f$ with these basis elements. \par
-Letting $\mathbf{f}$ be the $n$-point discretization of $f$ on $[0,1]$ defined by $f_j = f(j/n)$ with $j \in \{0,\ldots,n-1\}$, the difference between $c_j$ and $\widehat{f}_j$ can be conveniently quantified if the Fourier series of $f$ is assumed to be absolutely convergent, i.e.
-\[\sum_{j=-\infty}^{\infty} |c_j| < \infty.\]
-The quantification is stated as Theorem \ref{thm:Fourier accuracy}, which is a variation of a theorem in \cite[p.~19]{Henrici3}.
-\begin{theorem}
-\label{thm:Fourier accuracy}
-If $f \in \Pi$ is the sum of an absolutely convergent Fourier series, then
-\[\frac{1}{\sqrt{n}}\widehat{f}_j - c_j = \sum_{\substack{
-k = -\infty \\
-k \neq 0
-}}^{\infty} = \sum_{k=1}^{\infty} (c_{j+k{n}} + c_{j-k{n}}).\]
-\end{theorem}
-\begin{proof}
-Let $f \in \Pi$ with
-\[f(x) = \sum_{k=-\infty}^{\infty} c_j \exp(2\pi{i}kx), \quad \sum_{k=-\infty}^{\infty} |c_k| < \infty.\]
-Using the Fourier series and the definition of $\widehat{f}_j$,
-\[\frac{1}{\sqrt{n}}\widehat{f}_j = \frac{1}{n}\sum_{\ell=0}^{n-1} f_{\ell}\exp\left(\frac{-2\pi{ij\ell}}{n}\right) = \frac{1}{n} \sum_{\ell=0}^{n-1} \left(\sum_{k=-\infty}^{\infty} c_k \exp\left(\frac{2\pi{i}k\ell}{n}\right)\right)\exp\left(\frac{-2\pi{ij\ell}}{n}\right).\]
-Since the Fourier series converges absolutely, the order of summation can be switched so that
-\[\frac{1}{\sqrt{n}}\widehat{f}_j = \sum_{k=-\infty}^{\infty} c_k \left(\frac{1}{n} \sum_{\ell=0}^{n-1} \exp\left(\frac{2\pi{i}\ell(k-j)}{n}\right)\right).\]
-The now innermost sum is geometric and is thus equal to $n$ only when $k - j \equiv 0 \bmod n$ (otherwise the sum is zero). Thus
-\[\frac{1}{\sqrt{n}}\widehat{f}_j = \sum_{k=-\infty}^{\infty} c_{j+kn},\]
-and subtracting $c_j$ from both sides produces the desired result.
-\end{proof}
-
-\chapter{The DCT approach} \label{sec:DCT}
-Given an $N$-vector $\mathbf{x}$ of real numbers, the discrete cosine transform (DCT) of $\mathbf{x}$, denoted $\dct{x}$, is defined as
-\begin{equation}
-\label{eq:DCT definition}
-\dct{x}_j = \sqrt{\frac{2 - \delta_{j,0}}{N}} \sum_{k=0}^{N-1} \cos\left(\frac{\pi{j}(2k + 1)}{2N}\right) x_k.
-\end{equation}
-Here $\delta_{j,0}$ is the Kronecker delta function, which in \eqref{eq:DCT definition} has the effect of introducing a factor of $1/\sqrt{N}$ in the zeroth component of $\dct{x}$ instead of $\sqrt{2}/\sqrt{N}$. The DCT matrix, denoted by $C$, has entries
-\begin{equation}
-\label{eq:DCT matrix}
-C_{j,k} = \sqrt{\frac{2 - \delta_{j,0}}{N}} \cos\left(\frac{\pi{j}(2k + 1)}{2N}\right).
-\end{equation}
-By switching $j$ and $k$, it is clear that $C$ is not symmetric. However, $C$ is orthogonal which is analogous to the DFT matrix being unitary. Fortunately, many of the statistical results in \ref{sec:Results on distributions} are simplified by using the DCT instead of the DFT. For example, if $\gnoiseVec \sim \mathcal{N}(\gVec,\noiseSD^2 I)$, then $C\noiseVec \sim \mathcal{N}(C\gnoiseVec,\noiseSD^2 CC^\trans) = \mathcal{N}(\dct{\gnoiseVec},\noiseSD^2 I)$ using the properties of multivariate normal distributions and the orthogonality of $C$. In contrast, the covariance matrices of $A\gnoiseVec$ and $B\gnoiseVec$ ($A$ and $B$ representing the real and imaginary parts of the DFT matrix, respectively) are singular. \par 
-As with the DFT, the DCT has diagonalization properties for specific types of matrices. These properties will be presented in the context of convolution and boundary conditions. Recall when the kernel $k(x,t)$ is of the form $k(x,t) = k(x-t)$, \eqref{eq:FIE} is specific case of the convolution
+\chapter{The DFT approach} \label{ch:DFT}
+As with the DFT the DCT have diagonalization properties for specific types of matrices. These properties will be presented in the context of convolution and boundary conditions. Recall when the kernel $k(x,t)$ is of the form $k(x,t) = k(x-t)$, \eqref{eq:FIE} is specific case of the convolution
 \begin{equation}
 \label{eq:Inf. Cont. Conv.}
 g(x) = \int_{-\infty}^{\infty} k(x-t)f(t) ~dt.
@@ -1497,7 +1631,7 @@ f_{n+m-2} \\
 f_{n+m-1}
 \end{bmatrix}.
 \end{equation}
-As done in \cite{NeumannDCT}, the product \eqref{eq:FIEv. Prod.} can be expressed as
+The product \eqref{eq:FIEv. Prod.} can be expressed as
 \begin{equation}
 \label{eq: Tf = g}
 T_{l}\fVec_{l} + T\fVec + T_{r}\fVec_{r} = \gVec
@@ -1541,7 +1675,137 @@ k_{-m+1} & & \\
 \vdots & \ddots &  \\
 k_{-1} & \cdots & k_{-m+1} \\
 \end{bmatrix}.\]
-The goal is the same: obtain a solution $\fVec = [f_0,\ldots,f_{n-1}]^\trans$. However, it is clear that $\fVec$ depends not only upon the choice of kernel $k$ but on the boundaries of $\fVec$, i.e. the terms $f_j$ of $(f_n)$ where $j \not\in \{0,1,n-1\}$. There are a number of ways in which the boundaries can be handled; Dirichlet, periodic, and Neumann boundary conditions are considered in \cite{NeumannDCT}. The most-simplifying condition in terms of the result system is the Dirichlet condition, which assumed that $\fVec_l = \fVec_r = \bm{0}$. The resulting system \eqref{eq: Tf = g} is $T\fVec = \gVec$. The matrix $T$ is Toeplitz, and methods such as those presented in \cite{Vogel:2002} can be used to obtain solutions. The situation becomes more complicated in higher dimensions: for 2D problems, the system matrix is block-Toeplitz with Toeplitz blocks and solving such a system requires $O(n^4)$ operations \cite{KalouptsidisCarayannisManolakis}. \par 
+The goal is tto obtain a solution $\fVec = [f_0,\ldots,f_{n-1}]^\trans$. However, it is clear that $\fVec$ depends not only upon the choice of kernel $k$ but on the boundaries of $\fVec$, i.e. the terms $f_j$ of $(f_n)$ where $j \not\in \{0,1,n-1\}$. There are a number of ways in which the boundaries can be handled; Dirichlet, periodic, and Neumann boundary conditions are considered in \cite{NeumannDCT}. The most-simplifying condition in terms of the result system is the Dirichlet condition, which assumed that $\fVec_l = \fVec_r = \bm{0}$. The resulting system \eqref{eq: Tf = g} is $T\fVec = \gVec$. The matrix $T$ is Toeplitz, and methods such as those presented in \cite{Vogel:2002} can be used to obtain solutions. The situation becomes more complicated in higher dimensions: for 2D problems, the system matrix is block-Toeplitz with Toeplitz blocks and solving such a system requires $O(n^4)$ operations \cite{KalouptsidisCarayannisManolakis}. \par 
+The DFT is well-suited for situations in which the boundary conditions are assumed to be periodic. For one-dimensional problem, the resulting kernel matrix $\kMat$ is circulant and is therefore diagonalized by the DFT. For two-dimensional problems, $\kMat$ is a block-circulant matrix with circulant blocks; adopting the notation from \cite[p.~71-72]{Vogel:2002}, such matrices will be referred to as BCCB matrices. Analogously, BCCB matrices can be diagonalized with two-dimensional DFTs. \par 
+Focusing on the one-dimension case, imposing periodic boundary conditions on $\fVec$ means that $f_j = f_{n-j}$ in \eqref{eq:FIEv. Prod.} The result is that \eqref{eq: Tf = g} becomes
+\[ C\fVec = [(\bm{0} ~|~ T_l) + T + (T_r ~|~ \bm{0})]\fVec = \gVec,\]
+where $C$ is a circulant matrix. The diagonalization property \eqref{eq:CircDiag} then allows for the Tikhonov regularization parameter to be determined by DFT-versions of the methods in Chapter \ref{ch:Parameter estimation methods}. 
+
+%\section{Accuracy of the DFT components} \label{sec:Accuracy of DFT}
+%
+%As stated at the start of Chapter \ref{ch:DFT}, the DFT can be derived as an approximation of the Fourier coefficients of a given function. The relationships between the DFT and Fourier coefficients will now be discussed. \par 
+%Let $\Pi$ denote the vector space of integrable complex-valued functions defined on $\mathbb{R}$ with period 1. We only consider function that are integrable real-valued and defined on $[0,1]$, though their periodic extensions are contained in $\Pi$.  The Fourier coefficients of a function $f \in \Pi$ are given by 
+%\begin{equation}
+%\label{eq:Fourier coefficients}
+%c_j = \int_0^1 f(t)\exp(-2\pi{i}jt) \: dt, j \in \mathbb{Z}
+%\end{equation}
+%so that the $f$ can be expanded as the Fourier series
+%\begin{equation}
+%\label{eq:Fourier series}
+%f(x) = \sum_{j=-\infty}^{\infty} c_j \exp(2\pi{i}jx).
+%\end{equation}
+%The expansion of functions as Fourier series relies on the fact that the set $\{\exp(2\pi{i}jx)\:|\:j\in\mathbb{Z}\}$ forms is an orthonormal basis for $\Pi$; the Fourier coefficients \eqref{eq:Fourier coefficients} are inner products of the function $f$ with these basis elements. \par
+%Letting $\mathbf{f}$ be the $n$-point discretization of $f$ on $[0,1]$ defined by $f_j = f(j/n)$ with $j \in \{0,\ldots,n-1\}$, the difference between $c_j$ and $\widehat{f}_j$ can be conveniently quantified if the Fourier series of $f$ is assumed to be absolutely convergent, i.e.
+%\[\sum_{j=-\infty}^{\infty} |c_j| < \infty.\]
+%The quantification is stated as Theorem \ref{thm:Fourier accuracy}, which is a variation of a theorem in \cite[p.~19]{Henrici3}.
+%\begin{theorem}
+%\label{thm:Fourier accuracy}
+%If $f \in \Pi$ is the sum of an absolutely convergent Fourier series, then
+%\[\frac{1}{\sqrt{n}}\widehat{f}_j - c_j = \sum_{\substack{
+%k = -\infty \\
+%k \neq 0
+%}}^{\infty} = \sum_{k=1}^{\infty} (c_{j+k{n}} + c_{j-k{n}}).\]
+%\end{theorem}
+%\begin{proof}
+%Let $f \in \Pi$ with
+%\[f(x) = \sum_{k=-\infty}^{\infty} c_j \exp(2\pi{i}kx), \quad \sum_{k=-\infty}^{\infty} |c_k| < \infty.\]
+%Using the Fourier series and the definition of $\widehat{f}_j$,
+%\[\frac{1}{\sqrt{n}}\widehat{f}_j = \frac{1}{n}\sum_{\ell=0}^{n-1} f_{\ell}\exp\left(\frac{-2\pi{ij\ell}}{n}\right) = \frac{1}{n} \sum_{\ell=0}^{n-1} \left(\sum_{k=-\infty}^{\infty} c_k \exp\left(\frac{2\pi{i}k\ell}{n}\right)\right)\exp\left(\frac{-2\pi{ij\ell}}{n}\right).\]
+%Since the Fourier series converges absolutely, the order of summation can be switched so that
+%\[\frac{1}{\sqrt{n}}\widehat{f}_j = \sum_{k=-\infty}^{\infty} c_k \left(\frac{1}{n} \sum_{\ell=0}^{n-1} \exp\left(\frac{2\pi{i}\ell(k-j)}{n}\right)\right).\]
+%The now innermost sum is geometric and is thus equal to $n$ only when $k - j \equiv 0 \bmod n$ (otherwise the sum is zero). Thus
+%\[\frac{1}{\sqrt{n}}\widehat{f}_j = \sum_{k=-\infty}^{\infty} c_{j+kn},\]
+%and subtracting $c_j$ from both sides produces the desired result.
+%\end{proof}
+
+\section{Numerical results} \label{sec:Numerical results (DFT)}
+For the numerical examples, three test functions are considered. While these functions vary in the extent of smoothness, it is assumed that the information about the measured function $g(x)$ is only known over the $[0,1]$; this will also be the initial domain of definition for $f(t)$. However, the interval $[0,1]$ can be mapped to any other interval using an affine transformation. In general, the transformation from $[a,b]$ to $[c,d]$ such that $a \mapsto c$ and $b \mapsto d$ has a point-slope representation
+\[y - c = \left(\frac{d-c}{b-a}\right)(x - a)\]
+where $y \in [c,d]$ is the image of $x \in [a,b]$. \par
+The first test function is $f(t) = \cos(4\pi{t})\sin(6\pi{t})$, which is infinitely differentiable on all of $\mathbb{R}$. The second test function \eqref{eq:Test Function 2} is piecewise-smooth. The third and final test function is
+\begin{equation}
+f(t) = \cos(8\pi{t})\exp(\sin(10\pi{t})-1)
+\label{eq:Test Function 3}
+\end{equation}
+which is also infinitely differentiable on $\mathbb{R}$; the third function was selected to be more interesting than the first test function. Graphs of all three test functions are found in Figure \ref{TestFunctions}.  \par
+
+\begin{figure}
+	\centerline{\includegraphics[scale = 0.45]{Figures/TestFunctions1D.eps}}
+\caption{The three test functions considered in the numerical examples. Note that the second test function is only piecewise-smooth, while the first and second functions are smooth.}
+\label{TestFunctions}
+\end{figure}
+
+The interval $[0,1]$ is discretized as equispaced points $0, 1/N, 2/N, \ldots, (N-1)/N$ for $N = 4096$. In other words, the interval is discretized as the vector $\tVec = [t_0,t_1,\ldots,t_{N-1}]$ with $t_\ell = \ell/N$. Samples of $g(x)$ are given at these points so that the discrete date $\gVec = [g_0,g_1,\ldots,g_{N-1}]$ has elements $g_\ell = g(t_\ell)$. The truncated Gaussian kernel $k(x,t)$ is assumed to be centered at the origin and compactly supported on the interval $[-\frac{1}{2},\frac{1}{2}]$. In the numerical examples, the width of the Gaussian kernels (i.e. the value of $1/2\noiseSD^2$ in \eqref{eq:Gaussian kernel}) is chosen to be 100 and 200. With a support of $[-\frac{1}{2},\frac{1}{2}]$, the test functions $f(t)$ must be defined on the interval $[-\frac{1}{2},\frac{3}{2}]$ for the convolution to be defined; see Chapter \ref{ch:Introduction}. As stated at the beginning of this chapter, $f(t)$ is initially defined over the interval $[0,1]$ and so the extensions of $f(t)$ on $[-\frac{1}{2},0)$ and $(1,\frac{3}{2}]$ will reflect the boundary condition being imposed.
+
+%\begin{figure}
+%	\centerline{\includegraphics[scale = 0.45]{Figures/RegAndTroughGaussian.eps}}
+%\caption{Plots of different discretizations of the kernel $k(t)$. The discretization on the left reflects the compact support of $k(t)$ on the interval $[-1/2,1/2]$. The discretization on the right represents the periodic extension of $k(t)$ on the interval $[0,1]$.}
+%\label{RegAndTroughGaussian}
+%\end{figure}
+
+With the discretizations $\fVec$ and $\kVec$ determined, the discretization $\gVec$ of $g(t)$ can be evaluation using either a circular convolution or a linear convolution with appropriate vector padding. Ultimately the vectors $\fVec$, $\kVec$, and $\gVec$ are vector discretizations of $f(t)$, $k(x-t)$, and $g(t)$, respectively. \par
+Overall, two selections for the width of the Gaussian kernel, two selections 5 and 25 for SNR value, and three test functions lead to a total of 12 configurations. For each configuration, 20 noise realizations were generated and tested. The full resolution problem was constructed using $N = 4096$ points. The downsamped resolutions were selected as $n \in \{16,32,\ldots,2048\}$ for a total of nine resolutions (eight values of $n$). \par 
+A primary challenge of using the UPRE method with downsampled signals is that for a course downsampling (in other words, a small number of sample points), the resulting UPRE graphs are shallow. This shallowness makes finding a minimum difficult, and sometime the selected parameter is too small. Figure \ref{fig:UPRElambdas} shows that there are often outlier parameters that are too small, even sometimes for downsamplings with a moderate number of points. At $n = 16$, the range of the parameter values is larger than for the other downsampling levels, which can also be attributed to the shallowness of the function graphs. \par 
+A consequence of choosing the regularization parameter to be too small is that the resulting relative errors are large; the outliers in Figure \ref{fig:UPREerrors} are the relative errors corresponding to the parameter outliers in Figure \ref{fig:UPRElambdas}. Unfortunately the error outliers can be significant, as even evidenced by the outlier at the full $N = 4096$ level. \par 
+Fortunately, the averaged UPRE method appears to overcome the effects of the outliers. Figure \ref{fig:UPRElambdas} shows that for each downsampling level, the parameter found using the average UPRE method was larger than the mean of the parameters found by applying the UPRE to the noise realizations individually. As a result, the corresponding relative errors are less than the means of the errors for each downsampling level, displayed in Figure \ref{fig:UPREerrors}. However, the benefit derived from using the averaged UPRE method might be a consequence of the outliers themselves. Following the approximate region of the minimums of the UPRE functions (shown in Figure \ref{fig:UPREfunctions}), the functions increase rapidly. Thus functions that are excessively shallow may have this region of rapid increase located before the region of the minimums of the other functions. It could be the case that when the average UPRE function is formed, these outlier regions of rapid increase might push the final minimum toward a location that is actually beyond the region of the minimums of the non-outlier functions, resulting in a parameter that is larger than the mean of the individual parameters. Of course, this analysis is not rigorous and perhaps worthy of further investigation. 
+
+\begin{figure}
+	\centering
+	\begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{Figures/UPRE_AvgPlot1D_F1_S15_W100_R20.eps}
+        \caption{}
+        \label{fig:UPREfunctions}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{Figures/UPRE_LamPlot1D_F1_S15_W100_R20.eps}
+        \caption{}
+        \label{fig:UPRElambdas}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{Figures/UPRE_ErrPlot1D_F1_S15_W100_R20.eps}
+        \caption{}
+        \label{fig:UPREerrors}
+    \end{subfigure}
+    \caption{Three plots showing the averaged UPRE results for the first test function with an SNR of 15 and  a Gaussian width parameter of 100. Figure \ref{fig:UPREfunctions} shows a zoomed-in portion of the averaged UPRE graph in comparison with graphs pertaining to the 20 noise realizations at a downsampling level of $n = 128$. Figure \ref{fig:UPRElambdas} shows that the resulting regularization parameter is typically greater than the average of the individual regularization parameters. Figure \ref{fig:UPREerrors} shows that the relative error corresponding to the parameter chosen from the average UPRE method is less than the average of the individual relative errors.}
+\label{fig:UPREplots}
+\end{figure} 
+
+The numerical results of the GCV method are similar to those of the UPRE method. At times the graphs of the GCV functions are shallow and thus difficult to minimize. This is apparent from the parameter outliers in Figure \ref{fig:GCVlambdas} and the corresponding error outliers in Figure \ref{fig:GCVerrors}. The range of the parameters selected at the $n = 16$ is again significant. Some of the parameters at this level were selected so small (quite near to zero) so that the relative errors were excessively large; the largest relative error was approximately 35, and as a result the vertical axis in Figure \ref{fig:GCVerrors} had to be scaled so that errors larger than 2 are simply grouped in a non-scaled region to produce a tractable plot. \par 
+In contrast to the UPRE method, the averaged version of the GCV method selected a regularization parameter that was worse than those selected by using individual noise realizations. The consequence of this is that the corresponding relative errors were larger than the mean of the individual relative errors. Thus the averaged GCV method does not appear to be a viable parameter selection approach.
+%As previously mentioned, for the minimization-based methods UPRE and GCV, the shallowness of some of the curves made finding a meaningful minimum difficult. The approach that might be worth considering is to find the location of maximum curvature, which follows the observations and analysis presented in \cite{HansenOLeary}. \par 
+%The signed curvature of a function $f$, assuming appropriate differentiablility, is
+%\begin{equation}
+%\kappa(x) = \frac{f''(x)}{(1+(f'(x))^2)^{3/2}}.
+%\label{Eq:Curvature}
+%\end{equation}
+%Including the sign of the curvature is useful since a location of maximum curvature could be associated with local maximum instead of a minimum. A numerical approximation to \eqref{Eq:Curvature} can be readily obtained by discretizing $f$ on the domain of interest and using the finite difference approximations
+%\[f'(x) \approx \frac{x_{j+1} - x_{j}}{\Delta{x}} \text{ and } f''(x) \approx \frac{x_{j-1} - 2x_j + x_{j+1}}{(\Delta{x})^2}\]
+%for approximations of the derivatives. In MATLAB, the built-in function \texttt{diff} can be used to generate the derivative approximations. \par 
+%Once a discretization of curvature is obtained, the location of maximum curvature is determined and this location is taken to be the regularization parameter from the UPRE and GCV methods. While the approach of maximizing curvature is not the same as finding a minimum a function itself, this approach could avoid the numerical challenges of minimizing the shallow UPRE and GCV functions. 
+
+\begin{figure}
+	\centering
+	\begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{Figures/GCV_AvgPlot1D_F1_S15_W100_R20.eps}
+        \caption{}
+        \label{fig:GCVfunctions}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{Figures/GCV_LamPlot1D_F1_S15_W100_R20.eps}
+        \caption{}
+        \label{fig:GCVlambdas}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{Figures/GCV_ErrPlot1D_F1_S15_W100_R20.eps}
+        \caption{}
+        \label{fig:GCVerrors}
+    \end{subfigure}
+    \caption{Three plots showing the averaged GCV results for the first test function with an SNR of 15 and a Gaussian width parameter of 100. Figure \ref{fig:GCVfunctions} shows a zoomed-in portion of the averaged GCV graph in comparison with graphs pertaining to the 20 noise realizations at a downsampling level of $n = 128$. Figure \ref{fig:GCVlambdas} shows that the resulting regularization parameter is typically less than the average of the individual regularization parameters. Figure \ref{fig:GCVerrors} shows that the relative error corresponding to the parameter chosen from the average GCV method is greater than the average of the individual relative errors.}
+\label{fig:GCVplots}
+\end{figure}
+
+\chapter{The DCT approach} \label{ch:DCT}
+
 The first boundary condition that will be considered is the Neumann boundary condition, defined by setting
 \[\begin{cases}
 f_{-1} = f_0 \\
@@ -1560,26 +1824,10 @@ Letting $J$ denote the $n \times n$ exchange matrix, the Neumann boundary condit
 \label{eq:Neumann Kf = g}
 K\fVec = [(0~|~T_{l})J + T + (T_{r}~|~0)J]\fVec = \gVec,
 \end{equation}
-where $(0~|~T_{l})$ and $(T_{r}~|~0)$ are the $n \times n$ Toeplitz matrices formed by augmenting $T_{l}$ and $T_{r}$ with $n-m+1$ zero columns. As a result, the matrices $(0~|~T_{l})J$ and $(T_{r}~|~0)J$ are Hankel matrices. Therefore since $T$ is a Toeplitz matrix, the sum $[(0~|~T_{l})J + T + (T_{r}~|~0)J]$ is a Toeplitz-plus-Hankel matrix. Fortunately, this type of matrix is diagonalized by the DCT. To fully describe the set of matrices diagonalized by the DCT, let the shift operator $\shift: \mathbb{R}^n \rightarrow \mathbb{R}^n$ be defined as
-\[\shift(\mathbf{v}) = [v_1,v_2,\ldots,v_{n-1},0]^\trans, \quad \mathbf{v} = [v_0,v_1,\ldots,v_{n-1}]^\trans \in \mathbb{R}^n.\] 
-The class of matrices diagonalization by the DCT can now be described.
-\begin{theorem}[{{\cite{ChanChanWong,KailathOlshevsky1996,Martucci1994,Sanchez_et_al}}}]
-\label{thm:DCT Diagonalization}
-Let $\mathcal{C}$ be the class of matrices that can be diagonalized by the DCT matrix $C$. Then
-\[\mathcal{C} = \{T(\mathbf{v}) + H\left(\shift(\mathbf{v})\right) ~|~ \mathbf{v} \in \mathbb{R}^n\}.\]
-\end{theorem}
-The diagonalization properties of the DCT in relation to Neumann boundary conditions can now be described.
-\begin{theorem}
-\label{thm:Neumann Diagonalization}
-Let the kernel sequence \eqref{eq:Kernel seq.} satisfy $k_j = k_{-j}$ for all $j \in \mathbb{Z}$. Then the matrix $K$ in \eqref{eq:Neumann Kf = g} can be expressed as
-\[K = T(\mathbf{u}) + H\left(\shift(\mathbf{u})\right),\]
-where $\mathbf{u} = [k_0,k_1,\ldots,k_{m-1},0,\ldots,0]^\trans$. In other words, $K$ can be diagonalized by the DCT.
-\end{theorem}
-\begin{proof}
-Equation \eqref{eq:Neumann Kf = g} gives $K = [(0~|~T_{l})J + T + (T_{r}~|~0)J]$. Then $T = T(\mathbf{u})$ by the definition of $T$, and so it remains to show that $[(0~|~T_{l}) + (T_{r}~|~0)]J = H\left(\shift(\mathbf{u})\right)$. From the definitions of $T_{l}$ and $T_{r}$, the sum $(0~|~T_{l}) + (T_{r}~|~0)$ is equal to $T\left(J\shift(\mathbf{u})\right)$. Thus by Lemma \ref{lem:TJ = H},
-\[[(0~|~T_{l}) + (T_{r}~|~0)]J = T\left(J\shift(\mathbf{u})\right)J = H\left(\shift(\mathbf{u})\right).\]
-Therefore $K = T(\mathbf{u}) + H\left(\shift(\mathbf{u})\right)$, and Theorem \ref{thm:DCT Diagonalization} states that $K$ can be diagonalized by the DCT. 
-\end{proof}
+where $(0~|~T_{l})$ and $(T_{r}~|~0)$ are the $n \times n$ Toeplitz matrices formed by augmenting $T_{l}$ and $T_{r}$ with $n-m+1$ zero columns. As a result, the matrices $(0~|~T_{l})J$ and $(T_{r}~|~0)J$ are Hankel matrices. Therefore since $T$ is a Toeplitz matrix, the sum $[(0~|~T_{l})J + T + (T_{r}~|~0)J]$ is a Toeplitz-plus-Hankel matrix. Fortunately, this type of matrix is diagonalized by the DCT as stated in Section \ref{sec:Discrete trig. transforms}. The DCT-versions of the UPRE function \eqref{eq:UPRE DCT}, the GCV function \eqref{eq:GCV DCT}, and the discrepancy principle function \eqref{eq:DP DCT} can thus be used to select the Tikhonov regularization parameter $\regparam$.
+
+\section{Numerical results} \label{sec:Numerical results (DCT)}
+The setup of the numerical test problems for the DCT is the same as that used in Section \ref{sec:Numerical results (DFT)} for the DFT.
 
 \chapter{Two-dimensional problems} \label{ch:2D problems}
 
@@ -1593,25 +1841,23 @@ If the kernel satisfies $k(x,y,s,t) = k(x-s,y-t)$ and the limits of integration 
 g(x,y) = \iint_{\mathbb{R}^2} k(x-s,y-t)f(s,t)~ds~dt.
 \label{eq:Con_2D}
 \end{equation}
-Since an image can be considered a function $f : \mathbb{R}^2 \rightarrow R$, the process of finding solutions to equations of the form \eqref{eq:Con_2D} is commonly referred to \textit{image deblurring}. For an extensive handling of image deblurring techniques, see \cite{HansenNagyOLeary} and \cite[Ch.~5]{Vogel:2002}. \par
-If the support of $k(x-s,y-t)$ is $[a_k,b_k] \times [c_k,d_k]$ and information about $g(x,y)$ is known only in $[a_g,b_g] \times [c_g,d_g]$, then the integral equations for the values of $g(a_g,c_g)$ is given by
-\[g(a_g,c_g) = \iint_{\mathbb{R}^2} k(a_g-s,c_g-t)f(s,t)~ds~dt.\]
-Letting $u = a_g - s$ and $v = c_g - t$ means that $s = a_g - u$, $t = c_g - v$, and the Jacobian $J(x,y)$ is
-\[J(u,v) = \begin{bmatrix}
-\dfrac{\partial{s}}{\partial{u}} & \dfrac{\partial{s}}{\partial{v}} \\[2ex]
-\dfrac{\partial{t}}{\partial{u}} & \dfrac{\partial{s}}{\partial{v}}
-\end{bmatrix} = \begin{bmatrix}
--1 & 0 \\
-0 & -1
-\end{bmatrix} = -I.\]
-Thus $|J(u,v)| = 1$, and so the support of the kernel gives
-\[g(a_g,c_g) = \iint_{\mathbb{R}^2} k(u,v)f(a_g-s,c_g-t)~du~dv = \int_{c_k}^{d_k} \int_{a_k}^{b_k} k(u,v)f(a_g-s,c_g-t)~du~dv.\]
-
+Since an image can be considered a function $f : \mathbb{R}^2 \rightarrow \mathbb{R}$, the process of finding solutions to equations of the form \eqref{eq:Con_2D} is commonly referred to \textit{image deblurring}. For an extensive handling of image deblurring techniques, see \cite{HansenNagyOLeary} and \cite[Ch.~5]{Vogel:2002}. \par
+If the support of $k(x-s,y-t)$ is $[a_k,b_k] \times [c_k,d_k]$ and information about $g(x,y)$ is known only in $[a_g,b_g] \times [c_g,d_g]$, then the integral equations for the values of $g(x,y)$ on the vertices of the rectangles are
+\begin{align*}
+g(a_g,c_g) &= \int_{c_g-d_k}^{c_g-c_k} \int_{a_g-b_k}^{a_g-a_k} k(a_g-s,c_g-t)f(s,t)~ds~dt \\
+g(b_g,c_g) &= \int_{c_g-d_k}^{c_g-c_k} \int_{b_g-b_k}^{b_g-a_k} k(b_g-s,c_g-t)f(s,t)~ds~dt \\
+g(b_g,d_g) &= \int_{d_g-d_k}^{d_g-c_k} \int_{b_g-b_k}^{b_g-a_k} k(b_g-s,d_g-t)f(s,t)~ds~dt \\
+g(a_g,d_g) &= \int_{d_g-d_k}^{d_g-c_k} \int_{a_g-b_k}^{a_g-a_k} k(a_g-s,d_g-t)f(s,t)~ds~dt.
+\end{align*}
 For the sake of simplicity, assume that the support of $k(x-s,y-t)$ is $[-\frac{1}{2},\frac{1}{2}] \times [-\frac{1}{2},\frac{1}{2}]$ and information about $g(x,y)$ is known only in the unit square $[0,1] \times [0,1]$. Then
 \begin{align*}
-g(a_g,c_g) &= \int \int k(a_g-s,c_g-t)f(s,t)~ds~dt \\
-g &= 
+g(0,0) &= \int_{-\frac{1}{2}}^{\frac{1}{2}} \int_{-\frac{1}{2}}^{\frac{1}{2}} k(-s,-t)f(s,t)~ds~dt \\
+g(1,0) &= \int_{-\frac{1}{2}}^{\frac{1}{2}} \int_{\frac{1}{2}}^{\frac{3}{2}} k(1-s,-t)f(s,t)~ds~dt \\
+g(1,1) &= \int_{\frac{1}{2}}^{\frac{3}{2}} \int_{\frac{1}{2}}^{\frac{3}{2}} k(1-s,1-t)f(s,t)~ds~dt \\
+g(0,1) &= \int_{\frac{1}{2}}^{\frac{3}{2}} \int_{-\frac{1}{2}}^{\frac{1}{2}} k(-s,1-t)f(s,t)~ds~dt.
 \end{align*}
+From these equations, the domain of definition of $f(s,t)$ needed for the existence of the integrals is $[-\frac{1}{2},\frac{3}{2}] \times [-\frac{1}{2},\frac{3}{2}]$. Thus if information about $f(s,t)$ is only required in $[0,1] \times [0,1]$, boundary conditions must be imposed.
+
 
 %\section{Resolution Analysis} \label{ch:Resolution Analysis}
 %Our goal is to determine the efficacy of downsampling for regularization parameter estimation, the effects of downsampling on the parameter estimation methods must be carefully examined. The parameter estimation methods are considered from the perspective of the DFT, and so downsampling must be viewed from the same perspective. \par 
@@ -1645,191 +1891,11 @@ g &=
 %\end{equation}
 %Certainly there does not exist an $\Omega > 0$ such that the expression in \eqref{eq:Test Function 2 FT} is zero for all $|\omega| > \Omega$. 
 
-\chapter{Numerical examples} \label{sec:Numerical examples}
-
-For the numerical examples, three test functions are considered. While these functions vary in the extent of smoothness, it is assumed that the information about the measured function $g(x)$ is only known over the $[0,1]$; this will also be the initial domain of definition for $f(t)$. However, the interval $[0,1]$ can be mapped to any other interval using an affine transformation. In general, the transformation from $[a,b]$ to $[c,d]$ such that $a \mapsto c$ and $b \mapsto d$ has a point-slope representation
-\[y - c = \left(\frac{d-c}{b-a}\right)(x - a)\]
-where $y \in [c,d]$ is the image of $x \in [a,b]$. \par
-The first test function is $f(t) = \cos(4\pi{t})\sin(6\pi{t})$, which is infinitely differentiable on all of $\mathbb{R}$. The second test function \eqref{eq:Test Function 2} is piecewise-smooth. The third and final test function is
-\begin{equation}
-f(t) = \cos(8\pi{t})\exp(\sin(10\pi{t})-1)
-\label{eq:Test Function 3}
-\end{equation}
-which is also infinitely differentiable on $\mathbb{R}$; the third function was selected to be more interesting than the first test function. Graphs of all three test functions are found in Figure \ref{TestFunctions}.  \par
-
-\begin{figure}
-	\centerline{\includegraphics[scale = 0.45]{Figures/TestFunctions1D.eps}}
-\caption{The three test functions considered in the numerical examples. Note that the second test function is only piecewise-smooth, while the first and second functions are smooth.}
-\label{TestFunctions}
-\end{figure}
-
-The interval $[0,1]$ is discretized as equispaced points $0, 1/N, 2/N, \ldots, (N-1)/N$ for $N = 4096$. In other words, the interval is discretized as the vector $\tVec = [t_0,t_1,\ldots,t_{N-1}]$ with $t_\ell = \ell/N$. Samples of $g(x)$ are given at these points so that the discrete date $\gVec = [g_0,g_1,\ldots,g_{N-1}]$ has elements $g_\ell = g(t_\ell)$. The truncated Gaussian kernel $k(x,t)$ is assumed to be centered at the origin and compactly supported on the interval $[-\frac{1}{2},\frac{1}{2}]$. In the numerical examples, the width of the Gaussian kernels are chosen to be 100 and 200. With a support of $[-\frac{1}{2},\frac{1}{2}]$, the test functions $f(t)$ must be defined on the interval $[-\frac{1}{2},\frac{3}{2}]$ for the convolution to be defined; see Chapter \ref{sec:Introduction}. As stated at the beginning of this chapter, $f(t)$ is initially defined over the interval $[0,1]$ and so the extensions of $f(t)$ on $[-\frac{1}{2},0)$ and $(1,\frac{3}{2}]$ will reflect the boundary condition being imposed. \par
-If the periodic boundary conditions from Chapter \ref{sec:DFT} are imposed, then in the continuous setting we define $f(t) = f(t+1)$ on $[-\frac{1}{2},0)$ and $f(t) = f(t-1)$ on $(1,\frac{3}{2}]$. \par 
-If the Neumann boundary conditions from Chapter \ref{sec:DCT} are imposed, then in the continuous setting we define $f(t) = f(-t)$ on $[-\frac{1}{2},0)$ and $f(t) = f(-t+2)$ on $(1,\frac{3}{2}]$.
-
-%\begin{figure}
-%	\centerline{\includegraphics[scale = 0.45]{Figures/RegAndTroughGaussian.eps}}
-%\caption{Plots of different discretizations of the kernel $k(t)$. The discretization on the left reflects the compact support of $k(t)$ on the interval $[-1/2,1/2]$. The discretization on the right represents the periodic extension of $k(t)$ on the interval $[0,1]$.}
-%\label{RegAndTroughGaussian}
-%\end{figure}
-
-With the discretizations $\fVec$ and $\kVec$ determined, the discretization $\gVec$ of $g(t)$ can be evaluation using either a circular convolution or a linear convolution with appropriate vector padding. Ultimately the vectors $\fVec$, $\kVec$, and $\gVec$ are vector discretizations of $f(t)$, $k(x-t)$, and $g(t)$, respectively. \par
-Overall, two selections for the width of the Gaussian kernel, two selections 5 and 25 for SNR value, and three test functions lead to a total of 12 configurations. For each configuration, 20 noise realizations were generated and tested. The full resolution problem was constructed using $N = 4096$ points. The downsamped resolutions were selected as $n \in \{16,32,\ldots,2048\}$ for a total of nine resolutions (eight values of $n$). \par 
-Since both Neumann and periodic boundary conditions are considered for the boundaries of $f(t)$, connection between the continuous system \eqref{eq:FIE 2} and discrete system \eqref{eq: Tf = g} is handled thoroughly. 
-
-\section{Construction of noise} \label{sec:Construction of noise}
-
-Though the definition of SNR varies, the definition chosen for this investigation is
-\begin{equation}
-\label{eq:SNR}
-\text{SNR} = 10\log_{10}\left(\frac{P_{\text{signal}}}{P_{\text{noise}}}\right)
-\end{equation}
-where $P$ denotes average power. In the discrete setting, the average power of a signal $\mathbf{f}$ of length $N$ is defined as $\|\mathbf{f}\|^2/N$. Using this definition, $P_{\text{signal}} = \|\gVec\|^2/N$ and $P_{\text{noise}} = \|\noiseVec\|^2/N$ and so the quotient in the logarithm is $\|\gVec\|^2/\|\noiseVec\|^2$. The quotient can also be expressed as $(\|\gVec\|/\|\gnoiseVec - \gVec\|)^2$, which is the square of the multiplicative inverse of the relative error of $\gnoiseVec$. \par
-In MATLAB, the noise vector $\noiseVec$ can be constructed by first taking an $N$-vector $\mathbf{e}$ drawn from the multivariate standard normal distribution and multiplying the vector by a constant $\noiseSD$. Doing so ensures that $\noiseVec$ has variance $\noiseSD^2$ because $\Var(\noise) = \Var(\noiseSD\:\mathbf{e}) = \noiseSD^2\:\Var(\mathbf{e})$ and $\mathbf{e}$ has unit variance. Thus it is useful to rearrange the equation defining SNR into an equation that provides a way of finding the necessary variance for a given SNR value. The rearrangement is shown below, with $\|\noiseVec\|^2$ replaced by $\E(\|\noiseVec\|^2)$.
-\[\E(\|\noiseVec\|^2) = \frac{\|\gVec\|^2}{10^{(\text{SNR}/10)}}\]
-Using the properties of expected value and the fact that $\E(\|\noiseVec\|^2) = \E(\|\noiseSD\:\mathbf{e}\|^2)$, the term on the left hand side of the equation can be changed as
-\[\E(\|\noiseVec\|^2) = \E(\|\noiseSD\:\mathbf{e}\|^2) = \noiseSD^2 \sum_{j=1}^N \E(\mathbf{e}_i^2) = \noiseSD^2 \sum_{j=1}^N \left(\E(\mathbf{e}_i)^2 + \Var(\mathbf{e}_i)\right) = \noiseSD^2 \sum_{j=1}^N \left(0^2 + 1\right) = \noiseSD^2\:N.\]
-Utilizing this change, the following equation for variance is obtained.
-\begin{equation}
-\label{eq:Var}
-\noiseSD^2 = \frac{\|\gVec\|^2}{N \cdot 10^{(\text{SNR}/10)}}
-\end{equation}
-This equation is used for the numerical construction of the noise vectors. SNR values of 5 and 25 are used to generate the white noise added to $\gVec$, and one such data realization is shown in Figure \ref{NoisePlot1D_F2_S05_W200}. \par
-
-\begin{figure}
-	\centerline{\includegraphics[scale = 0.45]{Figures/NoisePlot1D_F2_S05_W200.eps}}
-\caption{The plot shows one data realization of $\gVec$ with noise, where the original function $f$ was the second test function. The SNR value is 5 and the width of the Gaussian PSF is 200.}
-\label{NoisePlot1D_F2_S05_W200}
-\end{figure}
-
-For an accurate evaluation of the numerical examples and their results, multiple realizations of noise are used. A primary advantage of multiple noise realizations is that the sample variance of noise vectors approaches the desired variance as the number of realizations increases. More rigorously, the mean of the sample variances of the noise vectors converges almost surely to the expected value of the sample variance, which is the desired variance $\noiseSD^2$; this is a direct consequence of the (strong) law of large numbers and the fact that the noise vectors are independent and identically distributed with standard normal distribution.  \par
-Another numerical consideration regarding noise is how the sample variance changes across downsampling resolutions. To formalize the concept of downsampling, consider $\mathbf{z} = [z_1,z_2,\ldots,z_n]$. Then a vector $\mathbf{y}$ is called a downsampling of $\mathbf{z}$ if $\mathbf{y} = [z_{n_1},z_{n_2},\ldots,z_{n_m}]$, where $m \leq n$ and $n_j:\{1,2,\ldots,m\}\rightarrow\{1,2,\ldots,n\}$ is a strictly increasing function. This definition is analogous to the definition of a subsequence except with a finite number of terms. \par
-Theoretically, the variance of the noise vector does not change when a vector is downsampled because of the properties of variance. For any $m\times n$ matrix $M$ and $n$-vector $\noiseVec \sim \mathcal{N}(\bm{0},\noiseSD^2I)$
-\begin{equation}
-\Var(M\noiseVec) = M\Var(\noiseVec)M^{\trans} = \noiseSD^2MIM^{\trans} = \noiseSD^2MM^{\trans}
-\label{eq:VarProp}
-\end{equation}
-where $MM^\trans$ is an $m \times m$ matrix. Certainly for arbitrary $M$, $MM^\trans$ can differ from an $m \times m$ identity matrix, which would mean that the new noise vector $M\noiseVec$ no longer represents white noise. However, given an $n$-vector $\noiseVec \sim \mathcal{N}(\bm{0},\noiseSD^2I)$ and the goal of obtaining a downsampled version of $\noiseVec$, a matrix $E$ can be found such that $E\noiseVec$ is the downsampled vector. Since DFT's are utilized in the regularization process, a downsampled vector whose components are still equidistant from adjacent components is desirable. Since the finest sampling $\tVec$ of the interval $[0,1]$ has $N = 4096 = 2^{12}$ points, a natural downsampling with this property would be to select every other component of $\tVec$. The resulting downsampled vector would then have length $N/2 = 2048 = 2^{11}$. The matrix $E$ that accomplishes this downsampling is the $N/2 \times N$ matrix defined as
-\begin{equation}
-E = [\mathbf{e}_1 \: \mathbf{0} \: \mathbf{e}_2 \: \mathbf{0} \: \mathbf{e}_3 \: \mathbf{0} \ldots \mathbf{e}_N]
-\label{eq:Downsampling matrix}
-\end{equation}
-where $\mathbf{0}$ is the $N/2$-vector of all zeros and $\mathbf{e}_j$ is the $N/2$-vector of all zeros except for 1 as the $j\text{th}$ component, $1 \leq j \leq N/2$. Another explanation of how to construct $E$ is to concatenate every other row of an $N \times N$ identity matrix. In an effort to clarify this downsampling process, let $\tVec^{n}$ denote the $n$-point downsampling of $\tVec$. Then with this new notation, $\tVec^{2046} = E\tVec$. \par
-As a smaller example, consider the vector
-\[\tVec = \begin{bmatrix}
-0 & \dfrac{1}{8} & \dfrac{1}{4} & \dfrac{3}{8} & \dfrac{1}{2} & \dfrac{5}{8} & \dfrac{3}{4} & \dfrac{7}{8}
-\end{bmatrix}^{\trans},\]
-which is an equispaced 8-point discretization of $[0,1]$. The $4 \times 8$ matrix $E$ used to obtain downsampling $\tVec^{4}$ is
-\[E = \begin{bmatrix}
-1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
-0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 \\
-0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 \\
-0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 \\
-\end{bmatrix}.\]
-Then $\tVec^4$ obtained by the product $E\tVec$ has equispaced components as desired:
-\[\tVec^4 = E\tVec = \begin{bmatrix}
-0 & \dfrac{1}{4} & \dfrac{1}{2} & \dfrac{3}{4}
-\end{bmatrix}^{\trans}.\]
-\indent Another property of the $N/2 \times N$ matrix $E$ defined in \eqref{eq:Downsampling matrix} is that $EE^{\trans} = I$, where $I$ is the $N/2 \times N/2$ identity matrix.  This is a direct consequence of $\mathbf{e}_j\mathbf{e}_j^\trans = 1$ for all $j$ with $1 \leq j \leq N/2$. Using the property in \eqref{eq:VarProp}, the variance of the  noise vector $\noiseVec^{N/2}$ downsampled from $\noiseVec$ is then
-\[\Var(\noiseVec^{N/2}) = \Var(E\noiseVec) = E\Var(\noiseVec)E^{\trans} = \noiseSD^2EE^{\trans} = \noiseSD^2I\]
-where $I$ is the $N/2 \times N/2$ identity matrix. Therefore, downsampling white noise vectors in this way produces white noise vectors of half length, theoretically preserving variance across downsamples. As a final remark, the process of downsampling described here can be used to obtain downsampled vectors of length $N/(2^2), N/(2^3), \ldots, N/N$, though the final resolution has been chosen as $N/(2^8) = 16$. \par 
-While the variance of the noise is preserved across downsampling resolution in theory, numerically there is some fluctuation. As the downsampling resolutions decrease, i.e. the length of the downsampled vectors decreases, the sample variances more spread out. Figure \ref{VarPlot1D} demonstrates this phenomenon by showing boxplots of sample variance versus downsampling resolutions. %\newpage
-
-\begin{figure}[htb]
-\centerline{\includegraphics[scale=0.45]{Figures/VarPlot1D_F1_S05_W100_R20.eps}}
-\caption{The boxplots were generated from the sample variances of downsampled noise vectors. The theoretical variance of the noise was set to 0.0327, which is indicated by the horizontal dotted line. This figure illustrates that as the lengths of the downsampled vectors decrease, the variance in the computed sample variances increases.}
-\label{VarPlot1D}
-\end{figure}
-
-%\chapter{Effects of downsampling} \label{sec:Effects of downsampling}
-%While analysis has been conducted regarding the convergence of predictive and estimation error for Tikhonov regularization as the number of sample points becomes large \cite{Vogel:2002}, the effects of reducing the number of sample points must be explored. To begin, results about aliasing and DFT components will be presented, followed by an analysis of each parameter estimation method in relation to downsampling. \par 
-%Given a vector $\mathbf{x} \in \mathbb{C}^N$, where $N = LM$ for positive integers $L$ and $M$. Furthermore let $\mathbf{x}[j:k]$ denote the vector $[x_j, x_{j+1},\ldots,x_k]$. The \textit{aliasing operator} $\alias_L(\cdot)$ is defined as
-%\[\alias_L(\mathbf{x}) = \sum_{\ell=0}^{L-1} \mathbf{x}[\ell{M}:(\ell+1)M-1].\]
-%In other words, $\alias_L(\mathbf{x})$ is the result of partitioning the vector $\mathbf{x}$ into $L$ vectors of length $M$ and summing them. The notation $\mathbf{x}[j:k]$ can be extended to recast the concept of downsampling introduced in Section \ref{sec:Construction of noise}; let $\mathbf{x}[j:k:\ell] := [x_{j},x_{j+k},x_{j+2k},\ldots,x_\ell]$. The downsampled vector $\mathbf{x}^{N/L}$ formed by taking every $L$th element of the original vector $\mathbf{x}$, starting with element $x_0$, is then given by
-%\[\mathbf{x}^{N/L} = \mathbf{x}[0:L:(M-1)L].\]
-%As a remark, the aliasing operator is linear and thus could be defined using a matrix representation. \par 
-%With this new notation in mind, Theorem \ref{thm:Downsampling thm}, which is called the Downsampling Theorem in \cite{AudioDFT}, connects the concepts of aliasing and downsampling.
-%
-%\begin{theorem}
-%\label{thm:Downsampling thm}
-%Let $\mathbf{x} \in \mathbb{C}^N$, where $N = LM$ for positive integers $L$ and $M$, and let $F$ be the $N/L \times N/L$ DFT matrix. Then
-%\[F\mathbf{x}^{N/L} = \frac{1}{L}\alias_L(F\mathbf{x}).\]
-%\end{theorem}
-
-
-%\chapter{Numerical Results} \label{Numerical results}
-%
-%\section{The UPRE method} \label{The UPRE method}
-%A primary challenge of using the UPRE method with downsampled signals is that for a course downsampling (in other words, a small number of sample points), the resulting UPRE graphs are shallow. This shallowness makes finding a minimum difficult, and sometime the selected parameter is too small. Figure \ref{fig:UPRElambdas} shows that there are often outlier parameters that are too small, even sometimes for downsamplings with a moderate number of points. At $n = 16$, the range of the parameter values is larger than for the other downsampling levels, which can also be attributed to the shallowness of the function graphs. \par 
-%A consequence of choosing the regularization parameter to be too small is that the resulting relative errors are large; the outliers in Figure \ref{fig:UPREerrors} are the relative errors corresponding to the parameter outliers in Figure \ref{fig:UPRElambdas}. Unfortunately the error outliers can be significant, as even evidenced by the outlier at the full $N = 4096$ level. \par 
-%Fortunately, the averaged UPRE method appears to overcome the effects of the outliers. Figure \ref{fig:UPRElambdas} shows that for each downsampling level, the parameter found using the average UPRE method was larger than the mean of the parameters found by applying the UPRE to the noise realizations individually. As a result, the corresponding relative errors are less than the means of the errors for each downsampling level, displayed in Figure \ref{fig:UPREerrors}. However, the benefit derived from using the averaged UPRE method might be a consequence of the outliers themselves. Following the approximate region of the minimums of the UPRE functions (shown in Figure \ref{fig:UPREfunctions}), the functions increase rapidly. Thus functions that are excessively shallow may have this region of rapid increase located before the region of the minimums of the other functions. It could be the case that when the average UPRE function is formed, these outlier regions of rapid increase might push the final minimum toward a location that is actually beyond the region of the minimums of the non-outlier functions, resulting in a parameter that is larger than the mean of the individual parameters. Of course, this analysis is not rigorous and perhaps worthy of further investigation. 
-%
-%\begin{figure}
-%	\centering
-%	\begin{subfigure}[b]{0.45\textwidth}
-%        \includegraphics[width=\textwidth]{Figures/UPRE_AvgPlot1D_F1_S15_W100_R20.eps}
-%        \caption{}
-%        \label{fig:UPREfunctions}
-%    \end{subfigure}
-%    \begin{subfigure}[b]{0.45\textwidth}
-%        \includegraphics[width=\textwidth]{Figures/UPRE_LamPlot1D_F1_S15_W100_R20.eps}
-%        \caption{}
-%        \label{fig:UPRElambdas}
-%    \end{subfigure}
-%    \begin{subfigure}[b]{0.45\textwidth}
-%        \includegraphics[width=\textwidth]{Figures/UPRE_ErrPlot1D_F1_S15_W100_R20.eps}
-%        \caption{}
-%        \label{fig:UPREerrors}
-%    \end{subfigure}
-%    \caption{Three plots showing the averaged UPRE results for the first test function with an SNR of 15 and  a Gaussian width parameter of 100. Figure \ref{fig:UPREfunctions} shows a zoomed-in portion of the averaged UPRE graph in comparison with graphs pertaining to the 20 noise realizations at a downsampling level of $n = 128$. Figure \ref{fig:UPRElambdas} shows that the resulting regularization parameter is typically greater than the average of the individual regularization parameters. Figure \ref{fig:UPREerrors} shows that the relative error corresponding to the parameter chosen from the average UPRE method is less than the average of the individual relative errors.}
-%\label{fig:UPREplots}
-%\end{figure} 
-%
-%\section{The GCV method} \label{The GCV method}
-%The numerical results of the GCV method are similar to those of the UPRE method. At times the graphs of the GCV functions are shallow and thus difficult to minimize. This is apparent from the parameter outliers in Figure \ref{fig:GCVlambdas} and the corresponding error outliers in Figure \ref{fig:GCVerrors}. The range of the parameters selected at the $n = 16$ is again significant. Some of the parameters at this level were selected so small (quite near to zero) so that the relative errors were excessively large; the largest relative error was approximately 35, and as a result the vertical axis in Figure \ref{fig:GCVerrors} had to be scaled so that errors larger than 2 are simply grouped in a non-scaled region to produce a tractable plot. \par 
-%In contrast to the UPRE method, the averaged version of the GCV method selected a regularization parameter that was worse than those selected by using individual noise realizations. The consequence of this is that the corresponding relative errors were larger than the mean of the individual relative errors. Thus the averaged GCV method does not appear to be a viable parameter selection approach. \par 
-%As previously mentioned, for the minimization-based methods UPRE and GCV, the shallowness of some of the curves made finding a meaningful minimum difficult. The approach that might be worth considering is to find the location of maximum curvature, which follows the observations and analysis presented in \cite{HansenOLeary}. \par 
-%The signed curvature of a function $f$, assuming appropriate differentiablility, is
-%\begin{equation}
-%\kappa(x) = \frac{f''(x)}{(1+(f'(x))^2)^{3/2}}.
-%\label{Eq:Curvature}
-%\end{equation}
-%Including the sign of the curvature is useful since a location of maximum curvature could be associated with local maximum instead of a minimum. A numerical approximation to \eqref{Eq:Curvature} can be readily obtained by discretizing $f$ on the domain of interest and using the finite difference approximations
-%\[f'(x) \approx \frac{x_{j+1} - x_{j}}{\Delta{x}} \text{ and } f''(x) \approx \frac{x_{j-1} - 2x_j + x_{j+1}}{(\Delta{x})^2}\]
-%for approximations of the derivatives. In MATLAB, the built-in function \texttt{diff} can be used to generate the derivative approximations. \par 
-%Once a discretization of curvature is obtained, the location of maximum curvature is determined and this location is taken to be the regularization parameter from the UPRE and GCV methods. While the approach of maximizing curvature is not the same as finding a minimum a function itself, this approach could avoid the numerical challenges of minimizing the shallow UPRE and GCV functions. 
-%
-%\begin{figure}
-%	\centering
-%	\begin{subfigure}[b]{0.45\textwidth}
-%        \includegraphics[width=\textwidth]{Figures/GCV_AvgPlot1D_F1_S15_W100_R20.eps}
-%        \caption{}
-%        \label{fig:GCVfunctions}
-%    \end{subfigure}
-%    \begin{subfigure}[b]{0.45\textwidth}
-%        \includegraphics[width=\textwidth]{Figures/GCV_LamPlot1D_F1_S15_W100_R20.eps}
-%        \caption{}
-%        \label{fig:GCVlambdas}
-%    \end{subfigure}
-%    \begin{subfigure}[b]{0.45\textwidth}
-%        \includegraphics[width=\textwidth]{Figures/GCV_ErrPlot1D_F1_S15_W100_R20.eps}
-%        \caption{}
-%        \label{fig:GCVerrors}
-%    \end{subfigure}
-%    \caption{Three plots showing the averaged GCV results for the first test function with an SNR of 15 and a Gaussian width parameter of 100. Figure \ref{fig:GCVfunctions} shows a zoomed-in portion of the averaged GCV graph in comparison with graphs pertaining to the 20 noise realizations at a downsampling level of $n = 128$. Figure \ref{fig:GCVlambdas} shows that the resulting regularization parameter is typically less than the average of the individual regularization parameters. Figure \ref{fig:GCVerrors} shows that the relative error corresponding to the parameter chosen from the average GCV method is greater than the average of the individual relative errors.}
-%\label{fig:GCVplots}
-%\end{figure}
-%
-%\section{The MDP method} \label{The MDP method}
-%
-%\begin{figure}
-%\centering
-%\includegraphics[width=\textwidth]{Figures/MDP_LamPlot1D_F1_S15_W100_R20.eps}
-%\caption{The parameter selected by the average MDP method appear to be constant, and outside of the range of the parameters found by using the individual noise realizations. This contradicts the lemma in Section \ref{The MDP method}; more investigation is needed.}
-%\label{fig:MDPlambdas}
-%\end{figure}
-
-\chapter{Conclusions and future work} \label{sec:Conclusion}
+\chapter{Conclusions and future work} \label{ch:Conclusion}
+Overall the numerical results demonstrate some potential viability of downsampling to obtain regularization parameters. At the least, the graphs in Sections \ref{sec:Numerical results (DFT)} and \ref{sec:Numerical results (DCT)} show that the statistics of the regularization parameters obtained have structure. The DFT and DCT versions of the UPRE, GCV, and discrepancy principle functions in Chapter \ref{ch:Parameter estimation methods} are useful when the two transforms are to be used in the inversion process. The corresponding statistical results of the function in Chapter \ref{ch:Parameter estimation methods}, such as \eqref{eq:UPRE Expected Value} and \eqref{eq:UPRE Var Sum Simple}, could be useful from an analytic standpoint. \par 
+There are many possible directions of future work. The most important is to quantify the statistics of the regularization parameters when downsampling is applied. Fortunately the DFT and DCT are topics which have been thoroughly investigated in a number of settings. For example, there are explicit connections between downsampling and aliasing with regard to the DFT presented in \cite[Ch.~7]{AudioDFT}; versions of these results could be derived for DCT.  Another means of quantification could be to utilize the statistics of the parameter estimation functions and try to estimate intervals in which $\regparam$ will be found for each downsampling level. In some information about the frequency content (in regard to the DFT or DCT) of the continuous solution $f(t)$ is available, then the information can be used to select an appropriate downsampling level to capture the overall behavior of the solution; the ideal result would be to explicitly show how this process effects the resulting value of $\regparam$. \par 
+Another direction of future work would be to investigate the situation where multiple data sets are available. The UPRE, GCV, and discrepancy principle functions for the availability of multiple data sets are \eqref{eq:SpectralUPREavg}, \eqref{eq:SpectralGCVsum}, and \eqref{eq:SpectralDPavg}, respectively. While the assumption of multiple data sets could produce some interesting results, this assumption is not appropriate for all applications. One issue is that repeated measurements cost time and additional resources. Another issue is that repeated measurements could alter the solution itself. For example, computed tomographic imaging used X-rays to obtain measurements regarding the internal structure of the object \cite[p.~12-14]{ABT} In the object in question is a human being, repeated measurements can result in cell damage. \par 
+As a final and overarching direction for future work, three-dimensional problems will be considered. Examples of setting that produce three-dimensional inverse problems include computed tomography and subsurface imaging by gravitational measurements \cite{ABT}. The primary challenges of working with three-dimensional problems are the numerical structure of the problems themselves, such as how to correctly express the problems as matrix-vector product, as well as the computational costs of solving the problems. However, three-dimensional problems could be the types of problems where downsampling is most useful. To illustrate this intuition, if the unit cube $[0,1] \times [0,1] \times [0,1]$ is discretized by using the vector $[0,\frac{1}{4},\frac{1}{2},\frac{3}{4}]$ along each dimension, then downsampling to the vector $[0,\frac{1}{2}]$ reduces the number of points from 64 to 8. While the quantitative effects of downsampling should be determined before moving to three-dimensional problems, three-dimensional problems possess the most potential for demonstrating these effects. 
 
 \bibliographystyle{siam}
 \bibliography{Parameter-Estimation}
