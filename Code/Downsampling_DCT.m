@@ -7,74 +7,83 @@
 %
 % Regularization method(s) considered: Tihkonov
 % 
-% Companion m-files: testFunction.m, GaussianBlur_1D.m
+% Companion m-files: testFunction.m
 % 
 
 % Fixed set-up:
 seed = RandStream('mt19937ar','Seed',53);   % Generate random seed
-% USE DOWNSAMPLE FUNCTION
-r = 4097; % Effective numerical rank: (2^12)+1
-N = 4097; % Number of points in the finest sampling
+M = 9; % Number of resolutions (downsample M-1 times)
+N = (2^M)+1; % Number of points in the finest sampling
+r = N; % Effective numerical rank
 
-% Variable set-up (input from the user):
-prompt = {'Enter test function number (1, 2, or 3):',...
-            'Enter SNR:',...
-            'Enter w parameter of Gaussian kernel:',...
-            'Enter number of noise realizations (20 recommended):'};
-title = 'Input data specifications';
-specs = inputdlg(prompt,title);
+Fnum = 2;
+w = 200;
+SNR = 5;
+R = 10;
 
-Fnum = str2double(specs{1}); % Test function number (see testFunction.m)
-SNR = str2double(specs{2});   % Signal-to-noise ratio
-w = str2double(specs{3}); % Width parameter for Gaussian PSF
-R = str2double(specs{4}); % Number of noise realizations
+% % Variable set-up (input from the user):
+% prompt = {'Enter test function number (1, 2, or 3):',...
+%             'Enter SNR:',...
+%             'Enter w parameter of Gaussian kernel:',...
+%             'Enter number of noise realizations (20 recommended):'};
+% title = 'Input data specifications';
+% specs = inputdlg(prompt,title);
+% 
+% Fnum = str2double(specs{1}); % Test function number (see testFunction.m)
+% SNR = str2double(specs{2});   % Signal-to-noise ratio
+% w = str2double(specs{3}); % Width parameter for Gaussian PSF
+% R = str2double(specs{4}); % Number of noise realizations
 
 %% Generation of data
 % In this section, the data used in the downsampling experiment is
 % generated using the set-up above. 
 
 % Initialization of storage arrays:
-upre_lambda = zeros(R,length(M));
-gcv_lambda = zeros(R,length(M));
-mdp_lambda = zeros(R,length(M));
-best_lambda = zeros(R,length(M));
+upre_lambda = zeros(R,M);
+gcv_lambda = zeros(R,M);
+mdp_lambda = zeros(R,M);
+best_lambda = zeros(R,1);   % Best lambda is only calculated for full problem
 
-upre_err = zeros(R,length(M));
-gcv_err = zeros(R,length(M));
-mdp_err = zeros(R,length(M));
+upre_err = zeros(R,M);
+gcv_err = zeros(R,M);
+mdp_err = zeros(R,M);
 
-upre_vectors = zeros(length(M),100,R);
-gcv_vectors = zeros(length(M),100,R);
-mdp_vectors = zeros(length(M),100,R);
+upre_vectors = zeros(M,100,R);
+gcv_vectors = zeros(M,100,R);
+mdp_vectors = zeros(M,100,R);
 
-upre_regf = zeros(length(M),N,R);
-gcv_regf = zeros(length(M),N,R);
-mdp_regf = zeros(length(M),N,R);
-best_regf = zeros(length(M),N,R);
+upre_regf = zeros(M,N,R);
+gcv_regf = zeros(M,N,R);
+mdp_regf = zeros(M,N,R);
+best_regf = zeros(N,R); % Best regf is only for full problem
 
-upre_error = zeros(R,length(M));
-gcv_error = zeros(R,length(M));
-mdp_error = zeros(R,length(M));
-best_error = zeros(R,length(M));
+upre_error = zeros(R,M);
+gcv_error = zeros(R,M);
+mdp_error = zeros(R,M);
+best_error = zeros(R,M);    % Best error is only for full problem
 
 % Construction of vector discretizations:
 t = linspace(0,1,N)';    % Equispaced discretization of [0,1] (column)
 f = testFunction(Fnum); % Function handle of test function
 f = f(t);   % Discretize f over [0,1]
-k = exp(-((t'-0.5).^2)/w);    % Convolution kernel row vector
-% k = k/norm(k);  % Normalize k
+if Fnum == 2
+    f = double(f);  % Convert from sym to double if Fnum = 2
+end
+k = exp(-w*((t'-0.5).^2));    % Convolution kernel row vector
 
-% Trapezoidal rule scaling:
+% Trapezoidal rule:
 k(2:end-1) = 2*k(2:end-1);
 dt = 1/(N-1);   % Length of each subinterval
-k = dt*k;
+k = (dt/2)*k;   % Scaling
+k = k/sum(k);  % Normalize k
 
-k = [k,zeros(1,N-1)];   % Pad the end of k with zeros
-
-K = repmat(k,N,1);
+% Pad k with zeros and form matrix K by circular shifts:
+K = repmat([k,zeros(1,N-1)],N,1);    
 for j = 1:N
     K(j,:) = circshift(K(j,:),j-1);
 end
+
+k = k'; % Make k a column vector
 
 m = (N+1)/2;
 T_l = K(:,1:(m-1)); % Left submatrix
@@ -85,97 +94,101 @@ J = rot90(eye(N));  % Exchange matrix
 Z = zeros(N,m); % Matrix for zero padding
 
 A = ([Z,T_l]*J) + T + ([T_r,Z]*J);  % Nuemann system matrix
-B = circshift(([Z,T_l]*J),1,2) + T + ...
-    circshift(([T_r,Z]*J),-1,2);  % Nuemann type-I system matrix
+% B = circshift(([Z,T_l]*J),1,2) + T + ...
+%     circshift(([T_r,Z]*J),-1,2);  % Nuemann type-I system matrix
 
 g = A*f;
 
-g_hat = dct(g)/N;
-k_hat = dct(k); % No scaling needed since k was already normalized by 1/N
+C = dctmtx(N);  % DCT matrix
+C = C(:,1);    % Extract first column of DCT matrix
+k_c = dct(A(:,1))./C;   % Eigenvalues of A
+
+f_c = dct(f);    % Compute DCT of f
+g_c = dct(g); % Compute DCT of g
+
 L = logspace(-5,1,100); % Discretization of lambda domain
 
 % Creation of noise:
 eta = (norm(g)^2)/(N*10^(SNR/10));  % See Report for SNR definition
-noise = sqrt(eta)*seed.randn(R,N);
-g_noise = repmat(g,R,1) + noise;
-testvar = var(noise,0,2);   % 0 specifies the default normalization N-1
+noise = sqrt(eta)*seed.randn(N,R);
+g_noise = repmat(g,1,R) + noise;
 
 %% Looping over noise realizations
 % This section is where the downsampling experiments occur. The process is
 % applied to each realization of noise, and various statistics are
-% calculated and saved. 
+% calculated and saved. The first go-through of the i loop is for the full
+% (N-point) problem.
 
 for j = 1:R    
 
     % For computing representative solutions with the finest sampling:
-    % Michael, look in UPRE_Test_B.m at this line for incorrect addition of noise?
-    % Something to do with adding noise to longest vector, which is
-    % different that above?
-    g_noise_hat = dct(g_noise(j,:))/r;
-    h_hatsol = dct(k);
+    g_noise_c = dct(g_noise(:,j));    % DCT of jth data set g_noise
 
-    % Loop over resolutions stored in M:
-    for i = 1:length(M)
-        n = M(i);
-        tn = linspace(0,1,n+1);
-        tn = tn(1:end-1);
+    % Loop over downsampling resolutions:
+    for i = 0:M-1  
+        tn = downsample(t,2^i);
+        n = length(tn);
+        r = n;
+        
+        kn = downsample(A(:,1),2^i);    % Downsample the first column of A
+        kn = kn/sum(kn);
+        C = dctmtx((2^(M-i))+1);  % DCT matrix
+        C = C(:,1);    % Extract first column of DCT matrix
+        kn_c = dct(kn)./C;   % Eigenvalues of A
+        
+        gn_noise = downsample(g_noise(:,j),2^i);
+        fn = downsample(f,2^i);
 
-        [~,hn] = GaussianBlur_1D(tn,tn,w);
+        fn_c = dct(fn);
+        gn_c = dct(gn_noise);
+        
+        if i == 0
+            best_lambda(j) = optimalParameter(gn_c,kn_c,ones(n,1),r,...
+                fn_c);
+            best_regf(:,j) = idct(filterFactors(k_c,best_lambda(j)).*...
+                g_noise_c./replaceZeros(k_c,1));
+        end
+        
+        [upre_vectors(i+1,:,j),upre_lambda(j,i+1)] = UPREparameter(gn_c,...
+            kn_c,ones(n,1),eta,L,r);
+        upre_lambda(j,i+1) = upre_lambda(j,i+1);  % Scale the lambda
+        
+        [gcv_vectors(i+1,:,j),gcv_lambda(j,i+1)] = GCVparameter(gn_c,kn_c,...
+            ones(n,1),L,r);
+        gcv_lambda(j,i+1) = gcv_lambda(j,i+1);  % Scale the lambda
+        
+%         delta = 1;  % Safety parameter; default is 1
+%         [mdp_vectors(i+1,:,j),mdp_lambda(j,i+1)] = MDPparameter(gn_c,kn_c,...
+%             ones(n,1),eta,delta,L,r);
+%         mdp_lambda(j,i+1) = mdp_lambda(j,i+1);  % Scale the lambda
 
-        gn = interp1(t,g,tn);
-        fn = interp1(t,f,tn);
-
-        gn_noise = interp1(t,g_noise(j,:),tn);
-        fn_hat = dct(fn)/n;
-        gn_hat = dct(gn_noise)/n;
-        hn_hat = dct(hn);
+        upre_regf(i+1,:,j) = idct(...
+            filterFactors(k_c,upre_lambda(j,i+1)).*g_noise_c./...
+            replaceZeros(k_c,1));
         
-        [upre_vectors(i,:,j),upre_lambda(j,i)] = UPREparameter(gn_hat,...
-            hn_hat,ones(1,length(gn)),eta,L,r);
-        upre_lambda(j,i) = upre_lambda(j,i)*sqrt(n/N);  % Scale the lambda
+        gcv_regf(i+1,:,j) = idct(...
+            filterFactors(k_c,gcv_lambda(j,i+1)).*g_noise_c./...
+            replaceZeros(k_c,1));
         
-        [gcv_vectors(i,:,j),gcv_lambda(j,i)] = GCVparameter(gn_hat,...
-            hn_hat,ones(1,length(gn)),L,r);
-        gcv_lambda(j,i) = gcv_lambda(j,i)*sqrt(n/N);  % Scale the lambda
-        
-        delta = 1;  % Safety parameter; default is 1
-        [mdp_vectors(i,:,j),mdp_lambda(j,i)] = MDPparameter(gn_hat,...
-            hn_hat,ones(1,length(gn)),eta,delta,L,r);
-        mdp_lambda(j,i) = mdp_lambda(j,i);  % Scale the lambda
-        
-        best_lambda(j,i) = optimalParameter(gn_hat,hn_hat,...
-            ones(1,length(gn)),r,fn_hat);
-
-        upre_regf(i,:,j) = N*real(ifft(ifftshift(...
-            filterFactors(h_hatsol,upre_lambda(j,i)).*g_noise_hat./...
-            replaceZeros(h_hatsol,1))));
-        
-        gcv_regf(i,:,j) = N*real(ifft(ifftshift(...
-            filterFactors(h_hatsol,gcv_lambda(j,i)).*g_noise_hat./...
-            replaceZeros(h_hatsol,1))));
-        
-        mdp_regf(i,:,j) = N*real(ifft(ifftshift(...
-            filterFactors(h_hatsol,mdp_lambda(j,i)).*g_noise_hat./...
-            replaceZeros(h_hatsol,1))));
-       
-        best_regf(i,:,j) = N*real(ifft(ifftshift(...
-            filterFactors(h_hatsol,best_lambda(j,i)).*g_noise_hat./...
-            replaceZeros(h_hatsol,1))));
+%         mdp_regf(i+1,:,j) = N*ifft(...
+%             filterFactors(k_c,mdp_lambda(j,i+1)).*g_noise_c./...
+%             replaceZeros(k_c,1));
 
     end
-        
-    upre_error(j,:) = TikhRegErr(g_noise_hat,h_hatsol,...
-        ones(1,length(g_noise_hat)),upre_lambda(j,:),r,fn_hat);
+    r = N;
+    
+    upre_error(j,:) = TikhRegErr(g_noise_c,k_c,ones(N,1),...
+        upre_lambda(j,:),r,f_c);
 
-    gcv_error(j,:) = TikhRegErr(g_noise_hat,h_hatsol,...
-        ones(1,length(g_noise_hat)),gcv_lambda(j,:),r,fn_hat);
+    gcv_error(j,:) = TikhRegErr(g_noise_c,k_c,ones(N,1),...
+        gcv_lambda(j,:),r,f_c);
 
-    mdp_error(j,:) = TikhRegErr(g_noise_hat,h_hatsol,...
-        ones(1,length(g_noise_hat)),mdp_lambda(j,:),r,fn_hat);
+%     mdp_error(j,:) = TikhRegErr(g_noise_c,k_c,ones(N,1),...
+%         mdp_lambda(j,:),r,f_c);
 
-    best_error(j,:) = TikhRegErr(g_noise_hat,h_hatsol,...
-        ones(1,length(g_noise_hat)),best_lambda(j,:)*sqrt(n/N),r,fn_hat);    
-
+    best_error(j,:) = TikhRegErr(g_noise_c,k_c,ones(N,1),...
+        best_lambda(j,:)*sqrt(n/N),r,f_c);    
+    
     % Relative solution errors: 
     upre_err(j,:) = err(upre_regf(:,:,j),f)';
     gcv_err(j,:) = err(gcv_regf(:,:,j),f)';
@@ -188,53 +201,52 @@ end
 gAvg_noise = (1/R)*sum(g_noise);
 
 % Initialization of storage vectors:
-upreAvg_lambda = zeros(1,length(M));
-gcvAvg_lambda = zeros(1,length(M));
-mdpAvg_lambda = zeros(1,length(M));
+upreAvg_lambda = zeros(1,M);
+gcvAvg_lambda = zeros(1,M);
+mdpAvg_lambda = zeros(1,M);
 
-upreAvg_regf = zeros(length(M),N);
-gcvAvg_regf = zeros(length(M),N);
-mdpAvg_regf = zeros(length(M),N);
+upreAvg_regf = zeros(M,N);
+gcvAvg_regf = zeros(M,N);
+mdpAvg_regf = zeros(M,N);
 
 % Loop over resolutions stored in M:
-for i = 1:length(M)
-    n = M(i);
-    tn = linspace(0,1,n+1);
-    tn = tn(1:end-1);
+for i = 0:M-1
+    tn = downsample(t,2^i);
+    n = length(tn);
 
-    [~,hn] = GaussianBlur_1D(tn,tn,w);
+    [~,kn] = GaussianBlur_1D(tn,tn,w);
 
     fn = interp1(t,f,tn);
 
     gnAvg_noise = interp1(t,gAvg_noise,tn);
-    fn_hat = dct(fn)/n;
+    fn_c = dct(fn)/n;
     gnAvg_hat = dct(gnAvg_noise)/n;
-    hn_hat = dct(hn);
+    kn_c = dct(kn);
 
     [~,upreAvg_lambda(i)] = UPREparameter(gnAvg_hat,...
-        hn_hat,ones(1,length(tn)),eta,L,r);
+        kn_c,ones(1,length(tn)),eta,L,r);
     upreAvg_lambda(i) = upreAvg_lambda(i)*sqrt(n/N);  % Scale the lambda
 
     [~,gcvAvg_lambda(i)] = GCVparameter(gnAvg_hat,...
-        hn_hat,ones(1,length(tn)),L,r);
+        kn_c,ones(1,length(tn)),L,r);
     gcvAvg_lambda(i) = gcvAvg_lambda(i)*sqrt(n/N);  % Scale the lambda
 
     delta = 1;  % Safety parameter; default is 1
     [~,mdpAvg_lambda(i)] = MDPparameter(gnAvg_hat,...
-        hn_hat,ones(1,length(tn)),eta,delta,L,r);
+        kn_c,ones(1,length(tn)),eta,delta,L,r);
     mdpAvg_lambda(i) = mdpAvg_lambda(i);  % Scale the lambda
 
     upreAvg_regf(i,:) = N*real(ifft(ifftshift(...
-        filterFactors(h_hatsol,upreAvg_lambda(i)).*g_noise_hat./...
-        replaceZeros(h_hatsol,1))));
+        filterFactors(k_c,upreAvg_lambda(i)).*g_noise_c./...
+        replaceZeros(k_c,1))));
 
     gcvAvg_regf(i,:) = N*real(ifft(ifftshift(...
-        filterFactors(h_hatsol,gcvAvg_lambda(i)).*g_noise_hat./...
-        replaceZeros(h_hatsol,1))));
+        filterFactors(k_c,gcvAvg_lambda(i)).*g_noise_c./...
+        replaceZeros(k_c,1))));
 
     mdpAvg_regf(i,:) = N*real(ifft(ifftshift(...
-        filterFactors(h_hatsol,mdpAvg_lambda(i)).*g_noise_hat./...
-        replaceZeros(h_hatsol,1))));
+        filterFactors(k_c,mdpAvg_lambda(i)).*g_noise_c./...
+        replaceZeros(k_c,1))));
 
 end
 
@@ -249,29 +261,29 @@ mdpAvg_vectors = (1/R)*sum(mdp_vectors,3);
 
 %% Implementaion of machine learning method
 
-g_noise_hat = dct(g_noise,[],2)/N;
-regf = @(lambda) N*idct(filterFactors(h_hatsol,lambda).*g_noise_hat./...
-        replaceZeros(h_hatsol,1),[],2);
+g_noise_c = dct(g_noise,[],2)/N;
+regf = @(lambda) N*idct(filterFactors(k_c,lambda).*g_noise_c./...
+        replaceZeros(k_c,1),[],2);
 F = @(lambda) (1/R)*sum(sum((f - regf(lambda)).^2,1));
 
 learned_lambda = fminbnd(F,1e-15,10);
 learned_sol = regf(learned_lambda);
 learned_err = err(learned_sol,f);
 
-%% Data Management
-
-% Clear variables that don't need to be saved:
-clear i j k n ans
-
-% Save workspace:
-answer = questdlg('Would you like to save the data?',...
-    'Data storage','Yes','No','No');    % No is the default
-switch answer
-    case 'Yes'
-        clear answer
-        save(dataname)
-        disp(['Data saved in ' dataname '.'])
-    otherwise
-        clear answer
-        disp('The data has not been saved.')
-end
+% %% Data Management
+% 
+% % Clear variables that don't need to be saved:
+% clear i j k n ans
+% 
+% % Save workspace:
+% answer = questdlg('Would you like to save the data?',...
+%     'Data storage','Yes','No','No');    % No is the default
+% switch answer
+%     case 'Yes'
+%         clear answer
+%         save(dataname)
+%         disp(['Data saved in ' dataname '.'])
+%     otherwise
+%         clear answer
+%         disp('The data has not been saved.')
+% end

@@ -9,7 +9,7 @@ if num == 1
     f = @(t) cos(4*pi*t).*sin(6*pi*t);
     return
 elseif num == 2
-    f = @(t) periodicTestFunction_1D(N);
+    f = periodicTestFunction_1D();
     return
 elseif num == 3
     f = @(t) cos(8*pi*t).*exp(sin(10*pi*t)-1);

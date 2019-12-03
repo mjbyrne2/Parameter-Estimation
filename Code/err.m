@@ -12,11 +12,14 @@ function e = err(D,T)
 [rowsT,colsT] = size(T);
 
 % Test for the size of fE:
-if ~isequal(colsD,colsT) || rowsT ~= 1
-    disp('Dimensions of inputs do not agree.')
-    return
-elseif isequal(rowsD,rowsT)
+if isequal(size(D),size(T))
     e = norm(D - T)/norm(T);
+    return
+elseif colsD == rowsT
+    T = T';
+    Tmat = repmat(T,rowsD,1);  % Tmat is reshaped T
+    e = sqrt(sum(abs(D-Tmat).^2,2));    % Euclidean norm of each row
+    e = e./norm(T); % Relative error
     return
 else
     Tmat = repmat(T,rowsD,1);  % Tmat is reshaped T
