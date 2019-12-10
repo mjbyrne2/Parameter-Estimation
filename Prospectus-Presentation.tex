@@ -253,12 +253,27 @@ Using the generalized SVD, the problem can be recast so that $D$ is ``absorbed" 
 \end{frame}
 
 \begin{frame}
+\frametitle{Downsampling}
+For two natural numbers $m$ and $n$ with $m \geq n$, the map $\downarrow(\cdot) : \mathbb{C}^m \rightarrow \mathbb{C}^{n}$ is defined by $\mathbf{y} = \downarrow(\mathbf{x})$, where $\mathbf{y}$ is the vector formed by concatenating select elements of $\mathbf{x}$ (selecting each element at most once).
+\begin{itemize}
+\item Downsampling has a matrix representation, which depends upon how the downsampled components are selected
+\item For example, $\downarrow(\cdot) : \mathbb{C}^4 \rightarrow \mathbb{C}^2$ can be defined by
+\[\downarrow\left([a,b,c,d]^\trans\right) = [a,c]^\trans, \quad [a,b,c,d]^\trans \in \mathbb{C}^4.\]
+The corresponding matrix representation $S$ would be
+\[S = \begin{bmatrix}
+1 & 0 & 0 & 0 \\
+0 & 0 & 1 & 0
+\end{bmatrix}\]
+\item The notation of downsampling can easily be extended to two dimensions by left and right matrix multiplication
+\end{itemize}
+\end{frame}
+
+\begin{frame}
 \frametitle{Goals and overview of remaining presentation}
 \begin{block}{}
 The primary goal is to determine the effects of downsampling on the efficacy of regularization parameters selected using a variety of methods.
 \end{block}
 \begin{itemize}
-\item Methodology of downsampling
 \item Parameter selection methods
 \begin{itemize}
 \item Unbiased predictive risk estimator
@@ -273,17 +288,6 @@ The primary goal is to determine the effects of downsampling on the efficacy of 
 \end{itemize}
 \item Conclusion and future work
 \end{itemize}
-\end{frame}
-
-\begin{frame}
-\frametitle{Downsampling}
-For two natural numbers $B$ and $N$, let $n = B^N$. The map $\downarrow_B:\mathbb{C}^n \rightarrow \mathbb{C}^{n/B}$ is defined by $\mathbf{y} = \downarrow_B(\mathbf{x})$, where $\mathbf{y}$ is the vector formed by concatenating every $B$th element of $\mathbf{x}$ \cite{AudioDFT}.
-\begin{itemize}
-\item For example, $\downarrow_2([1,2,3,4,5,6]) = [1,3,5]$
-\item $B$-downsampling has a matrix representation
-\item $B = 2$ is advantageous for FFT-type algorithms \ToDo{cite this}
-\end{itemize}
-\ToDo{including animation of this process for $B = 2$}
 \end{frame}
 
 \section{Parameter estimation methods}
@@ -371,7 +375,7 @@ The DCT has an orthogonal matrix representation $C$ with components
 \frametitle{Two-dimensional DCT}
   \begin{itemize}
    \item All eight of the DCTs can be expressed as two-dimensional transforms
-   \item Two-dimensional DCT matrices can be expressed as $C_x \otimes C_y$ where $C_m$ and $C_n$ are $m \times m$ and $n \times n$ DCT matrices, respectively
+   \item Two-dimensional DCT matrices can be expressed as $C_m \otimes C_n$ where $C_m$ and $C_n$ are $m \times m$ and $n \times n$ DCT matrices, respectively
    \item Below are examples of the two-dimensional DCT basis vectors
   \end{itemize}
  \begin{center}
@@ -381,7 +385,7 @@ The DCT has an orthogonal matrix representation $C$ with components
 
 \begin{frame}
 \frametitle{DCT-version of UPRE}
-If $K = C^\trans\Delta{C}$ and $D = C^\trans\Lambda{C}$, then
+If $K = C^\trans\Delta{C}$ and $D = C^\trans\Lambda{C}$ (see \cite{Strang1999}), then
 \[\frac{1}{n}\|\regres\|^2 = \frac{1}{n}\|C\regres\|^2 = \frac{1}{n}\|C(C^\trans\Delta{C})\regf - C\gnoiseVec\|^2 = \frac{1}{n}\|\Delta\dct{\regf} - \dct{\gnoiseVec}\|^2.\]
 Thus the product $\Delta\dct{\regf}$ can be written as
 \[\Delta\dct{\regf} = \Delta{C}[(K^\trans{K} + \regparam{D^\trans}D)^{-1}C^\trans\gnoiseVec] = \Delta(\Delta^\trans{\Delta} + \regparam\Lambda^\trans{\Lambda})^{-1}\Delta^\trans\dct{\gnoiseVec}.\]
@@ -409,7 +413,7 @@ Under the assumptions that $K$ is diagonalized by the DCT and that $D = I$,
 \begin{frame}
 \frametitle{Statistics of the UPRE}
 Under the assumption that $\mathbf{\noiseVec} \sim \mathcal{N}(\mathbf{0},\noiseSD^2 I)$, the orthogonality of the DCT matrix $C$ produces
-\[C\mathbf{\gnoiseVec} = \dct{\mathbf{\gnoiseVec}} \sim \mathcal{N}(C\mathbf{\gVec},\noiseSD^2 CC^\trans) = \mathcal{N}(\dct{\mathbf{\gnoiseVec}},\noiseSD^2 I).\]
+\[C\mathbf{\gnoiseVec} = \dct{\mathbf{\gnoiseVec}} \sim \mathcal{N}(C\mathbf{\gVec},\noiseSD^2 CC^\trans) = \mathcal{N}(\dct{\mathbf{\gVec}},\noiseSD^2 I).\]
 Thus statistical results like the following can be obtained.
 \begin{block}{Expected value of $\U_n(\regparam)$}
 \begin{align*}
@@ -536,6 +540,17 @@ For $\noiseVec \sim \mathcal{N}(\mathbf{0},\noiseSD^2 I)$, let $J = \{0,n/2\}$ i
 \[|\widehat{\noise}_j|^2 \sim \begin{cases}
 \text{gamma}(1/2,2\noiseSD^2), & j \in J \\
 \text{exponential}(\noiseSD^2), & j \not\in J \end{cases}.\]
+\end{block}
+\end{frame}
+
+\begin{frame}
+\frametitle{Downsampling and the DFT}
+Given a vector $\mathbf{x} \in \mathbb{C}^N$ with $N = LM$, the \textit{aliasing operator} $\text{A}_L : \mathbb{C}^N \rightarrow \mathbb{C}^M$ is defined by
+\[\left(\text{A}_L(\mathbf{x})\right)_j = \sum_{k=0}^{L-1} x_{j+kM}, \quad \mathbf{x} \in \mathbb{C}^N, \quad 0 \leq j \leq M-1.\]
+Letting $\mathbf{x}^M$ be the downsampling of $\mathbf{x}$ formed by every $L$th component of $\mathbf{x}$, the following result relates downsampling and the aliasing operator.
+\begin{block}{Downsampling Theorem \cite{AudioDFT}}
+Let $\mathbf{x} \in \mathbb{C}^N$, with $N = LM$, let $\mathbf{y} = \mathbf{x}^M$, and let $\widehat{\mathbf{x}}$ and $\widehat{\mathbf{y}}$ denote the DFT of $\mathbf{x}$ and $\mathbf{y}$, respectively. Then
+\[\widehat{\mathbf{y}} = \frac{1}{L} \text{A}_L(\widehat{\mathbf{x}}).\]
 \end{block}
 \end{frame}
 

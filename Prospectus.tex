@@ -189,7 +189,7 @@ Direct matrix inversion is not always practical, and not even possible when $\kM
 \label{eq:SVD}
 \end{equation}
 where the $m \times m$ matrix $U$ and the $n \times n$ matrix $V$ have orthogonal columns and $\Sigma$ is a $m \times n$ diagonal matrix. The diagonal elements of $\Sigma$ are the singular values of $\kMat$, denoted $\singular_\ell$ and satisfying $\singular_0 \geq \singular_1 \geq \ldots \geq \singular_{n-1} \geq 0$. The columns of $U$ and $V$ will be denoted $U_{\cdot,\ell}$ and $V_{\cdot,\ell}$, respectively; these vectors are known as the left and right singular vectors of $\kMat$, respectively. A matrix of complex values has a SVD as well, the only difference being that the transpose is replaced with conjugate transpose. \par
-Let $r$ denote the rank of $\kMat$. Then $\singular_0 \geq \ldots \geq \singular_{r-1} > 0$, i.e. the number of nonzero singular values of $\kMat$ is equal to the rank of $\kMat$.  A common variation of the SVD is the compact SVD (or economy SVD \cite{golub2013matrix}), in which $\Sigma = \diag(\singular_0,\ldots,\singular_{r-1})$, $U$ is an $m \times r$ matrix and $V^\trans$ is an $r \times n$ matrix. The matrices $U$ and $V$ are no longer orthogonal in the traditional sense because they are not square (unless $\kMat$ is nonsingular). Instead, $U$ and $V$ are column orthonormal. \par 
+Let $r$ denote the rank of $\kMat$. Then $\singular_0 \geq \ldots \geq \singular_{r-1} > 0$, i.e. the number of nonzero singular values of $\kMat$ is equal to the rank of $\kMat$.  A common variation of the SVD is the compact SVD (or economy SVD \cite{GolubVanLoan2013}), in which $\Sigma = \diag(\singular_0,\ldots,\singular_{r-1})$, $U$ is an $m \times r$ matrix and $V^\trans$ is an $r \times n$ matrix. The matrices $U$ and $V$ are no longer orthogonal in the traditional sense because they are not square (unless $\kMat$ is nonsingular). Instead, $U$ and $V$ are column orthonormal. \par 
 By using $\kMat^{-1} = V\Sigma^{-1}U^\trans$ when $\kMat$ is nonsingular, the product $\kMat^{-1}\gnoiseVec$ is
 \begin{equation}
 \kMat^{-1}\gnoiseVec = \kMat^{-1}\left(\kMat\fVec + \noiseVec\right) = \fVec + \kMat^{-1}\noiseVec = \fVec + V\Sigma^{-1}{U^\trans}\noiseVec = \fVec + \sum_{\ell = 0}^{n-1} \frac{{U^\trans_\ell}\noiseVec}{\singular_\ell}V_{\cdot,\ell}. 
@@ -555,20 +555,6 @@ Then $\tVec^4$ obtained by the product $E\tVec$ has equispaced components as des
 \indent Another property of the $N/2 \times N$ matrix $E$ defined in \eqref{eq:Downsampling matrix} is that $EE^{\trans} = I$, where $I$ is the $N/2 \times N/2$ identity matrix.  This is a direct consequence of $\mathbf{e}_j\mathbf{e}_j^\trans = 1$ for all $j$ with $0 \leq j \leq (N/2)-1$. Using the property in \eqref{eq:VarProp}, the variance of the  noise vector $\noiseVec^{N/2}$ downsampled from $\noiseVec$ is then
 \[\Var(\noiseVec^{N/2}) = \Var(E\noiseVec) = E\Var(\noiseVec)E^{\trans} = \noiseSD^2EE^{\trans} = \noiseSD^2I\]
 where $I$ is the $N/2 \times N/2$ identity matrix. Therefore, downsampling white noise vectors in this way produces white noise vectors of half length, theoretically preserving variance across downsamples. As a final remark, the process of downsampling described here can be used to obtain downsampled vectors of length $N/(2^2), N/(2^3), \ldots, N/N$, though the final resolution has been chosen as $N/(2^8) = 16$. \par
-
-%Given a vector $\mathbf{x} \in \mathbb{C}^N$, where $N = LM$ for positive integers $L$ and $M$. Furthermore let $\mathbf{x}[j:k]$ denote the vector $[x_j, x_{j+1},\ldots,x_k]$. The \textit{aliasing operator} $\alias_L(\cdot)$ is defined as
-%\[\alias_L(\mathbf{x}) = \sum_{\ell=0}^{L-1} \mathbf{x}[\ell{M}:(\ell+1)M-1].\]
-%In other words, $\alias_L(\mathbf{x})$ is the result of partitioning the vector $\mathbf{x}$ into $L$ vectors of length $M$ and summing them. The notation $\mathbf{x}[j:k]$ can be extended to recast the concept of downsampling introduced in Section \ref{sec:Construction of noise}; let $\mathbf{x}[j:k:\ell] := [x_{j},x_{j+k},x_{j+2k},\ldots,x_\ell]$. The downsampled vector $\mathbf{x}^{N/L}$ formed by taking every $L$th element of the original vector $\mathbf{x}$, starting with element $x_0$, is then given by
-%\[\mathbf{x}^{N/L} = \mathbf{x}[0:L:(M-1)L].\]
-%As a remark, the aliasing operator is linear and thus could be defined using a matrix representation. \par 
-%With this new notation in mind, Theorem \ref{thm:Downsampling thm}, which is called the Downsampling Theorem in \cite{AudioDFT}, connects the concepts of aliasing and downsampling.
-%
-%\begin{theorem}
-%\label{thm:Downsampling thm}
-%Let $\mathbf{x} \in \mathbb{C}^N$, where $N = LM$ for positive integers $L$ and $M$, and let $F$ be the $N/L \times N/L$ DFT matrix. Then
-%\[F\mathbf{x}^{N/L} = \frac{1}{L}\alias_L(F\mathbf{x}).\]
-%\end{theorem}
-
 While the variance of the noise is preserved across downsampling resolution in theory, numerically there is some fluctuation. As the downsampling resolutions decrease, i.e. the length of the downsampled vectors decreases, the sample variances more spread out. Figure \ref{VarPlot1D} demonstrates this phenomenon by showing boxplots of sample variance versus downsampling resolutions. %\newpage
 
 \begin{figure}[htb]
@@ -577,7 +563,40 @@ While the variance of the noise is preserved across downsampling resolution in t
 \label{VarPlot1D}
 \end{figure}
 
-Though the definition of SNR varies, the definition chosen for this investigation is
+One description of the effects of downsampling a vector in terms of the DFT is the Downsampling Theorem \cite[Ch.~7]{AudioDFT}. Given a vector $\mathbf{x} \in \mathbb{C}^N$, where $N = LM$ for positive integers $L$ and $M$, and \textit{aliasing operator} $\alias_L(\cdot) : \mathbb{C}^N \rightarrow \mathbb{C}^M$ is defined as
+\[\left(\alias_L(\mathbf{x})\right)_j = \sum_{k=0}^{L-1} x_{j+kM}, \quad \mathbf{x} \in \mathbb{C}^N, \quad j \in \{0,1,\ldots,M-1\}.\]
+The vector $\alias_L(\mathbf{x})$ is is the result of partitioning the vector $\mathbf{x}$ into $L$ vectors of length $M$ and summing them. The aliasing operator is linear and thus could be defined using a matrix representation; if $L = 2$, the aliasing operator has an $M \times N$ matrix representation $A$ that has entries
+\[A_{j,k} = \begin{cases}
+1, & j = k \bmod M, \\
+0, & \text{otherwise}
+\end{cases}, \quad 0 \leq j \leq M-1, ~ 0 \leq k \leq N-1.\]
+With the aliasing operator defined, the Downsampling Theorem can be stated.
+\begin{theorem}{Downsampling Theorem}
+Let $\mathbf{x} \in \mathbb{C}^N$, where $N = LM$ for positive integers $L$ and $M$, let $\mathbf{y} = \mathbf{x}^M$, and let $\widehat{y}$ and $\widehat{x}$ denote the DFT of $\mathbf{y}$ and $\mathbf{x}$, respectively. Then
+\[\widehat{\mathbf{y}} = \frac{1}{\sqrt{L}}\alias_L\left(\widehat{\mathbf{x}}\right).\]
+\end{theorem}
+\begin{proof}
+Since the length of $\widehat{\mathbf{x}}$ is $N$, $\alias_L\left(\widehat{\mathbf{x}}\right)$ has length $M = N/L$. Letting $\mathbf{z} = \alias\left(\widehat{\mathbf{x}}\right)$, we have that
+\[z_j = \sum_{k=0}^{L-1}\widehat{x}_{j+kM}, \quad j\in\{0,1,\ldots,M-1\},\]
+because each component of $\mathbf{z}$ is the sum of $L$ components of $\widehat{\mathbf{x}}$. Fixing some $j\in\{0,1,\ldots,M-1\}$, the definition of the DFT and the fact that $M/N = L$ give
+\begin{align*}
+\sum_{k=0}^{L-1}\widehat{x}_{j+kM} &= \sum_{k=0}^{L-1} \left(\frac{1}{\sqrt{N}}\sum_{\ell=0}^{N-1} x_{\ell}\exp\left(\frac{-2\pi{i}(j+kM)\ell}{N}\right)\right) \\
+&= \frac{1}{\sqrt{N}} \sum_{k=0}^{L-1} \sum_{\ell=0}^{N-1} x_{\ell}\exp\left(\frac{-2\pi{ij\ell}}{N}\right)\exp\left(\frac{-2\pi{ikM\ell}}{N}\right) \\
+&= \frac{1}{\sqrt{N}} \sum_{k=0}^{L-1} \sum_{\ell=0}^{N-1} x_{\ell}\exp\left(\frac{-2\pi{ij\ell}}{N}\right)\exp\left(\frac{-2\pi{ik\ell}}{L}\right) \\
+&= \frac{1}{\sqrt{N}} \sum_{\ell=0}^{N-1} x_{\ell} \exp\left(\frac{-2\pi{ij\ell}}{N}\right) \left(\sum_{k=0}^{L-1} \exp\left(\frac{-2\pi{ik\ell}}{L}\right)\right).
+\end{align*}
+The sum over $k$ is geometric:
+\[\sum_{k=0}^{L-1} \exp\left(\frac{-2\pi{ik\ell}}{L}\right) = \sum_{k=0}^{L-1} \left(\exp\left(\frac{-2\pi{i\ell}}{L}\right)\right)^k.\]
+If $n = 0 \bmod L$, then the summands are all 1 and the sum is equal to $L$. If $n \neq 0 \bmod L$, then the formula for a geometric sum produces
+\[\sum_{k=0}^{L-1} \left(\exp\left(\frac{-2\pi{i\ell}}{L}\right)\right)^k = \frac{1-\exp(-2\pi{i\ell})}{1-\exp(-2\pi{i\ell/L})} = 0,\]
+where the last equality comes from noting that $\exp(-2\pi{i\ell}) = 1$ for all integers $\ell$. Performing the change of index $m = \ell/L$, the results regarding the sum over $k$ imply
+\[\frac{1}{\sqrt{N}} \sum_{\ell=0}^{N-1} x_{\ell} \exp\left(\frac{-2\pi{ij\ell}}{N}\right) \left(\sum_{k=0}^{L-1} \exp\left(\frac{-2\pi{ik\ell}}{L}\right)\right) = \frac{L}{\sqrt{N}} \sum_{m=0}^{(N/L)-1} x_{mL} \exp\left(\frac{-2\pi{ijmL}}{N}\right)\]
+because integral values of $m = \ell/L$ means that $\ell = 0 \bmod L$. Using $N = LM$ and noting that $x_{mL} = y_m$ yields
+\[z_j = \frac{L}{\sqrt{N}} \sum_{m=0}^{(N/L)-1} x_{mL} \exp\left(\frac{-2\pi{ijmL}}{N}\right) = \frac{L}{\sqrt{N}} \sum_{m=0}^{M-1} y_m \exp\left(\frac{-2\pi{ijm}}{M}\right) = \frac{L\sqrt{M}}{\sqrt{N}} \widehat{y}_j.\]
+Therefore $\widehat{\mathbf{y}} = \frac{1}{\sqrt{L}}\mathbf{z} = \frac{1}{\sqrt{L}}\alias_L\left(\widehat{\mathbf{x}}\right)$.
+\end{proof}
+In words, the Downsampling Theorem states that the DFT of a downsampled vector is equal to a (scaled) summed partition of the DFT of the original vector. A direction of future work will be to see if the Downsampling Theorem can be directly applied to the parameter estimation functions in Chapter \ref{ch:Parameter estimation methods} to analyze the effects of downsampling on the functions themselves. \par 
+Each function in Chapter \ref{ch:Parameter estimation methods} uses the assumption that noise is present in the given data. Since data in the context of the DFT are often considered discretizations of analog signals, a common quantifier of noise in data is the signal-to-noise ratio (SNR). Though the definition of SNR varies, the definition chosen for this investigation is
 \begin{equation}
 \label{eq:SNR}
 \text{SNR} = 10\log_{10}\left(\frac{P_{\text{signal}}}{P_{\text{noise}}}\right)
@@ -1824,7 +1843,20 @@ Letting $J$ denote the $n \times n$ exchange matrix, the Neumann boundary condit
 \label{eq:Neumann Kf = g}
 K\fVec = [(0~|~T_{l})J + T + (T_{r}~|~0)J]\fVec = \gVec,
 \end{equation}
-where $(0~|~T_{l})$ and $(T_{r}~|~0)$ are the $n \times n$ Toeplitz matrices formed by augmenting $T_{l}$ and $T_{r}$ with $n-m+1$ zero columns. As a result, the matrices $(0~|~T_{l})J$ and $(T_{r}~|~0)J$ are Hankel matrices. Therefore since $T$ is a Toeplitz matrix, the sum $[(0~|~T_{l})J + T + (T_{r}~|~0)J]$ is a Toeplitz-plus-Hankel matrix. Fortunately, this type of matrix is diagonalized by the DCT as stated in Section \ref{sec:Discrete trig. transforms}. The DCT-versions of the UPRE function \eqref{eq:UPRE DCT}, the GCV function \eqref{eq:GCV DCT}, and the discrepancy principle function \eqref{eq:DP DCT} can thus be used to select the Tikhonov regularization parameter $\regparam$.
+where $(0~|~T_{l})$ and $(T_{r}~|~0)$ are the $n \times n$ Toeplitz matrices formed by augmenting $T_{l}$ and $T_{r}$ with $n-m+1$ zero columns. As a result, the matrices $(0~|~T_{l})J$ and $(T_{r}~|~0)J$ are Hankel matrices. Therefore since $T$ is a Toeplitz matrix, the sum $[(0~|~T_{l})J + T + (T_{r}~|~0)J]$ is a Toeplitz-plus-Hankel matrix. Fortunately, this type of matrix is diagonalized by the DCT as stated in Section \ref{sec:Discrete trig. transforms}. The DCT-versions of the UPRE function \eqref{eq:UPRE DCT}, the GCV function \eqref{eq:GCV DCT}, and the discrepancy principle function \eqref{eq:DP DCT} can thus be used to select the Tikhonov regularization parameter $\regparam$. \par 
+An version of the Downsampling Theorem can be obtained for the DCT. First, the following lemma will be established.
+\begin{lemma}
+Let $\mathbf{x} \in \mathbb{C}^N$, where $N = LM$ for positive integers $L$ and $M$. Then
+\begin{align*}
+\Re\left(\alias_L(\mathbf{x})\right) = \alias_L\left(\Re(\mathbf{x})\right), \\
+\Im\left(\alias_L(\mathbf{x})\right) = \alias_L\left(\Im(\mathbf{x})\right).
+\end{align*}
+\end{lemma}
+\begin{proof}
+Let $\mathbf{a} = \Re(\alias_L(\mathbf{x}))$ and $\mathbf{b} = \alias_L(\Re(\mathbf{x}))$. By the definition of the aliasing operator and the linearity of taking the real part,
+\[a_j = \Re\left(\sum_{k=0}^{L-1} x_{j+kM}\right) = \sum_{k=0}^{L-1} \Re(x_{j+kM}) = b_j.\]
+The proof for the imaginary part is identical.
+\end{proof}
 
 \section{Numerical results} \label{sec:Numerical results (DCT)}
 The setup of the numerical test problems for the DCT is the same as that used in Section \ref{sec:Numerical results (DFT)} for the DFT.
