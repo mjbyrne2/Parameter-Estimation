@@ -1,7 +1,10 @@
 function x = myIFFT(x_hat)
+% myIFFT.m is a rescaled version of the MATLAB built-in function ifft.m so
+% that the transform corresponds with the matrix-vector multiplication of a
+% vector with the unitary DFT matrix.
 
-n = length(x_hat);
-x = sqrt(n)*ifft(x_hat); % Rescale the ifft to so it is now unitary
+N = length(x_hat);
+x = sqrt(N)*ifft(x_hat);
 
 end
 
