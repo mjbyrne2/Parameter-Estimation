@@ -76,6 +76,7 @@
 % Discrepancy principle derivation notation:
 \newcommand{\D}{D}	% Discrepancy principle function
 \newcommand{\MDP}{\text{MDP}}	% Text of MDP for use in math mode
+\newcommand{\safeparam}{\epsilon}	% Safety parameter for the MDP method
 % Rosie's commands
 \newcommand{\comment}[1]{\textcolor{red}{ \textbf{Comment}: #1}}
 \newcommand{\ToDo}[1]{\textcolor{green}{\textbf{#1}}}
@@ -160,7 +161,7 @@ where the matrix $\Phi$ is diagonal with $\Phi_{k,k} = \filt(\regparam,\singular
 which is known as the standard Tikhonov filter function. The use of the Tikhonov filter function to generate an approximate solution is known as Tikhonov regularization \cite{Tikh1963}; in terms of an SVD, the obtained solution is
 \begin{equation}
 \label{eq:TikSol}
-\xVec(\regparam) = \sum_{k = 1}^{r} \frac{\singular_k \svd{\dVec}_k}{\singular_k^2 + \regparam^2}V_{\cdot,k}.
+\xVec(\regparam) = \sum_{k = 1}^{r} \frac{\singular_k \svd{\dVec}_k}{\singular_k^2 + \regparam^2}V_{\cdot,k} = \sum_{k = 1}^{r} \filt(\regparam,\singular_k)\frac{\svd{\dVec}_k}{\singular_k}V_{\cdot,k}.
 \end{equation}
 An alternative representation of the above Tikhonov solution is
 \begin{equation}
@@ -230,96 +231,97 @@ An application of the decompositions \eqref{eq:GSVD} is that the normal equation
 (\trans{\Delta}\Delta + \regparam^2 \trans{\Lambda}\Lambda)\trans{X}\xVec &= \trans{\Delta}\svd{\dVec}.
 \label{eq:Normal equation 2}
 \end{align}
-Certainly $\trans{\Lambda}\Lambda$ is diagonal, but the structure of $\trans{\Delta}\Delta$ may not be obvious if $m < n$. The structure of $\trans{\Delta}\Delta$ in such a case can be shown from the following lemma.
-
-\begin{lemma}
-\label{lem:k-diagonal}
-For any matrices $B \in \mathbb{C}^{m \times m}$ and $C \in \mathbb{C}^{n \times n}$ and any $k$-diagonal matrix $D \in \mathbb{C}^{m \times n}$ with $m < n$ and $k = n-m$, partition $D$ as $D = [\zeroVec_{m \times k} ~ E]$, where $\zeroVec_{m \times k}$ is an $m \times k$ zero matrix and $E$ is a $m \times m$ diagonal matrix. Similarly, partition $C$ as
-\[C = \begin{bmatrix}
-C_{k \times k} & C_{k \times m} \\
-C_{m \times k} & F
-\end{bmatrix}.\]
-where $F$ is an $m \times m$ matrix. Then the structure of the matrix conjugations $\trans{D}BD \in \mathbb{C}^{n \times n}$ and $DC\trans{D} \in \mathbb{C}^{m \times m}$ are described by the following.
-\begin{itemize}
-\item[(a)] The matrix $\trans{D}BD$ is block diagonal with
-\[\trans{D}BD = \begin{bmatrix}
-\zeroVec_{k \times k} & \zeroVec_{k \times m} \\
-\zeroVec_{m \times k} & \trans{E}BE
-\end{bmatrix}.\]
-\item[(b)] $DC\trans{D} = EF\trans{E}$.
-\end{itemize}
-\end{lemma}
-\begin{proof}
-For part (a), the partitioning of $D$ yields
-\[\trans{D}BD = \begin{bmatrix}
-\zeroVec_{k \times m} \\
-\trans{E}
-\end{bmatrix}B\begin{bmatrix}
-\zeroVec_{m \times k} & E
-\end{bmatrix} = \begin{bmatrix}
-\zeroVec_{k \times m} \\
-\trans{E}
-\end{bmatrix}\begin{bmatrix}
-\zeroVec_{m \times k} & BE
-\end{bmatrix} = 
-\begin{bmatrix}
-\zeroVec_{k \times k} & \zeroVec_{k \times m} \\
-\zeroVec_{m \times k} & \trans{E}BE
-\end{bmatrix}.\]
-Similarly, the proof of part (b) uses the partitioning of both $D$ and $C$:
-\[DC\trans{D} = 
-\begin{bmatrix}
-\zeroVec_{m \times k} & E
-\end{bmatrix}
-\begin{bmatrix}
-C_{k \times k} & C_{k \times m} \\
-C_{m \times k} & F
-\end{bmatrix}
-\begin{bmatrix}
-\zeroVec_{k \times m} \\
-\trans{E}
-\end{bmatrix} = \begin{bmatrix}
-\zeroVec_{m \times k} & E
-\end{bmatrix}
-\begin{bmatrix}
-C_{k \times m}\trans{E} \\
-F\trans{E}
-\end{bmatrix} = EF\trans{E}.\]
-\end{proof}
-\noindent Then it follows from part (a) of Lemma \ref{lem:k-diagonal} that $\trans{\Delta}\Delta$ is diagonal, which is stated as the following corollary.
-
-\begin{corollary}
-\label{cor:Diagonal}
-The $n \times n$ matrix $\trans{\Delta}\Delta$ in \eqref{eq:Normal equation 2} is diagonal.
-\end{corollary}
-\begin{proof}
-The $m \times n$ matrix $\Delta$ is diagonal if $m \geq n$, in which case it is immediate that $\trans{\Delta}\Delta$ is diagonal. If $m < n$, then $\Delta$ is a $k$-diagonal matrix with $k = n - m$. Part (a) of Lemma \ref{lem:k-diagonal} can be applied with $D = \Delta$ and $B = I$, which implies that the structure of $\trans{\Delta}\Delta$ is
-\[\trans{\Delta}\Delta = \begin{bmatrix}
-\zeroVec_{k \times k} & \zeroVec_{k \times m} \\
-\zeroVec_{m \times k} & \trans{E}E
-\end{bmatrix}\]
-with partition $\Delta = [\zeroVec_{m \times k} ~ E]$ and diagonal matrix $E$. The matrix $\trans{E}E$ is thus diagonal, and therefore $\trans{\Delta}\Delta$ is diagonal.
-\end{proof}
-
-A consequence of Corollary \ref{cor:Diagonal} is that the matrix $\trans{\Delta}\Delta + \regparam^2 \trans{\Lambda}\Lambda$ in \eqref{eq:Normal equation 2} is diagonal. Additionally, the assumption that the block system matrix in \eqref{eq:TikSol3} has full column rank means that $\trans{\Delta}\Delta + \regparam^2 \trans{\Lambda}\Lambda$ is non-singular for $\regparam > 0$. In such a case, a representation of the regularized solution similar to \eqref{eq:TikSol} is obtained:
+%Certainly $\trans{\Lambda}\Lambda$ is diagonal, but the structure of $\trans{\Delta}\Delta$ may not be obvious if $m < n$. The structure of $\trans{\Delta}\Delta$ in such a case can be shown from the following lemma.
+%
+%\begin{lemma}
+%\label{lem:k-diagonal}
+%For any matrices $B \in \mathbb{C}^{m \times m}$ and $C \in \mathbb{C}^{n \times n}$ and any $k$-diagonal matrix $D \in \mathbb{C}^{m \times n}$ with $m < n$ and $k = n-m$, partition $D$ as $D = [\zeroVec_{m \times k} ~ E]$, where $\zeroVec_{m \times k}$ is an $m \times k$ zero matrix and $E$ is a $m \times m$ diagonal matrix. Similarly, partition $C$ as
+%\[C = \begin{bmatrix}
+%C_{k \times k} & C_{k \times m} \\
+%C_{m \times k} & F
+%\end{bmatrix}.\]
+%where $F$ is an $m \times m$ matrix. Then the structure of the matrix conjugations $\trans{D}BD \in \mathbb{C}^{n \times n}$ and $DC\trans{D} \in \mathbb{C}^{m \times m}$ are described by the following.
+%\begin{itemize}
+%\item[(a)] The matrix $\trans{D}BD$ is block diagonal with
+%\[\trans{D}BD = \begin{bmatrix}
+%\zeroVec_{k \times k} & \zeroVec_{k \times m} \\
+%\zeroVec_{m \times k} & \trans{E}BE
+%\end{bmatrix}.\]
+%\item[(b)] $DC\trans{D} = EF\trans{E}$.
+%\end{itemize}
+%\end{lemma}
+%\begin{proof}
+%For part (a), the partitioning of $D$ yields
+%\[\trans{D}BD = \begin{bmatrix}
+%\zeroVec_{k \times m} \\
+%\trans{E}
+%\end{bmatrix}B\begin{bmatrix}
+%\zeroVec_{m \times k} & E
+%\end{bmatrix} = \begin{bmatrix}
+%\zeroVec_{k \times m} \\
+%\trans{E}
+%\end{bmatrix}\begin{bmatrix}
+%\zeroVec_{m \times k} & BE
+%\end{bmatrix} = 
+%\begin{bmatrix}
+%\zeroVec_{k \times k} & \zeroVec_{k \times m} \\
+%\zeroVec_{m \times k} & \trans{E}BE
+%\end{bmatrix}.\]
+%Similarly, the proof of part (b) uses the partitioning of both $D$ and $C$:
+%\[DC\trans{D} = 
+%\begin{bmatrix}
+%\zeroVec_{m \times k} & E
+%\end{bmatrix}
+%\begin{bmatrix}
+%C_{k \times k} & C_{k \times m} \\
+%C_{m \times k} & F
+%\end{bmatrix}
+%\begin{bmatrix}
+%\zeroVec_{k \times m} \\
+%\trans{E}
+%\end{bmatrix} = \begin{bmatrix}
+%\zeroVec_{m \times k} & E
+%\end{bmatrix}
+%\begin{bmatrix}
+%C_{k \times m}\trans{E} \\
+%F\trans{E}
+%\end{bmatrix} = EF\trans{E}.\]
+%\end{proof}
+%\noindent Then it follows from part (a) of Lemma \ref{lem:k-diagonal} that $\trans{\Delta}\Delta$ is diagonal, which is stated as the following corollary.
+%
+%\begin{corollary}
+%\label{cor:Diagonal}
+%The $n \times n$ matrix $\trans{\Delta}\Delta$ in \eqref{eq:Normal equation 2} is diagonal.
+%\end{corollary}
+%\begin{proof}
+%The $m \times n$ matrix $\Delta$ is diagonal if $m \geq n$, in which case it is immediate that $\trans{\Delta}\Delta$ is diagonal. If $m < n$, then $\Delta$ is a $k$-diagonal matrix with $k = n - m$. Part (a) of Lemma \ref{lem:k-diagonal} can be applied with $D = \Delta$ and $B = I$, which implies that the structure of $\trans{\Delta}\Delta$ is
+%\[\trans{\Delta}\Delta = \begin{bmatrix}
+%\zeroVec_{k \times k} & \zeroVec_{k \times m} \\
+%\zeroVec_{m \times k} & \trans{E}E
+%\end{bmatrix}\]
+%with partition $\Delta = [\zeroVec_{m \times k} ~ E]$ and diagonal matrix $E$. The matrix $\trans{E}E$ is thus diagonal, and therefore $\trans{\Delta}\Delta$ is diagonal.
+%\end{proof}
+%
+%A consequence of Corollary \ref{cor:Diagonal} is that the matrix $\trans{\Delta}\Delta + \regparam^2 \trans{\Lambda}\Lambda$ in \eqref{eq:Normal equation 2} is diagonal. 
+Additionally, the assumption that the block system matrix in \eqref{eq:TikSol3} has full column rank means that $\trans{\Delta}\Delta + \regparam^2 \trans{\Lambda}\Lambda$ is non-singular for $\regparam > 0$. In such a case, a representation of the regularized solution similar to \eqref{eq:TikSol} is obtained:
 \begin{equation}
 \label{eq:GSVD Solution 1}
-\xVec(\regparam) = \sum_{k = 1}^{n} \frac{\sqrt{\delta_k} \svd{\dVec}_k}{\delta_k + \regparam^2\lambda_k}Y_{\cdot,k},
+\xVec(\regparam) = \sum_{k = 1}^{n} \frac{\delta_k \svd{\dVec}_k}{\delta^2_k + \regparam^2 \lambda^2_k}Y_{\cdot,k},
 \end{equation}
-where $\bm{\delta} = \diag(\trans{\Delta}\Delta)$, $\bm{\lambda} = \diag(\trans{\Lambda}\Lambda)$, and $Y$ is the inverse of $\trans{X}$. A filter function $\filt_j$ and complement $\mfilt_j$ similar to \eqref{eq:TikFilt} can be introduced to further simplify notation:
+where $Y$ is the inverse of $\trans{X}$, $\bm{\delta} = \sqrt{\diag(\trans{\Delta}\Delta)}$, and $\bm{\lambda} = \sqrt{\diag(\trans{\Lambda}\Lambda)}$ (the square roots being applied element-wise).  A filter function $\filt_j$ and complement $\mfilt_j$ similar to \eqref{eq:TikFilt} can be introduced to further simplify notation:
 \begin{equation}
 \label{eq:Filter functions}
-\filt_j = \frac{\delta_j}{\delta_j + \regparam^2 \lambda_j}, \quad \mfilt_j = 1 - \filt_j = \frac{\regparam^2 \lambda_j}{\delta_j + \regparam^2 \lambda_j}.
+\filt_j\left(\regparam,\frac{\delta_j}{\lambda_j}\right) = \frac{\delta^2_j}{\delta^2_j + \regparam^2 \lambda^2_j}, \quad \mfilt_j\left(\regparam,\frac{\delta_j}{\lambda_j}\right) = 1 - \filt_j\left(\regparam,\frac{\delta_j}{\lambda_j}\right) = \frac{\regparam^2 \lambda^2_j}{\delta^2_j + \regparam^2 \lambda^2_j}.
 \end{equation}
 Using $\filt_j$, the solution \eqref{eq:GSVD Solution 1} can be written as
 \begin{equation}
 \label{eq:GSVD Solution 2}
-\xVec(\regparam) = \sum_{k = 1}^{n} \frac{\delta_k}{\delta_k + \regparam^2 \lambda_k} \frac{\svd{\dVec}_k}{\sqrt{\delta_k}} Y_{\cdot,k} = \sum_{k = 1}^{n} \filt_j \frac{\svd{\dVec}_k}{\sqrt{\delta_k}} Y_{\cdot,k}.
+\xVec(\regparam) = \sum_{k = 1}^{n} \frac{\delta^2_k}{\delta^2_k + \regparam^2 \lambda^2_k} \frac{\svd{\dVec}_k}{\delta_k} Y_{\cdot,k} = \sum_{k = 1}^{n} \filt_k\left(\regparam,\frac{\delta_k}{\lambda_k}\right) \frac{\svd{\dVec}_k}{\delta_k} Y_{\cdot,k}.
 \end{equation} 
-If terms of the generalized singular values $\gamma_k = \sqrt{\delta_k/\lambda_k}$ for $k = 1,\ldots,n$, the solution \eqref{eq:GSVD Solution 1} can also be written as
+In terms of the generalized singular values $\gamma_k = \delta_k/\lambda_k$ for $k = 1,\ldots,n$, the solution \eqref{eq:GSVD Solution 1} can also be written as
 \begin{equation}
 \label{eq:GSVD Solution 3}
-\xVec(\regparam) = \sum_{k = 1}^{n} \frac{\delta_k}{\delta_k + \regparam^2 \lambda_k} \frac{\svd{\dVec}_k}{\sqrt{\delta_k}} Y_{\cdot,k} = \sum_{k = 1}^{n} \frac{\gamma_k^2}{\gamma_k^2 + \regparam^2} \frac{\svd{\dVec}_k}{\sqrt{\delta_k}} Y_{\cdot,k}.
+\xVec(\regparam) = \sum_{k = 1}^{n} \filt_k\left(\regparam,\gamma_k\right) \frac{\svd{\dVec}_k}{\delta_k} Y_{\cdot,k}.
 \end{equation} 
 
 \subsection{Multiple data sets}
@@ -335,7 +337,7 @@ T^\ell(\xVec) := \|A^{(\ell)}\xVec - \dVec^{(\ell)}\|_2^2 + \regparam_\ell^2\|L^
 A parameter selection method is generally utilized to select the regularization parameter for each system. Instead, let $\widetilde{\dVec}$ be the vector formed by vertically concatenating the data sets $\{\dVec^{(\ell)}\}_{\ell=1}^R$ and define the functional
 \begin{equation}
 \label{eq:Big functional}
-\widetilde{T}(\widetilde{\xVec}) = \|\widetilde{A}\widetilde{\xVec} - \widetilde{\dVec}\|_2^2 + \widetilde{\regparam}^2\|\widetilde{L}\widetilde{\xVec}\|_2^2
+\widetilde{T}(\widetilde{\xVec}) = \|\widetilde{A}\widetilde{\xVec} - \widetilde{\dVec}\|_2^2 + \widetilde{\regparam}^2\|\widetilde{L}\widetilde{\xVec}\|_2^2,
 \end{equation}
 where $\widetilde{\regparam}$ is a single regularization parameter. This construction implies that $\widetilde{\bVec}$ and $\widetilde{\noiseVec}$ are vertical concatenations of vectors in $\{\bVec^{(\ell)}\}_{\ell=1}^R$ and $\{\noiseVec^{(\ell)}\}_{\ell=1}^R$, respectively. The matrices $\widetilde{A}$ and $\widetilde{L}$ are block diagonal matrices with diagonal blocks $\{A^{(\ell)}\}_{\ell=1}^R$ and $\{L^{(\ell)}\}_{\ell=1}^R$, respectively. By the definition of the 2-norm and the construction of \eqref{eq:Big functional}, we can also write
 \begin{equation}
@@ -384,7 +386,8 @@ Let $\{\noiseVec^{(\ell)}\}_{\ell=1}^R$ be a collection of mutually independent 
 \noindent Lemma \ref{lem:Concatenation of Normal Noise} is useful in determining quantities like $\E(\|\widetilde{\noiseVec}\|_2^2)$, which is accomplished as needed in Sections \ref{sec:UPRE} and \ref{sec:MDP}.
 
 \subsection{Main contributions and outline}
-The main contribution of this paper is to demonstrate how the functions associated with the unbiased predictive risk estimator, generalized cross validation, and the Morozov discrepancy principle methods can be adapted to handle multiple data sets. We will use the term ``adapted'' in the body of the paper to refer to both these generalized methods and their corresponding functions, while the term ``big'' will be used in plots for the sake of space. For example, the adapted UPRE method means the extension of the unbiased predictive risk estimator method (UPRE) for multiple data sets. The development of the adapted methods is done in Section \ref{sec:Methods} and numerical results are shown in Section \ref{sec:Validation}. Sections \ref{sec:UPRE}, \ref{sec:MDP}, and \ref{sec:GCV} pertain to the unbiased predictive risk method, Morozov's discrepancy principle method, and the generalized cross validation method, respectively.  \par 
+Techniques for utilizing and analyzing multiple data sets permeates a multitude of scientific fields, such as geoscience imaging \cite{GeoscienceML} and the detection of cancers \cite{MedicineML}. Many of these techniques have statistical foundations \cite{StatLearning}. Focusing on applications to inverse problems,  
+The main contribution of this paper is to demonstrate how the functions associated with the unbiased predictive risk estimator (UPRE), generalized cross validation (GCV), and the Morozov discrepancy principle (MDP) methods can be adapted to handle multiple data sets. We will use the term ``adapted'' in the body of the paper to refer to both these generalized methods and their corresponding functions, while the term ``big'' will be used in plots for the sake of space. For example, the adapted UPRE method means the extension of the unbiased predictive risk estimator method (UPRE) for multiple data sets. The development of the adapted methods is done in Section \ref{sec:Methods} and numerical results are shown in Section \ref{sec:Validation}. Sections \ref{sec:UPRE}, \ref{sec:MDP}, and \ref{sec:GCV} pertain to the UPRE, method, MDP method, and the GCV method, respectively.  \par 
 In addition to developing these adapted parameter selection methods, some results will be presented regarding their relationship with the original method (i.e. the non-adapted methods). These results are presented at the end of each subsection in Section \ref{sec:Methods}. Comparisons are also made to other regularization parameter selection methods that use multiple data sets; see Section \ref{sec:Validation}. The invariance of the method functions under certain image transformations is presented in Section \ref{sec:2D}.  A consequence of this invariance is the preservation of selected regularization parameters. Lastly, the results are summarized and directions for future work are considered in Section \ref{sec:Conclusion}. 
 
 %\begin{proof}
@@ -414,9 +417,9 @@ In addition to developing these adapted parameter selection methods, some result
 %The matrix representing the inverse DFT is then $\trans{F}$, where $\trans{}$ denotes conjugate transposition. A property of $F$ is that $\trans{F}F = F\trans{F} = (1/n)\diag(n) = I$, and so splitting the factor of $1/n$ as $(1/\sqrt{n})(1/\sqrt{n})$ for the definition of the DFT provides the benefit of $F$ being a unitary matrix. A direct consequence of the DFT being unitary is Parseval's theorem: $\|\mathbf{f}\| = \|F\mathbf{f}\|$ for any $\mathbf{f} \in \mathbb{C}^n$. Another useful property of $F$ is that if $C$ is a circulant matrix, then $C = \trans{F}\Delta{F}$ where $\Delta = \diag(\sqrt{n}\dft{\mathbf{c}})$ and $\mathbf{c}$ is the first column of $C$.
 
 \section{Parameter selection methods} \label{sec:Methods}
-There are various methods for selecting regularization parameters. Some methods, such as Morozov's discrepancy principle, choose regularization parameters as roots of functions. Other methods, like the unbiased predictive risk estimator method and the generalized cross validation method, choose regularization parameters a minimizers of functions; if the function being considered is differentiable, then the method can be re-expressed as a root-finding method. There are methods that do not fall into the categories of minimization or root-finding problems; for example, the L-curve method selects a regularization parameter as the value that locates the point of maximum curvature of a function \cite{Hansen1992,HansenOLeary}.
+There are various methods for selecting regularization parameters. Some methods, such as the MDP method, choose regularization parameters as roots of functions. Other methods, like the UPRE method and the GCV method, choose regularization parameters a minimizers of functions; if the function being considered is differentiable, then the method can be re-expressed as a root-finding method. There are methods that do not fall into the categories of minimization or root-finding problems; for example, the L-curve method selects a regularization parameter as the value that locates the point of maximum curvature of a function \cite{Hansen1992,HansenOLeary}.
 \subsection{Unbiased Predictive Risk Estimator} \label{sec:UPRE}
-We begin with the unbiased predictive risk estimator (UPRE) method for selecting regularization parameters. The UPRE method was developed in 1973 by Mallows \cite{Mallows1973} and considers the statistical relationship between predictive error $\pVec(\regparam)$ and the regularized residual $\rVec(\regparam)$; these quantities are defined respectively as
+The UPRE method was developed in 1973 by Mallows \cite{Mallows1973} and considers the statistical relationship between predictive error $\pVec(\regparam)$ and the regularized residual $\rVec(\regparam)$; these quantities are defined respectively as
 \begin{equation}
 \label{eq:Predictive Error and Regularized Residual}
 \pVec(\regparam) = A(\xReg - \xSol), \quad \rVec(\regparam) = A\xReg - \dVec.
@@ -536,9 +539,9 @@ While this is an extremely strong and unrealistic assumption (the belief that su
 From \eqref{eq:Fourier diagonalization}, we define the generalized filter functions to be
 \begin{equation}
 \label{eq:Filter functions 2}
-\filt^{(\ell)}_j = \frac{\delta^{(\ell)}_j}{\delta^{(\ell)}_j + \regparam^2 \lambda^{(\ell)}_j}, \quad \mfilt^{(\ell)}_j = 1 - \filt^{(\ell)}_j = \frac{\regparam^2 \lambda^{(\ell)}_j}{\delta^{(\ell)}_j + \regparam^2 \lambda^{(\ell)}_j}
+\filt^{(\ell)}_j = \frac{\left(\delta^{(\ell)}_j\right)^2}{\left(\delta^{(\ell)}_j\right)^2 + \regparam^2 \left(\lambda^{(\ell)}_j\right)^2}, \quad \mfilt^{(\ell)}_j = 1 - \filt^{(\ell)}_j = \frac{\regparam^2 \left(\lambda^{(\ell)}_j\right)^2}{\left(\delta^{(\ell)}_j\right)^2 + \regparam^2 \left(\lambda^{(\ell)}_j\right)^2}
 \end{equation}
-where $\bm{\delta}^{(\ell)} = \diag(\trans{(\Delta^{(\ell)})}\Delta^{(\ell)})$ and $\bm{\lambda}^{(\ell)} = \diag(\trans{(\Lambda^{(\ell)})}\Lambda^{(\ell)})$ for each $\ell = 1,\ldots,R$. The matrix $\A^{(\ell)}$ given by \eqref{eq:Diagonal blocks} can be expressed as
+where $\bm{\delta}^{(\ell)} = \sqrt{\diag(\trans{(\Delta^{(\ell)})}\Delta^{(\ell)})}$ and $\bm{\lambda}^{(\ell)} = \sqrt{\diag(\trans{(\Lambda^{(\ell)})}\Lambda^{(\ell)})}$ for each $\ell = 1,\ldots,R$. The matrix $\A^{(\ell)}$ given by \eqref{eq:Diagonal blocks} can be expressed as
 \begin{equation}
 \label{eq:Fourier diagonalization 2}
 \A^{(\ell)} = U\Delta^{(\ell)}\left[\trans{(\Delta^{(\ell)})}\Delta^{(\ell)} + \regparam^2\trans{(\Lambda^{(\ell)})}\Lambda^{(\ell)}\right]^{-1}\trans{(\Delta^{(\ell)})}\trans{U}, \qquad \ell = 1,\ldots,R.
@@ -591,12 +594,12 @@ i.e. $\overline{U}(\regparam)$ is the UPRE function as applied to the average $\
 Therefore the adapted UPRE function is truly distinct from simply applying the UPRE method to the average of the data, and the bound \eqref{eq:UPRE Bound} demonstrates a relationship between the two modalities.
 
 \subsection{Morozov's discrepancy principle} \label{sec:MDP}
-Similar to the UPRE method, Morozov's discrepancy principle (MDP) \cite{Morozov1966} relies on knowledge of the variance of $\noiseVec$. If $\noise \sim \mathcal{N}(\bm{0},\noiseSD^2I)$, then the MDP function is 
+Similar to the UPRE method, the MDP method \cite{Morozov1966} relies on knowledge of the variance of $\noiseVec$. If $\noise \sim \mathcal{N}(\bm{0},\noiseSD^2I)$, then the MDP function is 
 \begin{equation}
 \label{eq:MDP}
 \D(\regparam) = \frac{1}{n}\|\rVec(\regparam)\|_2^2 - \noiseSD^2.
 \end{equation}
-The function \eqref{eq:MDP} stems from the observation that if $\xReg = \xVec$, then $\E(\frac{1}{n}\|\rVec(\regparam)\|_2^2) = E(\frac{1}{n}\|\noiseVec\|_2^2) = \noiseSD^2$. A more relaxed condition would be $\frac{1}{n}\|\xReg - \xVec\|_2^2 < \epsilon$, in which case $\E(\frac{1}{n}\|\rVec(\regparam)\|_2^2) < \epsilon + \noiseSD^2$. The MDP method is to choose $\regparam_{\MDP}$ as the zero of $\D(\regparam)$.  \par 
+The function \eqref{eq:MDP} stems from the observation that if $\xReg = \xVec$, then $\E(\frac{1}{n}\|\rVec(\regparam)\|_2^2) = E(\frac{1}{n}\|\noiseVec\|_2^2) = \noiseSD^2$. The MDP method is to choose $\regparam_{\MDP}$ as the zero of $\D(\regparam)$.  \par 
 Before extending the MDP method to account for multiple data sets, some comments on the behavior of the MDP function \eqref{eq:MDP} are warranted. The term $\frac{1}{n}\|\rVec(\regparam)\|_2^2$ is a monotone increasing function of $\regparam$ for $\regparam > 0$, which can be seen by differentiating the summands of \eqref{eq:Fourier regularized residual} for $R = 1$:
 \[\frac{d}{d\regparam}\left(\left(\mfilt_j\right)^2\left(\dft{\dVec}_j\right)^2\right) = 2 \left(\dft{\dVec}_j\right)^2 \mfilt_j\left(\frac{d}{d\regparam}\mfilt_j\right) = 2 \left(\dft{\dVec}_j\right)^2 \mfilt_j \frac{2\regparam\bm{\lambda_j}\bm{\delta_j}}{\left(\bm{\delta}_j + \regparam^2 \bm{\lambda}_j\right)^2} \geq 0, \quad \regparam > 0.\]
 The monotonicity of $\frac{1}{n}\|\rVec(\regparam)\|_2^2$ does not guarantee, however, the existence of a zero of $\D(\regparam)$. If the selected value of $\noiseSD^2$ is too large, then it is possible that $\D(\regparam) < 0$ for all $\regparam > 0$ and a root will not exist. This can be attributed to the limiting behavior of $\frac{1}{n}\|\rVec(\regparam)\|_2^2$, which is described by Lemma \ref{lem:Residual limit}.
@@ -616,7 +619,12 @@ Therefore
 \[\lim_{\regparam\rightarrow\infty} \frac{1}{n}\|\rVec(\regparam)\|_2^2 = \frac{1}{n} \sum_{j=1}^{n} \left(\lim_{\regparam\rightarrow\infty}\left(\mfilt_j\right)^2\right)\left(\dft{d}_j\right)^2 \leq \frac{1}{n} \sum_{j=1}^{n} \left(\dft{d}_j\right)^2 = \frac{1}{n}\|\svd{\dVec}\|_2^2 = \frac{1}{n}\|\dVec\|_2^2,\]
 with the last equality following from $\svd{\dVec} = \trans{U}\dVec$ with orthogonal $U$.
 \end{proof}
-\noindent Lemma \ref{lem:Residual limit} implies that if the selected value of $\noiseSD^2$ is larger than $\frac{1}{n}\|\dVec\|_2^2$, $\D(\regparam)$ will not have a root for $\regparam > 0$ and the MDP method fails to select a regularization parameter. \par
+\noindent Lemma \ref{lem:Residual limit} implies that if the selected value of $\noiseSD^2$ is larger than $\frac{1}{n}\|\dVec\|_2^2$, $\D(\regparam)$ will not have a root for $\regparam > 0$ and the MDP method fails to select a regularization parameter. Sometimes a safety parameter $\safeparam > 0$ is introduced to modify the MDP function to
+\begin{equation}
+\label{eq:MDP Safety}
+\D(\regparam) = \frac{1}{n}\|\rVec(\regparam)\|_2^2 - \safeparam\noiseSD^2.
+\end{equation}
+to account for root-finding difficulties \cite{ABT,IRTools}, though selecting an appropriate value of $\safeparam$ is an ad hoc process and depends on the confidence of $\noiseSD^2$ as the true noise. The original MDP function is recovered from \eqref{eq:MDP Safety} when $\safeparam = 1$. \par
 The MDP function for the more general assumption that $\noiseVec \sim \mathcal{N}(\zeroVec,\Sigma)$ will now be presented. Since $\E(\frac{1}{n}\|\rVec(\regparam)\|_2^2) = E(\frac{1}{n}\|\noiseVec\|_2^2)$ and $E(\|\noiseVec\|_2^2) = \trace(\Sigma)$, the corresponding MDP function is
 \begin{equation}
 \label{eq:General MDP}
@@ -639,7 +647,7 @@ the MDP function \eqref{eq:Big MDP} for the large system can be written as an av
 &= \frac{1}{R}\sum_{\ell=1}^R \frac{1}{n}\|\rVec^{(\ell)}(\regparam)\|_2^2 - \frac{1}{R}\sum_{\ell=1}^R \frac{1}{n}\trace\left(\Sigma^{(\ell)}\right) \nonumber \\
 &= \frac{1}{R}\sum_{\ell=1}^R \D^{(\ell)}(\regparam).
 \end{align}
-The MDP method for multiple data then defines $\widetilde{\regparam}_{\textrm{MDP}}$ as the zero of $\widetilde{\D}(\regparam)$. Analogous to the UPRE method, \eqref{eq:Individual MDP} is equivalent to \eqref{eq:MDP} if $\Sigma^{(\ell)} = \noiseSD^2 I$ for all $\ell = 1,\ldots,R$. \par 
+The MDP method for multiple data then defines $\widetilde{\regparam}_{\textrm{MDP}}$ as the zero of $\widetilde{\D}(\regparam)$. Analogous to the UPRE method, \eqref{eq:Individual MDP} is equivalent to \eqref{eq:MDP} if $\Sigma^{(\ell)} = \noiseSD^2 I$ for all $\ell = 1,\ldots,R$. A safety parameter $\safeparam$ can also be included in the trace terms of \eqref{eq:Big MDP} and \eqref{eq:Individual MDP} for more control over selected parameters. \par 
 As with the adapted UPRE method, the adapted MDP method is distinct from the MDP method as applied to the averaged data \eqref{eq:Averaged data}. Again we assume that $\Sigma^{(\ell)} = \noiseSD_\ell^2 I$, $A^{(\ell)} = A$, and $L^{(\ell)} = L$ for all $\ell = 1,\ldots,R$. Under these assumptions, for the MDP method we have $\widetilde{\D}(\regparam)$ is equal to
 \[\frac{1}{R} \sum_{\ell=1}^R \D^{(\ell)}(\regparam) = \frac{1}{R}\sum_{\ell=1}^R \left[\frac{1}{n}\|\rVec^{(\ell)}(\regparam)\|_2^2 - \noiseSD_{\ell}^2\right] = R\left[\frac{1}{n}\sum_{j=1}^{n} \left(\mfilt_j\right)^2\left(\frac{1}{R^2} \sum_{\ell=1}^R |\dft{\dVec}_j^{(\ell)}|^2\right) - \frac{1}{R^2}\sum_{\ell=1}^R \noiseSD_{\ell}^2\right]\]
 so that letting
@@ -651,7 +659,7 @@ results in bound
 \end{equation}
 
 \subsection{Generalized cross validation} \label{sec:GCV}
-Unlike the UPRE and MDP methods, the generalized cross validation (GCV) method \cite{Wahba1977,Wahba1990} does not depend upon knowledge of the noise variance. For a single data set $\dVec = A\xVec + \noiseVec$, the GCV function is defined as
+Unlike the UPRE and MDP methods, the GCV method \cite{Wahba1977,Wahba1990} does not depend upon knowledge of the noise variance. For a single data set $\dVec = A\xVec + \noiseVec$, the GCV function is defined as
 \begin{equation}
 \label{eq:GCV}
 \G(\regparam) = \frac{\frac{1}{n}\|\regres\|_2^2}{\left[\frac{1}{n}\trace(I-\A)\right]^2} = \frac{\frac{1}{n}\|\regres\|_2^2}{\left[1 - \frac{1}{n}\trace(\A)\right]^2}.
@@ -980,12 +988,12 @@ For a basis of comparison, parameters were selected as minimizers of the functio
 \label{eq:Learning function}
 F(\regparam) = \frac{1}{R}\sum_{\ell=1}^R \left\|\xVec^{(\ell)}(\regparam) - \xVec^{(\ell)}\right\|_2^2,
 \end{equation} 
-which uses the true solutions $\{\xVec^{(\ell)}\}_{\ell=1}^R$. Minimization of \eqref{eq:Learning function} was considered in \cite{ChungEspanol2017} as a way of learning regularization parameters from training data and applying the resulting parameters to a validation set. A simpler way of selecting regularization parameters which relies on knowledge of true solutions is to simply minimize
+which was considered in \cite{ChungEspanol2017}. A simpler way of selecting regularization parameters is to simply minimize
 \begin{equation}
 \label{eq:Best function}
 B^{(\ell)}(\regparam) = \left\|\xVec^{(\ell)}(\regparam) - \xVec^{(\ell)}\right\|_2^2, \quad \ell = 1,\ldots,R.
 \end{equation}
-Parameters chosen as minimizers of \eqref{eq:Best function} are ``best" in the sense of minimizing the norm of the error of a single regularized solution. It is important to note that minimization of \eqref{eq:Learning function} results in a single parameter depending on all $R$ data vectors, while minimizing \eqref{eq:Best function} results in a single parameter for each of the $R$ data vectors. The relationship between \eqref{eq:Learning function} and \eqref{eq:Best function} can be expressed as
+Both functions \eqref{eq:Learning function} and \eqref{eq:Best function} rely on knowledge of the true solutions $\{\xVec^{(\ell)}\}_{\ell=1}^R$. Parameters chosen as minimizers of \eqref{eq:Best function} are ``best" in the sense of minimizing the norm of the error of a single regularized solution. It is important to note that minimization of \eqref{eq:Learning function} results in a single parameter depending on all $R$ data vectors, while minimizing \eqref{eq:Best function} results in a single parameter for each of the $R$ data vectors. The relationship between \eqref{eq:Learning function} and \eqref{eq:Best function} can be expressed as
 \[F(\regparam) = \frac{1}{R}\sum_{\ell=1}^R B^{(\ell)}(\regparam).\]
 \indent To evaluate the effectiveness of the adapted parameter selection methods described in Section \ref{sec:Methods}, two test problems were considered. For both problems, data vectors were considered as a set of training data and resulting parameters were then applied to validation data set. A one-dimensional problem serves as a proof of concept and uses MRI data that is built into MATLAB, which is shown in Figure \ref{fig:MRI 1D True}. The other problem is two-dimensional and also is constructed from the MATLAB MRI data. \par
 For both problems, the following definition of signal-to-noise ratio (SNR) is used as a measurement for noise content in the images:
@@ -1000,20 +1008,20 @@ The one-dimensional test problem uses the MRI data built into MATLAB, which can 
 
 \begin{figure}[ht]
 \begin{subfigure}{\textwidth}
-\includegraphics[scale=0.36]{Figures/Full-MRI}
+\includegraphics[scale=0.36]{Figures/Full_MRI}
 \subcaption{}
 \label{fig:MRI 1D True}
 \end{subfigure} \\
 \begin{subfigure}{\textwidth}
-\includegraphics[scale=0.36]{Figures/Blurred-MRI}
+\includegraphics[scale=0.36]{Figures/Noisy_MRI}
 \subcaption{}
-\label{fig:MRI 1D Blurred}
+\label{fig:MRI 1D Noisy}
 \end{subfigure}
-\caption{MRI data formed by reformatting the MATLAB built-in MRI data. Figure \ref{fig:MRI 1D True} shows the true data from which the training and validation vectors were selected. Each vector was blurred using a Gaussian kernel and the blurred vectors are shown in Figure \ref{fig:MRI 1D Blurred}.}
+\caption{MRI data formed by reformatting the MATLAB built-in MRI data. Figure \ref{fig:MRI 1D True} shows the true data from which the training and validation vectors were selected. Each vector was blurred using a Gaussian kernel and normal noise was added; the resulting vectors are shown in Figure \ref{fig:MRI 1D Noisy}. The dimension of both images is $256 \times 536$.}
 \label{fig:MRI 1D}
 \end{figure}
 
-\noindent The default dimension of each horizontal MRI slice accessible using \texttt{load mri.mat} is $128 \times 128$. Linear interpolation was used to double the number of rows; the number of columns of the concatenated MRI slices was trimmed to to eliminate leading and trailing zero columns. The columns of the image were then multiplied by a symmetric Toeplitz matrix, approximating a Fredholm integral equation of the first kind with a Gaussian kernel of mean 0 and variance 1. The resulting MRI image is vertically blurred; see Figure \ref{fig:MRI 1D Blurred}. SNR values were selected randomly between 6 and 7 for each blurred column, and realizations of normal noise with the corresponding variances were added to blurred columns. The first $536/2 = 268$ columns of Figure \ref{fig:MRI 1D True} served as the training set, while the remaining 268 columns serve as a validation set.  The following $257 \times 256$ penalty matrix $L_1$ was used, which represents an approximation of a first derivative operator:
+\noindent The default dimension of each horizontal MRI slice accessible using \texttt{load mri.mat} is $128 \times 128$. Linear interpolation was used to double the number of rows; the number of columns of the concatenated MRI slices was trimmed to to eliminate leading and trailing zero columns. The columns of the image were then multiplied by a symmetric Toeplitz matrix, approximating a Fredholm integral equation of the first kind with a Gaussian kernel of mean 0 and variance 1 (each pixel representing a unit square in the continuous problem). The resulting MRI image is vertically blurred; see Figure \ref{fig:MRI 1D Noisy}. SNR values were selected randomly between 6 and 7 for each blurred column, and realizations of normal noise with the corresponding variances were added to blurred columns. The first $536/2 = 268$ columns of Figure \ref{fig:MRI 1D True} served as the training set, while the remaining 268 columns serve as a validation set.  The following $257 \times 256$ penalty matrix $L_1$ was used, which represents an approximation of a first derivative operator:
 \[L_1 = \begin{bmatrix}
 1 & & & \\
 -1 & 1 & &  \\
