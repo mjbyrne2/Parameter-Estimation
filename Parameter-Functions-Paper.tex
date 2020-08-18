@@ -13,6 +13,7 @@
 \newcommand{\rVec}{\mathbf{r}}	% Vector
 \newcommand{\fVec}{\mathbf{f}}	% Vector
 \newcommand{\xVec}{\mathbf{x}}	% Vector
+\newcommand{\xTrue}{\mathbf{x}_{\text{true}}}	% Vector (true solution)
 \newcommand{\yVec}{\mathbf{y}}	% Vector
 \newcommand{\tVec}{\mathbf{t}}	% Vector
 \newcommand{\uVec}{\mathbf{u}}	% Vector
@@ -108,7 +109,21 @@ In this paper, we seek solutions of
 \label{eq:Ax = b}
 A\xVec = \dVec,
 \end{equation}
-where $\xVec$ and $\dVec$ are vectors and $A$ is an ill-conditioned matrix. Specifically we consider the situation where the condition number of $A$ is large and the data available to us is $\dVec = \bVec + \noiseVec$, with $\noiseVec$ being a realization of a random vector. Even for problems resulting in large systems, the singular value decomposition (SVD) is a useful tool for analyzing methods of solving \eqref{eq:Ax = b}.  Assuming $A$ is a real $m \times n$ matrix, the SVD of $A$ is
+where $A \in \mathbb{R}^{m \times n}$ is ill-conditioned and $\dVec$ is known. Specifically we consider the situation where the condition number of $A$ is large and the data available to us is $\dVec = \bVec + \noiseVec$, with $\noiseVec$ being a realization of a random vector and $\bVec = A\xTrue$. Even for small systems, direct matrix inversion is not recommended due to the noise in the data and the ill-conditioning of the system matrix $A$. An alternative approach is regularization, which aims to mathematically describe desired characteristics of a solution to produce a more well-posed problem. A common regularization technique is Tikhonov regularization \cite{Tikh1963}, in which the regularized solution $\xReg$ is defined as
+\begin{equation}
+\label{eq:TikSol2}
+\xVec(\regparam) = \argmin_{\xVec \in \mathbb{R}^n} \left\{\|A\xVec - \dVec\|_2^2 + \regparam^2\|L\xVec\|_2^2\right\}, \quad \regparam > 0, ~ L \in \mathbb{R}^{p \times n}.
+\end{equation}
+The scalar $\regparam$ is the regularization parameter and $L$ is a matrix representing a linear operator. The term $\|L\xVec\|_2^2$ is an example of a penalty function \cite{Vogel:2002}, and $L$ is called the penalty matrix. If $L = I \in \mathbb{R}^{n \times n}$, then regularization via \eqref{eq:TikSol2} is called standard or zeroth-order Tikhonov regularization \cite{ABT}. Other choices of $L$ include approximations of first and second order derivative operators that depend upon assumed boundary conditions \cite{NeumannDCT,Strang1999,Vogel:2002}. \par 
+The quality of $\xReg$ depends on the choice of both $\regparam$ and $L$. There are a number of methods for selecting $\regparam$ when $L$ has been fixed. Some methods, such as the Morozov discrepancy principle (MDP) method, choose regularization parameters as roots of functions. Other methods, like the unbiased predictive risk estimator (UPRE) method and the generalized cross validation (GCV) method, choose regularization parameters as minimizers of functions; if the function being considered is differentiable, then the method can be re-expressed as a root-finding method. There are methods that do not fall into the categories of minimization or root-finding problems; for example, the L-curve method selects a regularization parameter as the value that locates the point of maximum curvature of a function \cite{Hansen1992,HansenOLeary}. There has also been a considerable amount of research in selecting sets of regularization parameters for a pre-selected set of penalty matrices, a process called multi-parameter regularization \cite{Brezinski2003,ChungEspanol2017,GazzolaNovati2013,LuPereverzev2011,Wood2002}. Approaches to multi-parameter regularization using versions of the L-curve and MDP methods can be found in \cite{BelgeKilmerMiller2002} and \cite{Wang2012}, respectively. \par 
+In this paper, we focus on adapting the UPRE, MDP, and GCV methods to accommodate multiple data sets. Techniques for utilizing and analyzing multiple data sets permeates a multitude of scientific fields, such as geoscience \cite{GeoscienceML,Zobitz2020EfficientHD} and the detection of cancers \cite{MedicineML}. Many of these techniques, including the UPRE, MDP, and GCV methods, have statistical foundations \cite{StatLearning}. A comprehensive overview of data-driven approaches to inverse problems can be found in \cite{Arridge2019SolvingIP}, while specific examples of applying multiple data sets to the solution of inverse problems include \cite{ChungChungOLeary2011,ChungEspanol2017,HaberTenorio2003,KunischPock2013,TaroudakiOLeary2015,Learning2005}. \par 
+The main contribution of this paper is to demonstrate how the functions associated with the UPRE, MDP, and GCV methods can be adapted to handle multiple data sets. We will use the term ``adapted'' in the body of the paper to refer to both these generalized methods and their corresponding functions, while the term ``big'' will be used in plots for the sake of space. For example, the adapted UPRE method means the extension of the UPRE method for multiple data sets. The development of the adapted methods is done in Section \ref{sec:Methods} and numerical results are shown in Section \ref{sec:Validation}. Sections \ref{sec:UPRE}, \ref{sec:MDP}, and \ref{sec:GCV} pertain to the UPRE, method, MDP method, and the GCV method, respectively.  \par 
+In addition to developing these adapted parameter selection methods, some results will be presented regarding their relationship with the original method (i.e. the non-adapted methods). These results are presented at the end of each subsection in Section \ref{sec:Methods}. Comparisons are also made to other regularization parameter selection methods that use multiple data sets; see Section \ref{sec:Validation}. Lastly, the results are summarized and directions for future work are considered in Section \ref{sec:Conclusion}.
+
+
+\section{Preliminaries} \label{sec:Preliminaries}
+
+Even for problems resulting in large systems, the singular value decomposition (SVD) is a useful tool for analyzing methods of solving \eqref{eq:Ax = b}.  Assuming $A$ is a real $m \times n$ matrix, the SVD of $A$ is
 \begin{equation}
 \label{eq:SVD}
 A = US\trans{V}
@@ -189,12 +204,8 @@ where system matrix has full rank for all $\regparam > 0$. Using the SVD of $A$,
 (\trans{S}S + \regparam^2 I)\trans{V}\xVec &= \trans{S}\svd{\dVec}.
 \end{align}
 Representation \eqref{eq:TikSol} is then obtained by noting that $(\trans{S}S + \regparam^2 I)$ is a diagonal matrix that is guaranteed to be non-singular for $\regparam > 0$. If $A$ has full column rank and $m \geq n$, then $(\trans{S}S + \regparam^2 I)$ is non-singular even when $\regparam = 0$. \par
-The generalized Tikhonov solution is
-\begin{equation}
-\label{eq:TikSol2}
-\xVec(\regparam) = \argmin_{\xVec \in \mathbb{R}^n} \left\{\|A\xVec - \dVec\|_2^2 + \regparam^2\|L\xVec\|_2^2\right\},
-\end{equation}
-where $L$ is a $p \times n$ matrix representing a linear operator. The term $\|L\xVec\|_2^2$ is commonly called the penalty function \cite{Vogel:2002}, and $L$ is called the penalty matrix. Representation \eqref{eq:Damped LS} follows from selecting $L$ to be $I$, the $n \times n$ identity matrix. Analogous to \eqref{eq:Ordinary LS}, the solution \eqref{eq:TikSol2} can be expressed in block form as
+
+ Representation \eqref{eq:Damped LS} follows from selecting $L$ to be $I$, the $n \times n$ identity matrix. Analogous to \eqref{eq:Ordinary LS}, the solution \eqref{eq:TikSol2} can be expressed in block form as
 \begin{equation}
 \xVec(\regparam) = \argmin_{\xVec \in \mathbb{R}^n} \left\{\left\| \begin{bmatrix}
 A \\
@@ -385,11 +396,6 @@ Let $\{\noiseVec^{(\ell)}\}_{\ell=1}^R$ be a collection of mutually independent 
 \end{lemma}
 \noindent Lemma \ref{lem:Concatenation of Normal Noise} is useful in determining quantities like $\E(\|\widetilde{\noiseVec}\|_2^2)$, which is accomplished as needed in Sections \ref{sec:UPRE} and \ref{sec:MDP}.
 
-\subsection{Main contributions and outline}
-Techniques for utilizing and analyzing multiple data sets permeates a multitude of scientific fields, such as geoscience imaging \cite{GeoscienceML} and the detection of cancers \cite{MedicineML}. Many of these techniques have statistical foundations \cite{StatLearning}. Focusing on applications to inverse problems,  
-The main contribution of this paper is to demonstrate how the functions associated with the unbiased predictive risk estimator (UPRE), generalized cross validation (GCV), and the Morozov discrepancy principle (MDP) methods can be adapted to handle multiple data sets. We will use the term ``adapted'' in the body of the paper to refer to both these generalized methods and their corresponding functions, while the term ``big'' will be used in plots for the sake of space. For example, the adapted UPRE method means the extension of the unbiased predictive risk estimator method (UPRE) for multiple data sets. The development of the adapted methods is done in Section \ref{sec:Methods} and numerical results are shown in Section \ref{sec:Validation}. Sections \ref{sec:UPRE}, \ref{sec:MDP}, and \ref{sec:GCV} pertain to the UPRE, method, MDP method, and the GCV method, respectively.  \par 
-In addition to developing these adapted parameter selection methods, some results will be presented regarding their relationship with the original method (i.e. the non-adapted methods). These results are presented at the end of each subsection in Section \ref{sec:Methods}. Comparisons are also made to other regularization parameter selection methods that use multiple data sets; see Section \ref{sec:Validation}. The invariance of the method functions under certain image transformations is presented in Section \ref{sec:2D}.  A consequence of this invariance is the preservation of selected regularization parameters. Lastly, the results are summarized and directions for future work are considered in Section \ref{sec:Conclusion}. 
-
 %\begin{proof}
 %For each $\ell = 1,\ldots,R$, let $N_\ell$ denote the length of $\noiseVec^{(\ell)}$ and let $N = \sum_{\ell=1}^R N_\ell$. Next define $B^{(\ell)}$ as the $N \times N_\ell$ matrix whose block from row $(\ell-1)N_\ell$ to row $\ell{N_\ell} - 1$ is the $N_\ell \times N_\ell$ identity matrix and zero elsewhere. These matrices allow the concatenation to be written as
 %\[\widetilde{\noiseVec} = \sum_{\ell=1}^R B^{(\ell)}\noiseVec^{(\ell)}, \quad \widetilde{\bm{\mu}} = \sum_{\ell=1}^R B^{(\ell)}\bm{\mu}^{(\ell)}.\]
@@ -417,7 +423,9 @@ In addition to developing these adapted parameter selection methods, some result
 %The matrix representing the inverse DFT is then $\trans{F}$, where $\trans{}$ denotes conjugate transposition. A property of $F$ is that $\trans{F}F = F\trans{F} = (1/n)\diag(n) = I$, and so splitting the factor of $1/n$ as $(1/\sqrt{n})(1/\sqrt{n})$ for the definition of the DFT provides the benefit of $F$ being a unitary matrix. A direct consequence of the DFT being unitary is Parseval's theorem: $\|\mathbf{f}\| = \|F\mathbf{f}\|$ for any $\mathbf{f} \in \mathbb{C}^n$. Another useful property of $F$ is that if $C$ is a circulant matrix, then $C = \trans{F}\Delta{F}$ where $\Delta = \diag(\sqrt{n}\dft{\mathbf{c}})$ and $\mathbf{c}$ is the first column of $C$.
 
 \section{Parameter selection methods} \label{sec:Methods}
-There are various methods for selecting regularization parameters. Some methods, such as the MDP method, choose regularization parameters as roots of functions. Other methods, like the UPRE method and the GCV method, choose regularization parameters a minimizers of functions; if the function being considered is differentiable, then the method can be re-expressed as a root-finding method. There are methods that do not fall into the categories of minimization or root-finding problems; for example, the L-curve method selects a regularization parameter as the value that locates the point of maximum curvature of a function \cite{Hansen1992,HansenOLeary}.
+
+
+
 \subsection{Unbiased Predictive Risk Estimator} \label{sec:UPRE}
 The UPRE method was developed in 1973 by Mallows \cite{Mallows1973} and considers the statistical relationship between predictive error $\pVec(\regparam)$ and the regularized residual $\rVec(\regparam)$; these quantities are defined respectively as
 \begin{equation}
