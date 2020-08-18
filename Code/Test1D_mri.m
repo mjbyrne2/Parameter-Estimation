@@ -16,8 +16,12 @@ zeroInd = find(I == 0); % Find zero elements
 zeroInd = zeroInd(2:end-1); % Remove first and last index
 I(zeroInd) = (1/2)*(I(zeroInd-1) + I(zeroInd+1));   % Inpaint with average of neighbors
 I = [I(1:n/2,:); I(n/2,:); I((n/2)+1:end,:)];   % Insert copy of middle row
+origI = I;  % Copy of original I for plots
 
-Rvec = R;   % Vector containing the number of data sets
+% (Optional) Randomly rearrange data and solutions:
+pind = randperm(2*R);
+I = I(:,pind);
+
 Xt = I(:,1:R);   % Take the first R columns as the training set
 Xv = I(:,R+1:2*R);   % Take next R columns as validation set
 
@@ -78,6 +82,10 @@ dpsi = @(alpha) (2*delta.*lambda*alpha)./((delta + lambda*(alpha.^2)).^2);
 
 % Select method (UPRE = 1, GCV = 2, MDP = 3):
 method = 3;
+safeparam = 0.8;  % Only for MDP
+
+% Select number of data to use:
+Rvec = R;   % Vector containing the number of data sets
 
 % Parameter methods:
 switch method
@@ -100,8 +108,8 @@ switch method
         bigFprime = @(alpha,d_hat) (1 - (1/numel(d_hat))*sum(phi(alpha))).*sum(sum(psi(alpha).*dpsi(alpha).*(d_hat.^2))) + ...
             (1/numel(d_hat))*sum(sum((psi(alpha).^2).*(d_hat.^2))).*sum(-dpsi(alpha));
     case 3  % MDP
-        F = @(alpha,d_hat,eta) (1/n)*sum((psi(alpha).^2).*(d_hat.^2)) - eta;
-        bigF = @(alpha,D_hat,Eta) (1/numel(D_hat))*sum(sum((psi(alpha).^2).*(D_hat.^2))) - mean(Eta);
+        F = @(alpha,d_hat,eta) (1/n)*sum((psi(alpha).^2).*(d_hat.^2)) - safeparam*eta;
+        bigF = @(alpha,D_hat,Eta) (1/numel(D_hat))*sum(sum((psi(alpha).^2).*(D_hat.^2))) - safeparam*mean(Eta);
 end
 
 %% Find individual regularization parameters
@@ -199,11 +207,12 @@ end
 
 %% Boxplot comparing all four adaptive methods using all data vectors:
 
-errorsBig = [err_learned;err_UPREBig;err_GCVBig;err_MDPBig]';
+errorsBig = [err_learned;err_UPREBig;err_GCVBig;err_mdp;err_mdp2]';
 errorsLabels = [repmat({'Learned'},R,1);...
     repmat({'UPRE-Big'},R,1);...
     repmat({'GCV-Big'},R,1);...
-    repmat({'MDP-Big'},R,1)];
+    repmat({['MDP-Big (' char(949) ' = 1)']},R,1);...
+    repmat({['MDP-Big (' char(949) ' = 0.8)']},R,1)];
 
 figure
 b = boxplot(errorsBig,errorsLabels);
@@ -211,7 +220,7 @@ set(b,{'linew'},{1.5})
 set(gca,'Fontsize',20)
 ylabel('Relative Error','Fontsize',24)
 
-%% Boxplot showing "convergence" of parameters:
+%% Plot showing "convergence" of parameters:
 
 figure
 hold on
@@ -219,9 +228,24 @@ grid on
 plot(Rvec,alpha_learned,'ro','MarkerSize',14,'Linewidth',2)
 plot(Rvec,alpha_UPREBig,'bx','MarkerSize',14,'Linewidth',2)
 plot(Rvec,alpha_GCVBig,'m+','MarkerSize',14,'Linewidth',2)
-plot(Rvec,alpha_MDPBig,'k*','MarkerSize',14,'Linewidth',2)
+plot(Rvec,mdp1,'k*','MarkerSize',14,'Linewidth',2)
+plot(Rvec,mdp2,'ks','MarkerSize',14,'Linewidth',2)
 set(gca,'Fontsize',20)
 ylabel('Regularization parameter \alpha','Fontsize',24)
 xlabel('Number of utilized training data vectors','Fontsize',24)
-legend({'Learned','UPRE-Big','GCV-Big','MDP-Big'},'Fontsize',24,...
-    'Location','Best','Orientation','Horizontal')
+legend({'Learned','UPRE-Big','GCV-Big','MDP-Big (\epsilon = 1)',...
+    'MDP-Big (\epsilon = 0.8)'},'Fontsize',24,'Location','Best',...
+    'Orientation','Horizontal')
+
+%% Plot showing effects of safety parameter on adapted MDP
+
+figure
+hold on
+grid on
+plot(Rvec,mdp2,'ko','MarkerSize',14,'Linewidth',2)
+plot(Rvec,mdp,'kx','MarkerSize',14,'Linewidth',2)
+set(gca,'Fontsize',20)
+ylabel('Regularization parameter \alpha','Fontsize',24)
+xlabel('Number of utilized training data vectors','Fontsize',24)
+% legend({'Learned','UPRE-Big','GCV-Big','MDP-Big'},'Fontsize',24,...
+%     'Location','Best','Orientation','Horizontal')
