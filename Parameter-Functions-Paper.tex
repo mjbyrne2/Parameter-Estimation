@@ -32,6 +32,7 @@
 \DeclareMathOperator{\alias}{A}	% Aliasing operator
 \newcommand{\dct}[1]{\breve{#1}}	% DCT of vector
 \newcommand{\dft}[1]{\widehat{#1}}	% DFT of vector
+\DeclareMathOperator{\vcat}{vcat}	% Concatenation of vector
 \DeclareMathOperator{\shift}{\sigma}	% Shift operator
 
 % Regularization notation:
@@ -81,8 +82,7 @@
 % Rosie's commands
 \newcommand{\comment}[1]{\textcolor{red}{ \textbf{Comment}: #1}}
 \newcommand{\ToDo}[1]{\textcolor{green}{\textbf{#1}}}
-% General Proposition
-\newtheorem{proposition}{Proposition}[section]
+\newtheorem{assumption}{Assumption}
 % General Lemma
 \newtheorem{lemma}{Lemma}[section]
 % General Theorem
@@ -109,17 +109,17 @@ In this paper, we seek solutions of
 \label{eq:Ax = b}
 A\xVec = \dVec,
 \end{equation}
-where $A \in \mathbb{R}^{m \times n}$ is ill-conditioned and $\dVec$ is known. Specifically we consider the situation where the condition number of $A$ is large and the data available to us is $\dVec = \bVec + \noiseVec$, with $\noiseVec$ being a realization of a random vector and $\bVec = A\xTrue$. Even for small systems, direct matrix inversion is not recommended due to the noise in the data and the ill-conditioning of the system matrix $A$. An alternative approach is regularization, which aims to mathematically describe desired characteristics of a solution to produce a more well-posed problem. A common regularization technique is Tikhonov regularization \cite{Tikh1963}, in which the regularized solution $\xReg$ is defined as
+where $A \in \mathbb{R}^{m \times n}$ is ill-conditioned and $\dVec$ is known. Specifically we consider the situation where the condition number of $A$ is large and the data available to us is $\dVec = \bVec + \noiseVec$, with $\noiseVec$ being a realization of a random vector and $\bVec = A\xTrue$. Even for small systems, direct matrix inversion is not recommended due to the noise in the data and the ill-conditioning of the system matrix $A$. An alternative approach is regularization, which aims to mathematically describe desired characteristics of a solution to produce a more well-posed problem. \par
+A common regularization technique is Tikhonov regularization \cite{Tikh1963}, in which the regularized solution $\xReg$ is defined as
 \begin{equation}
 \label{eq:TikSol2}
 \xVec(\regparam) = \argmin_{\xVec \in \mathbb{R}^n} \left\{\|A\xVec - \dVec\|_2^2 + \regparam^2\|L\xVec\|_2^2\right\}, \quad \regparam > 0, ~ L \in \mathbb{R}^{p \times n}.
 \end{equation}
-The scalar $\regparam$ is the regularization parameter and $L$ is a matrix representing a linear operator. The term $\|L\xVec\|_2^2$ is an example of a penalty function \cite{Vogel:2002}, and $L$ is called the penalty matrix. If $L = I \in \mathbb{R}^{n \times n}$, then regularization via \eqref{eq:TikSol2} is called standard or zeroth-order Tikhonov regularization \cite{ABT}. Other choices of $L$ include approximations of first and second order derivative operators that depend upon assumed boundary conditions \cite{NeumannDCT,Strang1999,Vogel:2002}. \par 
-The quality of $\xReg$ depends on the choice of both $\regparam$ and $L$. There are a number of methods for selecting $\regparam$ when $L$ has been fixed. Some methods, such as the Morozov discrepancy principle (MDP) method, choose regularization parameters as roots of functions. Other methods, like the unbiased predictive risk estimator (UPRE) method and the generalized cross validation (GCV) method, choose regularization parameters as minimizers of functions; if the function being considered is differentiable, then the method can be re-expressed as a root-finding method. There are methods that do not fall into the categories of minimization or root-finding problems; for example, the L-curve method selects a regularization parameter as the value that locates the point of maximum curvature of a function \cite{Hansen1992,HansenOLeary}. There has also been a considerable amount of research in selecting sets of regularization parameters for a pre-selected set of penalty matrices, a process called multi-parameter regularization \cite{Brezinski2003,ChungEspanol2017,GazzolaNovati2013,LuPereverzev2011,Wood2002}. Approaches to multi-parameter regularization using versions of the L-curve and MDP methods can be found in \cite{BelgeKilmerMiller2002} and \cite{Wang2012}, respectively. \par 
+The scalar $\regparam$ is the regularization parameter and $L$ is a matrix representation of a linear operator. The term $\|L\xVec\|_2^2$ is an example of a penalty function \cite{Vogel:2002}, and $L$ is called the penalty matrix. If $L = I \in \mathbb{R}^{n \times n}$, then regularization via \eqref{eq:TikSol2} is called standard or zeroth-order Tikhonov regularization \cite{ABT}. Other choices of $L$ include approximations of first and second order derivative operators that depend upon assumed boundary conditions \cite{NeumannDCT,Strang1999,Vogel:2002}. \par 
+The quality of $\xReg$ depends on the choice of both $\regparam$ and $L$. There are a number of methods for selecting $\regparam$ when $L$ has been fixed. Some methods, such as the Morozov discrepancy principle (MDP) method \cite{Morozov1966}, choose regularization parameters as roots of functions. Other methods, like the unbiased predictive risk estimator (UPRE) method \cite{Mallows1973} and the generalized cross validation (GCV) method \cite{Wahba1977,Wahba1990}, choose regularization parameters as minimizers of functions; if the function being considered is differentiable, then the method can be re-expressed as a root-finding method. There are methods that do not fall into the categories of minimization or root-finding problems; for example, the L-curve method selects a regularization parameter as the value that locates the point of maximum curvature of a function \cite{Hansen1992,HansenOLeary}. There has also been a considerable amount of research in selecting sets of regularization parameters for a pre-selected set of penalty matrices, a process called multi-parameter regularization \cite{Brezinski2003,ChungEspanol2017,GazzolaNovati2013,LuPereverzev2011,Wood2002}. Approaches to multi-parameter regularization using versions of the L-curve and MDP methods can be found in \cite{BelgeKilmerMiller2002} and \cite{Wang2012}, respectively. There has also been recent work on learning seminorms as regularization operators \cite{Holler2020LearningNR}. \par 
 In this paper, we focus on adapting the UPRE, MDP, and GCV methods to accommodate multiple data sets. Techniques for utilizing and analyzing multiple data sets permeates a multitude of scientific fields, such as geoscience \cite{GeoscienceML,Zobitz2020EfficientHD} and the detection of cancers \cite{MedicineML}. Many of these techniques, including the UPRE, MDP, and GCV methods, have statistical foundations \cite{StatLearning}. A comprehensive overview of data-driven approaches to inverse problems can be found in \cite{Arridge2019SolvingIP}, while specific examples of applying multiple data sets to the solution of inverse problems include \cite{ChungChungOLeary2011,ChungEspanol2017,HaberTenorio2003,KunischPock2013,TaroudakiOLeary2015,Learning2005}. \par 
-The main contribution of this paper is to demonstrate how the functions associated with the UPRE, MDP, and GCV methods can be adapted to handle multiple data sets. We will use the term ``adapted'' in the body of the paper to refer to both these generalized methods and their corresponding functions, while the term ``big'' will be used in plots for the sake of space. For example, the adapted UPRE method means the extension of the UPRE method for multiple data sets. The development of the adapted methods is done in Section \ref{sec:Methods} and numerical results are shown in Section \ref{sec:Validation}. Sections \ref{sec:UPRE}, \ref{sec:MDP}, and \ref{sec:GCV} pertain to the UPRE, method, MDP method, and the GCV method, respectively.  \par 
+The main contribution of this paper is to demonstrate how the functions associated with the UPRE, MDP, and GCV methods can be adapted to handle multiple data sets. We will use the term ``adapted'' in the body of the paper to refer to both these generalized methods and their corresponding functions, while the term ``big'' will be used in plots for the sake of space. For example, the adapted UPRE method means the extension of the UPRE method for multiple data sets. There is a distinction between the adapted methods and using the averages of the parameter selection functions. The development of the adapted methods is done in Section \ref{sec:Methods} and numerical results are shown in Section \ref{sec:Validation}. Sections \ref{sec:UPRE}, \ref{sec:MDP}, and \ref{sec:GCV} pertain to the UPRE, method, MDP method, and the GCV method, respectively.  \par 
 In addition to developing these adapted parameter selection methods, some results will be presented regarding their relationship with the original method (i.e. the non-adapted methods). These results are presented at the end of each subsection in Section \ref{sec:Methods}. Comparisons are also made to other regularization parameter selection methods that use multiple data sets; see Section \ref{sec:Validation}. Lastly, the results are summarized and directions for future work are considered in Section \ref{sec:Conclusion}.
-
 
 \section{Preliminaries} \label{sec:Preliminaries}
 
@@ -350,51 +350,37 @@ A parameter selection method is generally utilized to select the regularization 
 \label{eq:Big functional}
 \widetilde{T}(\widetilde{\xVec}) = \|\widetilde{A}\widetilde{\xVec} - \widetilde{\dVec}\|_2^2 + \widetilde{\regparam}^2\|\widetilde{L}\widetilde{\xVec}\|_2^2,
 \end{equation}
-where $\widetilde{\regparam}$ is a single regularization parameter. This construction implies that $\widetilde{\bVec}$ and $\widetilde{\noiseVec}$ are vertical concatenations of vectors in $\{\bVec^{(\ell)}\}_{\ell=1}^R$ and $\{\noiseVec^{(\ell)}\}_{\ell=1}^R$, respectively. The matrices $\widetilde{A}$ and $\widetilde{L}$ are block diagonal matrices with diagonal blocks $\{A^{(\ell)}\}_{\ell=1}^R$ and $\{L^{(\ell)}\}_{\ell=1}^R$, respectively. By the definition of the 2-norm and the construction of \eqref{eq:Big functional}, we can also write
+where $\widetilde{\regparam}$ is a single regularization parameter. This construction implies that $\widetilde{\xVec}$, $\widetilde{\bVec}$, $\widetilde{\noiseVec}$ are vertical concatenations of vectors in $\{\bVec^{(\ell)}\}_{\ell=1}^R$ and $\{\noiseVec^{(\ell)}\}_{\ell=1}^R$, respectively. The matrices $\widetilde{A}$ and $\widetilde{L}$ are block diagonal matrices with diagonal blocks $\{A^{(\ell)}\}_{\ell=1}^R$ and $\{L^{(\ell)}\}_{\ell=1}^R$, respectively. By the definition of the 2-norm and the construction of \eqref{eq:Big functional}, we can also write
 \begin{equation}
 \label{eq:Big functional 2}
 \widetilde{T}(\widetilde{\xVec}) = \sum_{\ell = 1}^R \left(\|A^{(\ell)}\xVec^{(\ell)} - \dVec^{(\ell)}\|_2^2 + \widetilde{\regparam}^2\|L^{(\ell)} \xVec^{(\ell)}\|_2^2\right).
 \end{equation}
-In regards to selecting regularization parameters, the advantage of regularizing via \eqref{eq:Big functional} is that we only have to select one parameter instead of $R$ parameters (one for each data set). Table \ref{tab:System assumptions} contains the assumptions used here for the development of parameter selections methods for multiple data sets.
+In regards to selecting regularization parameters, the advantage of regularizing via \eqref{eq:Big functional} is that we only have to select one parameter instead of $R$ parameters (one for each data set). Table \ref{tab:System assumptions} contains the assumptions used here for the development of parameter selections methods for multiple data sets. The notation $\vcat$ is used for brevity and denotes vertical concatenation of column vectors. The built-in MATLAB command $\mathtt{vertcat}$ can be used for vertical concatenation of vectors or matrices of appropriate dimension.
 
 \begin{table}[ht!]
   \begin{center}
-    \caption{Summary of assumptions and constructions used for $R$ data sets.}
+    \caption{Summary of assumptions and constructions used for $\ell = 1,\ldots,R$.}
     \label{tab:System assumptions}
-    \begin{tabular}{ccc} 
-    $\dVec^{(\ell)} = \bVec^{(\ell)} + \noiseVec^{(\ell)}$ & $\noiseVec^{(\ell)} \sim \mathcal{N}(\bm{0},\Sigma^{(\ell)})$ & ${A^{(\ell)}}\xVec^{(\ell)} = \bVec^{(\ell)}$ \\
-    $\widetilde{\xVec} = \begin{bmatrix}
-    \xVec^{(1)} \\
-    \vdots \\
-    \xVec^{(R)}
-    \end{bmatrix}$, $\widetilde{\dVec} = \begin{bmatrix}
-    \dVec^{(1)} \\
-    \vdots \\
-    \dVec^{(R)}
-    \end{bmatrix}$, $\widetilde{\noiseVec} = \begin{bmatrix}
-    \noiseVec^{(1)} \\
-    \vdots \\
-    \noiseVec^{(R)}
-    \end{bmatrix}$ & $\widetilde{\Sigma} = \begin{bmatrix}
-    \Sigma^{(1)} & & \\
-     & \ddots & \\
-    & & \Sigma^{(R)}
-    \end{bmatrix}$ & $\widetilde{A} = \begin{bmatrix}
-    A^{(1)} & & \\
-     & \ddots & \\
-    & & A^{(R)}
-    \end{bmatrix}$ \\    
+    \begin{tabular}{cc} 
+    $\dVec^{(\ell)} = \bVec^{(\ell)} + \noiseVec^{(\ell)}$, & $\bVec^{(\ell)} = {A^{(\ell)}}\xVec^{(\ell)}$, \\ 
+    $\widetilde{\xVec} = \vcat(\xVec^{(1)},\ldots,\xVec^{(R)})$, & $\noiseVec^{(\ell)} \sim \mathcal{N}(\zeroVec^{(\ell)},\Sigma^{(\ell)})$, \\
+    $\widetilde{\dVec} = \vcat(\dVec^{(1)},\ldots,\dVec^{(R)})$, & $\widetilde{\Sigma} = \diag(\Sigma^{(1)},\ldots,\Sigma^{(R)})$, \\
+    $\widetilde{\noiseVec} = \vcat(\noiseVec^{(1)},\ldots,\noiseVec^{(R)})$, & $\widetilde{A} = \diag(A^{(1)},\ldots,A^{(R)})$. 
     \end{tabular}
   \end{center}
 \end{table}
 
- 
 Some of the parameter estimation methods considered in this paper rely upon the statistical properties of the noise in the data, so the statistics of $\widetilde{\noiseVec}$ will be addressed. Though \eqref{eq:Big vectors} indicates that the random vectors $\{\noiseVec^{(\ell)}\}_{\ell=1}^R$ are assumed to have zero mean, we can relax this assumption so that $\noiseVec^{(\ell)} \sim \mathcal{N}(\bm{\mu}^{(\ell)},\Sigma^{(\ell)})$ for all $\ell = 1,\ldots,R$. The distribution of $\widetilde{\noiseVec}$ is then given by Lemma \ref{lem:Concatenation of Normal Noise}, which follows from the properties of the multivariate normal distribution. 
 \begin{lemma}
 \label{lem:Concatenation of Normal Noise}
-Let $\{\noiseVec^{(\ell)}\}_{\ell=1}^R$ be a collection of mutually independent random vectors with $\noiseVec^{(\ell)} \sim \mathcal{N}(\bm{\mu}^{(\ell)},\Sigma^{(\ell)})$ for each $\ell = 1,\ldots,R$, and let $\widetilde{\noiseVec}$ be the vertical concatenation of the vectors $\{\noiseVec^{(\ell)}\}_{\ell=1}^R$. Then $\widetilde{\noiseVec} \sim \mathcal{N}(\widetilde{\bm{\mu}},\widetilde{\Sigma})$ where $\widetilde{\bm{\mu}}$ is the vertical concatenation of mean vectors $\{\bm{\mu}^{(\ell)}\}_{\ell=1}^R$ and $\widetilde{\Sigma} = \diag(\Sigma^{(1)},\ldots,\Sigma^{(R)})$.
+Let $\{\noiseVec^{(\ell)}\}_{\ell=1}^R$ be a collection of mutually independent random vectors with $\noiseVec^{(\ell)} \sim \mathcal{N}(\bm{\mu}^{(\ell)},\Sigma^{(\ell)})$ for each $\ell = 1,\ldots,R$, and let $\widetilde{\noiseVec} = \vcat(\noiseVec^{(1)},\ldots,\noiseVec^{(R)})$. Then $\widetilde{\noiseVec} \sim \mathcal{N}(\widetilde{\bm{\mu}},\widetilde{\Sigma})$ where $\widetilde{\bm{\mu}} = \vcat(\bm{\mu}^{(\ell)},\ldots,\bm{\mu}^{(R)})$ and $\widetilde{\Sigma} = \diag(\Sigma^{(1)},\ldots,\Sigma^{(R)})$.
 \end{lemma}
-\noindent Lemma \ref{lem:Concatenation of Normal Noise} is useful in determining quantities like $\E(\|\widetilde{\noiseVec}\|_2^2)$, which is accomplished as needed in Sections \ref{sec:UPRE} and \ref{sec:MDP}.
+\noindent Lemma \ref{lem:Concatenation of Normal Noise} is useful in determining quantities like $\E(\|\widetilde{\noiseVec}\|_2^2)$, which is accomplished as needed in Sections \ref{sec:UPRE} and \ref{sec:MDP}. \par
+
+\begin{assumption}
+Let 
+\end{assumption} 
+
 
 %\begin{proof}
 %For each $\ell = 1,\ldots,R$, let $N_\ell$ denote the length of $\noiseVec^{(\ell)}$ and let $N = \sum_{\ell=1}^R N_\ell$. Next define $B^{(\ell)}$ as the $N \times N_\ell$ matrix whose block from row $(\ell-1)N_\ell$ to row $\ell{N_\ell} - 1$ is the $N_\ell \times N_\ell$ identity matrix and zero elsewhere. These matrices allow the concatenation to be written as
@@ -424,10 +410,10 @@ Let $\{\noiseVec^{(\ell)}\}_{\ell=1}^R$ be a collection of mutually independent 
 
 \section{Parameter selection methods} \label{sec:Methods}
 
-
+The development of the adapted UPRE, MDP, and GCV methods will rely on the assumptions and constructions contained in Table \ref{tab:System assumptions}. In addition, the development of all three adapted methods will use the additional assumption that $\noiseVec^{(\ell)} \sim \mathcal{N}(\zeroVec^{(\ell)},\Sigma^{(\ell)})$ for all $\ell = 1,\ldots,R$, where the length of $\noiseVec^{(\ell)}$ is $n_\ell$. By Lemma \ref{lem:Concatenation of Normal Noise}, this assumption implies that $\widetilde{\noiseVec} \sim \mathcal{N}\left(\widetilde{\zeroVec},\widetilde{\Sigma}\right)$ with $\widetilde{\zeroVec} \in \mathbb{R}^N$ and $N = \sum_{\ell=1}^{R} n_\ell$. 
 
 \subsection{Unbiased Predictive Risk Estimator} \label{sec:UPRE}
-The UPRE method was developed in 1973 by Mallows \cite{Mallows1973} and considers the statistical relationship between predictive error $\pVec(\regparam)$ and the regularized residual $\rVec(\regparam)$; these quantities are defined respectively as
+The UPRE method was developed in 1973 by Mallows and considers the statistical relationship between predictive error $\pVec(\regparam)$ and the regularized residual $\rVec(\regparam)$; these quantities are defined respectively as
 \begin{equation}
 \label{eq:Predictive Error and Regularized Residual}
 \pVec(\regparam) = A(\xReg - \xSol), \quad \rVec(\regparam) = A\xReg - \dVec.
@@ -572,14 +558,18 @@ where $\dft{\dVec}^{(\ell)} = \trans{U}\dVec^{(\ell)}$ for $\ell = 1,\ldots,R$. 
 \U^{(\ell)}(\regparam) = \frac{1}{n} \sum_{j=1}^{n} \left(\mfilt^{(\ell)}_j\right)^2\left(\dft{\dVec}_j^{(\ell)}\right)^2 + \frac{2\noiseSD^2_\ell}{n} \sum_{j=1}^{n} \filt^{(\ell)}_j - \noiseSD^2_\ell, \quad \ell = 1,\ldots,R.
 \end{equation}
 \indent We conclude Section \ref{sec:UPRE} by showing a relationship between the adapted UPRE method that uses \eqref{eq:Averaged UPRE} and the UPRE method as simply applied to averaged data; the relationship is shown by first making some additional assumptions. The assumptions we make in addition to $\Sigma^{(\ell)} = \noiseSD_\ell^2 I$ are that $A^{(\ell)} = A$ and $L^{(\ell)} = L$ for all $\ell = 1,\ldots,R$. The consequence of these assumptions is that $\filt_j^{(\ell)} = \filt_j$ (and $\mfilt_j^{(\ell)} = \mfilt_j$) for all $\ell = 1,\ldots,R$. Using representation \eqref{eq:Individual UPRE 2}, we can write \eqref{eq:Averaged UPRE} as
+\begin{align*}
+\frac{1}{R} \sum_{\ell=1}^R \U^{(\ell)}(\regparam) &= \frac{1}{R} \sum_{\ell=1}^R \left[\frac{1}{n}\sum_{j=1}^{n} \left(\mfilt_j\right)^2\left(\dft{\dVec}_j^{(\ell)}\right)^2 + \frac{2\noiseSD_\ell^2}{n} \sum_{j=1}^{n} \filt_j - \noiseSD_\ell^2\right] \\
+&= \frac{1}{R} \sum_{\ell=1}^R \left(\frac{1}{n}\sum_{j=1}^{n} \left(\mfilt_j\right)^2\left(\dft{\dVec}_j^{(\ell)}\right)^2\right) + \frac{1}{R} \sum_{\ell=1}^R \left(\frac{2\noiseSD_\ell^2}{n} \sum_{j=1}^{n} \filt_j\right) - \frac{1}{R} \sum_{\ell=1}^R\noiseSD_\ell^2 \\
+&= \frac{1}{n}\sum_{j=1}^{n} \left(\mfilt_j\right)^2\left(\frac{1}{R} \sum_{\ell=1}^R \left(\dft{\dVec}_j^{(\ell)}\right)^2\right) + \frac{2}{n} \left(\frac{1}{R} \sum_{\ell=1}^R \noiseSD_\ell^2\right) \left(\sum_{j=1}^{n} \filt_j\right) - \frac{1}{R} \sum_{\ell=1}^R\noiseSD_\ell^2.
+\end{align*}
+Multiplying through by $R/R$ then yields
 \begin{align}
 \label{eq:Non-average UPRE}
-\frac{1}{R} \sum_{\ell=1}^R \U^{(\ell)}(\regparam) &= \frac{1}{R} \sum_{\ell=1}^R \left[\frac{1}{n}\sum_{j=1}^{n} \left(\mfilt_j\right)^2\left(\dft{\dVec}_j^{(\ell)}\right)^2 + \frac{2\noiseSD_\ell^2}{n} \sum_{j=1}^{n} \filt_j - \noiseSD_\ell^2\right] \nonumber \\
-&= \frac{1}{R} \sum_{\ell=1}^R \left(\frac{1}{n}\sum_{j=1}^{n} \left(\mfilt_j\right)^2\left(\dft{\dVec}_j^{(\ell)}\right)^2\right) + \frac{1}{R} \sum_{\ell=1}^R \left(\frac{2\noiseSD_\ell^2}{n} \sum_{j=1}^{n} \filt_j\right) - \frac{1}{R} \sum_{\ell=1}^R\noiseSD_\ell^2 \nonumber \\
-&= \frac{1}{n}\sum_{j=1}^{n} \left(\mfilt_j\right)^2\left(\frac{1}{R} \sum_{\ell=1}^R \left(\dft{\dVec}_j^{(\ell)}\right)^2\right) + \frac{2}{n} \left(\frac{1}{R} \sum_{\ell=1}^R \noiseSD_\ell^2\right) \left(\sum_{j=1}^{n} \filt_j\right) - \frac{1}{R} \sum_{\ell=1}^R\noiseSD_\ell^2 \nonumber \\
-&= R\left[\frac{1}{n}\sum_{j=1}^{n} \left(\mfilt_j\right)^2\left(\frac{1}{R^2} \sum_{\ell=1}^R \left(\dft{\dVec}_j^{(\ell)}\right)^2\right) + \frac{2}{n} \left(\frac{1}{R^2} \sum_{\ell=1}^R \noiseSD_\ell^2\right) \left(\sum_{j=1}^{n} \filt_j\right) - \frac{1}{R^2} \sum_{\ell=1}^R\noiseSD_\ell^2\right]
+&\frac{1}{R} \sum_{\ell=1}^R \U^{(\ell)}(\regparam) \nonumber \\
+&= R\left[\frac{1}{n}\sum_{j=1}^{n} \left(\mfilt_j\right)^2\left(\frac{1}{R^2} \sum_{\ell=1}^R \left(\dft{\dVec}_j^{(\ell)}\right)^2\right) + \frac{2}{n} \left(\frac{1}{R^2} \sum_{\ell=1}^R \noiseSD_\ell^2\right) \left(\sum_{j=1}^{n} \filt_j\right) - \frac{1}{R^2} \sum_{\ell=1}^R\noiseSD_\ell^2\right].
 \end{align}
-where the last equality is obtained through multiplication by $\frac{R}{R}$. Note that the term $\frac{1}{R^2} \sum_{\ell=1}^R\noiseSD_\ell^2$ is the variance of $\frac{1}{R} \sum_{\ell=1}^R \noiseVec^{(\ell)}$ since the random vectors $\{\noiseVec^{(\ell)}\}_{\ell=1}^R$ are mutually independent. However, \eqref{eq:Non-average UPRE} is not equal to $R$ times the UPRE function as applied to the average of the data
+Note that the term $\frac{1}{R^2} \sum_{\ell=1}^R\noiseSD_\ell^2$ is the variance of $\frac{1}{R} \sum_{\ell=1}^R \noiseVec^{(\ell)}$ since the random vectors $\{\noiseVec^{(\ell)}\}_{\ell=1}^R$ are mutually independent. However, \eqref{eq:Non-average UPRE} is not equal to $R$ times the UPRE function as applied to the average of the data
 \begin{equation}
 \label{eq:Averaged data}
 \aVec \coloneqq \frac{1}{R}\sum_{\ell=1}^R \dVec^{(\ell)} = \frac{1}{R} \sum_{\ell=1}^R \bVec^{(\ell)} + \frac{1}{R} \sum_{\ell=1}^R \noiseVec^{(\ell)}
@@ -602,7 +592,7 @@ i.e. $\overline{U}(\regparam)$ is the UPRE function as applied to the average $\
 Therefore the adapted UPRE function is truly distinct from simply applying the UPRE method to the average of the data, and the bound \eqref{eq:UPRE Bound} demonstrates a relationship between the two modalities.
 
 \subsection{Morozov's discrepancy principle} \label{sec:MDP}
-Similar to the UPRE method, the MDP method \cite{Morozov1966} relies on knowledge of the variance of $\noiseVec$. If $\noise \sim \mathcal{N}(\bm{0},\noiseSD^2I)$, then the MDP function is 
+Similar to the UPRE method, the MDP method relies on knowledge of the variance of $\noiseVec$. If $\noise \sim \mathcal{N}(\bm{0},\noiseSD^2I)$, then the MDP function is 
 \begin{equation}
 \label{eq:MDP}
 \D(\regparam) = \frac{1}{n}\|\rVec(\regparam)\|_2^2 - \noiseSD^2.
@@ -667,7 +657,7 @@ results in bound
 \end{equation}
 
 \subsection{Generalized cross validation} \label{sec:GCV}
-Unlike the UPRE and MDP methods, the GCV method \cite{Wahba1977,Wahba1990} does not depend upon knowledge of the noise variance. For a single data set $\dVec = A\xVec + \noiseVec$, the GCV function is defined as
+Unlike the UPRE and MDP methods, the GCV method does not depend upon knowledge of the noise variance. For a single data set $\dVec = A\xVec + \noiseVec$, the GCV function is defined as
 \begin{equation}
 \label{eq:GCV}
 \G(\regparam) = \frac{\frac{1}{n}\|\regres\|_2^2}{\left[\frac{1}{n}\trace(I-\A)\right]^2} = \frac{\frac{1}{n}\|\regres\|_2^2}{\left[1 - \frac{1}{n}\trace(\A)\right]^2}.
@@ -1084,18 +1074,15 @@ In contrast to the one-dimensional case, the adapted MDP method returned paramet
 \end{figure}
 The errors of the regularized solutions obtained using the adapted MDP method are close to those of the machine learning method.
 
+\begin{figure}
+\label{fig:MESSENGER True}
+\includegraphics[scale=0.36]{Figures/MESSENGER}
+\caption{Courtesy NASA/JPL-Caltech.}
+\end{figure}
+
 \section{Conclusions and future work} \label{sec:Conclusion}
 In conclusion, this paper demonstrate a means by which UPRE, MDP, and GCV methods can be extended to accommodate multiple data sets. The most general forms of functions associate with these methods are \eqref{eq:UPRE 3}, \eqref{eq:Big MDP}, \eqref{eq:GCV Big}, and , respectively. The adapted UPRE and MDP methods are novel in that their corresponding functions can be written as an average of the individual functions associate with each data set. None of the three adapted methods require knowledge of true solutions unlike the machine learning approach defined by \eqref{eq:Learning function}, though the MRI test problems demonstrate that the adapted methods can perform competitively. \par
 There are various directions of future investigation. Perhaps the most significant results could be obtained through approaches of determining the necessary number of data sets for a stabilization of selected parameters. Figure \ref{fig:Parameters 1D MRI} and Figure \ref{fig:Parameters 2D} suggest that obtained parameters stabilize fairly fast in relation to the number of data sets incorporate into the method functions. Another direction of future work would be to use the adapted methods on data sets containing images of differing objects. The MRI images used here are all visualizes of a human brain; it would be interesting to see how these methods perform for drastically different data sets.
-
-%\begin{figure}
-%\begin{subfigure}
-%\includegraphics[scale=•]{•}
-%\subcaption{}
-%\label{fig:MESSENGER True}
-%\end{subfigure}
-%\caption{Courtesy NASA/JPL-Caltech.}
-%\end{figure}
 
 \bibliographystyle{siam}
 \bibliography{Parameter-Estimation}
