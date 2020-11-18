@@ -116,7 +116,7 @@ A common regularization technique is Tikhonov regularization \cite{Tikh1963}, in
 \xVec(\regparam) = \argmin_{\xVec \in \mathbb{R}^n} \left\{\|A\xVec - \dVec\|_2^2 + \regparam^2\|L\xVec\|_2^2\right\}, \quad \regparam > 0, ~ L \in \mathbb{R}^{p \times n}.
 \end{equation}
 The scalar $\regparam$ is the regularization parameter and $L$ is a matrix representation of a linear operator. The term $\|L\xVec\|_2^2$ is an example of a penalty function \cite{Vogel:2002}, and $L$ is called the penalty matrix. If $L = I \in \mathbb{R}^{n \times n}$, then regularization via \eqref{eq:TikSol2} is called standard or zeroth-order Tikhonov regularization \cite{ABT}. Other choices of $L$ include approximations of first and second order derivative operators that depend upon assumed boundary conditions \cite{NeumannDCT,Strang1999,Vogel:2002}. \par 
-The quality of $\xReg$ depends on the choice of both $\regparam$ and $L$. There are a number of methods for selecting $\regparam$ when $L$ has been fixed. Some methods, such as the Morozov discrepancy principle (MDP) method \cite{Morozov1966}, choose regularization parameters as roots of functions. Other methods, like the unbiased predictive risk estimator (UPRE) method \cite{Mallows1973} and the generalized cross validation (GCV) method \cite{Wahba1977,Wahba1990}, choose regularization parameters as minimizers of functions; if the function being considered is differentiable, then the method can be re-expressed as a root-finding method. There are methods that do not fall into the categories of minimization or root-finding problems; for example, the L-curve method selects a regularization parameter as the value that locates the point of maximum curvature of a function \cite{Hansen1992,HansenOLeary}. There has also been a considerable amount of research in selecting sets of regularization parameters for a pre-selected set of penalty matrices, a process called multi-parameter regularization \cite{Brezinski2003,ChungEspanol2017,GazzolaNovati2013,LuPereverzev2011,Wood2002}. Approaches to multi-parameter regularization using versions of the L-curve and MDP methods can be found in \cite{BelgeKilmerMiller2002} and \cite{Wang2012}, respectively. There has also been recent work on learning seminorms as regularization operators \cite{Holler2020LearningNR}. \par 
+The quality of $\xReg$ depends on the choice of both $\regparam$ and $L$. There are a number of methods for selecting $\regparam$ when $L$ has been fixed. Some methods, such as the Morozov discrepancy principle (MDP) method \cite{Morozov1966}, selects regularization parameters as roots of functions. Other methods, like the unbiased predictive risk estimator (UPRE) method \cite{Mallows1973} and the generalized cross validation (GCV) method \cite{Wahba1977,Wahba1990}, select regularization parameters as minimizers of functions; if the function being considered is differentiable, then the method can be re-expressed as a root-finding method. There are methods that do not fall into the categories of minimization or root-finding problems; for example, the L-curve method selects a regularization parameter as the value that locates the point of maximum curvature of a function \cite{Hansen1992,HansenOLeary}. There has also been a considerable amount of research in selecting sets of regularization parameters for a pre-selected set of penalty matrices, a process called multi-parameter regularization \cite{Brezinski2003,ChungEspanol2017,GazzolaNovati2013,LuPereverzev2011,Wood2002}. Approaches to multi-parameter regularization using versions of the L-curve and MDP methods can be found in \cite{BelgeKilmerMiller2002} and \cite{Wang2012}, respectively. There has also been recent work on learning seminorms as regularization operators \cite{Holler2020LearningNR}. \par 
 In this paper, we focus on adapting the UPRE, MDP, and GCV methods to accommodate multiple data sets. Techniques for utilizing and analyzing multiple data sets permeates a multitude of scientific fields, such as geoscience \cite{GeoscienceML,Zobitz2020EfficientHD} and the detection of cancers \cite{MedicineML}. Many of these techniques, including the UPRE, MDP, and GCV methods, have statistical foundations \cite{StatLearning}. A comprehensive overview of data-driven approaches to inverse problems can be found in \cite{Arridge2019SolvingIP}, while specific examples of applying multiple data sets to the solution of inverse problems include \cite{ChungChungOLeary2011,ChungEspanol2017,HaberTenorio2003,KunischPock2013,TaroudakiOLeary2015,Learning2005}. \par 
 The main contribution of this paper is to demonstrate how the functions associated with the UPRE, MDP, and GCV methods can be adapted to handle multiple data sets. We will use the term ``adapted'' in the body of the paper to refer to both these generalized methods and their corresponding functions, while the term ``big'' will be used in plots for the sake of space. For example, the adapted UPRE method means the extension of the UPRE method for multiple data sets. There is a distinction between the adapted methods and using the averages of the parameter selection functions. The development of the adapted methods is done in Section \ref{sec:Methods} and numerical results are shown in Section \ref{sec:Validation}. Sections \ref{sec:UPRE}, \ref{sec:MDP}, and \ref{sec:GCV} pertain to the UPRE, method, MDP method, and the GCV method, respectively.  \par 
 In addition to developing these adapted parameter selection methods, some results will be presented regarding their relationship with the original method (i.e. the non-adapted methods). These results are presented at the end of each subsection in Section \ref{sec:Methods}. Comparisons are also made to other regularization parameter selection methods that use multiple data sets; see Section \ref{sec:Validation}. Lastly, the results are summarized and directions for future work are considered in Section \ref{sec:Conclusion}.
@@ -163,7 +163,7 @@ With the compact SVD, the pseudoinverse of $A$ can be expressed as $\pinv{A} = V
   \end{center}
 \end{table}
 
-In any case for $A$, however, the summands in \eqref{eq:InvProd} are numerically unstable for small $\singular_k$ when the terms $|\svd{\dVec}_k|$ do not decay as fast as the $s_k$; this describes the discrete Picard condition \cite{Hansen:98}. For an ill-conditioned matrix $A$, forming \eqref{eq:InvProd} will often result in a meaningless solution. A common approach to overcome numerical instabilities is to multiply the summands in \eqref{eq:InvProd} by filter functions $\filt$ that depend upon $\singular_k$ and a non-negative regularization parameter $\regparam$, a process called regularization. By doing so, an approximate solution is
+In any case for $A$, the summands in \eqref{eq:InvProd} are numerically unstable for small $\singular_k$ when the terms $|\svd{\dVec}_k|$ do not decay as fast as the $s_k$; this describes the discrete Picard condition \cite{Hansen:98}. For an ill-conditioned matrix $A$, forming \eqref{eq:InvProd} will often result in a meaningless solution. A common approach to overcome numerical instabilities is to multiply the summands in \eqref{eq:InvProd} by filter functions $\filt$ that depend upon $\singular_k$ and a non-negative regularization parameter $\regparam$, a process called regularization. By doing so, an approximate solution is
 \begin{equation}
 \label{eq:ApproxSol}
 \xVec(\regparam) := \sum_{k=1}^{r} \filt(\regparam,\singular_k) \frac{\svd{\dVec}_k}{\singular_k}V_{\cdot,k}  = V\Phi{S}^\dagger\svd{\dVec},
@@ -203,9 +203,9 @@ where system matrix has full rank for all $\regparam > 0$. Using the SVD of $A$,
 (V\trans{S}S\trans{V} + \regparam^2 I)\xVec &= V\trans{S}\trans{U}\dVec \nonumber \\
 (\trans{S}S + \regparam^2 I)\trans{V}\xVec &= \trans{S}\svd{\dVec}.
 \end{align}
-Representation \eqref{eq:TikSol} is then obtained by noting that $(\trans{S}S + \regparam^2 I)$ is a diagonal matrix that is guaranteed to be non-singular for $\regparam > 0$. If $A$ has full column rank and $m \geq n$, then $(\trans{S}S + \regparam^2 I)$ is non-singular even when $\regparam = 0$. \par
+Representation \eqref{eq:TikSol} is then obtained by noting that $(\trans{S}S + \regparam^2 I)$ is a diagonal matrix that is guaranteed to be non-singular for $\regparam > 0$. If $A$ has full column rank and $m \geq n$, then $\trans{S}S + \regparam^2 I$ is non-singular even when $\regparam = 0$. \par
 
- Representation \eqref{eq:Damped LS} follows from selecting $L$ to be $I$, the $n \times n$ identity matrix. Analogous to \eqref{eq:Ordinary LS}, the solution \eqref{eq:TikSol2} can be expressed in block form as
+Representation \eqref{eq:Damped LS} follows from selecting $L$ in \eqref{eq:TikSol2} to be $I$, the $n \times n$ identity matrix. Analogous to \eqref{eq:Ordinary LS}, the solution \eqref{eq:TikSol2} can be expressed in block form as
 \begin{equation}
 \xVec(\regparam) = \argmin_{\xVec \in \mathbb{R}^n} \left\{\left\| \begin{bmatrix}
 A \\
@@ -221,7 +221,9 @@ If the matrix $L$ in \eqref{eq:TikSol2} is non-singular, then the substitutions 
 \mathbf{y}(\regparam) = \argmin_{\mathbf{y} \in \mathbb{R}^n} \left\{\|B\mathbf{y} - \dVec\|_2^2 + \regparam^2\|\mathbf{y}\|_2^2\right\}.
 \label{eq:TikSol Standard Form}
 \end{equation}
-This is known as the standard form of the regularization problem. Once $\mathbf{y}$ is obtained from \eqref{eq:TikSol Standard Form}, the final solution is recovered by $\xVec = L^{-1}\mathbf{y}$.  However, there are many examples of matrices $L$ that are singular, such as finite difference matrices that approximate derivative operators. In such cases, the regularization can still be recast in standard form, which can be accomplished in a convenient way using the generalized singular value decomposition (GSVD) \cite{HansenGSVD,Hansen:98}. \par
+This is known as the standard form of the regularization problem. Once $\mathbf{y}$ is obtained from \eqref{eq:TikSol Standard Form}, the final solution is recovered by $\xVec = L^{-1}\mathbf{y}$.  However, there are many examples of matrices $L$ that are singular, such as finite difference matrices that approximate derivative operators. In such cases, the regularization can still be recast in standard form, which can be accomplished in a convenient way using the generalized singular value decomposition (GSVD) \cite{HansenGSVD,Hansen:98}.
+
+\subsection{GSVD}
 In light of having to consider two (often very different) matrices $A$ and $L$ in formulations such as \eqref{eq:TikSol2} and \eqref{eq:TikSol3}, a brief discussion of the GSVD is worthwhile. The discussion closely follows the presentation of the GSVD in \cite{ABT}, which uses the assumption that $\nullspace(A) \cap \nullspace(L) = \{\zeroVec\}$. This condition means that the block system matrix in \eqref{eq:TikSol3} has full column rank for the sake of a unique regularized solution $\xVec(\regparam)$. Given real matrices $A$ and $L$ of size $m \times n$ and $p \times n$, respectively, the decompositions
 \begin{equation}
 \label{eq:GSVD}
@@ -235,13 +237,7 @@ The only elements of the $m \times n$ matrix $\Delta$ that are possibly non-zero
  0 \leq \Delta_{1,k+1} \leq \Delta_{2,k+2} \leq \ldots \leq \Delta_{m,k+m} \leq 1, \quad k = \max \{0,n-m\}.
 \end{equation}
 The structure of $\Delta$ depends upon the dimension of $A$. If $m \geq n$, then $\Delta$ is a diagonal matrix. Let a $k$-diagonal matrix be defined as an $m \times n$ matrix with nonzero entries given by \eqref{eq:k-diagonal} when $m < n$ (which implies $k \neq 0$). In other words, a $k$-diagonal matrix is a rectangular matrix where the only entries that are possibly nonzero are located on the $k$th upper diagonal. With this definition, $\Delta$ is a $k$-diagonal matrix if $m < n$. \par 
-An application of the decompositions \eqref{eq:GSVD} is that the normal equations corresponding to \eqref{eq:TikSol3} can be simplified as
-\begin{align}
-(\trans{A}A + \regparam^2 \trans{L}L)\xVec &= \trans{A}\dVec \nonumber \\
-(X\trans{\Delta}\Delta\trans{X} + \regparam^2 X\trans{\Lambda}\Lambda\trans{X})\xVec &= X\trans{\Delta}\trans{U}\dVec \nonumber \\
-(\trans{\Delta}\Delta + \regparam^2 \trans{\Lambda}\Lambda)\trans{X}\xVec &= \trans{\Delta}\svd{\dVec}.
-\label{eq:Normal equation 2}
-\end{align}
+An application of the decompositions \eqref{eq:GSVD} is that the normal equations $(\trans{A}A + \regparam^2 \trans{L}L)\xVec = \trans{A}\dVec$ corresponding to \eqref{eq:TikSol3} can be simplified as $(X\trans{\Delta}\Delta\trans{X} + \regparam^2 X\trans{\Lambda}\Lambda\trans{X})\xVec = X\trans{\Delta}\trans{U}\dVec$, which gives $(\trans{\Delta}\Delta + \regparam^2 \trans{\Lambda}\Lambda)\trans{X}\xVec = \trans{\Delta}\svd{\dVec}$ due to the invertibility of $X$.
 %Certainly $\trans{\Lambda}\Lambda$ is diagonal, but the structure of $\trans{\Delta}\Delta$ may not be obvious if $m < n$. The structure of $\trans{\Delta}\Delta$ in such a case can be shown from the following lemma.
 %
 %\begin{lemma}
@@ -332,8 +328,9 @@ Using $\filt_j$, the solution \eqref{eq:GSVD Solution 1} can be written as
 In terms of the generalized singular values $\gamma_k = \delta_k/\lambda_k$ for $k = 1,\ldots,n$, the solution \eqref{eq:GSVD Solution 1} can also be written as
 \begin{equation}
 \label{eq:GSVD Solution 3}
-\xVec(\regparam) = \sum_{k = 1}^{n} \filt_k\left(\regparam,\gamma_k\right) \frac{\svd{\dVec}_k}{\delta_k} Y_{\cdot,k}.
-\end{equation} 
+\xVec(\regparam) = \sum_{k = 1}^{n} \filt_k\left(\regparam,\gamma_k\right) \frac{\svd{\dVec}_k}{\delta_k} Y_{\cdot,k},
+\end{equation}
+which generalizes \eqref{eq:TikSol}.
 
 \subsection{Multiple data sets}
 We now consider the situation where we have a collection of data sets $\{\dVec^{(\ell)}\}_{\ell=1}^R$ where 
@@ -343,44 +340,60 @@ We now consider the situation where we have a collection of data sets $\{\dVec^{
 \end{equation}
 For given regularization parameters $\regparam_\ell$ and penalty matrices $L^{(\ell)}$, Tikhonov regularization can be performed to produce regularized solutions $\xVec(\regparam_\ell)$ that minimize the functionals
 \begin{equation}
-T^\ell(\xVec) := \|A^{(\ell)}\xVec - \dVec^{(\ell)}\|_2^2 + \regparam_\ell^2\|L^{(\ell)}\xVec\|_2^2.
+T^{(\ell)}(\xVec;\regparam_\ell) := \|A^{(\ell)}\xVec - \dVec^{(\ell)}\|_2^2 + \regparam_\ell^2\|L^{(\ell)}\xVec\|_2^2.
 \end{equation}
 A parameter selection method is generally utilized to select the regularization parameter for each system. Instead, let $\widetilde{\dVec}$ be the vector formed by vertically concatenating the data sets $\{\dVec^{(\ell)}\}_{\ell=1}^R$ and define the functional
 \begin{equation}
 \label{eq:Big functional}
-\widetilde{T}(\widetilde{\xVec}) = \|\widetilde{A}\widetilde{\xVec} - \widetilde{\dVec}\|_2^2 + \widetilde{\regparam}^2\|\widetilde{L}\widetilde{\xVec}\|_2^2,
+\widetilde{T}\left(\widetilde{\xVec};\widetilde{\regparam}\right) = \|\widetilde{A}\widetilde{\xVec} - \widetilde{\dVec}\|_2^2 + \widetilde{\regparam}^2\|\widetilde{L}\widetilde{\xVec}\|_2^2,
 \end{equation}
 where $\widetilde{\regparam}$ is a single regularization parameter. This construction implies that $\widetilde{\xVec}$, $\widetilde{\bVec}$, $\widetilde{\noiseVec}$ are vertical concatenations of vectors in $\{\bVec^{(\ell)}\}_{\ell=1}^R$ and $\{\noiseVec^{(\ell)}\}_{\ell=1}^R$, respectively. The matrices $\widetilde{A}$ and $\widetilde{L}$ are block diagonal matrices with diagonal blocks $\{A^{(\ell)}\}_{\ell=1}^R$ and $\{L^{(\ell)}\}_{\ell=1}^R$, respectively. By the definition of the 2-norm and the construction of \eqref{eq:Big functional}, we can also write
 \begin{equation}
 \label{eq:Big functional 2}
-\widetilde{T}(\widetilde{\xVec}) = \sum_{\ell = 1}^R \left(\|A^{(\ell)}\xVec^{(\ell)} - \dVec^{(\ell)}\|_2^2 + \widetilde{\regparam}^2\|L^{(\ell)} \xVec^{(\ell)}\|_2^2\right).
+\widetilde{T}\left(\widetilde{\xVec};\widetilde{\regparam}\right) = \sum_{\ell = 1}^R \left(\|A^{(\ell)}\xVec^{(\ell)} - \dVec^{(\ell)}\|_2^2 + \widetilde{\regparam}^2\|L^{(\ell)} \xVec^{(\ell)}\|_2^2\right) = \sum_{\ell=1}^R T^{(\ell)}\left(\xVec^{(\ell)};\widetilde{\regparam}\right).
 \end{equation}
-In regards to selecting regularization parameters, the advantage of regularizing via \eqref{eq:Big functional} is that we only have to select one parameter instead of $R$ parameters (one for each data set). Table \ref{tab:System assumptions} contains the assumptions used here for the development of parameter selections methods for multiple data sets. The notation $\vcat$ is used for brevity and denotes vertical concatenation of column vectors. The built-in MATLAB command $\mathtt{vertcat}$ can be used for vertical concatenation of vectors or matrices of appropriate dimension.
+In regards to selecting regularization parameters, the advantage of regularizing via \eqref{eq:Big functional} is that we only have to select one parameter instead of $R$ parameters (one for each data set). Table \ref{tab:System assumptions} contains the assumptions used here for the development of parameter selections methods for multiple data sets. The notation $\vcat$ is used for brevity and denotes vertical concatenation of column vectors. The built-in MATLAB command $\mathtt{vertcat}$ can be used for vertical concatenation of vectors or matrices of appropriate dimension. Assumption \ref{Assumption_System} summarizes the set-up established in \eqref{eq:Big vectors}.
 
+\renewcommand{\arraystretch}{1.5}	% Change of scale factor the for the following table
 \begin{table}[ht!]
   \begin{center}
     \caption{Summary of assumptions and constructions used for $\ell = 1,\ldots,R$.}
     \label{tab:System assumptions}
-    \begin{tabular}{cc} 
-    $\dVec^{(\ell)} = \bVec^{(\ell)} + \noiseVec^{(\ell)}$, & $\bVec^{(\ell)} = {A^{(\ell)}}\xVec^{(\ell)}$, \\ 
-    $\widetilde{\xVec} = \vcat(\xVec^{(1)},\ldots,\xVec^{(R)})$, & $\noiseVec^{(\ell)} \sim \mathcal{N}(\zeroVec^{(\ell)},\Sigma^{(\ell)})$, \\
-    $\widetilde{\dVec} = \vcat(\dVec^{(1)},\ldots,\dVec^{(R)})$, & $\widetilde{\Sigma} = \diag(\Sigma^{(1)},\ldots,\Sigma^{(R)})$, \\
-    $\widetilde{\noiseVec} = \vcat(\noiseVec^{(1)},\ldots,\noiseVec^{(R)})$, & $\widetilde{A} = \diag(A^{(1)},\ldots,A^{(R)})$. 
+    \begin{tabular}{|c|c|}
+    \hline
+    $\widetilde{\xVec} = \vcat\left(\xVec^{(1)},\ldots,\xVec^{(R)}\right)$ & $\widetilde{\Sigma} = \diag\left(\Sigma^{(1)},\ldots,\Sigma^{(R)}\right)$ \\
+    \hline
+    $\widetilde{\dVec} = \vcat\left(\dVec^{(1)},\ldots,\dVec^{(R)}\right)$ & $\widetilde{A} = \diag\left(A^{(1)},\ldots,A^{(R)}\right)$ \\
+    \hline
+    $\widetilde{\noiseVec} = \vcat\left(\noiseVec^{(1)},\ldots,\noiseVec^{(R)}\right)$ & $\widetilde{L} = \diag\left(L^{(1)},\ldots,L^{(R)}\right)$ \\
+    \hline
     \end{tabular}
   \end{center}
 \end{table}
+
+\begin{assumption}
+\label{Assumption_System}
+For $\ell = 1,\ldots,R$, assume that $\bVec^{(\ell)} = {A^{(\ell)}}\xVec^{(\ell)}$, $\dVec^{(\ell)} = \bVec^{(\ell)} + \noiseVec^{(\ell)}$, and $\noiseVec^{(\ell)} \sim \mathcal{N}(\zeroVec^{(\ell)},\Sigma^{(\ell)})$. The vectors $\bVec^{(\ell)}$, $\dVec^{(\ell)}$, and $\noiseVec^{(\ell)}$ are of length $n_\ell$.
+\end{assumption}
 
 Some of the parameter estimation methods considered in this paper rely upon the statistical properties of the noise in the data, so the statistics of $\widetilde{\noiseVec}$ will be addressed. Though \eqref{eq:Big vectors} indicates that the random vectors $\{\noiseVec^{(\ell)}\}_{\ell=1}^R$ are assumed to have zero mean, we can relax this assumption so that $\noiseVec^{(\ell)} \sim \mathcal{N}(\bm{\mu}^{(\ell)},\Sigma^{(\ell)})$ for all $\ell = 1,\ldots,R$. The distribution of $\widetilde{\noiseVec}$ is then given by Lemma \ref{lem:Concatenation of Normal Noise}, which follows from the properties of the multivariate normal distribution. 
 \begin{lemma}
 \label{lem:Concatenation of Normal Noise}
 Let $\{\noiseVec^{(\ell)}\}_{\ell=1}^R$ be a collection of mutually independent random vectors with $\noiseVec^{(\ell)} \sim \mathcal{N}(\bm{\mu}^{(\ell)},\Sigma^{(\ell)})$ for each $\ell = 1,\ldots,R$, and let $\widetilde{\noiseVec} = \vcat(\noiseVec^{(1)},\ldots,\noiseVec^{(R)})$. Then $\widetilde{\noiseVec} \sim \mathcal{N}(\widetilde{\bm{\mu}},\widetilde{\Sigma})$ where $\widetilde{\bm{\mu}} = \vcat(\bm{\mu}^{(\ell)},\ldots,\bm{\mu}^{(R)})$ and $\widetilde{\Sigma} = \diag(\Sigma^{(1)},\ldots,\Sigma^{(R)})$.
 \end{lemma}
-\noindent Lemma \ref{lem:Concatenation of Normal Noise} is useful in determining quantities like $\E(\|\widetilde{\noiseVec}\|_2^2)$, which is accomplished as needed in Sections \ref{sec:UPRE} and \ref{sec:MDP}. \par
+\noindent Lemma \ref{lem:Concatenation of Normal Noise} is also useful in determining quantities like $\E(\|\widetilde{\noiseVec}\|_2^2)$, which is accomplished as needed in Sections \ref{sec:UPRE} and \ref{sec:MDP}. \par
+We conclude Section \ref{sec:Preliminaries} by enumerating the additional underlying assumptions that will be utilized in Section \ref{sec:Methods}.
 
 \begin{assumption}
-Let 
-\end{assumption} 
+\label{Assumption_Matrices}
+For $\ell = 1,\ldots,R$, assume that $A^{(\ell)} = A$ and $L^{(\ell)} = L$.
+\end{assumption}  
 
+\begin{assumption}
+\label{Assumption_Noise}
+Given $\noiseVec^{(\ell)} \sim \mathcal{N}(\zeroVec^{(\ell)},\Sigma^{(\ell)})$ for $\ell = 1,\ldots,R$, assume that $\Sigma^{(\ell)} = \noiseSD_\ell^2I$.
+\end{assumption}
+\noindent In particular, Assumptions \ref{Assumption_System} and \ref{Assumption_Matrices} imply that $n_\ell = n$ for $\ell = 1,\ldots,R$.
 
 %\begin{proof}
 %For each $\ell = 1,\ldots,R$, let $N_\ell$ denote the length of $\noiseVec^{(\ell)}$ and let $N = \sum_{\ell=1}^R N_\ell$. Next define $B^{(\ell)}$ as the $N \times N_\ell$ matrix whose block from row $(\ell-1)N_\ell$ to row $\ell{N_\ell} - 1$ is the $N_\ell \times N_\ell$ identity matrix and zero elsewhere. These matrices allow the concatenation to be written as
@@ -410,7 +423,7 @@ Let
 
 \section{Parameter selection methods} \label{sec:Methods}
 
-The development of the adapted UPRE, MDP, and GCV methods will rely on the assumptions and constructions contained in Table \ref{tab:System assumptions}. In addition, the development of all three adapted methods will use the additional assumption that $\noiseVec^{(\ell)} \sim \mathcal{N}(\zeroVec^{(\ell)},\Sigma^{(\ell)})$ for all $\ell = 1,\ldots,R$, where the length of $\noiseVec^{(\ell)}$ is $n_\ell$. By Lemma \ref{lem:Concatenation of Normal Noise}, this assumption implies that $\widetilde{\noiseVec} \sim \mathcal{N}\left(\widetilde{\zeroVec},\widetilde{\Sigma}\right)$ with $\widetilde{\zeroVec} \in \mathbb{R}^N$ and $N = \sum_{\ell=1}^{R} n_\ell$. 
+The development of the adapted UPRE, MDP, and GCV methods will rely on Assumption \ref{Assumption_System} and the constructions contained in Table \ref{tab:System assumptions}. By Lemma \ref{lem:Concatenation of Normal Noise}, this assumption implies that $\widetilde{\noiseVec} \sim \mathcal{N}\left(\widetilde{\zeroVec},\widetilde{\Sigma}\right)$ with $\widetilde{\zeroVec} \in \mathbb{R}^N$ and $N = \sum_{\ell=1}^{R} n_\ell$. 
 
 \subsection{Unbiased Predictive Risk Estimator} \label{sec:UPRE}
 The UPRE method was developed in 1973 by Mallows and considers the statistical relationship between predictive error $\pVec(\regparam)$ and the regularized residual $\rVec(\regparam)$; these quantities are defined respectively as
@@ -423,7 +436,7 @@ The standard UPRE function for Tikhonov regularization is
 \label{eq:UPRE}
 \U(\alpha) = \frac{1}{n}\|\rVec(\regparam)\|_2^2 + \frac{2\noiseSD^2}{n}\trace(A_\regparam) - \noiseSD^2
 \end{equation}
-where $\A = A(\trans{A}A + \regparam^2\trans{L}L)^{-1}\trans{A}$ and $\noiseVec \sim \mathcal{N}(\bm{0},\noiseSD^2I)$. The function $\U(\regparam)$ is an unbiased estimator of the expected value of $\frac{1}{n}\|\pVec(\regparam)\|_2^2$, a quantity called the predictive risk. The UPRE method is to choose $\regparam_{\textrm{UPRE}} = \argmin_{\regparam > 0} \U(\regparam)$. \par
+where $\A = A(\trans{A}A + \regparam^2\trans{L}L)^{-1}\trans{A}$ is the influence matrix and $\noiseVec \sim \mathcal{N}(\bm{0},\noiseSD^2I)$. The function $\U(\regparam)$ is an unbiased estimator of the expected value of $\frac{1}{n}\|\pVec(\regparam)\|_2^2$, a quantity called the predictive risk. The UPRE method selects $\regparam_{\textrm{UPRE}} = \argmin_{\regparam > 0} \U(\regparam)$. \par
 We first derive the UPRE function for Tikhonov regularization under the more general condition that $\noiseVec \sim \mathcal{N}(\bm{0},\Sigma)$. To this end, we can then use the following lemma, which is a modification of the Trace Lemma stated in \cite[p.~98]{Vogel:2002}.
 \begin{lemma}
 \label{lem:Generalized Trace Lemma}
@@ -523,7 +536,7 @@ where
 \label{eq:Individual UPRE}
 \U^{(\ell)}(\regparam) = \frac{1}{n}\left\|\rVec^{(\ell)}(\regparam)\right\|_2^2 + \frac{2}{n} \trace\left(\Sigma^{(\ell)} A_\regparam^{(\ell)}\right) - \frac{1}{n} \trace\left(\Sigma^{(\ell)}\right), \quad \ell = 1,\ldots,R.
 \end{equation}
-In other words, $\widetilde{\U}(\regparam)$ is the average of $\{\U^{(\ell)}(\regparam)\}_{\ell=1}^R$. The UPRE method for multiple data sets is then to choose $\widetilde{\regparam}_{\textrm{UPRE}} = \argmin_{\regparam > 0} \widetilde{\U}(\regparam)$. As a final remark, \eqref{eq:Individual UPRE} is equivalent to \eqref{eq:UPRE} if $\Sigma^{(\ell)} = \noiseSD^2 I$ for all $\ell = 1,\ldots,R$. \par
+In other words, $\widetilde{\U}(\regparam)$ is the average of $\{\U^{(\ell)}(\regparam)\}_{\ell=1}^R$. The UPRE method for multiple data sets is then let $\widetilde{\regparam}_{\textrm{UPRE}} = \argmin_{\regparam > 0} \widetilde{\U}(\regparam)$. As a final remark, \eqref{eq:Individual UPRE} is equivalent to \eqref{eq:UPRE} if $\Sigma^{(\ell)} = \noiseSD^2 I$ for all $\ell = 1,\ldots,R$. \par
 A representation of \eqref{eq:Averaged UPRE} will now be presented that involves generalizations of the filter functions \eqref{eq:Filter functions}. In an effort to streamline this presentation, we will use the version of the GSVD outlined in Section \ref{sec:Introduction} (which uses the assumption that the system matrix in \eqref{eq:TikSol3} has full column rank). Specifically, we assume that
 \begin{equation}
 \label{eq:Fourier diagonalization}
@@ -597,7 +610,7 @@ Similar to the UPRE method, the MDP method relies on knowledge of the variance o
 \label{eq:MDP}
 \D(\regparam) = \frac{1}{n}\|\rVec(\regparam)\|_2^2 - \noiseSD^2.
 \end{equation}
-The function \eqref{eq:MDP} stems from the observation that if $\xReg = \xVec$, then $\E(\frac{1}{n}\|\rVec(\regparam)\|_2^2) = E(\frac{1}{n}\|\noiseVec\|_2^2) = \noiseSD^2$. The MDP method is to choose $\regparam_{\MDP}$ as the zero of $\D(\regparam)$.  \par 
+The function \eqref{eq:MDP} stems from the observation that if $\xReg = \xVec$, then $\E(\frac{1}{n}\|\rVec(\regparam)\|_2^2) = E(\frac{1}{n}\|\noiseVec\|_2^2) = \noiseSD^2$. The MDP method selects $\regparam_{\MDP}$ as the zero of $\D(\regparam)$.  \par 
 Before extending the MDP method to account for multiple data sets, some comments on the behavior of the MDP function \eqref{eq:MDP} are warranted. The term $\frac{1}{n}\|\rVec(\regparam)\|_2^2$ is a monotone increasing function of $\regparam$ for $\regparam > 0$, which can be seen by differentiating the summands of \eqref{eq:Fourier regularized residual} for $R = 1$:
 \[\frac{d}{d\regparam}\left(\left(\mfilt_j\right)^2\left(\dft{\dVec}_j\right)^2\right) = 2 \left(\dft{\dVec}_j\right)^2 \mfilt_j\left(\frac{d}{d\regparam}\mfilt_j\right) = 2 \left(\dft{\dVec}_j\right)^2 \mfilt_j \frac{2\regparam\bm{\lambda_j}\bm{\delta_j}}{\left(\bm{\delta}_j + \regparam^2 \bm{\lambda}_j\right)^2} \geq 0, \quad \regparam > 0.\]
 The monotonicity of $\frac{1}{n}\|\rVec(\regparam)\|_2^2$ does not guarantee, however, the existence of a zero of $\D(\regparam)$. If the selected value of $\noiseSD^2$ is too large, then it is possible that $\D(\regparam) < 0$ for all $\regparam > 0$ and a root will not exist. This can be attributed to the limiting behavior of $\frac{1}{n}\|\rVec(\regparam)\|_2^2$, which is described by Lemma \ref{lem:Residual limit}.
@@ -1036,7 +1049,7 @@ Figure \ref{fig:Parameters 1D MRI} illustrates a comparison of the methods in te
 \label{fig:Parameters 1D MRI}
 \end{figure}
 
-\noindent When the number of training vectors is small (e.g. between 1 and 10 from Figure \ref{fig:Parameters 1D MRI}), the parameters selected by all four methods change significantly. This can be attributed to the fact that all of the methods choose a parameter that is either a root or a minimum of an average of functions. For a small amount of training vectors, each additional vector has more influence over the behavior of the adapted function. The parameters do seem to stabilize as the number of training vectors reach a certain point; in the problem being considered here, the parameters stabilize by about 40 training sets. The stabilization of the parameter most likely follows from the fact that each vector is part of the same type of image (MRI). It would seem unreasonable to expect the same stabilization when using vectors pulled from dissimilar images. \par 
+\noindent When the number of training vectors is small (e.g. between 1 and 10 from Figure \ref{fig:Parameters 1D MRI}), the parameters selected by all four methods change significantly. This can be attributed to the fact that all of the methods select a parameter that is either a root or a minimum of an average of functions. For a small amount of training vectors, each additional vector has more influence over the behavior of the adapted function. The parameters do seem to stabilize as the number of training vectors reach a certain point; in the problem being considered here, the parameters stabilize by about 40 training sets. The stabilization of the parameter most likely follows from the fact that each vector is part of the same type of image (MRI). It would seem unreasonable to expect the same stabilization when using vectors pulled from dissimilar images. \par 
 Before looking at the relative errors of the regularized solutions, another observation regarding Figure \ref{fig:Parameters 1D MRI} can be made. While the parameters selected using the learning function \eqref{eq:Learning function} and the adapted UPRE and GCV methods are close (the maximum difference in the parameters does not exceed 0.5), the adapted MDP method consistently selected significantly larger parameters. A direct consequence is that the regularized solutions have higher relative errors. \par
 Figure \ref{fig:Errors 1D MRI} shows the relative errors of the regularized solutions corresponding to the parameters from each method. 
 
