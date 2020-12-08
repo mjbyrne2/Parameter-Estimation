@@ -4,6 +4,8 @@
 \geometry{margin = 1 in}
 \usepackage{color}
 
+\renewcommand{\arraystretch}{1.5}	% Change of table scale factor
+
 % Discrete notation:
 \newcommand{\aVec}{\mathbf{a}}	% Vector
 \newcommand{\bVec}{\mathbf{b}}	% Vector
@@ -17,6 +19,7 @@
 \newcommand{\yVec}{\mathbf{y}}	% Vector
 \newcommand{\tVec}{\mathbf{t}}	% Vector
 \newcommand{\uVec}{\mathbf{u}}	% Vector
+\newcommand{\wVec}{\mathbf{w}}	% Vector
 \newcommand{\trans}[1]{{#1}^\mathsf{T}}	% Matrix transpose
 \newcommand{\ctrans}[1]{{#1}^\mathsf{H}}	% Hermitian transpose
 \newcommand{\inv}[1]{{#1}^{-1}}	% Inverse of a matrix
@@ -40,6 +43,7 @@
 \newcommand{\R}{R_{\regparam}}	% Regularization matrix
 \newcommand{\regf}{\fVec_{\regparam}}	% Regularized solution
 \newcommand{\xReg}{\xVec(\regparam)}	% Regularized solution
+\newcommand{\xWin}{\xVec_{\text{win}}(\regparam)}	% Windowed regularized solution
 \newcommand{\xSol}{\xVec}	% True solution
 \DeclareMathOperator*{\argmax}{arg\,max}
 \DeclareMathOperator*{\argmin}{arg\,min}
@@ -89,6 +93,8 @@
 \newtheorem{theorem}{Theorem}[section]
 % General Corollary
 \newtheorem{corollary}{Corollary}[theorem]
+% General Proposition
+\newtheorem{proposition}{Proposition}[section]
 
 \title{Adapting methods for selecting Tikhonov regularization parameters for multiple data sets}
 \author{Michael Byrne and Rosemary Renaut}
@@ -116,7 +122,7 @@ A common regularization technique is Tikhonov regularization \cite{Tikh1963}, in
 \xVec(\regparam) = \argmin_{\xVec \in \mathbb{R}^n} \left\{\|A\xVec - \dVec\|_2^2 + \regparam^2\|L\xVec\|_2^2\right\}, \quad \regparam > 0, ~ L \in \mathbb{R}^{p \times n}.
 \end{equation}
 The scalar $\regparam$ is the regularization parameter and $L$ is a matrix representation of a linear operator. The term $\|L\xVec\|_2^2$ is an example of a penalty function \cite{Vogel:2002}, and $L$ is called the penalty matrix. If $L = I \in \mathbb{R}^{n \times n}$, then regularization via \eqref{eq:TikSol2} is called standard or zeroth-order Tikhonov regularization \cite{ABT}. Other choices of $L$ include approximations of first and second order derivative operators that depend upon assumed boundary conditions \cite{NeumannDCT,Strang1999,Vogel:2002}. \par 
-The quality of $\xReg$ depends on the choice of both $\regparam$ and $L$. There are a number of methods for selecting $\regparam$ when $L$ has been fixed. Some methods, such as the Morozov discrepancy principle (MDP) method \cite{Morozov1966}, selects regularization parameters as roots of functions. Other methods, like the unbiased predictive risk estimator (UPRE) method \cite{Mallows1973} and the generalized cross validation (GCV) method \cite{Wahba1977,Wahba1990}, select regularization parameters as minimizers of functions; if the function being considered is differentiable, then the method can be re-expressed as a root-finding method. There are methods that do not fall into the categories of minimization or root-finding problems; for example, the L-curve method selects a regularization parameter as the value that locates the point of maximum curvature of a function \cite{Hansen1992,HansenOLeary}. There has also been a considerable amount of research in selecting sets of regularization parameters for a pre-selected set of penalty matrices, a process called multi-parameter regularization \cite{Brezinski2003,ChungEspanol2017,GazzolaNovati2013,LuPereverzev2011,Wood2002}. Approaches to multi-parameter regularization using versions of the L-curve and MDP methods can be found in \cite{BelgeKilmerMiller2002} and \cite{Wang2012}, respectively. There has also been recent work on learning seminorms as regularization operators \cite{Holler2020LearningNR}. \par 
+The quality of $\xReg$ depends on the choice of both $\regparam$ and $L$. There are a number of methods for selecting $\regparam$ when $L$ has been fixed. Some methods, such as the Morozov discrepancy principle (MDP) method \cite{Morozov1966}, select regularization parameters as roots of functions. Other methods, like the unbiased predictive risk estimator (UPRE) method \cite{Mallows1973} and the generalized cross validation (GCV) method \cite{Wahba1977,Wahba1990}, select regularization parameters as minimizers of functions; if the function being considered is differentiable, then the method can be re-expressed as a root-finding method. There are methods that do not fall into the categories of minimization or root-finding problems; for example, the L-curve method selects a regularization parameter as the value that locates the point of maximum curvature of a function \cite{Hansen1992,HansenOLeary}. There has also been a considerable amount of research in selecting sets of regularization parameters for a pre-selected set of penalty matrices, a process called multi-parameter regularization \cite{Brezinski2003,ChungEspanol2017,GazzolaNovati2013,LuPereverzev2011,Wood2002}. Approaches to multi-parameter regularization using versions of the L-curve and MDP methods can be found in \cite{BelgeKilmerMiller2002} and \cite{Wang2012}, respectively. There has also been recent work on learning seminorms as regularization operators \cite{Holler2020LearningNR}. \par 
 In this paper, we focus on adapting the UPRE, MDP, and GCV methods to accommodate multiple data sets. Techniques for utilizing and analyzing multiple data sets permeates a multitude of scientific fields, such as geoscience \cite{GeoscienceML,Zobitz2020EfficientHD} and the detection of cancers \cite{MedicineML}. Many of these techniques, including the UPRE, MDP, and GCV methods, have statistical foundations \cite{StatLearning}. A comprehensive overview of data-driven approaches to inverse problems can be found in \cite{Arridge2019SolvingIP}, while specific examples of applying multiple data sets to the solution of inverse problems include \cite{ChungChungOLeary2011,ChungEspanol2017,HaberTenorio2003,KunischPock2013,TaroudakiOLeary2015,Learning2005}. \par 
 The main contribution of this paper is to demonstrate how the functions associated with the UPRE, MDP, and GCV methods can be adapted to handle multiple data sets. We will use the term ``adapted'' in the body of the paper to refer to both these generalized methods and their corresponding functions, while the term ``big'' will be used in plots for the sake of space. For example, the adapted UPRE method means the extension of the UPRE method for multiple data sets. There is a distinction between the adapted methods and using the averages of the parameter selection functions. The development of the adapted methods is done in Section \ref{sec:Methods} and numerical results are shown in Section \ref{sec:Validation}. Sections \ref{sec:UPRE}, \ref{sec:MDP}, and \ref{sec:GCV} pertain to the UPRE, method, MDP method, and the GCV method, respectively.  \par 
 In addition to developing these adapted parameter selection methods, some results will be presented regarding their relationship with the original method (i.e. the non-adapted methods). These results are presented at the end of each subsection in Section \ref{sec:Methods}. Comparisons are also made to other regularization parameter selection methods that use multiple data sets; see Section \ref{sec:Validation}. Lastly, the results are summarized and directions for future work are considered in Section \ref{sec:Conclusion}.
@@ -197,14 +203,11 @@ A \\
 \end{bmatrix}
 \right\|_2^2\right\},
 \end{equation}
-where system matrix has full rank for all $\regparam > 0$. Using the SVD of $A$, the normal equations corresponding to \eqref{eq:Ordinary LS} simplify to
-\begin{align}
-(\trans{A}A + \regparam^2 I)\xVec &= \trans{A}\dVec \nonumber \\
-(V\trans{S}S\trans{V} + \regparam^2 I)\xVec &= V\trans{S}\trans{U}\dVec \nonumber \\
-(\trans{S}S + \regparam^2 I)\trans{V}\xVec &= \trans{S}\svd{\dVec}.
-\end{align}
+where system matrix has full rank for all $\regparam > 0$. Using the SVD of $A$, the normal equations 
+\[(\trans{A}A + \regparam^2 I)\xVec = \trans{A}\dVec\]
+corresponding to \eqref{eq:Ordinary LS} simplify to
+\[(\trans{S}S + \regparam^2 I)\trans{V}\xVec = \trans{S}\svd{\dVec}.\]
 Representation \eqref{eq:TikSol} is then obtained by noting that $(\trans{S}S + \regparam^2 I)$ is a diagonal matrix that is guaranteed to be non-singular for $\regparam > 0$. If $A$ has full column rank and $m \geq n$, then $\trans{S}S + \regparam^2 I$ is non-singular even when $\regparam = 0$. \par
-
 Representation \eqref{eq:Damped LS} follows from selecting $L$ in \eqref{eq:TikSol2} to be $I$, the $n \times n$ identity matrix. Analogous to \eqref{eq:Ordinary LS}, the solution \eqref{eq:TikSol2} can be expressed in block form as
 \begin{equation}
 \xVec(\regparam) = \argmin_{\xVec \in \mathbb{R}^n} \left\{\left\| \begin{bmatrix}
@@ -223,7 +226,7 @@ If the matrix $L$ in \eqref{eq:TikSol2} is non-singular, then the substitutions 
 \end{equation}
 This is known as the standard form of the regularization problem. Once $\mathbf{y}$ is obtained from \eqref{eq:TikSol Standard Form}, the final solution is recovered by $\xVec = L^{-1}\mathbf{y}$.  However, there are many examples of matrices $L$ that are singular, such as finite difference matrices that approximate derivative operators. In such cases, the regularization can still be recast in standard form, which can be accomplished in a convenient way using the generalized singular value decomposition (GSVD) \cite{HansenGSVD,Hansen:98}.
 
-\subsection{GSVD}
+\subsection{Generalized Singular Value Decomposition} \label{sec:GSVD}
 In light of having to consider two (often very different) matrices $A$ and $L$ in formulations such as \eqref{eq:TikSol2} and \eqref{eq:TikSol3}, a brief discussion of the GSVD is worthwhile. The discussion closely follows the presentation of the GSVD in \cite{ABT}, which uses the assumption that $\nullspace(A) \cap \nullspace(L) = \{\zeroVec\}$. This condition means that the block system matrix in \eqref{eq:TikSol3} has full column rank for the sake of a unique regularized solution $\xVec(\regparam)$. Given real matrices $A$ and $L$ of size $m \times n$ and $p \times n$, respectively, the decompositions
 \begin{equation}
 \label{eq:GSVD}
@@ -237,7 +240,12 @@ The only elements of the $m \times n$ matrix $\Delta$ that are possibly non-zero
  0 \leq \Delta_{1,k+1} \leq \Delta_{2,k+2} \leq \ldots \leq \Delta_{m,k+m} \leq 1, \quad k = \max \{0,n-m\}.
 \end{equation}
 The structure of $\Delta$ depends upon the dimension of $A$. If $m \geq n$, then $\Delta$ is a diagonal matrix. Let a $k$-diagonal matrix be defined as an $m \times n$ matrix with nonzero entries given by \eqref{eq:k-diagonal} when $m < n$ (which implies $k \neq 0$). In other words, a $k$-diagonal matrix is a rectangular matrix where the only entries that are possibly nonzero are located on the $k$th upper diagonal. With this definition, $\Delta$ is a $k$-diagonal matrix if $m < n$. \par 
-An application of the decompositions \eqref{eq:GSVD} is that the normal equations $(\trans{A}A + \regparam^2 \trans{L}L)\xVec = \trans{A}\dVec$ corresponding to \eqref{eq:TikSol3} can be simplified as $(X\trans{\Delta}\Delta\trans{X} + \regparam^2 X\trans{\Lambda}\Lambda\trans{X})\xVec = X\trans{\Delta}\trans{U}\dVec$, which gives $(\trans{\Delta}\Delta + \regparam^2 \trans{\Lambda}\Lambda)\trans{X}\xVec = \trans{\Delta}\svd{\dVec}$ due to the invertibility of $X$.
+An application of the decompositions \eqref{eq:GSVD} is that the normal equations 
+\[(\trans{A}A + \regparam^2 \trans{L}L)\xVec = \trans{A}\dVec\] corresponding to \eqref{eq:TikSol3} can be simplified as 
+\[(X\trans{\Delta}\Delta\trans{X} + \regparam^2 X\trans{\Lambda}\Lambda\trans{X})\xVec = X\trans{\Delta}\trans{U}\dVec,\]
+which gives 
+\[(\trans{\Delta}\Delta + \regparam^2 \trans{\Lambda}\Lambda)\trans{X}\xVec = \trans{\Delta}\svd{\dVec}\] 
+due to the invertibility of $X$.
 %Certainly $\trans{\Lambda}\Lambda$ is diagonal, but the structure of $\trans{\Delta}\Delta$ may not be obvious if $m < n$. The structure of $\trans{\Delta}\Delta$ in such a case can be shown from the following lemma.
 %
 %\begin{lemma}
@@ -332,6 +340,28 @@ In terms of the generalized singular values $\gamma_k = \delta_k/\lambda_k$ for 
 \end{equation}
 which generalizes \eqref{eq:TikSol}.
 
+\subsection{Multiparameter Tikhonov regularization} \label{sec:Multiparameter}
+For $\ell = 1,\ldots,p$, let $\wVec^{(\ell)} \in \mathbb{R}^n$ be vectors containing the non-negative weights that satisfies
+\begin{equation}
+\label{eq:Weights}
+\sum_{\ell=1}^{p} \wVec_j^{(\ell)} = 1, \quad j = 1,\ldots,n.
+\end{equation}
+Defining windows $W^{(j)} = \diag(\wVec^{(j)})$ for $\ell = 1,\ldots,p$, property \eqref{eq:Weights} implies that $\sum_{\ell=1}^p W^{(j)} = I$.  A regularization parameter $\regparam^{(j)}$ can be selected for each window $W^{(j)}$, so that a windowed regularized solution can be constructed as
+\begin{equation}
+\label{eq:TikSolWindow}
+\xWin = \sum_{\ell=1}^p V\inv{\left[\trans{S}S + (\regparam^{(\ell)})^2\right]}W^{(j)}\trans{S}\dft{\dVec}.
+\end{equation}
+The windows must be selected before choosing corresponding regularization parameters; as such, some types of windows will be discussed. \par
+Perhaps the simplest way of choosing the components of $\wVec^{(\ell)}$ is to first choose $p+1$ values $\omega^{(0)} \geq \ldots \geq \omega^{(p)}$ such that $\omega^{(0)} \geq \singular_1$ and $\singular_n > \omega^{(p)}$. For $\ell = 1,\ldots,p$, we can then set
+\begin{equation}
+\label{eq:Non-overlapping windows}
+\wVec_j^{(\ell)} = \begin{cases}
+1, & \omega^{(\ell-1)} \geq \singular_j > \omega^{(\ell)} \\
+0, & \text{otherwise.}
+\end{cases}
+\end{equation}
+Choosing $p-1$ linearly-spaced or logarithmically-spaced
+
 \subsection{Multiple data sets}
 We now consider the situation where we have a collection of data sets $\{\dVec^{(\ell)}\}_{\ell=1}^R$ where 
 \begin{equation}
@@ -354,7 +384,6 @@ where $\widetilde{\regparam}$ is a single regularization parameter. This constru
 \end{equation}
 In regards to selecting regularization parameters, the advantage of regularizing via \eqref{eq:Big functional} is that we only have to select one parameter instead of $R$ parameters (one for each data set). Table \ref{tab:System assumptions} contains the assumptions used here for the development of parameter selections methods for multiple data sets. The notation $\vcat$ is used for brevity and denotes vertical concatenation of column vectors. The built-in MATLAB command $\mathtt{vertcat}$ can be used for vertical concatenation of vectors or matrices of appropriate dimension. Assumption \ref{Assumption_System} summarizes the set-up established in \eqref{eq:Big vectors}.
 
-\renewcommand{\arraystretch}{1.5}	% Change of scale factor the for the following table
 \begin{table}[ht!]
   \begin{center}
     \caption{Summary of assumptions and constructions used for $\ell = 1,\ldots,R$.}
@@ -506,10 +535,25 @@ Analogous to the standard UPRE function, we can define $\widetilde{\U}(\regparam
 \label{eq:UPRE 2}
 \widetilde{\U}(\regparam) = \frac{1}{n}\left\|\rVec(\regparam)\right\|_2^2 + \frac{2}{n}\trace\left(\Sigma\A\right) - \frac{1}{n}\trace\left(\Sigma\right).
 \end{equation}
-so that $\widetilde{\U}(\regparam)$ is an unbiased estimator of predictive risk. The standard UPRE function \eqref{eq:UPRE} is recovered from \eqref{eq:UPRE 2} if $\Sigma = \noiseSD^2 I$. \par 
-For multiple data vectors $\{\dVec^{(\ell)}\}_{\ell=1}^R$ of length $n$ satisfying \eqref{eq:Big vectors}, vertical concatenations $\widetilde{\dVec}$, $\widetilde{\xVec}(\regparam)$, and $\widetilde{\xVec}$ of length $N = nR$ can be considered along with block diagonal matrices $\widetilde{A} = \diag(A^{(1)},\ldots,A^{(R)})$ and $\widetilde{L} = \diag(L^{(1)},\ldots,L^{(R)})$. A block diagonal regularization matrix $\widetilde{A}_\regparam$ can be defined as
+so that $\widetilde{\U}(\regparam)$ is an unbiased estimator of predictive risk. The standard UPRE function \eqref{eq:UPRE} is recovered from \eqref{eq:UPRE 2} if $\Sigma = \noiseSD^2 I$.
+
+\begin{proposition}
+Using the constructions in Table \ref{tab:System assumptions} under Assumption \ref{Assumption_System} with $n_\ell = n$ for all $\ell = 1,\ldots,R$, the UPRE function $\widetilde{U}(\regparam)$ for the data sets $\{\dVec^{(\ell)}\}_{\ell=1}^R$ is
+\begin{equation}
+\label{eq:Averaged UPRE}
+\widetilde{\U}(\regparam) = \frac{1}{R} \sum_{\ell=1}^R \U^{(\ell)}(\regparam),
+\end{equation}
+where
+\begin{equation}
+\label{eq:Individual UPRE}
+\U^{(\ell)}(\regparam) = \frac{1}{n}\left\|\rVec^{(\ell)}(\regparam)\right\|_2^2 + \frac{2}{n} \trace\left(\Sigma^{(\ell)} A_\regparam^{(\ell)}\right) - \frac{1}{n} \trace\left(\Sigma^{(\ell)}\right).
+\end{equation}
+with $\rVec^{(\ell)} = A^{(\ell)}\xVec^{(\ell)}(\regparam) - \dVec^{(\ell)}$.
+\end{proposition}
+\begin{proof}
+A block diagonal influence matrix $\widetilde{A}_\regparam$ can be defined as
 \[\widetilde{A}_\regparam = \widetilde{A}(\trans{\widetilde{A}}\widetilde{A} + \regparam^2\trans{\widetilde{L}}\widetilde{L})^{-1}\trans{\widetilde{A}}\]
-which has diagonal blocks
+with diagonal blocks
 \begin{equation}
 \label{eq:Diagonal blocks}
 A^{(\ell)}_\regparam = A^{(\ell)}\left(\trans{\left(A^{(\ell)}\right)}A^{(\ell)} + \regparam^2\trans{\left(L^{(\ell)}\right)}L^{(\ell)}\right)^{-1}\trans{\left(A^{(\ell)}\right)}, \quad \ell = 1,\ldots,R.
@@ -525,25 +569,22 @@ The block diagonal structure of both $\widetilde{\Sigma}$ and $\widetilde{A}_\re
 \widetilde{\U}(\regparam) = \frac{1}{N}\left\|\widetilde{\rVec}(\regparam)\right\|_2^2 + \frac{2}{N} \sum_{\ell=1}^R \trace\left(\Sigma^{(\ell)}A^{(\ell)}_\regparam\right) - \frac{1}{N} \sum_{\ell=1}^R \trace\left(\Sigma^{(\ell)}\right).
 \end{equation}
 The squared 2-norm of $\widetilde{\rVec}(\regparam)$ can also be expressed as a sum so that
-\begin{align}
-\label{eq:Averaged UPRE}
-\widetilde{\U}(\regparam) &= \frac{1}{N} \sum_{\ell=1}^R \left\|\rVec^{(\ell)}(\regparam)\right\|_2^2 + \frac{2}{N} \sum_{\ell=1}^R \trace\left(\Sigma^{(\ell)} A_\regparam^{(\ell)}\right) - \frac{1}{N} \sum_{\ell=1}^R \trace\left(\Sigma^{(\ell)}\right) \nonumber \\
-&= \frac{1}{R} \sum_{\ell=1}^R \left(\frac{1}{n}\left\|\rVec^{(\ell)}(\regparam)\right\|_2^2 + \frac{2}{n} \trace\left(\Sigma^{(\ell)} A_\regparam^{(\ell)}\right) - \frac{1}{n} \trace\left(\Sigma^{(\ell)}\right)\right) \nonumber \\
+\begin{align*}
+\widetilde{\U}(\regparam) &= \frac{1}{N} \sum_{\ell=1}^R \left\|\rVec^{(\ell)}(\regparam)\right\|_2^2 + \frac{2}{N} \sum_{\ell=1}^R \trace\left(\Sigma^{(\ell)} A_\regparam^{(\ell)}\right) - \frac{1}{N} \sum_{\ell=1}^R \trace\left(\Sigma^{(\ell)}\right) \\
+&= \frac{1}{R} \sum_{\ell=1}^R \left(\frac{1}{n}\left\|\rVec^{(\ell)}(\regparam)\right\|_2^2 + \frac{2}{n} \trace\left(\Sigma^{(\ell)} A_\regparam^{(\ell)}\right) - \frac{1}{n} \trace\left(\Sigma^{(\ell)}\right)\right) \\
 &= \frac{1}{R} \sum_{\ell=1}^R \U^{(\ell)}(\regparam),
-\end{align}
+\end{align*}
 where
-\begin{equation}
-\label{eq:Individual UPRE}
-\U^{(\ell)}(\regparam) = \frac{1}{n}\left\|\rVec^{(\ell)}(\regparam)\right\|_2^2 + \frac{2}{n} \trace\left(\Sigma^{(\ell)} A_\regparam^{(\ell)}\right) - \frac{1}{n} \trace\left(\Sigma^{(\ell)}\right), \quad \ell = 1,\ldots,R.
-\end{equation}
-In other words, $\widetilde{\U}(\regparam)$ is the average of $\{\U^{(\ell)}(\regparam)\}_{\ell=1}^R$. The UPRE method for multiple data sets is then let $\widetilde{\regparam}_{\textrm{UPRE}} = \argmin_{\regparam > 0} \widetilde{\U}(\regparam)$. As a final remark, \eqref{eq:Individual UPRE} is equivalent to \eqref{eq:UPRE} if $\Sigma^{(\ell)} = \noiseSD^2 I$ for all $\ell = 1,\ldots,R$. \par
-A representation of \eqref{eq:Averaged UPRE} will now be presented that involves generalizations of the filter functions \eqref{eq:Filter functions}. In an effort to streamline this presentation, we will use the version of the GSVD outlined in Section \ref{sec:Introduction} (which uses the assumption that the system matrix in \eqref{eq:TikSol3} has full column rank). Specifically, we assume that
-\begin{equation}
-\label{eq:Fourier diagonalization}
-A^{(\ell)} = U{\Delta^{(\ell)}}\trans{X}, \quad L^{(\ell)} = V{\Lambda^{(\ell)}}\trans{X}, \qquad \ell = 1,\ldots,R
-\end{equation}
-While this is an extremely strong and unrealistic assumption (the belief that such a factorization does not exist in general is expressed in \cite{Brezinski2003}), it certainly becomes realistic if $A^{(\ell)} = A$ and $L^{(\ell)} = L$ for all $\ell = 1,\ldots,R$. We use \eqref{eq:Fourier diagonalization} to simply present the following derivation in the most general setting. An analogous approach could be taken if the matrices $A^{(\ell)}$ and $L^{(\ell)}$ can be simultaneously diagonalized with respect to a orthogonal/unitary transformation, such as the discrete cosine transform (DCT) or discrete Fourier transform (DFT); test problems using the DCT and DFT are considered in Section \ref{sec:Validation}. \par
-From \eqref{eq:Fourier diagonalization}, we define the generalized filter functions to be
+\[\U^{(\ell)}(\regparam) = \frac{1}{n}\left\|\rVec^{(\ell)}(\regparam)\right\|_2^2 + \frac{2}{n} \trace\left(\Sigma^{(\ell)} A_\regparam^{(\ell)}\right) - \frac{1}{n} \trace\left(\Sigma^{(\ell)}\right), \quad \ell = 1,\ldots,R.\]
+\end{proof}
+\noindent In other words, $\widetilde{\U}(\regparam)$ is the average of $\{\U^{(\ell)}(\regparam)\}_{\ell=1}^R$. The UPRE method for multiple data sets is to let $\widetilde{\regparam}_{\textrm{UPRE}} = \argmin_{\regparam > 0} \widetilde{\U}(\regparam)$. As a final remark, \eqref{eq:Individual UPRE} is equivalent to \eqref{eq:UPRE} under Assumption \ref{Assumption_Noise}. \par
+A representation of \eqref{eq:Averaged UPRE} will now be presented that involves generalizations of the filter functions \eqref{eq:Filter functions}. In an effort to streamline this presentation, we will use the version of the GSVD outlined in Section \ref{sec:GSVD} (which uses the assumption that the system matrix in \eqref{eq:TikSol3} has full column rank). Specifically, we make the following assumption.
+\begin{assumption}
+\label{Assumption_Diagonalization}
+We assume that there exist matrices $U$, $V$, and $\trans{X}$ such that $A^{(\ell)} = U{\Delta^{(\ell)}}\trans{X}$ and  $L^{(\ell)} = V{\Lambda^{(\ell)}}\trans{X}$ for all $\ell = 1,\ldots,R$. 
+\end{assumption}
+\noindent While this is an extremely strong and unrealistic assumption (the belief that such a factorization does not exist in general is expressed in \cite{Brezinski2003}), it certainly becomes realistic under Assumption \ref{Assumption_Matrices}. We use Assumption \ref{Assumption_Diagonalization} to simply present the following derivation in the most general setting. An analogous approach could be taken if the matrices $A^{(\ell)}$ and $L^{(\ell)}$ can be simultaneously diagonalized with respect to a orthogonal/unitary transformation, such as the discrete cosine transform (DCT) or discrete Fourier transform (DFT); test problems using the DCT and DFT are considered in Section \ref{sec:Validation}. \par
+From Assumption \ref{Assumption_Diagonalization}, we define the generalized filter functions to be
 \begin{equation}
 \label{eq:Filter functions 2}
 \filt^{(\ell)}_j = \frac{\left(\delta^{(\ell)}_j\right)^2}{\left(\delta^{(\ell)}_j\right)^2 + \regparam^2 \left(\lambda^{(\ell)}_j\right)^2}, \quad \mfilt^{(\ell)}_j = 1 - \filt^{(\ell)}_j = \frac{\regparam^2 \left(\lambda^{(\ell)}_j\right)^2}{\left(\delta^{(\ell)}_j\right)^2 + \regparam^2 \left(\lambda^{(\ell)}_j\right)^2}
@@ -553,7 +594,7 @@ where $\bm{\delta}^{(\ell)} = \sqrt{\diag(\trans{(\Delta^{(\ell)})}\Delta^{(\ell
 \label{eq:Fourier diagonalization 2}
 \A^{(\ell)} = U\Delta^{(\ell)}\left[\trans{(\Delta^{(\ell)})}\Delta^{(\ell)} + \regparam^2\trans{(\Lambda^{(\ell)})}\Lambda^{(\ell)}\right]^{-1}\trans{(\Delta^{(\ell)})}\trans{U}, \qquad \ell = 1,\ldots,R.
 \end{equation}
-If $\Sigma^{(\ell)} = \noiseSD_\ell^2I$ for all $\ell = 1,\ldots,R,$ then $\trace(\Sigma^{(\ell)}) = n\noiseSD^2_\ell$ and the similarity invariance of the trace operator gives
+Under Assumption \ref{Assumption_Noise}, $\trace(\Sigma^{(\ell)}) = n\noiseSD^2_\ell$ and the similarity invariance of the trace operator gives
 \begin{equation}
 \label{eq:Trace}
 \trace\left(\Sigma^{(\ell)}\A^{\ell}\right) = \noiseSD_\ell^2 \trace\left(\Delta^{(\ell)}\left[\trans{(\Delta^{(\ell)})}\Delta^{(\ell)} + \regparam^2\trans{(\Lambda^{(\ell)})}\Lambda^{(\ell)}\right]^{-1}\trans{(\Delta^{(\ell)})}\right) = \noiseSD_\ell^2 \sum_{j=1}^{n} \filt^{(\ell)}_j.
@@ -570,7 +611,28 @@ where $\dft{\dVec}^{(\ell)} = \trans{U}\dVec^{(\ell)}$ for $\ell = 1,\ldots,R$. 
 \label{eq:Individual UPRE 2}
 \U^{(\ell)}(\regparam) = \frac{1}{n} \sum_{j=1}^{n} \left(\mfilt^{(\ell)}_j\right)^2\left(\dft{\dVec}_j^{(\ell)}\right)^2 + \frac{2\noiseSD^2_\ell}{n} \sum_{j=1}^{n} \filt^{(\ell)}_j - \noiseSD^2_\ell, \quad \ell = 1,\ldots,R.
 \end{equation}
-\indent We conclude Section \ref{sec:UPRE} by showing a relationship between the adapted UPRE method that uses \eqref{eq:Averaged UPRE} and the UPRE method as simply applied to averaged data; the relationship is shown by first making some additional assumptions. The assumptions we make in addition to $\Sigma^{(\ell)} = \noiseSD_\ell^2 I$ are that $A^{(\ell)} = A$ and $L^{(\ell)} = L$ for all $\ell = 1,\ldots,R$. The consequence of these assumptions is that $\filt_j^{(\ell)} = \filt_j$ (and $\mfilt_j^{(\ell)} = \mfilt_j$) for all $\ell = 1,\ldots,R$. Using representation \eqref{eq:Individual UPRE 2}, we can write \eqref{eq:Averaged UPRE} as
+
+We conclude Section \ref{sec:UPRE} by showing a relationship between the adapted UPRE method that uses \eqref{eq:Averaged UPRE} and the UPRE method as simply applied to averaged data. 
+
+\begin{proposition}
+Under Assumptions \ref{Assumption_System} through \ref{Assumption_Diagonalization} with data vectors $\{\dVec^{(\ell)}\}_{\ell=1}^R$, let 
+\begin{equation}
+\label{eq:Averaged data}
+\aVec = \frac{1}{R}\sum_{\ell=1}^R \dVec^{(\ell)},
+\end{equation}
+$\dft{\aVec} = \trans{U}\aVec$, and let
+\begin{equation}
+\label{eq:UPRE of Average}
+\overline{U}(\regparam) = \frac{1}{n}\sum_{j=1}^{n} \left(\mfilt_j\right)^2\left(\dft{\aVec}_j\right)^2 + \frac{2}{n} \left(\frac{1}{R^2} \sum_{\ell=1}^R \noiseSD_\ell^2\right) \left(\sum_{j=1}^{n} \filt_j\right) - \frac{1}{R^2} \sum_{\ell=1}^R\noiseSD_\ell^2.
+\end{equation}
+Then
+\begin{equation}
+\label{eq:UPRE Bound}
+\widetilde{U}(\regparam) = \frac{1}{R} \sum_{\ell=1}^R \U^{(\ell)}(\regparam) \leq R \overline{U}(\regparam), \qquad \regparam \geq 0.
+\end{equation}
+\end{proposition}
+\begin{proof}
+The consequence of Assumptions \ref{Assumption_System} through \ref{Assumption_Noise} is that $\filt_j^{(\ell)} = \filt_j$ (and $\mfilt_j^{(\ell)} = \mfilt_j$) for all $\ell = 1,\ldots,R$. Using representation \eqref{eq:Individual UPRE 2}, we can write \eqref{eq:Averaged UPRE} as
 \begin{align*}
 \frac{1}{R} \sum_{\ell=1}^R \U^{(\ell)}(\regparam) &= \frac{1}{R} \sum_{\ell=1}^R \left[\frac{1}{n}\sum_{j=1}^{n} \left(\mfilt_j\right)^2\left(\dft{\dVec}_j^{(\ell)}\right)^2 + \frac{2\noiseSD_\ell^2}{n} \sum_{j=1}^{n} \filt_j - \noiseSD_\ell^2\right] \\
 &= \frac{1}{R} \sum_{\ell=1}^R \left(\frac{1}{n}\sum_{j=1}^{n} \left(\mfilt_j\right)^2\left(\dft{\dVec}_j^{(\ell)}\right)^2\right) + \frac{1}{R} \sum_{\ell=1}^R \left(\frac{2\noiseSD_\ell^2}{n} \sum_{j=1}^{n} \filt_j\right) - \frac{1}{R} \sum_{\ell=1}^R\noiseSD_\ell^2 \\
@@ -583,26 +645,18 @@ Multiplying through by $R/R$ then yields
 &= R\left[\frac{1}{n}\sum_{j=1}^{n} \left(\mfilt_j\right)^2\left(\frac{1}{R^2} \sum_{\ell=1}^R \left(\dft{\dVec}_j^{(\ell)}\right)^2\right) + \frac{2}{n} \left(\frac{1}{R^2} \sum_{\ell=1}^R \noiseSD_\ell^2\right) \left(\sum_{j=1}^{n} \filt_j\right) - \frac{1}{R^2} \sum_{\ell=1}^R\noiseSD_\ell^2\right].
 \end{align}
 Note that the term $\frac{1}{R^2} \sum_{\ell=1}^R\noiseSD_\ell^2$ is the variance of $\frac{1}{R} \sum_{\ell=1}^R \noiseVec^{(\ell)}$ since the random vectors $\{\noiseVec^{(\ell)}\}_{\ell=1}^R$ are mutually independent. However, \eqref{eq:Non-average UPRE} is not equal to $R$ times the UPRE function as applied to the average of the data
-\begin{equation}
-\label{eq:Averaged data}
-\aVec \coloneqq \frac{1}{R}\sum_{\ell=1}^R \dVec^{(\ell)} = \frac{1}{R} \sum_{\ell=1}^R \bVec^{(\ell)} + \frac{1}{R} \sum_{\ell=1}^R \noiseVec^{(\ell)}
-\end{equation}
+\[\aVec = \frac{1}{R}\sum_{\ell=1}^R \dVec^{(\ell)} = \frac{1}{R} \sum_{\ell=1}^R \bVec^{(\ell)} + \frac{1}{R} \sum_{\ell=1}^R \noiseVec^{(\ell)}\]
 because of the term $\frac{1}{R^2} \sum_{\ell=1}^R \left(\dft{\dVec}_j^{(\ell)}\right)^2$. If the UPRE method was used with the average $\aVec$, then
 \begin{equation}
 \label{eq:Coefficients of Average}
 \left(\dft{\aVec}_j\right)^2 = \frac{1}{R^2}\left(\sum_{\ell=1}^R \dft{\dVec}_j^{(\ell)}\right)^2 \leq \frac{1}{R^2} \sum_{\ell=1}^R \left(\dft{\dVec}_j^{(\ell)}\right)^2, \qquad j = 1,\ldots,n.
 \end{equation}
 Thus the result \eqref{eq:Non-average UPRE} shows that for
-\begin{equation}
-\label{eq:UPRE of Average}
-\overline{U}(\regparam) \coloneqq \frac{1}{n}\sum_{j=1}^{n} \left(\mfilt_j\right)^2\left(\dft{\aVec}_j\right)^2 + \frac{2}{n} \left(\frac{1}{R^2} \sum_{\ell=1}^R \noiseSD_\ell^2\right) \left(\sum_{j=1}^{n} \filt_j\right) - \frac{1}{R^2} \sum_{\ell=1}^R\noiseSD_\ell^2,
-\end{equation}
+\[\overline{U}(\regparam) = \frac{1}{n}\sum_{j=1}^{n} \left(\mfilt_j\right)^2\left(\dft{\aVec}_j\right)^2 + \frac{2}{n} \left(\frac{1}{R^2} \sum_{\ell=1}^R \noiseSD_\ell^2\right) \left(\sum_{j=1}^{n} \filt_j\right) - \frac{1}{R^2} \sum_{\ell=1}^R\noiseSD_\ell^2,\]
 i.e. $\overline{U}(\regparam)$ is the UPRE function as applied to the average $\aVec$ of the data $\{\dVec^{(\ell)}\}_{\ell=1}^R$, we have that
-\begin{equation}
-\label{eq:UPRE Bound}
-\widetilde{U}(\regparam) = \frac{1}{R} \sum_{\ell=1}^R \U^{(\ell)}(\regparam) \leq R \overline{U}(\regparam), \qquad \regparam \geq 0.
-\end{equation}
-Therefore the adapted UPRE function is truly distinct from simply applying the UPRE method to the average of the data, and the bound \eqref{eq:UPRE Bound} demonstrates a relationship between the two modalities.
+\[\widetilde{U}(\regparam) = \frac{1}{R} \sum_{\ell=1}^R \U^{(\ell)}(\regparam) \leq R \overline{U}(\regparam), \qquad \regparam \geq 0\]
+\end{proof}
+\noindent Therefore the adapted UPRE function is truly distinct from simply applying the UPRE method to the average of the data, and the bound \eqref{eq:UPRE Bound} demonstrates a relationship between the two modalities.
 
 \subsection{Morozov's discrepancy principle} \label{sec:MDP}
 Similar to the UPRE method, the MDP method relies on knowledge of the variance of $\noiseVec$. If $\noise \sim \mathcal{N}(\bm{0},\noiseSD^2I)$, then the MDP function is 

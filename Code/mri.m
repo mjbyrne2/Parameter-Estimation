@@ -29,9 +29,9 @@ end
 
 % Construct system matrix A:
 [N,~] = size(X);    % Length of each column
-y = linspace(-1,1,N)';
+y = linspace(-N,N,N)';
 if nargin < 1
-    vy = 0.01;   % Default variance of Gaussian kernel in the y direction
+    vy = 1;   % Default variance of Gaussian kernel in the y direction
 end 
 c = exp(-((y.^2)/(2*vy))); % 1D Gaussian kernel centered at (0,0)
 c = c/sum(c); % Scale the kernel

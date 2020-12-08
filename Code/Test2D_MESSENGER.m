@@ -1,5 +1,5 @@
 %% Test of UPRE, GCV, and Discrepancy Principle for Multiple Data Sets
-% Uses the MESSENGER NASA images and the DCT.
+% Uses the MRI data built into MATLAB and the DFT.
 
 % Labels for each method (specify method in next code block):
 namemeth{1} = 'UPRE';
@@ -7,12 +7,20 @@ namemeth{2} = 'GCV';
 namemeth{3} = 'DP';
 
 % Problem set-up:
-R = 6; % Number of test images as well as validation images; < 8
-[K,B,X] = MESSENGER(1:(2*R)); % K is not the system matrix; see mri2
-ny = 512;   % Number of rows
-nx = 512;   % Number of columns
+R = 10; % Number of default test images as well as validation images; < 14
+[K,B,X] = MESSENGER(1:(2*R)); % K is not the system matrix; see MESSENGER
+R = 8*R;    % mri2 creates 7 new images for each default image
+ny = 256;   % Number of rows
+nx = 256;   % Number of columns
 n = ny*nx;    % Number of total elements in each image
-Rvec = 2:2:R;   % Vector containing the number of data sets
+Rvec = 1:R;   % Vector containing the number of data sets
+
+% (Optional) Randomly rearrange data and solutions:
+pind = randperm(2*R);
+X = X(:,:,pind);
+B = B(:,:,pind);
+
+% Split data into training and validation sets:
 Xt = X(:,:,1:R);   % Take the first R columns as the training set
 Xv = X(:,:,R+1:2*R);   % Take next R columns as validation set
 Bt = B(:,:,1:R);   % Blurred training data
@@ -89,7 +97,8 @@ dpsi = @(alpha) (2*(abs(Delta).^2).*(abs(Lambda).^2)*alpha)./...
 %% Set-up of parameter selection methods
 
 % Select method (UPRE = 1, GCV = 2, MDP = 3):
-method = 3;
+method = 2;
+safeparam = 1;  % Only for MDP 
 
 % Parameter methods:
 switch method
@@ -118,9 +127,9 @@ switch method
 %             (1/numel(d_hat))*sum(sum((psi(alpha).^2).*(d_hat.^2))).*sum(-dpsi(alpha));
     case 3  % MDP
 %         F = @(alpha,d_hat,eta) (1/n)*(norm(psi(alpha).*d_hat,'fro')^2) - eta;
-        F = @(alpha,d_hat,eta) (1/n)*(norm(psi(alpha).*d_hat,'fro')^2) - eta*n;
+        F = @(alpha,d_hat,eta) (1/n)*(norm(psi(alpha).*d_hat,'fro')^2) - safeparam*eta*n;
 %         bigF = @(alpha,D_hat,Eta) (1/numel(D_hat))*sum(arrayNorm(psi(alpha).*D_hat).^2) - mean(Eta);
-        bigF = @(alpha,D_hat,Eta) (1/numel(D_hat))*sum(arrayNorm(psi(alpha).*D_hat).^2) - (n*mean(Eta));
+        bigF = @(alpha,D_hat,Eta) (1/numel(D_hat))*sum(arrayNorm(psi(alpha).*D_hat).^2) - safeparam*(n*mean(Eta));
 end
 
 %% Find individual regularization parameters
@@ -239,12 +248,28 @@ ylabel('Relative Error','Fontsize',20)
 figure
 hold on
 grid on
-plot(Rvec,alpha_learned,'ro','MarkerSize',10)
-plot(Rvec,alpha_UPREBig,'bx','MarkerSize',10)
-plot(Rvec,alpha_GCVBig,'g+','MarkerSize',10)
-plot(Rvec,alpha_MDPBig,'y*','MarkerSize',10)
+plot(Rvec,alpha_learned,'ro','MarkerSize',12)
+plot(Rvec,alpha_UPREBig,'bx','MarkerSize',12)
+plot(Rvec,alpha_GCVBig,'m+','MarkerSize',12)
+plot(Rvec,alpha_MDPBig,'k*','MarkerSize',12)
 set(gca,'Fontsize',18)
 ylabel('Regularization parameter \alpha','Fontsize',20)
 xlabel('Number of utilized training data vectors','Fontsize',20)
 legend({'Learned','UPRE-Big','GCV-Big','MDP-Big'},'Fontsize',20,...
     'Location','Best','Orientation','Horizontal')
+
+%% Boxplot comparing all four adaptive methods using all data vectors:
+
+c = 10;
+errorsBig = [err_learned(c,:)';err_UPREBig(c,:)';err_GCVBig(c,:)';...
+    err_MDPBig(c,:)'];
+errorsLabels = [repmat({'Learned'},R,1);...
+    repmat({'UPRE-Big'},R,1);...
+    repmat({'GCV-Big'},R,1);...
+    repmat({'MDP-Big'},R,1)];
+
+figure
+b = boxplot(errorsBig,errorsLabels);
+set(b,{'linew'},{1.5})
+set(gca,'Fontsize',18)
+ylabel('Relative Error','Fontsize',20)
