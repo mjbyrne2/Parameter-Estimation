@@ -39,7 +39,8 @@
 \DeclareMathOperator{\shift}{\sigma}	% Shift operator
 
 % Regularization notation:
-\newcommand{\regparam}{\alpha}
+\newcommand{\regparam}{\alpha}  % Regularization parameter
+\newcommand{\regparamVec}{\mathbf{\regparam}}   % Vector of regularization parameters
 \newcommand{\R}{R_{\regparam}}	% Regularization matrix
 \newcommand{\regf}{\fVec_{\regparam}}	% Regularized solution
 \newcommand{\xReg}{\xVec(\regparam)}	% Regularized solution
@@ -360,7 +361,7 @@ Perhaps the simplest way of choosing the components of $\wVec^{(\ell)}$ is to fi
 0, & \text{otherwise.}
 \end{cases}
 \end{equation}
-Choosing $p-1$ linearly-spaced or logarithmically-spaced
+There are some advantages of using \eqref{eq:Non-overlapping windows}. One advantage is that singular values of similar magnitude are grouped together. Another advantage is that the windows do not overlap. Non-overlapping windows allows for the multiparameter estimation functions discussed in Section \ref{sec:Methods} to decoupled into linear combinations of single parameter functions. Choosing $\omega^{(1)},\ldots,\omega^{(p-1)}$ to be the $p-1$ linearly-spaced or logarithmically-spaced points between $\singular_1$ and $\singular_n$ and then setting $\omega^{(0)} = \singular_1$ and $\omega^{(p)} < \singular_n$ is an example of how to use \eqref{eq:Non-overlapping windows}.
 
 \subsection{Multiple data sets}
 We now consider the situation where we have a collection of data sets $\{\dVec^{(\ell)}\}_{\ell=1}^R$ where 
@@ -658,6 +659,40 @@ i.e. $\overline{U}(\regparam)$ is the UPRE function as applied to the average $\
 \end{proof}
 \noindent Therefore the adapted UPRE function is truly distinct from simply applying the UPRE method to the average of the data, and the bound \eqref{eq:UPRE Bound} demonstrates a relationship between the two modalities.
 
+\subsubsection{Multiparameter UPRE}
+We now derive a multiparameter version of the UPRE function for a single data set $\dVec = A\xVec + \noiseVec$ with $A \in \mathbb{R}^{m \times n}$ $\noiseVec \sim \mathcal{N}(\zeroVec,\noiseSD^2 I)$. For $\ell = 1,\ldots,p$, let $\wVec^{(\ell)}$ be weight vectors satisfying \eqref{eq:Weights} and let $W^{(\ell)} = \diag(\wVec^{(\ell)})$. For the regularized solution \eqref{eq:TikSolWindow}, the regularization matrix $R_\text{win}(\regparamVec)$ is
+\begin{equation}
+\label{eq:Windowed Reg Matrix}
+    R_\text{win}(\regparamVec) = \sum_{\ell=1}^p V\inv{\left[\trans{S}S + (\regparam^{(\ell)})^2\right]}W^{(j)}\trans{S}\trans{U}.
+\end{equation}
+The corresponding influence matrix $A_\text{win}(\regparamVec) = AR_\text{win}(\regparamVec)$ is then
+\begin{equation}
+\label{eq:Windowed Influence Matrix}
+    A_\text{win}(\regparamVec) = US\sum_{\ell=1}^p V\inv{\left[\trans{S}S + (\regparam^{(\ell)})^2\right]}W^{(j)}\trans{S}\trans{U}. 
+\end{equation}
+The windowed regularized residual $\rVec_\text{win}(\regparamVec) = (A_\text{win}(\regparamVec) - I)\dVec$ can be written as
+\begin{equation}
+    \rVec_\text{win}(\regparamVec) = U\left(S\sum_{\ell=1}^p V\inv{\left[\trans{S}S + (\regparam^{(\ell)})^2\right]}W^{(j)}\trans{S}-I\right)\dft{\dVec}.
+\end{equation}
+Thus the multiparameter UPRE function for problem $\dVec = A\xVec + \noiseVec$ is 
+\begin{equation}
+\label{eq:Multiparameter UPRE}
+    U_\text{win}(\regparamVec) = \frac{1}{n}\left\|\rVec_\text{win}(\regparamVec)\right\|_2^2 + \frac{2\noiseSD^2}{n}\trace\left(A_\text{win}(\regparamVec)\right) - \noiseSD^2.
+\end{equation}
+Using $\mfilt(\regparam,\singular) := 1 - \filt(\regparam,\singular)$ with $\filt(\regparam,\singular)$ defined by \eqref{eq:TikFilt}, $\|\rVec_\text{win}(\regparamVec)\|_2^2$ can be expressed as
+\begin{equation}
+    \left\|\rVec_\text{win}(\regparamVec)\right\|_2^2 = \sum_{j=1}^{n} \left(\sum_{k=1}^{p} w_j^{(k)} \mfilt\left(\regparam^{(k)},\singular_j\right) \right)^2 \left(\dft{d}_j\right)^2.
+\end{equation}
+Similarly, the trace of the windowed influence matrix can be written as
+\begin{equation}
+    \trace\left(A_\text{win}(\regparamVec)\right) = \sum_{j=1}^{n} \left(\sum_{k=1}^{p} w_j^{(k)} \filt\left(\regparam^{(k)},\singular_j\right) \right).
+\end{equation}
+Thus \eqref{eq:Multiparameter UPRE} becomes
+\begin{equation}
+\label{eq:Multiparameter UPRE 2}
+    U_\text{win}(\regparamVec) = \frac{1}{n}\sum_{j=1}^{n} \left(\sum_{k=1}^{p} w_j^{(k)} \mfilt\left(\regparam^{(k)},\singular_j\right) \right)^2 \left(\dft{d}_j\right)^2 + \frac{2\noiseSD^2}{n}\sum_{j=1}^{n} \left(\sum_{k=1}^{p} w_j^{(k)} \filt\left(\regparam^{(k)},\singular_j\right) \right) - \noiseSD^2.
+\end{equation}
+
 \subsection{Morozov's discrepancy principle} \label{sec:MDP}
 Similar to the UPRE method, the MDP method relies on knowledge of the variance of $\noiseVec$. If $\noise \sim \mathcal{N}(\bm{0},\noiseSD^2I)$, then the MDP function is 
 \begin{equation}
@@ -695,33 +730,56 @@ The MDP function for the more general assumption that $\noiseVec \sim \mathcal{N
 \label{eq:General MDP}
 \widetilde{\D}(\regparam) = \frac{1}{n}\|\rVec(\regparam)\|_2^2 - \frac{1}{n}\trace\left(\Sigma\right).
 \end{equation}
-The function \eqref{eq:General MDP} can be applied to data $\{\dVec\}_{\ell=1}^R$ with characteristics \eqref{eq:Big vectors} and the formation of $\widetilde{\dVec}$, $\widetilde{\xVec}(\regparam)$, $\widetilde{\xVec}$, $\widetilde{A}_{\regparam}$, and $\widetilde{\Sigma}$. Therefore we define
+Function \eqref{eq:General MDP} can be applied to data $\{\dVec\}_{\ell=1}^R$ with constructions described in Table \ref{tab:System assumptions}. 
+
+\begin{proposition}
+Using the constructions in Table \ref{tab:System assumptions} under Assumption \ref{Assumption_System} with $n_\ell = n$ for all $\ell = 1,\ldots,R$, the MDP function $\widetilde{\D}(\regparam)$ for the data sets $\{\dVec^{(\ell)}\}_{\ell=1}^R$ is
+\begin{equation}
+\label{eq:Averaged MDP}
+\widetilde{\D}(\regparam) = \frac{1}{R} \sum_{\ell=1}^R \D^{(\ell)}(\regparam),
+\end{equation}
+where
+\begin{equation}
+\label{eq:Individual MDP}
+\D^{(\ell)}(\regparam) = \D^{(\ell)}(\regparam) = \frac{1}{n}\|\rVec^{(\ell)}(\regparam)\|_2^2 - \frac{1}{n}\trace\left(\Sigma^{(\ell)}\right), \quad \ell = 1,\ldots,R
+\end{equation}
+with $\rVec^{(\ell)} = A^{(\ell)}\xVec^{(\ell)}(\regparam) - \dVec^{(\ell)}$.
+\end{proposition}
+
+\begin{proof}
+We first define
 \begin{equation}
 \label{eq:Big MDP}
 \widetilde{\D}(\regparam) = \frac{1}{N}\|\widetilde{\rVec}(\regparam)\|_2^2 - \frac{1}{N}\trace\left(\widetilde{\Sigma}\right).
 \end{equation}
-By defining the individual MDP functions as
-\begin{equation}
-\label{eq:Individual MDP}
-\D^{(\ell)}(\regparam) = \frac{1}{n}\|\rVec^{(\ell)}(\regparam)\|_2^2 - \frac{1}{n}\trace\left(\Sigma^{(\ell)}\right), \quad \ell = 1,\ldots,R,
-\end{equation}
-the MDP function \eqref{eq:Big MDP} for the large system can be written as an average of the functions \eqref{eq:Individual MDP} by exploiting the block structure of $\widetilde{A}_{\regparam}$ and $\widetilde{\Sigma}$:
-\begin{align}
-\label{eq:Averaged MDP}
+By defining the individual MDP functions by \eqref{eq:Individual MDP}, the MDP function \eqref{eq:Big MDP} for the large system can be written as an average by exploiting the block structure of $\widetilde{A}_{\regparam}$ and $\widetilde{\Sigma}$:
+\begin{align*}
 \widetilde{\D}(\regparam) &= \frac{1}{N}\sum_{\ell=1}^R \|\rVec^{(\ell)}(\regparam)\|_2^2 - \frac{1}{N}\sum_{\ell=1}^R \trace\left(\Sigma^{(\ell)}\right) \nonumber \\
 &= \frac{1}{R}\sum_{\ell=1}^R \frac{1}{n}\|\rVec^{(\ell)}(\regparam)\|_2^2 - \frac{1}{R}\sum_{\ell=1}^R \frac{1}{n}\trace\left(\Sigma^{(\ell)}\right) \nonumber \\
 &= \frac{1}{R}\sum_{\ell=1}^R \D^{(\ell)}(\regparam).
-\end{align}
-The MDP method for multiple data then defines $\widetilde{\regparam}_{\textrm{MDP}}$ as the zero of $\widetilde{\D}(\regparam)$. Analogous to the UPRE method, \eqref{eq:Individual MDP} is equivalent to \eqref{eq:MDP} if $\Sigma^{(\ell)} = \noiseSD^2 I$ for all $\ell = 1,\ldots,R$. A safety parameter $\safeparam$ can also be included in the trace terms of \eqref{eq:Big MDP} and \eqref{eq:Individual MDP} for more control over selected parameters. \par 
-As with the adapted UPRE method, the adapted MDP method is distinct from the MDP method as applied to the averaged data \eqref{eq:Averaged data}. Again we assume that $\Sigma^{(\ell)} = \noiseSD_\ell^2 I$, $A^{(\ell)} = A$, and $L^{(\ell)} = L$ for all $\ell = 1,\ldots,R$. Under these assumptions, for the MDP method we have $\widetilde{\D}(\regparam)$ is equal to
-\[\frac{1}{R} \sum_{\ell=1}^R \D^{(\ell)}(\regparam) = \frac{1}{R}\sum_{\ell=1}^R \left[\frac{1}{n}\|\rVec^{(\ell)}(\regparam)\|_2^2 - \noiseSD_{\ell}^2\right] = R\left[\frac{1}{n}\sum_{j=1}^{n} \left(\mfilt_j\right)^2\left(\frac{1}{R^2} \sum_{\ell=1}^R |\dft{\dVec}_j^{(\ell)}|^2\right) - \frac{1}{R^2}\sum_{\ell=1}^R \noiseSD_{\ell}^2\right]\]
-so that letting
-\[\overline{\D}(\regparam) = \frac{1}{n}\sum_{j=1}^{n} \left(\mfilt_j\right)^2 |\dft{\aVec}_j|^2 - \frac{1}{R^2}\sum_{\ell=1}^R \noiseSD_{\ell}^2\]
-results in bound
+\end{align*}
+\end{proof}
+
+The MDP method for multiple data then defines $\widetilde{\regparam}_{\textrm{MDP}}$ as the zero of $\widetilde{\D}(\regparam)$. Analogous to the UPRE method, \eqref{eq:Individual MDP} is equivalent to \eqref{eq:MDP} under Assumption \ref{Assumption_Noise}. A safety parameter $\safeparam$ can also be included in the trace terms of \eqref{eq:Big MDP} and \eqref{eq:Individual MDP} for more control over selected parameters. \par 
+As with the adapted UPRE method, the adapted MDP method is distinct from the MDP method as applied to the averaged data \eqref{eq:Averaged data}.
+
+\begin{proposition}
+Under Assumptions \ref{Assumption_System} through \ref{Assumption_Diagonalization} with data vectors $\{\dVec^{(\ell)}\}_{\ell=1}^R$, let $\aVec$ be defined by \eqref{eq:Averaged data}, $\dft{\aVec} = \trans{U}\aVec$, and let
+\begin{equation}
+\label{eq:MDP of Average}
+\overline{\D}(\regparam) = \frac{1}{n}\sum_{j=1}^{n} \left(\mfilt_j\right)^2 |\dft{\aVec}_j|^2 - \frac{1}{R^2}\sum_{\ell=1}^R \noiseSD_{\ell}^2
+\end{equation}
+Then
 \begin{equation}
 \label{eq:MDP Bound}
 \widetilde{\D}(\regparam) = \frac{1}{R} \sum_{\ell=1}^R \D^{(\ell)}(\regparam) \leq R \overline{\D}(\regparam), \qquad \regparam \geq 0.
 \end{equation}
+\end{proposition}
+\begin{proof}
+Under these assumptions, for the MDP method we have $\widetilde{\D}(\regparam)$ is equal to
+\[\frac{1}{R} \sum_{\ell=1}^R \D^{(\ell)}(\regparam) = \frac{1}{R}\sum_{\ell=1}^R \left[\frac{1}{n}\|\rVec^{(\ell)}(\regparam)\|_2^2 - \noiseSD_{\ell}^2\right] = R\left[\frac{1}{n}\sum_{j=1}^{n} \left(\mfilt_j\right)^2\left(\frac{1}{R^2} \sum_{\ell=1}^R |\dft{\dVec}_j^{(\ell)}|^2\right) - \frac{1}{R^2}\sum_{\ell=1}^R \noiseSD_{\ell}^2\right]\]
+so that using \eqref{eq:MDP of Average} results in the bound \eqref{eq:MDP Bound}.
+\end{proof}
 
 \subsection{Generalized cross validation} \label{sec:GCV}
 Unlike the UPRE and MDP methods, the GCV method does not depend upon knowledge of the noise variance. For a single data set $\dVec = A\xVec + \noiseVec$, the GCV function is defined as
@@ -729,18 +787,24 @@ Unlike the UPRE and MDP methods, the GCV method does not depend upon knowledge o
 \label{eq:GCV}
 \G(\regparam) = \frac{\frac{1}{n}\|\regres\|_2^2}{\left[\frac{1}{n}\trace(I-\A)\right]^2} = \frac{\frac{1}{n}\|\regres\|_2^2}{\left[1 - \frac{1}{n}\trace(\A)\right]^2}.
 \end{equation}
-The GCV method determines $\regparam$ such that $\regparam_\GCV = \argmin_{\regparam > 0} \G(\regparam)$. \par 
-With data $\dVec^{(\ell)}$ with characteristics \eqref{eq:Big vectors} and vertical concatenations $\widetilde{\dVec}$, $\widetilde{\xVec}(\regparam)$, and $\widetilde{\xVec}$, we can define a GCV function for multiple data sets as
-\begin{equation}
-\label{eq:GCV Big}
-\widetilde{\G}(\regparam) = \frac{\frac{1}{N}\|\widetilde{\mathbf{r}}_\regparam\|_2^2}{\left[1 - \frac{1}{N}\trace(\widetilde{A}_\regparam)\right]^2}.
-\end{equation}
-From the structure of $\widetilde{\mathbf{r}}_\regparam$ and $\widetilde{A}_\regparam$, \eqref{eq:GCV Big} can be rewritten as
+The GCV method determines $\regparam$ such that $\regparam_\GCV = \argmin_{\regparam > 0} \G(\regparam)$.
+
+\begin{proposition}
+Using the constructions in Table \ref{tab:System assumptions} under Assumption \ref{Assumption_System} with $n_\ell = n$ for all $\ell = 1,\ldots,R$, the GCV function $\widetilde{\D}(\regparam)$ for the data sets $\{\dVec^{(\ell)}\}_{\ell=1}^R$ is
 \begin{equation}
 \label{eq:GCV Big 2}
 \widetilde{\G}(\regparam) = \frac{\frac{1}{N}\sum_{\ell=1}^R \|\regres^{(\ell)}\|_2^2}{\left[1 - \frac{1}{N}\sum_{\ell=1}^R \trace\left(\A^{(\ell)}\right)\right]^2}.
 \end{equation}
-The GCV method for multiple data sets defines $\widetilde{\regparam}_{\textrm{GCV}} = \argmin_{\regparam > 0} \widetilde{\G}(\regparam)$. \par 
+\end{proposition}
+\begin{proof}
+We define the GCV function for multiple data sets as
+\begin{equation}
+\label{eq:GCV Big}
+\widetilde{\G}(\regparam) = \frac{\frac{1}{N}\|\widetilde{\mathbf{r}}_\regparam\|_2^2}{\left[1 - \frac{1}{N}\trace(\widetilde{A}_\regparam)\right]^2}.
+\end{equation}
+From the definition of $\widetilde{\mathbf{r}}_\regparam$ and the block structure $\widetilde{A}_\regparam$, \eqref{eq:GCV Big} can be rewritten as \eqref{eq:GCV Big 2}.
+\end{proof} 
+\noindent The GCV method for multiple data sets defines $\widetilde{\regparam}_{\textrm{GCV}} = \argmin_{\regparam > 0} \widetilde{\G}(\regparam)$. \par 
 In contrast to the UPRE and MDP methods, the GCV function \eqref{eq:GCV Big 2} for multiple data sets is not equal to the mean of individual GCV functions
 \begin{equation}
 \label{eq:Individual GCV}
@@ -751,16 +815,28 @@ However, if we assume that $A^{(\ell)} = A$ and $L^{(\ell)} = L$ for each $\ell 
 \label{eq:Averaged GCV}
 \widetilde{\G}(\regparam) = \frac{\frac{1}{N}\sum_{\ell=1}^R \|\regres^{(\ell)}\|_2^2}{\left[1 - \frac{1}{N}\sum_{\ell=1}^R \trace\left(\A\right)\right]^2} = \frac{1}{R}\frac{\sum_{\ell=1}^R \frac{1}{n} \|\regres^{(\ell)}\|_2^2}{\left[1 - \frac{1}{n} \trace\left(\A\right)\right]^2} = \frac{1}{R}\sum_{\ell=1}^R \G^{(\ell)}(\regparam).
 \end{equation}
-Note that \eqref{eq:Individual GCV} is equivalent to \eqref{eq:GCV} without the assumption that $\Sigma^{(\ell)} = \noiseSD^2 I$ for $\ell = 1,\ldots,R$, which is to be expected since the GCV method does not rely on knowledge of the noise variance. \par 
-A bound analogous to \eqref{eq:UPRE Bound} and \eqref{eq:MDP Bound} can be obtained for the adapted GCV function as well using the assumption that $A^{(\ell)} = A$ and $L^{(\ell)} = L$ for each $\ell = 1,\ldots,R$. With these assumptions,
-\[\widetilde{\G}(\regparam) = \frac{1}{R} \sum_{\ell=1}^R \G^{(\ell)}(\regparam) = \frac{1}{R}\sum_{\ell=1}^R \left[\frac{\frac{1}{n}\|\regres^{(\ell)}\|_2^2}{\left[1 - \frac{1}{n}\trace\left(\A\right)\right]^2}\right]  = R\frac{\frac{1}{n}\sum_{j=1}^{n} \left(\mfilt_j\right)^2\left(\frac{1}{R^2} \sum_{\ell=1}^R |\dft{\dVec}_j^{(\ell)}|^2\right)}{\left[1 - \frac{1}{n}\trace\left(\A\right)\right]^2},\]
-again where the last equality is obtained through multiplication by $\frac{R}{R}$. Using \eqref{eq:Coefficients of Average} and letting
-\[\overline{\G}(\regparam) = \frac{\frac{1}{n}\sum_{j=1}^{n} \left(\mfilt_j\right)^2|\dft{\aVec}_j|^2}{\left[1 - \frac{1}{n}\trace\left(\A\right)\right]^2},\]
-we have
+Note that \eqref{eq:Individual GCV} is equivalent to \eqref{eq:GCV} without Assumption \ref{Assumption_Noise}, which is to be expected since the GCV method does not rely on knowledge of the noise variance. \par 
+A bound analogous to \eqref{eq:UPRE Bound} and \eqref{eq:MDP Bound} can be obtained for the adapted GCV function.
+
+\begin{proposition}
+Under Assumptions \ref{Assumption_System} through \ref{Assumption_Diagonalization} with data vectors $\{\dVec^{(\ell)}\}_{\ell=1}^R$, let $\aVec$ be defined by \eqref{eq:Averaged data}, $\dft{\aVec} = \trans{U}\aVec$, and let
+\begin{equation}
+\label{eq:GCV of Average}
+\overline{\G}(\regparam) = \frac{\frac{1}{n}\sum_{j=1}^{n} \left(\mfilt_j\right)^2|\dft{\aVec}_j|^2}{\left[1 - \frac{1}{n}\trace\left(\A\right)\right]^2}.
+\end{equation}
+Then
 \begin{equation}
 \label{eq:GCV Bound}
 \widetilde{\G}(\regparam) = \frac{1}{R} \sum_{\ell=1}^R \G^{(\ell)}(\regparam) \leq R \overline{\G}(\regparam), \qquad \regparam \geq 0.
 \end{equation}
+\end{proposition}
+
+\begin{proof}
+With these assumptions,
+\[\widetilde{\G}(\regparam) = \frac{1}{R} \sum_{\ell=1}^R \G^{(\ell)}(\regparam) = \frac{1}{R}\sum_{\ell=1}^R \left[\frac{\frac{1}{n}\|\regres^{(\ell)}\|_2^2}{\left[1 - \frac{1}{n}\trace\left(\A\right)\right]^2}\right]  = R\frac{\frac{1}{n}\sum_{j=1}^{n} \left(\mfilt_j\right)^2\left(\frac{1}{R^2} \sum_{\ell=1}^R |\dft{\dVec}_j^{(\ell)}|^2\right)}{\left[1 - \frac{1}{n}\trace\left(\A\right)\right]^2},\]
+again where the last equality is obtained through multiplication by $\frac{R}{R}$. The definition of $\overline{\G}(\regparam)$ and \eqref{eq:Coefficients of Average} then results in the bound \eqref{eq:GCV Bound}.
+\end{proof}
+
 As a closing remark regarding the GCV method, it is important to note that the assumption $A^{(\ell)} = A$ and $L^{(\ell)} = L$ for each $\ell = 1,\ldots,R$ was needed for result \eqref{eq:Averaged GCV}. In contrast, no such assumption is necessary for the corresponding UPRE and MDP results, which respectively are \eqref{eq:Averaged UPRE} and \eqref{eq:Averaged MDP}.
 
 %\subsection{Numerical implementation} \label{sec:Implementation}
