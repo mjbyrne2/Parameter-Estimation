@@ -1,5 +1,5 @@
 \documentclass[12pt]{article}
-\usepackage{amsmath,amssymb,amsthm,bm,enumitem,mathtools}
+\usepackage{amsmath,amssymb,amsthm,bm,enumerate,enumitem,mathtools}
 \usepackage{geometry,graphicx,subcaption,sidecap,multirow}
 \geometry{margin = 1 in}
 \usepackage{color}
@@ -142,19 +142,42 @@ where the $m \times m$ matrix $U$ and the $n \times n$ matrix $V$ are orthogonal
 \inv{A}\dVec = VS^{-1}{\trans{U}}\dVec = \sum_{k=1}^{r} \frac{{\trans{(U_{\cdot,k})}}\dVec}{\singular_k}V_{\cdot,k} = \sum_{k=1}^{r} \frac{\svd{\dVec}_k}{\singular_k}V_{\cdot,k}
 \end{equation}
 where $\svd{\dVec} = \trans{U}\dVec$ and $r := \rank(A) = m = n$. \par 
-Beyond the situation where $A$ is square and invertible, the pseudoinverse $\pinv{A} = V\pinv{S}\trans{U}$, where $\pinv{S} \in \mathbb{R}^{n \times m}$ is formed by reciprocating the nonzero diagonal elements of $\trans{S}$, can be used to obtain a solution $\pinv{A}\dVec = V\pinv{S}\svd{\dVec}$. When working with the pseudoinverse $\pinv{A}$, it can be convenient to write
+Beyond the situation where $A$ is square and invertible, the pseudoinverse $\pinv{A} = V\pinv{S}\trans{U}$, where $\pinv{S} \in \mathbb{R}^{n \times m}$ is formed by reciprocating the nonzero diagonal elements of $\trans{S}$. The pseudoinverse, also called the Moore-Penrose generalized inverse \cite{Penrose1955}, is the unique matrix $\pinv{A} \in \mathbb{R}^{n \times m}$ that satisfies the following Moore-Penrose conditions \cite{GolubVanLoan2013}:
+
+\begin{itemize}
+    \begin{minipage}{0.45\linewidth}
+        \centering
+        \item[(i)] $A\pinv{A}A = A$, 
+        \item[(ii)] $\pinv{A}A\pinv{A} = \pinv{A}$,
+    \end{minipage}
+    \begin{minipage}{0.45\linewidth}
+        \centering
+        \item[(iii)] $\trans{\left(A\pinv{A}\right)} = A\pinv{A}$,
+        \item[(iv)] $\trans{\left(\pinv{A}A\right)} = \pinv{A}A$.
+    \end{minipage}
+\end{itemize}
+
+\noindent When working with the pseudoinverse $\pinv{A}$, it can be convenient to write
 \begin{equation}
 \label{eq:Compact SVD}
 A = U_rS_r\trans{V}_r
 \end{equation}
 where $U_r \in \mathbb{R}^{m \times r}$ and $V_r \in \mathbb{R}^{n \times r}$ consist of the first $r$ columns of $U$ and $V$, respectively, and $S_r = \diag(\singular_1,\ldots,\singular_{r}) \in \mathbb{R}^{r \times r}$ is invertible. Factorization \eqref{eq:Compact SVD} is called the compact SVD of $A$ \cite{ABT,Leon2010}. The columns of $U_r$ form an orthonormal basis for $\range(A)$, while the columns of $V_r$ form an orthonormal basis for $\range(\trans{A})$. Writing $U = [U_r ~ U_0]$ and $V = [V_r ~ V_0]$, the fundamental theorem of linear algebra \cite{Strang1993} implies that the columns $U_0$  and $V_0$ form orthonormal bases for $\nullspace(\trans{A})$ and $\nullspace(A)$, respectively. Furthermore, we have that $U_r\trans{U}_r$ projects vectors onto the range of $A$:
 \[U_r\trans{U}_r\yVec = \proj_{\range(A)}\yVec, \quad \yVec \in \mathbb{R}^m.\]
-\indent With the compact SVD, the pseudoinverse of $A$ can be expressed as 
+With the compact SVD, the pseudoinverse of $A$ can be expressed as 
 \begin{equation}
 \label{eq:Pseudoinverse}
     \pinv{A} = V_r\inv{S}_r\trans{U}_r.
 \end{equation} 
-Let $\pinv{\xVec} = \pinv{A}\dVec$ denote the solution of $A\xVec = \dVec$ obtained using the pseudoinverse $\pinv{A}$. The summation representation of $\pinv{\xVec}$ is the same as \eqref{eq:InvProd} except that $r \leq \min\{m,n\}$. Table \ref{tab:Cases for A} summarizes the situations involving $\pinv{\xVec}$ as a solution to $A\xVec = \dVec$. In the case where $\nullspace(A) \neq \{\zeroVec\}$, infinitely many solutions to $A\xVec = \dVec$ can be constructed as $\pinv{\xVec} + \xVec_0$ where $\xVec_0 \in \nullspace(A)$ is arbitrary.
+Representation \eqref{eq:Pseudoinverse} is convenient for the purpose of proving some basic properties of the pseudoinverse presented in Proposition \ref{prop:Pseudoinverse properties}.
+
+\begin{proposition}
+\label{prop:Pseudoinverse properties}
+Given $A \in \mathbb{R}^{m \times n}$, let $\pinv{A} \in \mathbb{R}^{n \times m}$ denote the pseudoinverse of $A$. Then
+\end{proposition}
+
+
+Let $\pinv{\xVec} = \pinv{A}\dVec = V\pinv{S}\svd{\dVec}$ denote the solution of $A\xVec = \dVec$ obtained using the pseudoinverse $\pinv{A}$. The summation representation of $\pinv{\xVec}$ is the same as \eqref{eq:InvProd} except that $r \leq \min\{m,n\}$. Table \ref{tab:Cases for A} summarizes the situations involving $\pinv{\xVec}$ as a solution to $A\xVec = \dVec$. In the case where $\nullspace(A) \neq \{\zeroVec\}$, infinitely many solutions to $A\xVec = \dVec$ can be constructed as $\pinv{\xVec} + \xVec_0$ where $\xVec_0 \in \nullspace(A)$ is arbitrary.
 
 \begin{table}[ht!]
   \begin{center}
