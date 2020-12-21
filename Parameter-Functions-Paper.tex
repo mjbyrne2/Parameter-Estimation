@@ -9,6 +9,7 @@
 % Discrete notation:
 \newcommand{\aVec}{\mathbf{a}}	% Vector
 \newcommand{\bVec}{\mathbf{b}}	% Vector
+\newcommand{\cVec}{\mathbf{c}}	% Vector
 \newcommand{\dVec}{\mathbf{d}}	% Vector
 \newcommand{\kVec}{\mathbf{k}}	% Vector
 \newcommand{\pVec}{\mathbf{p}}	% Vector
@@ -143,21 +144,45 @@ where the $m \times m$ matrix $U$ and the $n \times n$ matrix $V$ are orthogonal
 \end{equation}
 where $\svd{\dVec} = \trans{U}\dVec$ and $r := \rank(A) = m = n$. \par 
 Beyond the situation where $A$ is square and invertible, the pseudoinverse $\pinv{A} = V\pinv{S}\trans{U}$, where $\pinv{S} \in \mathbb{R}^{n \times m}$ is formed by reciprocating the nonzero diagonal elements of $\trans{S}$. The pseudoinverse, also called the Moore-Penrose generalized inverse \cite{Penrose1955}, is the unique matrix $\pinv{A} \in \mathbb{R}^{n \times m}$ that satisfies the following Moore-Penrose conditions \cite{GolubVanLoan2013}:
-
-\begin{itemize}
+\begin{enumerate}[label={(\Roman*)}]
     \begin{minipage}{0.45\linewidth}
         \centering
-        \item[(i)] $A\pinv{A}A = A$, 
-        \item[(ii)] $\pinv{A}A\pinv{A} = \pinv{A}$,
+        \item $A\pinv{A}A = A$, \label{MP Condition 1}
+        \item $\pinv{A}A\pinv{A} = \pinv{A}$, \label{MP Condition 2}
     \end{minipage}
     \begin{minipage}{0.45\linewidth}
         \centering
-        \item[(iii)] $\trans{\left(A\pinv{A}\right)} = A\pinv{A}$,
-        \item[(iv)] $\trans{\left(\pinv{A}A\right)} = \pinv{A}A$.
+        \item $\trans{\left(A\pinv{A}\right)} = A\pinv{A}$, \label{MP Condition 3}
+        \item $\trans{\left(\pinv{A}A\right)} = \pinv{A}A$. \label{MP Condition 4}
     \end{minipage}
-\end{itemize}
+\end{enumerate}
+Proposition \ref{prop:Special pseudoinverses} describes some special cases of the pseudoinverse.
+\begin{proposition}
+\label{prop:Special pseudoinverses}
+Let $A \in \mathbb{R}^{m \times n}$ and let $\pinv{A} \in \mathbb{R}^{n \times m}$ be the pseudoinverse of $A$.
+    \begin{enumerate}[label={(\roman*)}]
+    \item If $\rank(A) = m$, then $\pinv{A} = \trans{A}\inv{\left(A\trans{A}\right)}$ and so $\pinv{A}$ is the right inverse of $A$. \label{prop:Right inverse}
+    \item If $\rank(A) = n$, then $\pinv{A} = \inv{\left(\trans{A}A\right)}\trans{A}$ and so $\pinv{A}$ is the left inverse of $A$. \label{prop:Left inverse}
+    \item If $A = \zeroVec_{m \times n}$, then $\pinv{A} = \zeroVec_{n \times m}$. \label{prop:Zero Pseudoinverse}
+    \item If $\rank(A) = m = n$, then $\pinv{A} = \inv{A}$. \label{prop:Full inverse}
+    \end{enumerate}
+\end{proposition}
+\begin{proof}
+We prove part \ref{prop:Right inverse}. The proofs of parts \ref{prop:Left inverse} and \ref{prop:Zero Pseudoinverse} are analogous to that of part \ref{prop:Right inverse}, and part \ref{prop:Full inverse} follows from the definition of $\pinv{S}$ using $A = US\trans{V}$.
+\begin{enumerate}
+    \item[\ref{prop:Right inverse}] Since $A$ has full row rank, $A\trans{A}$ is invertible. Let $B = \trans{A}\inv{\left(A\trans{A}\right)}$. The Moore-Penrose conditions are satisfied as follows:
+    \begin{enumerate}
+        \item[\ref{MP Condition 1}] $ABA = \left(A\trans{A}\right)\inv{\left(A\trans{A}\right)}A = 
+        A$,
+        \item[\ref{MP Condition 2}] $BAB = \trans{A}\inv{\left(A\trans{A}\right)}\left(A\trans{A}\right)\inv{\left(A\trans{A}\right)} = \trans{A}\inv{\left(A\trans{A}\right)} = B$,
+        \item[\ref{MP Condition 3}] $\trans{\left(AB\right)} = \trans{\left(\left(A\trans{A}\right)\inv{\left(A\trans{A}\right)}\right)} = I_{m \times m} = \left(A\trans{A}\right)\inv{\left(A\trans{A}\right)} = AB$,
+        \item[\ref{MP Condition 4}] $\trans{\left(BA\right)} = \trans{\left(\trans{A}\inv{\left(A\trans{A}\right)}A\right)} = \trans{A}\inv{\left(A\trans{A}\right)}A = BA$.
+    \end{enumerate}
+\end{enumerate}
+As a remark about part \ref{prop:Zero Pseudoinverse} of Proposition \ref{prop:Special pseudoinverses}, any matrix other than $\zeroVec_{n \times m}$ would fail to satisfy \ref{MP Condition 2} of the Moore-Penrose conditions.
+\end{proof}
 
-\noindent When working with the pseudoinverse $\pinv{A}$, it can be convenient to write
+When working with the pseudoinverse $\pinv{A}$, it can be convenient to write
 \begin{equation}
 \label{eq:Compact SVD}
 A = U_rS_r\trans{V}_r
@@ -168,14 +193,7 @@ With the compact SVD, the pseudoinverse of $A$ can be expressed as
 \begin{equation}
 \label{eq:Pseudoinverse}
     \pinv{A} = V_r\inv{S}_r\trans{U}_r.
-\end{equation} 
-Representation \eqref{eq:Pseudoinverse} is convenient for the purpose of proving some basic properties of the pseudoinverse presented in Proposition \ref{prop:Pseudoinverse properties}.
-
-\begin{proposition}
-\label{prop:Pseudoinverse properties}
-Given $A \in \mathbb{R}^{m \times n}$, let $\pinv{A} \in \mathbb{R}^{n \times m}$ denote the pseudoinverse of $A$. Then
-\end{proposition}
-
+\end{equation}
 
 Let $\pinv{\xVec} = \pinv{A}\dVec = V\pinv{S}\svd{\dVec}$ denote the solution of $A\xVec = \dVec$ obtained using the pseudoinverse $\pinv{A}$. The summation representation of $\pinv{\xVec}$ is the same as \eqref{eq:InvProd} except that $r \leq \min\{m,n\}$. Table \ref{tab:Cases for A} summarizes the situations involving $\pinv{\xVec}$ as a solution to $A\xVec = \dVec$. In the case where $\nullspace(A) \neq \{\zeroVec\}$, infinitely many solutions to $A\xVec = \dVec$ can be constructed as $\pinv{\xVec} + \xVec_0$ where $\xVec_0 \in \nullspace(A)$ is arbitrary.
 
@@ -249,9 +267,9 @@ A \\
 \end{bmatrix} \right\|_2^2\right\}.
 \label{eq:TikSol3}
 \end{equation}
-If the matrix $L$ in \eqref{eq:TikSol2} is non-singular, then the substitutions $\mathbf{y} = L\xVec$ and $B = A{L}^{-1}$ give
+If the matrix $L$ in \eqref{eq:TikSol2} is non-singular, then the substitutions $\mathbf{y} = L\xVec$, $B = A{L}^{-1}$, and $\cVec = \dVec$ give
 \begin{equation}
-\mathbf{y}(\regparam) = \argmin_{\mathbf{y} \in \mathbb{R}^n} \left\{\|B\mathbf{y} - \dVec\|_2^2 + \regparam^2\|\mathbf{y}\|_2^2\right\}.
+\mathbf{y}(\regparam) = \argmin_{\mathbf{y} \in \mathbb{R}^n} \left\{\|B\mathbf{y} - \cVec\|_2^2 + \regparam^2\|\mathbf{y}\|_2^2\right\}.
 \label{eq:TikSol Standard Form}
 \end{equation}
 This is known as the standard form of the regularization problem. Once $\mathbf{y}$ is obtained from \eqref{eq:TikSol Standard Form}, the final solution is recovered by $\xVec = L^{-1}\mathbf{y}$.  However, there are many examples of matrices $L$ that are singular, such as finite difference matrices that approximate derivative operators. In such cases, the regularization can still be recast in standard form, which can be accomplished in a convenient way using the generalized singular value decomposition (GSVD) \cite{HansenGSVD,Hansen:98}. 
@@ -378,13 +396,21 @@ The definition of $\pinv{L}_A$ is somewhat natural, as evidenced by Proposition 
 
 \begin{proposition}
 \label{prop:Pseudoinverse of L}
-Given $A \in \mathbb{R}^{m \times n}$, $L \in \mathbb{R}^{p \times n}$ of full row rank, and $\pinv{L}_A$ defined by \eqref{eq:A-weighted inverse of L}, if $p \geq n$ then $\pinv{L}_A = \pinv{L}$.
+Given $A \in \mathbb{R}^{m \times n}$, $L \in \mathbb{R}^{p \times n}$, and $\pinv{L}_A$ defined by \eqref{eq:A-weighted inverse of L}, if $p \geq n$ and $\rank(L) = n$ then $\pinv{L}_A = \pinv{L}$.
 \end{proposition}
 \begin{proof}
-From the definition of $\pinv{L}_A$, we need to show that
-\[I-\pinv{(A(I-\pinv{L}L))}A = I,\]
-or equivalently that $\pinv{(A(I-\pinv{L}L))}A$ is the $n \times n$ zero matrix.
+Since $\rank(L) = n$, part \ref{prop:Left inverse} of Proposition \ref{prop:Special pseudoinverses} gives $\pinv{L} = \inv{\left(\trans{L}L\right)}\trans{L}$. Thus $\pinv{L}L = I$, and so
+\[\pinv{L}_A = \left(I - \pinv{\left(A\left(I - I\right)\right)}A\right)\pinv{L} = \left(I - \pinv{\left(\zeroVec_{m \times n}\right)}A\right)\pinv{L}.\]
+$\pinv{\left(\zeroVec_{m \times n}\right)} = \zeroVec_{n \times m}$ from part \ref{prop:Zero Pseudoinverse} of Proposition \ref{prop:Special pseudoinverses}, and therefore
+\[\pinv{L}_A = \left(I - \zeroVec_{n \times m}A\right)\pinv{L} = \left(I - \zeroVec_{n \times n}\right)\pinv{L} = \pinv{L}.\]
 \end{proof}
+\noindent By letting $\xVec_0 = \pinv{\left(A\left(I - \pinv{L}L\right)\right)}\dVec$, we can define the substitutions
+\begin{equation}
+\label{eq:Standard Form Substitutions}
+    \yVec = L\xVec, \quad B = A\pinv{L}_A, \quad \cVec = \dVec - A\xVec_0.
+\end{equation}
+These substitutions transform \eqref{eq:TikSol2} into the standard form \eqref{eq:TikSol Standard Form}, while the solution $\xVec$ can be obtained from $\xVec = \pinv{L}_A \yVec + \xVec_0$. The transformation proceeds by the simultaneous addition and subtraction of $A\xVec_0$ as follows
+\[A\xVec - \dVec = A\xVec - A\xVec_0 - \dVec + A\xVec_0 = A\left(\xVec - \xVec_0\right) - \left(\dVec - A\xVec_0\right) = A\pinv{L}_A \yVec - \cVec = B\yVec - \cVec.\]
 
 \subsection{Multiparameter Tikhonov regularization} \label{sec:Multiparameter}
 For $\ell = 1,\ldots,p$, let $\wVec^{(\ell)} \in \mathbb{R}^n$ be vectors containing the non-negative weights that satisfies
