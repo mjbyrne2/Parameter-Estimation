@@ -128,7 +128,7 @@ The quality of $\xReg$ depends on the choice of both $\regparam$ and $L$. There 
 In this paper, we focus on adapting the UPRE, MDP, and GCV methods to accommodate multiple data sets. Techniques for utilizing and analyzing multiple data sets permeates a multitude of scientific fields, such as geoscience \cite{GeoscienceML,Zobitz2020EfficientHD} and the detection of cancers \cite{MedicineML}. Many of these techniques, including the UPRE, MDP, and GCV methods, have statistical foundations \cite{StatLearning}. A comprehensive overview of data-driven approaches to inverse problems can be found in \cite{Arridge2019SolvingIP}, while specific examples of applying multiple data sets to the solution of inverse problems include \cite{ChungChungOLeary2011,ChungEspanol2017,HaberTenorio2003,KunischPock2013,TaroudakiOLeary2015,Learning2005}. \par 
 The main contribution of this paper is to demonstrate how the functions associated with the UPRE, MDP, and GCV methods can be adapted to handle multiple data sets. We will use the term ``adapted'' in the body of the paper to refer to both these generalized methods and their corresponding functions, while the term ``big'' will be used in plots for the sake of space. For example, the adapted UPRE method means the extension of the UPRE method for multiple data sets. There is a distinction between the adapted methods and using the averages of the parameter selection functions. The development of the adapted methods is done in Section \ref{sec:Methods} and numerical results are shown in Section \ref{sec:Validation}. Sections \ref{sec:UPRE}, \ref{sec:MDP}, and \ref{sec:GCV} pertain to the UPRE, method, MDP method, and the GCV method, respectively. \par 
 In addition to developing these adapted parameter selection methods, some results will be presented regarding their relationship with the original method (i.e. the non-adapted methods). These results are presented at the end of each subsection in Section \ref{sec:Methods}. Comparisons are also made to other regularization parameter selection methods that use multiple data sets; see Section \ref{sec:Validation}. \par
-Lastly, this paper introduces how multiple data sets could be used in conjunction with multiparameter regularization. Multiparameter versions of the GCV method are presented in \cite{ChungEasleyOLeary,ModarresiGolub2}; we extend these formulations to multiparameter versions of the UPRE and MDP methods. Results summaries and directions for future work are considered in Section \ref{sec:Conclusion}.
+Lastly, this paper introduces how multiple data sets could be used in conjunction with multiparameter regularization. Multiparameter versions of the GCV method are presented in \cite{ChungEasleyOLeary,ModarresiGolub2}; we extend these formulations to multiparameter versions of the UPRE and MDP methods. Results, summaries and directions for future work are considered in Section \ref{sec:Conclusion}.
 
 \section{Preliminaries} \label{sec:Preliminaries}
 
@@ -272,7 +272,30 @@ If the matrix $L$ in \eqref{eq:TikSol2} is non-singular, then the substitutions 
 \mathbf{y}(\regparam) = \argmin_{\mathbf{y} \in \mathbb{R}^n} \left\{\|B\mathbf{y} - \cVec\|_2^2 + \regparam^2\|\mathbf{y}\|_2^2\right\}.
 \label{eq:TikSol Standard Form}
 \end{equation}
-This is known as the standard form of the regularization problem. Once $\mathbf{y}$ is obtained from \eqref{eq:TikSol Standard Form}, the final solution is recovered by $\xVec = L^{-1}\mathbf{y}$.  However, there are many examples of matrices $L$ that are singular, such as finite difference matrices that approximate derivative operators. In such cases, the regularization can still be recast in standard form, which can be accomplished in a convenient way using the generalized singular value decomposition (GSVD) \cite{HansenGSVD,Hansen:98}. 
+This is known as the standard form of the regularization problem. Once $\mathbf{y}$ is obtained from \eqref{eq:TikSol Standard Form}, the final solution is recovered by $\xVec = L^{-1}\mathbf{y}$.  However, there are many examples of matrices $L$ that are singular, such as finite difference matrices that approximate derivative operators. In such cases, \eqref{eq:TikSol2} can still be transformed into the standard form \eqref{eq:TikSol Standard Form}; this transformation was originally given by Eld\'{e}n \cite{Elden} and is discussed in \cite{Hansen:98}. We begin by introducing an $A$-weighted generalized inverse of $L$:
+\begin{equation}
+\label{eq:A-weighted inverse of L}
+    \pinv{L}_A := \left(I - \pinv{\left(A\left(I - \pinv{L}L\right)\right)}A\right)\pinv{L}, \quad I \in \mathbb{R}^{n \times n}.
+\end{equation}
+The definition of $\pinv{L}_A$ is somewhat natural, as evidenced by Proposition \ref{prop:Pseudoinverse of L}.
+
+\begin{proposition}
+\label{prop:Pseudoinverse of L}
+Given $A \in \mathbb{R}^{m \times n}$, $L \in \mathbb{R}^{p \times n}$, and $\pinv{L}_A$ defined by \eqref{eq:A-weighted inverse of L}, if $p \geq n$ and $\rank(L) = n$ then $\pinv{L}_A = \pinv{L}$.
+\end{proposition}
+\begin{proof}
+Since $\rank(L) = n$, part \ref{prop:Left inverse} of Proposition \ref{prop:Special pseudoinverses} gives $\pinv{L} = \inv{\left(\trans{L}L\right)}\trans{L}$. Thus $\pinv{L}L = I$, and so
+\[\pinv{L}_A = \left(I - \pinv{\left(A\left(I - I\right)\right)}A\right)\pinv{L} = \left(I - \pinv{\left(\zeroVec_{m \times n}\right)}A\right)\pinv{L}.\]
+$\pinv{\left(\zeroVec_{m \times n}\right)} = \zeroVec_{n \times m}$ from part \ref{prop:Zero Pseudoinverse} of Proposition \ref{prop:Special pseudoinverses}, and therefore
+\[\pinv{L}_A = \left(I - \zeroVec_{n \times m}A\right)\pinv{L} = \left(I - \zeroVec_{n \times n}\right)\pinv{L} = \pinv{L}.\]
+\end{proof}
+\noindent By letting $\xVec_0 = \pinv{\left(A\left(I - \pinv{L}L\right)\right)}\dVec$, we can define the substitutions
+\begin{equation}
+\label{eq:Standard Form Substitutions}
+    \yVec = L\xVec, \quad B = A\pinv{L}_A, \quad \cVec = \dVec - A\xVec_0.
+\end{equation}
+These substitutions transform \eqref{eq:TikSol2} into the standard form \eqref{eq:TikSol Standard Form}, while the solution $\xVec$ can be obtained from $\xVec = \pinv{L}_A \yVec + \xVec_0$. The transformation proceeds by the simultaneous addition and subtraction of $A\xVec_0$ as follows
+\[A\xVec - \dVec = A\xVec - A\xVec_0 - \dVec + A\xVec_0 = A\left(\xVec - \xVec_0\right) - \left(\dVec - A\xVec_0\right) = A\pinv{L}_A \yVec - \cVec = B\yVec - \cVec.\] 
 
 \subsection{Generalized Singular Value Decomposition} \label{sec:GSVD}
 In light of having to consider two (often very different) matrices $A$ and $L$ in formulations such as \eqref{eq:TikSol2} and \eqref{eq:TikSol3}, a brief discussion of the GSVD is worthwhile. The discussion closely follows the presentation of the GSVD in \cite{ABT}, which uses the assumption that $\nullspace(A) \cap \nullspace(L) = \{\zeroVec\}$. This condition means that the block system matrix in \eqref{eq:TikSol3} has full column rank for the sake of a unique regularized solution $\xVec(\regparam)$. Given real matrices $A$ and $L$ of size $m \times n$ and $p \times n$, respectively, the decompositions
@@ -387,30 +410,10 @@ In terms of the generalized singular values $\gamma_k = \delta_k/\lambda_k$ for 
 \xVec(\regparam) = \sum_{k = 1}^{n} \filt_k\left(\regparam,\gamma_k\right) \frac{\svd{\dVec}_k}{\delta_k} Y_{\cdot,k},
 \end{equation}
 which generalizes \eqref{eq:TikSol}. \par
-We conclude Section \ref{sec:GSVD} by presenting a means of using the GSVD to transform \eqref{eq:TikSol2} into the standard form \eqref{eq:TikSol Standard Form}; this transformation was originally given by Eld\'{e}n \cite{Elden} and is discussed in \cite{Hansen:98}. We begin by introducing an $A$-weighted generalized inverse of $L$:
-\begin{equation}
-\label{eq:A-weighted inverse of L}
-    \pinv{L}_A := \left(I - \pinv{\left(A\left(I - \pinv{L}L\right)\right)}A\right)\pinv{L}, \quad I \in \mathbb{R}^{n \times n}.
-\end{equation}
-The definition of $\pinv{L}_A$ is somewhat natural, as evidenced by Proposition \ref{prop:Pseudoinverse of L}.
-
-\begin{proposition}
-\label{prop:Pseudoinverse of L}
-Given $A \in \mathbb{R}^{m \times n}$, $L \in \mathbb{R}^{p \times n}$, and $\pinv{L}_A$ defined by \eqref{eq:A-weighted inverse of L}, if $p \geq n$ and $\rank(L) = n$ then $\pinv{L}_A = \pinv{L}$.
-\end{proposition}
-\begin{proof}
-Since $\rank(L) = n$, part \ref{prop:Left inverse} of Proposition \ref{prop:Special pseudoinverses} gives $\pinv{L} = \inv{\left(\trans{L}L\right)}\trans{L}$. Thus $\pinv{L}L = I$, and so
-\[\pinv{L}_A = \left(I - \pinv{\left(A\left(I - I\right)\right)}A\right)\pinv{L} = \left(I - \pinv{\left(\zeroVec_{m \times n}\right)}A\right)\pinv{L}.\]
-$\pinv{\left(\zeroVec_{m \times n}\right)} = \zeroVec_{n \times m}$ from part \ref{prop:Zero Pseudoinverse} of Proposition \ref{prop:Special pseudoinverses}, and therefore
-\[\pinv{L}_A = \left(I - \zeroVec_{n \times m}A\right)\pinv{L} = \left(I - \zeroVec_{n \times n}\right)\pinv{L} = \pinv{L}.\]
-\end{proof}
-\noindent By letting $\xVec_0 = \pinv{\left(A\left(I - \pinv{L}L\right)\right)}\dVec$, we can define the substitutions
-\begin{equation}
-\label{eq:Standard Form Substitutions}
-    \yVec = L\xVec, \quad B = A\pinv{L}_A, \quad \cVec = \dVec - A\xVec_0.
-\end{equation}
-These substitutions transform \eqref{eq:TikSol2} into the standard form \eqref{eq:TikSol Standard Form}, while the solution $\xVec$ can be obtained from $\xVec = \pinv{L}_A \yVec + \xVec_0$. The transformation proceeds by the simultaneous addition and subtraction of $A\xVec_0$ as follows
-\[A\xVec - \dVec = A\xVec - A\xVec_0 - \dVec + A\xVec_0 = A\left(\xVec - \xVec_0\right) - \left(\dVec - A\xVec_0\right) = A\pinv{L}_A \yVec - \cVec = B\yVec - \cVec.\]
+% We conclude Section \ref{sec:GSVD} by mentioning an application of the GSVD to the standard form transformation described in Section \ref{sec:Preliminaries}. From \cite{HansenGSVD,Hansen:98}, one can write
+% \begin{equation}
+%     \pinv{L}_A = , \quad \xVec_0 = \sum_{j=p+1}^{n} 
+% \end{equation}
 
 \subsection{Multiparameter Tikhonov regularization} \label{sec:Multiparameter}
 For $\ell = 1,\ldots,p$, let $\wVec^{(\ell)} \in \mathbb{R}^n$ be vectors containing the non-negative weights that satisfies
