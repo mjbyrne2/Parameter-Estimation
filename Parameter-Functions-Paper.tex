@@ -143,7 +143,7 @@ where the $m \times m$ matrix $U$ and the $n \times n$ matrix $V$ are orthogonal
 \inv{A}\dVec = VS^{-1}{\trans{U}}\dVec = \sum_{k=1}^{r} \frac{{\trans{(U_{\cdot,k})}}\dVec}{\singular_k}V_{\cdot,k} = \sum_{k=1}^{r} \frac{\svd{\dVec}_k}{\singular_k}V_{\cdot,k}
 \end{equation}
 where $\svd{\dVec} = \trans{U}\dVec$ and $r := \rank(A) = m = n$. \par 
-Beyond the situation where $A$ is square and invertible, the pseudoinverse $\pinv{A} = V\pinv{S}\trans{U}$, where $\pinv{S} \in \mathbb{R}^{n \times m}$ is formed by reciprocating the nonzero diagonal elements of $\trans{S}$. The pseudoinverse, also called the Moore-Penrose generalized inverse \cite{Penrose1955}, is the unique matrix $\pinv{A} \in \mathbb{R}^{n \times m}$ that satisfies the following Moore-Penrose conditions \cite{GolubVanLoan2013}:
+Beyond the situation where $A$ is square and invertible, the pseudoinverse $\pinv{A} = V\pinv{S}\trans{U}$, where $\pinv{S} \in \mathbb{R}^{n \times m}$ is formed by reciprocating the nonzero diagonal elements of $\trans{S}$. The pseudoinverse, also called the Moore-Penrose generalized inverse \cite{Penrose1955}, is the unique matrix $\pinv{A} \in \mathbb{R}^{n \times m}$ that satisfies the following Moore-Penrose conditions \cite[p.~290]{GolubVanLoan2013}:
 \begin{enumerate}[label={(\Roman*)}]
     \begin{minipage}{0.45\linewidth}
         \centering
@@ -179,17 +179,61 @@ We prove part \ref{prop:Right inverse}. The proofs of parts \ref{prop:Left inver
         \item[\ref{MP Condition 4}] $\trans{\left(BA\right)} = \trans{\left(\trans{A}\inv{\left(A\trans{A}\right)}A\right)} = \trans{A}\inv{\left(A\trans{A}\right)}A = BA$.
     \end{enumerate}
 \end{enumerate}
-As a remark about part \ref{prop:Zero Pseudoinverse} of Proposition \ref{prop:Special pseudoinverses}, any matrix other than $\zeroVec_{n \times m}$ would fail to satisfy \ref{MP Condition 2} of the Moore-Penrose conditions.
+As a final remark regarding part \ref{prop:Zero Pseudoinverse} of Proposition \ref{prop:Special pseudoinverses}, any matrix other than $\zeroVec_{n \times m}$ would fail to satisfy \ref{MP Condition 2} of the Moore-Penrose conditions.
 \end{proof}
+
+\noindent The pseudoinverse can also be used with orthogonal projections onto fundamental subspaces; some applications are described in Proposition \ref{prop:Subspace projections}.
+
+\begin{proposition}
+\label{prop:Subspace projections}
+Let $A \in \mathbb{R}^{m \times n}$, $P \in \mathbb{R}^{n \times n}$ be an orthogonal projection matrix, and let $\pinv{A} \in \mathbb{R}^{n \times m}$ be the pseudoinverse of $A$.
+\begin{enumerate}[label={(\roman*)}]
+    \item $A\pinv{A}$ is the orthogonal projection onto $\range(A)$. \label{prop:Range projector}
+    \item $\pinv{A}A$ is the orthogonal projection onto $\range\left(\trans{A}\right)$. \label{prop:Transpose range projector}
+    \item $\pinv{P} = P$. \label{prop:Projection pseudoinverse}
+    \item $P\pinv{\left(AP\right)} = \pinv{\left(AP\right)}$. \label{prop:Left projection}
+    \item $\pinv{\left(PA\right)}P = \pinv{\left(PA\right)}$. \label{prop:Right projection}
+\end{enumerate}
+\end{proposition}
+\begin{proof}
+We prove parts \ref{prop:Range projector} and \ref{prop:Left projection}. The proof of part \ref{prop:Projection pseudoinverse} follows immediately from Moore-Penrose conditions and the properties of orthogonal projections. The proof of parts \ref{prop:Transpose range projector} and \ref{prop:Right projection} are similar to that of parts \ref{prop:Range projector} and \ref{prop:Left projection}, respectively. 
+\begin{enumerate}
+    \item[\ref{prop:Range projector}] Let $B = A\pinv{A}$.  From \cite[p.~82]{GolubVanLoan2013}, we must show that $B$ is idempotent ($B^2 = B$), symmetric, and that $\range(B) = \range(A)$. We can use the SVD $A = US\trans{V}$ to demonstrate all three properties. Condition \ref{MP Condition 2} of the Moore-Penrose conditions gives the idempotence of $B$:
+    \[B^2 = \left(A\pinv{A}\right)\left(A\pinv{A}\right) = A\left(\pinv{A}A\pinv{A}\right) = A\pinv{A} = B.\]
+    For symmetry, we have that
+    \[\trans{B} = \trans{\left(A\pinv{A}\right)} = \trans{\left(US\pinv{S}\trans{U}\right)} = U\trans{\left(S\pinv{S}\right)}\trans{U}.\]
+    By the definition of $\pinv{S}$, the matrix $S\pinv{S} \in \mathbb{R}^{m \times m}$ is
+    \[S\pinv{S} = \begin{bmatrix}
+    I & \zeroVec \\
+    \zeroVec & \zeroVec
+    \end{bmatrix}, \quad I \in \mathbb{R}^{r \times r}.\]
+    Thus $S\pinv{S}$ is symmetric and 
+    \[\trans{B} = U\trans{\left(S\pinv{S}\right)}\trans{U} = US\pinv{S}\trans{U} = B,\]
+    showing that $B$ is symmetric. If we carry out the multiplication $B = US\pinv{S}\trans{U}$, then
+    \[B = U_{r}\trans{U}_{r}\]
+    where $r = \rank(A)$ and $U_r$ consists of the first $r$ columns of $U$. Since the first $r$ columns of $U$ form an orthonormal bases for $\range(A)$ \cite[p.~340]{Leon2010}, $B = U_{\cdot,1:r}\trans{U}_{\cdot,1:r}$ shows that $\range(B) = \range(A)$. Therefore, $B$ is the orthogonal projection onto $\range(A)$.
+    \item[\ref{prop:Left projection}] Let $B = AP$ and $C = P\pinv{\left(AP\right)}$. It will be shown that $C$ satisfies the Moore-Penrose conditions.
+    \begin{enumerate}
+        \item[\ref{MP Condition 1}] $BCB = APP\pinv{\left(AP\right)}AP = AP\pinv{\left(AP\right)}AP$. The matrix 
+        \item[\ref{MP Condition 2}]  
+        \item[\ref{MP Condition 3}] First we have that \[\trans{\left(BC\right)} = \trans{\left(APP\pinv{\left(AP\right)}\right)} = \trans{\left(AP\pinv{\left(AP\right)}\right)} = AP\pinv{\left(AP\right)},\]
+        where the last equality results from the symmetry of $AP\pinv{\left(AP\right)}$. Writing $P = P^2$, we have
+        \[\trans{\left(BC\right)} = AP^2\pinv{\left(AP\right)} = \left(AP\right)P\pinv{\left(AP\right)} = BC.\]
+        \item[\ref{MP Condition 4}] We begin with
+        \[\trans{\left(CB\right)} = \trans{\left(P\pinv{\left(AP\right)}AP\right)} = P\trans{A}\pinv{\left(P\trans{A}\right)}P.\]
+        Writing the leading $P$ as $P = P^2$ and noting that $P\trans{A}\pinv{\left(P\trans{A}\right)}$ is symmetric, we have
+        \[P\trans{A}\pinv{\left(P\trans{A}\right)}P = P\trans{\left(P\trans{A}\pinv{\left(P\trans{A}\right)}\right)}P = P\pinv{\left(AP\right)}AP^2 = P\pinv{\left(AP\right)}AP = CB.\]
+    \end{enumerate}
+\end{enumerate}
+\end{proof}
+
 
 When working with the pseudoinverse $\pinv{A}$, it can be convenient to write
 \begin{equation}
 \label{eq:Compact SVD}
 A = U_rS_r\trans{V}_r
 \end{equation}
-where $U_r \in \mathbb{R}^{m \times r}$ and $V_r \in \mathbb{R}^{n \times r}$ consist of the first $r$ columns of $U$ and $V$, respectively, and $S_r = \diag(\singular_1,\ldots,\singular_{r}) \in \mathbb{R}^{r \times r}$ is invertible. Factorization \eqref{eq:Compact SVD} is called the compact SVD of $A$ \cite{ABT,Leon2010}. The columns of $U_r$ form an orthonormal basis for $\range(A)$, while the columns of $V_r$ form an orthonormal basis for $\range(\trans{A})$. Writing $U = [U_r ~ U_0]$ and $V = [V_r ~ V_0]$, the fundamental theorem of linear algebra \cite{Strang1993} implies that the columns $U_0$  and $V_0$ form orthonormal bases for $\nullspace(\trans{A})$ and $\nullspace(A)$, respectively. Furthermore, we have that $U_r\trans{U}_r$ projects vectors onto the range of $A$:
-\[U_r\trans{U}_r\yVec = \proj_{\range(A)}\yVec, \quad \yVec \in \mathbb{R}^m.\]
-With the compact SVD, the pseudoinverse of $A$ can be expressed as 
+where $U_r \in \mathbb{R}^{m \times r}$ and $V_r \in \mathbb{R}^{n \times r}$ consist of the first $r$ columns of $U$ and $V$, respectively, and $S_r = \diag(\singular_1,\ldots,\singular_{r}) \in \mathbb{R}^{r \times r}$ is invertible. Factorization \eqref{eq:Compact SVD} is called the compact SVD of $A$ \cite{ABT,Leon2010}. As mentioned in the proof of Proposition \ref{prop:Special pseudoinverses}, the columns of $U_r$ form an orthonormal basis for $\range(A)$. Similarly, the columns of $V_r$ form an orthonormal basis for $\range(\trans{A})$. Writing $U = [U_r ~ U_0]$ and $V = [V_r ~ V_0]$, the fundamental theorem of linear algebra \cite{Strang1993} implies that the columns $U_0$  and $V_0$ form orthonormal bases for $\nullspace(\trans{A})$ and $\nullspace(A)$, respectively. With the compact SVD, the pseudoinverse of $A$ can be expressed as 
 \begin{equation}
 \label{eq:Pseudoinverse}
     \pinv{A} = V_r\inv{S}_r\trans{U}_r.
@@ -295,7 +339,18 @@ $\pinv{\left(\zeroVec_{m \times n}\right)} = \zeroVec_{n \times m}$ from part \r
     \yVec = L\xVec, \quad B = A\pinv{L}_A, \quad \cVec = \dVec - A\xVec_0.
 \end{equation}
 These substitutions transform \eqref{eq:TikSol2} into the standard form \eqref{eq:TikSol Standard Form}, while the solution $\xVec$ can be obtained from $\xVec = \pinv{L}_A \yVec + \xVec_0$. The transformation proceeds by the simultaneous addition and subtraction of $A\xVec_0$ as follows
-\[A\xVec - \dVec = A\xVec - A\xVec_0 - \dVec + A\xVec_0 = A\left(\xVec - \xVec_0\right) - \left(\dVec - A\xVec_0\right) = A\pinv{L}_A \yVec - \cVec = B\yVec - \cVec.\] 
+\[A\xVec - \dVec = A\xVec - A\xVec_0 - \dVec + A\xVec_0 = A\left(\xVec - \xVec_0\right) - \left(\dVec - A\xVec_0\right) = A\pinv{L}_A \yVec - \cVec = B\yVec - \cVec.\]
+Proposition \ref{prop:Nullspace of L} shows that $\xVec_0$ lies within the nullspace of $L$.
+
+\begin{proposition}
+\label{prop:Nullspace of L}
+Given $A \in \mathbb{R}^{m \times n}$, $L \in \mathbb{R}^{p \times n}$, and $\dVec \in \mathbb{R}^m$, let
+\[\xVec_0 = \pinv{\left(A\left(I - \pinv{L}L\right)\right)}\dVec.\]
+Then $\xVec_0 \in \nullspace(L)$.
+\end{proposition}
+\begin{proof}
+Let $B = I - \pinv{L}L$. Part \ref{prop:Transpose range projector} of Proposition \ref{prop:Special pseudoinverses} states that $\pinv{L}L$ is the orthogonal projector onto $\range(\trans{L})$. Thus $B$ is the orthogonal projector onto $\nullspace(L)$. 
+\end{proof}
 
 \subsection{Generalized Singular Value Decomposition} \label{sec:GSVD}
 In light of having to consider two (often very different) matrices $A$ and $L$ in formulations such as \eqref{eq:TikSol2} and \eqref{eq:TikSol3}, a brief discussion of the GSVD is worthwhile. The discussion closely follows the presentation of the GSVD in \cite{ABT}, which uses the assumption that $\nullspace(A) \cap \nullspace(L) = \{\zeroVec\}$. This condition means that the block system matrix in \eqref{eq:TikSol3} has full column rank for the sake of a unique regularized solution $\xVec(\regparam)$. Given real matrices $A$ and $L$ of size $m \times n$ and $p \times n$, respectively, the decompositions
