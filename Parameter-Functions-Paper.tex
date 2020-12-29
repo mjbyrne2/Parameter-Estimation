@@ -214,8 +214,13 @@ We prove parts \ref{prop:Range projector} and \ref{prop:Left projection}. The pr
     where $r = \rank(A)$ and $U_r$ consists of the first $r$ columns of $U$. Since the first $r$ columns of $U$ form an orthonormal bases for $\range(A)$ \cite[p.~340]{Leon2010}, $B = U_{\cdot,1:r}\trans{U}_{\cdot,1:r}$ shows that $\range(B) = \range(A)$. Therefore, $B$ is the orthogonal projection onto $\range(A)$.
     \item[\ref{prop:Left projection}] Let $B = AP$ and $C = P\pinv{\left(AP\right)}$. It will be shown that $C$ satisfies the Moore-Penrose conditions.
     \begin{enumerate}
-        \item[\ref{MP Condition 1}] $BCB = APP\pinv{\left(AP\right)}AP = AP\pinv{\left(AP\right)}AP$. The matrix 
-        \item[\ref{MP Condition 2}]  
+        \item[\ref{MP Condition 1}] Substituting $B$ and $C$ into the product $BCB$, we have 
+        \[BCB = APP\pinv{\left(AP\right)}AP = AP\pinv{\left(AP\right)}AP.\] 
+        By definition, $\pinv{\left(AP\right)}$ satisfies Moore-Penrose condition \ref{MP Condition 1}; thus $AP\pinv{\left(AP\right)}AP = AP = B$.
+        \item[\ref{MP Condition 2}] Checking the product $CBC$, we have 
+        \[CBC = P\pinv{\left(AP\right)}APP\pinv{\left(AP\right)} = P\pinv{\left(AP\right)}AP\pinv{\left(AP\right)}.\]
+        $\pinv{\left(AP\right)}$ satisfies Moore-Penrose condition \ref{MP Condition 2}, and so
+        \[P\left(\pinv{\left(AP\right)}AP\pinv{\left(AP\right)}\right) = P\pinv{\left(AP\right)} = C.\]
         \item[\ref{MP Condition 3}] First we have that \[\trans{\left(BC\right)} = \trans{\left(APP\pinv{\left(AP\right)}\right)} = \trans{\left(AP\pinv{\left(AP\right)}\right)} = AP\pinv{\left(AP\right)},\]
         where the last equality results from the symmetry of $AP\pinv{\left(AP\right)}$. Writing $P = P^2$, we have
         \[\trans{\left(BC\right)} = AP^2\pinv{\left(AP\right)} = \left(AP\right)P\pinv{\left(AP\right)} = BC.\]
@@ -224,9 +229,9 @@ We prove parts \ref{prop:Range projector} and \ref{prop:Left projection}. The pr
         Writing the leading $P$ as $P = P^2$ and noting that $P\trans{A}\pinv{\left(P\trans{A}\right)}$ is symmetric, we have
         \[P\trans{A}\pinv{\left(P\trans{A}\right)}P = P\trans{\left(P\trans{A}\pinv{\left(P\trans{A}\right)}\right)}P = P\pinv{\left(AP\right)}AP^2 = P\pinv{\left(AP\right)}AP = CB.\]
     \end{enumerate}
+    Therefore $C = P\pinv{\left(AP\right)}$ satisfies the Moore-Penrose conditions, meaning that $P\pinv{\left(AP\right)}$ is the pseudoinverse of $B = AP$.
 \end{enumerate}
 \end{proof}
-
 
 When working with the pseudoinverse $\pinv{A}$, it can be convenient to write
 \begin{equation}
@@ -340,7 +345,7 @@ $\pinv{\left(\zeroVec_{m \times n}\right)} = \zeroVec_{n \times m}$ from part \r
 \end{equation}
 These substitutions transform \eqref{eq:TikSol2} into the standard form \eqref{eq:TikSol Standard Form}, while the solution $\xVec$ can be obtained from $\xVec = \pinv{L}_A \yVec + \xVec_0$. The transformation proceeds by the simultaneous addition and subtraction of $A\xVec_0$ as follows
 \[A\xVec - \dVec = A\xVec - A\xVec_0 - \dVec + A\xVec_0 = A\left(\xVec - \xVec_0\right) - \left(\dVec - A\xVec_0\right) = A\pinv{L}_A \yVec - \cVec = B\yVec - \cVec.\]
-Proposition \ref{prop:Nullspace of L} shows that $\xVec_0$ lies within the nullspace of $L$.
+Proposition \ref{prop:Nullspace of L} shows that $\xVec_0$ indeed lies within the nullspace of $L$.
 
 \begin{proposition}
 \label{prop:Nullspace of L}
@@ -349,7 +354,11 @@ Given $A \in \mathbb{R}^{m \times n}$, $L \in \mathbb{R}^{p \times n}$, and $\dV
 Then $\xVec_0 \in \nullspace(L)$.
 \end{proposition}
 \begin{proof}
-Let $B = I - \pinv{L}L$. Part \ref{prop:Transpose range projector} of Proposition \ref{prop:Special pseudoinverses} states that $\pinv{L}L$ is the orthogonal projector onto $\range(\trans{L})$. Thus $B$ is the orthogonal projector onto $\nullspace(L)$. 
+Let $B = I - \pinv{L}L$. Part \ref{prop:Transpose range projector} of Proposition \ref{prop:Subspace projections} states that $\pinv{L}L$ is the orthogonal projection onto $\range(\trans{L})$. Thus $B$ is the orthogonal projection onto $\nullspace(L)$. From part \ref{prop:Left projection} of Proposition \ref{prop:Subspace projections}, we can write $L\xVec_0$ as $L\xVec_0 = L\pinv{\left(AB\right)}\dVec = LB\pinv{\left(AB\right)}\dVec$. Substituting back $B = I - \pinv{L}L$ into the product $LB$, we have
+\[LB = L\left(I - \pinv{L}L\right) = L - L\pinv{L}L.\]
+$\pinv{L}$ satisfies Moore-Penrose condition \ref{MP Condition 1}, meaning $L - L\pinv{L}L = L - L = \zeroVec$ where $\zeroVec \in \mathbb{R}^{p \times n}$. Therefore
+\[L\xVec_0 = LB\pinv{\left(AB\right)}\dVec = \zeroVec\pinv{\left(AB\right)}\dVec = \zeroVec \in \mathbb{R}^{p},\]
+and so $\xVec_0 \in \nullspace(L)$.
 \end{proof}
 
 \subsection{Generalized Singular Value Decomposition} \label{sec:GSVD}
