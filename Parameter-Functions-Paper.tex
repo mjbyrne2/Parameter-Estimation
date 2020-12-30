@@ -485,12 +485,18 @@ For $\ell = 1,\ldots,p$, let $\wVec^{(\ell)} \in \mathbb{R}^n$ be vectors contai
 \label{eq:Weights}
 \sum_{\ell=1}^{p} \wVec_j^{(\ell)} = 1, \quad j = 1,\ldots,n.
 \end{equation}
-Defining windows $W^{(j)} = \diag(\wVec^{(j)})$ for $\ell = 1,\ldots,p$, property \eqref{eq:Weights} implies that $\sum_{\ell=1}^p W^{(j)} = I$.  A regularization parameter $\regparam^{(j)}$ can be selected for each window $W^{(j)}$, so that a windowed regularized solution can be constructed as
+Defining windows $W^{(\ell)} = \diag\left(\wVec^{(\ell)}\right)$ for $\ell = 1,\ldots,p$, property \eqref{eq:Weights} implies that $\sum_{\ell=1}^p W^{(\ell)} = I$.  A regularization parameter $\regparam^{(\ell)}$ can be selected for each window $W^{(\ell)}$ so that a windowed regularized solution can be constructed as
 \begin{equation}
 \label{eq:TikSolWindow}
-\xWin = \sum_{\ell=1}^p V\inv{\left[\trans{S}S + (\regparam^{(\ell)})^2\right]}W^{(j)}\trans{S}\dft{\dVec}.
+\xWin = \sum_{\ell=1}^p V\inv{\left[\trans{S}S + (\regparam^{(\ell)})^2\right]}W^{(\ell)}\trans{S}\dft{\dVec}.
 \end{equation}
 The windows must be selected before choosing corresponding regularization parameters; as such, some types of windows will be discussed. \par
+A specific class of windows are windows that do not overlap. Windows $W^{(\ell)}$ are defined to be non-overlapping if the components of their corresponding weight vectors $\wVec^{(\ell)}$ satisfy
+\begin{equation}
+\label{eq:Non-overlapping window condition}
+    \wVec_j^{(\ell)} \in \{0,1\}, \qquad j = 1,\ldots,n, \quad \ell = 1,\ldots,p.
+\end{equation}
+In words, condition \eqref{eq:Non-overlapping window condition} means that for each $j = 1,\ldots,n$, there is exactly one $\ell \in \{1,\ldots,p\}$ such that $\wVec_j^{(\ell)} = 1$. When working with non-overlapping windows, the pigeonhole principle \cite{DummitFoote3} can be used to show that there will exist indices $\ell$ such that $\wVec^{(\ell)} = \zeroVec$ if $p > n$. \par
 Perhaps the simplest way of choosing the components of $\wVec^{(\ell)}$ is to first choose $p+1$ values $\omega^{(0)} \geq \ldots \geq \omega^{(p)}$ such that $\omega^{(0)} \geq \singular_1$ and $\singular_n > \omega^{(p)}$. For $\ell = 1,\ldots,p$, we can then set
 \begin{equation}
 \label{eq:Non-overlapping windows}
@@ -687,7 +693,11 @@ where
 \label{eq:Individual UPRE}
 \U^{(\ell)}(\regparam) = \frac{1}{n}\left\|\rVec^{(\ell)}(\regparam)\right\|_2^2 + \frac{2}{n} \trace\left(\Sigma^{(\ell)} A_\regparam^{(\ell)}\right) - \frac{1}{n} \trace\left(\Sigma^{(\ell)}\right).
 \end{equation}
-with $\rVec^{(\ell)} = A^{(\ell)}\xVec^{(\ell)}(\regparam) - \dVec^{(\ell)}$.
+with
+\begin{equation}
+\label{eq:Single Regularized Residual}
+    \rVec^{(\ell)} = A^{(\ell)}\xVec^{(\ell)}(\regparam) - \dVec^{(\ell)}.
+\end{equation}
 \end{proposition}
 \begin{proof}
 A block diagonal influence matrix $\widetilde{A}_\regparam$ can be defined as
@@ -819,6 +829,7 @@ Thus the multiparameter UPRE function for problem $\dVec = A\xVec + \noiseVec$ i
 \end{equation}
 Using $\mfilt(\regparam,\singular) := 1 - \filt(\regparam,\singular)$ with $\filt(\regparam,\singular)$ defined by \eqref{eq:TikFilt}, $\|\rVec_\text{win}(\regparamVec)\|_2^2$ can be expressed as
 \begin{equation}
+\label{eq:Windowed Regularized Residual}
     \left\|\rVec_\text{win}(\regparamVec)\right\|_2^2 = \sum_{j=1}^{n} \left(\sum_{k=1}^{p} w_j^{(k)} \mfilt\left(\regparam^{(k)},\singular_j\right) \right)^2 \left(\dft{d}_j\right)^2.
 \end{equation}
 Similarly, the trace of the windowed influence matrix can be written as
@@ -830,6 +841,19 @@ Thus \eqref{eq:Multiparameter UPRE} becomes
 \label{eq:Multiparameter UPRE 2}
     U_\text{win}(\regparamVec) = \frac{1}{n}\sum_{j=1}^{n} \left(\sum_{k=1}^{p} w_j^{(k)} \mfilt\left(\regparam^{(k)},\singular_j\right) \right)^2 \left(\dft{d}_j\right)^2 + \frac{2\noiseSD^2}{n}\sum_{j=1}^{n} \left(\sum_{k=1}^{p} w_j^{(k)} \filt\left(\regparam^{(k)},\singular_j\right) \right) - \noiseSD^2.
 \end{equation}
+
+The MDP and GCV methods, described in Sections \ref{sec:MDP} and \ref{sec:GCV} respectively, involve the norm of a regularized residual. The exact form of this term depends upon the setting. In the single parameter, single data set case, the regularized residual $\rVec(\regparam)$ is given by \eqref{eq:Predictive Error and Regularized Residual}. In the single parameter, multiple data set case, the norm of the regularized residual $\widetilde{\rVec}(\regparam)$ can be written as a sum of terms $\|\rVec^{(j)}(\regparam)\|_2^2$ with $\rVec^{(j)}(\regparam)$ given by \eqref{eq:Single Regularized Residual}. For a multiparameter problem with a single data set, we use $\|\rVec_{\text{win}}(\regparam)\|_2^2$ given by \eqref{eq:Windowed Regularized Residual}. Proposition \ref{prop:Non-overlapping windows} describes how $\|\rVec_{\text{win}}(\regparam)\|_2^2$ can be decomposed when working with non-overlapping windows.
+
+\begin{proposition}
+\label{prop:Non-overlapping windows}
+If the weight vectors $\{\wVec^{(\ell)}\}_{\ell=1}^{p}$ satisfy \eqref{eq:Non-overlapping window condition}, then $\|\rVec_{\text{win}}(\regparam)\|_2^2$ can be written as
+\[\left\|\rVec_{\text{win}}(\regparam)\right\|_2^2 = \sum\]
+\end{proposition}
+\begin{proof}
+Using \eqref{eq:Windowed Regularized Residual}, we can write $\|\rVec_{\text{win}}(\regparam)\|_2^2$ as
+\[\left\|\rVec_{\text{win}}(\regparam)\right\|_2^2 = \sum_{j=1}^{n} \left(\sum_{k=1}^{p} \wVec_j^{(k)} \mfilt\left(\regparam^{(k)},\singular_j\right) \right)^2 \left(\dft{d}_j\right)^2.\]
+Since the weight vectors $\{\wVec^{(\ell)}\}_{\ell=1}^{p}$ satisfy \eqref{eq:Non-overlapping window condition}, for each index $j$ there exists exactly one index $k$ such that $\wVec^{(k)}_j \neq 0$. Thus
+\end{proof}
 
 \subsection{Morozov's discrepancy principle} \label{sec:MDP}
 Similar to the UPRE method, the MDP method relies on knowledge of the variance of $\noiseVec$. If $\noise \sim \mathcal{N}(\bm{0},\noiseSD^2I)$, then the MDP function is 
@@ -919,6 +943,8 @@ Under these assumptions, for the MDP method we have $\widetilde{\D}(\regparam)$ 
 so that using \eqref{eq:MDP of Average} results in the bound \eqref{eq:MDP Bound}.
 \end{proof}
 
+\subsubsection{Multiparameter MDP} \label{sec:Multiparameter MDP}
+
 \subsection{Generalized cross validation} \label{sec:GCV}
 Unlike the UPRE and MDP methods, the GCV method does not depend upon knowledge of the noise variance. For a single data set $\dVec = A\xVec + \noiseVec$, the GCV function is defined as
 \begin{equation}
@@ -976,6 +1002,8 @@ again where the last equality is obtained through multiplication by $\frac{R}{R}
 \end{proof}
 
 As a closing remark regarding the GCV method, it is important to note that the assumption $A^{(\ell)} = A$ and $L^{(\ell)} = L$ for each $\ell = 1,\ldots,R$ was needed for result \eqref{eq:Averaged GCV}. In contrast, no such assumption is necessary for the corresponding UPRE and MDP results, which respectively are \eqref{eq:Averaged UPRE} and \eqref{eq:Averaged MDP}.
+
+\subsubsection{Multiparameter GCV} \label{sec:Multiparameter GCV}
 
 %\subsection{Numerical implementation} \label{sec:Implementation}
 %In an effort to streamline a discussion on the implementation of the parameter selection methods, we will use the version of the GSVD outlined in Section \ref{sec:Introduction} (which uses the assumption that the system matrix in \eqref{eq:TikSol3} has full column rank). Specifically, we assume that
