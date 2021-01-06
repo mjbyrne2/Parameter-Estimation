@@ -25,6 +25,8 @@
 \newcommand{\ctrans}[1]{{#1}^\mathsf{H}}	% Hermitian transpose
 \newcommand{\inv}[1]{{#1}^{-1}}	% Inverse of a matrix
 \newcommand{\pinv}[1]{{#1}^\dagger}	% Inverse of a matrix
+\newcommand{\partition}{\omega}  % Partition values
+\newcommand{\midpoint}{\partition_{\text{mid}}}   % Midpoint partition values
 \DeclareMathOperator{\trace}{trace}		% Trace
 \DeclareMathOperator{\diag}{diag}	% Diagonal matrix
 \DeclareMathOperator{\rank}{rank}	% Rank of a matrix
@@ -497,7 +499,7 @@ A specific class of windows are windows that do not overlap. Windows $W^{(\ell)}
     \wVec_j^{(\ell)} \in \{0,1\}, \qquad j = 1,\ldots,n, \quad \ell = 1,\ldots,p.
 \end{equation}
 In words, condition \eqref{eq:Non-overlapping window condition} means that for each $j = 1,\ldots,n$, there is exactly one $\ell \in \{1,\ldots,p\}$ such that $\wVec_j^{(\ell)} = 1$. When working with non-overlapping windows, the pigeonhole principle \cite{DummitFoote3} can be used to show that there will exist indices $\ell$ such that $\wVec^{(\ell)} = \zeroVec$ if $p > n$. \par
-Perhaps the simplest way of choosing the components of $\wVec^{(\ell)}$ is to first choose $p+1$ values $\omega^{(0)} \geq \ldots \geq \omega^{(p)}$ such that $\omega^{(0)} \geq \singular_1$ and $\singular_n > \omega^{(p)}$. For $\ell = 1,\ldots,p$, we can then set
+Perhaps the simplest way of choosing the components of $\wVec^{(\ell)}$ is to first choose $p+1$ values $\omega^{(0)} \geq \ldots \geq \omega^{(p)}$ such that $\omega^{(0)} \geq \singular_1$ and $\singular_n > \omega^{(p)}$. For $\ell = 1,\ldots,p$, we could then set
 \begin{equation}
 \label{eq:Non-overlapping windows}
 \wVec_j^{(\ell)} = \begin{cases}
@@ -505,7 +507,18 @@ Perhaps the simplest way of choosing the components of $\wVec^{(\ell)}$ is to fi
 0, & \text{otherwise.}
 \end{cases}
 \end{equation}
-There are some advantages of using \eqref{eq:Non-overlapping windows}. One advantage is that singular values of similar magnitude are grouped together. Another advantage is that the windows do not overlap. Non-overlapping windows allows for the multiparameter estimation functions discussed in Section \ref{sec:Methods} to decoupled into linear combinations of single parameter functions. Choosing $\omega^{(1)},\ldots,\omega^{(p-1)}$ to be the $p-1$ linearly-spaced or logarithmically-spaced points between $\singular_1$ and $\singular_n$ and then setting $\omega^{(0)} = \singular_1$ and $\omega^{(p)} < \singular_n$ is an example of how to use \eqref{eq:Non-overlapping windows}.
+There are some advantages of using \eqref{eq:Non-overlapping windows}. One advantage is that singular values of similar magnitude are grouped together. Another advantage is that the windows do not overlap. Non-overlapping windows allows for the multiparameter estimation functions discussed in Section \ref{sec:Methods} to decoupled into linear combinations of single parameter functions. Choosing $\partition^{(1)},\ldots,\partition^{(p-1)}$ to be the $p-1$ linearly-spaced or logarithmically-spaced points between $\singular_1$ and $\singular_n$ and then setting $\partition^{(0)} = \singular_1$ and $\partition^{(p)} < \singular_n$ is an example of how to use \eqref{eq:Non-overlapping windows}. \par 
+Partition values $\partition^{(0)} \geq \ldots \geq \partition^{(p)}$ can also be used to generate overlapping windows. For example, cosine windows are defined in \cite{ChungEasleyOLeary} by using midpoints
+\[\midpoint^{(\ell)} = \frac{\partition^{(\ell-1)} + \partition^{(\ell)}}{2},\] 
+so that
+\begin{equation}
+    \wVec_j^{(\ell)} = \begin{dcases}
+    \cos^2\left(\frac{\frac{\pi}{2}\left(\midpoint^{(\ell)} - \singular_j\right)}{\midpoint^{(\ell)} - \midpoint^{(\ell-1)}}\right) & \midpoint^{(\ell-1)} \geq \singular_j > \midpoint^{(\ell)}, \\
+    \cos^2\left(\frac{\frac{\pi}{2}\left(\singular_j - \midpoint^{(\ell)}\right)}{\midpoint^{(\ell+1)} - \midpoint^{(\ell)}}\right) & \midpoint^{(\ell)} \geq \singular_j > \midpoint^{(\ell+1)}, \\
+    0 & \text{otherwise.}
+    \end{dcases}
+\end{equation}
+for $\ell = 2,\ldots,p-1$.
 
 \subsection{Multiple data sets}
 We now consider the situation where we have a collection of data sets $\{\dVec^{(\ell)}\}_{\ell=1}^R$ where 
