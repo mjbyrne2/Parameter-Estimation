@@ -26,7 +26,7 @@
 \newcommand{\inv}[1]{{#1}^{-1}}	% Inverse of a matrix
 \newcommand{\pinv}[1]{{#1}^\dagger}	% Inverse of a matrix
 \newcommand{\partition}{\omega}  % Partition values
-\newcommand{\midpoint}{\partition_{\text{mid}}}   % Midpoint partition values
+\newcommand{\midpoint}{\partition_{\text{m}}}   % Midpoint partition values
 \DeclareMathOperator{\trace}{trace}		% Trace
 \DeclareMathOperator{\diag}{diag}	% Diagonal matrix
 \DeclareMathOperator{\rank}{rank}	% Rank of a matrix
@@ -509,16 +509,57 @@ Perhaps the simplest way of choosing the components of $\wVec^{(\ell)}$ is to fi
 \end{equation}
 There are some advantages of using \eqref{eq:Non-overlapping windows}. One advantage is that singular values of similar magnitude are grouped together. Another advantage is that the windows do not overlap. Non-overlapping windows allows for the multiparameter estimation functions discussed in Section \ref{sec:Methods} to decoupled into linear combinations of single parameter functions. Choosing $\partition^{(1)},\ldots,\partition^{(p-1)}$ to be the $p-1$ linearly-spaced or logarithmically-spaced points between $\singular_1$ and $\singular_n$ and then setting $\partition^{(0)} = \singular_1$ and $\partition^{(p)} < \singular_n$ is an example of how to use \eqref{eq:Non-overlapping windows}. \par 
 Partition values $\partition^{(0)} \geq \ldots \geq \partition^{(p)}$ can also be used to generate overlapping windows. For example, cosine windows are defined in \cite{ChungEasleyOLeary} by using midpoints
-\[\midpoint^{(\ell)} = \frac{\partition^{(\ell-1)} + \partition^{(\ell)}}{2},\] 
+\begin{equation}
+\label{eq:Midpoints}
+    \midpoint^{(\ell)} = \frac{\partition^{(\ell-1)} + \partition^{(\ell)}}{2}, \quad \ell = 1,\ldots,p,
+\end{equation}
 so that
 \begin{equation}
+\label{eq:Middle cosine windows}
     \wVec_j^{(\ell)} = \begin{dcases}
-    \cos^2\left(\frac{\frac{\pi}{2}\left(\midpoint^{(\ell)} - \singular_j\right)}{\midpoint^{(\ell)} - \midpoint^{(\ell-1)}}\right) & \midpoint^{(\ell-1)} \geq \singular_j > \midpoint^{(\ell)}, \\
-    \cos^2\left(\frac{\frac{\pi}{2}\left(\singular_j - \midpoint^{(\ell)}\right)}{\midpoint^{(\ell+1)} - \midpoint^{(\ell)}}\right) & \midpoint^{(\ell)} \geq \singular_j > \midpoint^{(\ell+1)}, \\
-    0 & \text{otherwise.}
+    \cos^2\left(\frac{\frac{\pi}{2}\left(\singular_j - \midpoint^{(\ell)}\right)}{\midpoint^{(\ell-1)} - \midpoint^{(\ell)}}\right) & \midpoint^{(\ell-1)} \geq \singular_j > \midpoint^{(\ell)}, \\
+    \cos^2\left(\frac{\frac{\pi}{2}\left(\midpoint^{(\ell)} - \singular_j\right)}{\midpoint^{(\ell)} - \midpoint^{(\ell+1)}}\right) & \midpoint^{(\ell)} \geq \singular_j > \midpoint^{(\ell+1)}, \\
+    0 & \text{otherwise,}
+    \end{dcases} \qquad \ell = 2,\ldots,p-1.
+\end{equation}
+The first and $p$th weight vectors can be defined by 
+\begin{equation}
+\label{eq:First cosine window}
+     \wVec_j^{(1)} = \begin{dcases}
+    1 & \omega^{(0)} \geq \singular_j > \midpoint^{(1)}, \\
+    \cos^2\left(\frac{\frac{\pi}{2}\left(\midpoint^{(1)} - \singular_j\right)}{\midpoint^{(1)} - \midpoint^{(2)}}\right) & \midpoint^{(1)} \geq \singular_j > \midpoint^{(2)}, \\
+    0 & \text{otherwise}
     \end{dcases}
 \end{equation}
-for $\ell = 2,\ldots,p-1$.
+and
+\begin{equation}
+\label{eq:Last cosine window}
+    \wVec_j^{(p)} = \begin{dcases}
+    \cos^2\left(\frac{\frac{\pi}{2}\left(\singular_j - \midpoint^{(p)}\right)}{\midpoint^{(p-1)} - \midpoint^{(p)}}\right) & \midpoint^{(p-1)} \geq \singular_j > \midpoint^{(p)}, \\
+    1 & \midpoint^{(p)} \geq \singular_j > \omega^{(p)}, \\
+    0 & \text{otherwise,}
+    \end{dcases}
+\end{equation}
+respectively.
+\begin{proposition}
+\label{prop:Cosine windows}
+The cosine windows defined by \eqref{eq:Midpoints} through \eqref{eq:Last cosine window} satisfy
+\[\sum_{\ell=1}^{p} \wVec_j^{(\ell)} = 1, \quad j = 1,\ldots,n.\]
+\end{proposition}
+\begin{proof}
+Let $j \in \{1,\ldots,n\}$ be fixed. If either $\omega^{(0)} \geq \singular_j > \midpoint^{(1)}$ or $\midpoint^{(p)} \geq \singular_j > \omega^{(p)}$, the result follows immediately from \eqref{eq:First cosine window} or \eqref{eq:Last cosine window}, respectively. Now suppose that $\midpoint^{(1)} \geq \singular_j > \midpoint^{(p)}$. Then there exists exactly one value $\ell \in \{1,\ldots,p-1\}$ such that $\midpoint^{(\ell)} \geq \singular_j > \midpoint^{(\ell+1)}$. By definition of the cosine windows, $\wVec^{(\ell)}$ and $\wVec^{(\ell+1)}$ are the only weight vectors such that their $j$th components are nonzero. It must be shown that $\wVec^{(\ell)}_j + \wVec^{(\ell+1)}_j = 1$. From \eqref{eq:Middle cosine windows}, the $j$th component of $\wVec^{(\ell)}$ is
+\[\wVec^{(\ell)}_j = \cos^2\left(\frac{\frac{\pi}{2}\left(\midpoint^{(\ell)} - \singular_j\right)}{\midpoint^{(\ell)} - \midpoint^{(\ell+1)}}\right)\]
+and the $j$th component of $\wVec^{(\ell+1)}$ is
+\[\wVec^{(\ell+1)}_j =  \cos^2\left(\frac{\frac{\pi}{2}\left(\singular_j - \midpoint^{(\ell+1)}\right)}{\midpoint^{(\ell)} - \midpoint^{(\ell+1)}}\right).\]
+Using the identity $\cos(\theta) = \sin\left(\frac{\pi}{2} - \theta\right)$, we have that
+\begin{align*}
+\wVec^{(\ell+1)}_j &= \sin^2\left(\frac{\pi}{2} - \frac{\frac{\pi}{2}\left(\singular_j - \midpoint^{(\ell+1)}\right)}{\midpoint^{(\ell)} - \midpoint^{(\ell+1)}}\right) \\
+&= \sin^2\left(\frac{\frac{\pi}{2}\left(\midpoint^{(\ell)} - \midpoint^{(\ell+1)}\right) - \frac{\pi}{2}\left(\singular_j - \midpoint^{(\ell+1)}\right)}{\midpoint^{(\ell)} - \midpoint^{(\ell+1)}}\right) \\
+&= \sin^2\left(\frac{\frac{\pi}{2}\left(\midpoint^{(\ell)} - \singular_j\right)}{\midpoint^{(\ell)} - \midpoint^{(\ell+1)}}\right).
+\end{align*}
+Therefore,
+\[\wVec^{(\ell)}_j + \wVec^{(\ell+1)}_j = \cos^2\left(\frac{\frac{\pi}{2}\left(\midpoint^{(\ell)} - \singular_j\right)}{\midpoint^{(\ell)} - \midpoint^{(\ell+1)}}\right) +  \sin^2\left(\frac{\frac{\pi}{2}\left(\midpoint^{(\ell)} - \singular_j\right)}{\midpoint^{(\ell)} - \midpoint^{(\ell+1)}}\right) = 1.\]
+\end{proof}
 
 \subsection{Multiple data sets}
 We now consider the situation where we have a collection of data sets $\{\dVec^{(\ell)}\}_{\ell=1}^R$ where 
