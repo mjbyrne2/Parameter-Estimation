@@ -213,7 +213,7 @@ We prove parts \ref{prop:Range projector} and \ref{prop:Left projection}. The pr
     \[\trans{B} = U\trans{\left(S\pinv{S}\right)}\trans{U} = US\pinv{S}\trans{U} = B,\]
     showing that $B$ is symmetric. If we carry out the multiplication $B = US\pinv{S}\trans{U}$, then
     \[B = U_{r}\trans{U}_{r}\]
-    where $r = \rank(A)$ and $U_r$ consists of the first $r$ columns of $U$. Since the first $r$ columns of $U$ form an orthonormal bases for $\range(A)$ \cite[p.~340]{Leon2010}, $B = U_{\cdot,1:r}\trans{U}_{\cdot,1:r}$ shows that $\range(B) = \range(A)$. Therefore, $B$ is the orthogonal projection onto $\range(A)$.
+    where $r = \rank(A)$ and $U_r$ consists of the first $r$ columns of $U$. Since the first $r$ columns of $U$ form an orthonormal basis for $\range(A)$ \cite[p.~340]{Leon2010}, $B = U_{\cdot,1:r}\trans{U}_{\cdot,1:r}$ shows that $\range(B) = \range(A)$. Therefore, $B$ is the orthogonal projection onto $\range(A)$.
     \item[\ref{prop:Left projection}] Let $B = AP$ and $C = P\pinv{\left(AP\right)}$. It will be shown that $C$ satisfies the Moore-Penrose conditions.
     \begin{enumerate}
         \item[\ref{MP Condition 1}] Substituting $B$ and $C$ into the product $BCB$, we have 
@@ -223,7 +223,7 @@ We prove parts \ref{prop:Range projector} and \ref{prop:Left projection}. The pr
         \[CBC = P\pinv{\left(AP\right)}APP\pinv{\left(AP\right)} = P\pinv{\left(AP\right)}AP\pinv{\left(AP\right)}.\]
         $\pinv{\left(AP\right)}$ satisfies Moore-Penrose condition \ref{MP Condition 2}, and so
         \[P\left(\pinv{\left(AP\right)}AP\pinv{\left(AP\right)}\right) = P\pinv{\left(AP\right)} = C.\]
-        \item[\ref{MP Condition 3}] First we have that \[\trans{\left(BC\right)} = \trans{\left(APP\pinv{\left(AP\right)}\right)} = \trans{\left(AP\pinv{\left(AP\right)}\right)} = AP\pinv{\left(AP\right)},\]
+        \item[\ref{MP Condition 3}] First, we have that \[\trans{\left(BC\right)} = \trans{\left(APP\pinv{\left(AP\right)}\right)} = \trans{\left(AP\pinv{\left(AP\right)}\right)} = AP\pinv{\left(AP\right)},\]
         where the last equality results from the symmetry of $AP\pinv{\left(AP\right)}$. Writing $P = P^2$, we have
         \[\trans{\left(BC\right)} = AP^2\pinv{\left(AP\right)} = \left(AP\right)P\pinv{\left(AP\right)} = BC.\]
         \item[\ref{MP Condition 4}] We begin with
@@ -567,9 +567,9 @@ We now consider the situation where we have a collection of data sets $\{\dVec^{
 \label{eq:Big vectors}
 \dVec^{(\ell)} = \bVec^{(\ell)} + \noiseVec^{(\ell)} = {A^{(\ell)}}\xVec^{(\ell)} + \noiseVec^{(\ell)}, \quad \noiseVec^{(\ell)} \sim \mathcal{N}(\bm{0},\Sigma^{(\ell)}), \qquad \ell = 1,\ldots,R.
 \end{equation}
-For given regularization parameters $\regparam_\ell$ and penalty matrices $L^{(\ell)}$, Tikhonov regularization can be performed to produce regularized solutions $\xVec(\regparam_\ell)$ that minimize the functionals
+For given regularization parameters $\regparam^{(\ell)}$ and penalty matrices $L^{(\ell)}$, Tikhonov regularization can be performed to produce regularized solutions $\xVec(\regparam^{(\ell)})$ that minimize the functionals
 \begin{equation}
-T^{(\ell)}(\xVec;\regparam_\ell) := \|A^{(\ell)}\xVec - \dVec^{(\ell)}\|_2^2 + \regparam_\ell^2\|L^{(\ell)}\xVec\|_2^2.
+T^{(\ell)}(\xVec;\regparam^{(\ell)}) := \|A^{(\ell)}\xVec - \dVec^{(\ell)}\|_2^2 + \regparam^{(\ell)}^2\|L^{(\ell)}\xVec\|_2^2.
 \end{equation}
 A parameter selection method is generally utilized to select the regularization parameter for each system. Instead, let $\widetilde{\dVec}$ be the vector formed by vertically concatenating the data sets $\{\dVec^{(\ell)}\}_{\ell=1}^R$ and define the functional
 \begin{equation}
@@ -865,12 +865,12 @@ i.e. $\overline{U}(\regparam)$ is the UPRE function as applied to the average $\
 We now derive a multiparameter version of the UPRE function for a single data set $\dVec = A\xVec + \noiseVec$ with $A \in \mathbb{R}^{m \times n}$ $\noiseVec \sim \mathcal{N}(\zeroVec,\noiseSD^2 I)$. For $\ell = 1,\ldots,p$, let $\wVec^{(\ell)}$ be weight vectors satisfying \eqref{eq:Weights} and let $W^{(\ell)} = \diag(\wVec^{(\ell)})$. For the regularized solution \eqref{eq:TikSolWindow}, the regularization matrix $R_\text{win}(\regparamVec)$ is
 \begin{equation}
 \label{eq:Windowed Reg Matrix}
-    R_\text{win}(\regparamVec) = \sum_{\ell=1}^p V\inv{\left(\trans{S}S + \regparamVec_{\ell}^2\right)}W^{(j)}\trans{S}\trans{U}.
+    R_\text{win}(\regparamVec) = \sum_{\ell=1}^p V\inv{\left(\trans{S}S + \regparam^{(\ell)}^2\right)}W^{(j)}\trans{S}\trans{U}.
 \end{equation}
 The corresponding influence matrix $A_\text{win}(\regparamVec) = AR_\text{win}(\regparamVec)$ is then
 \begin{equation}
 \label{eq:Windowed Influence Matrix}
-    A_\text{win}(\regparamVec) = US\left[\sum_{\ell=1}^p V\inv{\left(\trans{S}S + \regparamVec_{\ell}^2\right)}W^{(j)}\right]\trans{S}\trans{U}. 
+    A_\text{win}(\regparamVec) = US\left[\sum_{\ell=1}^p V\inv{\left(\trans{S}S + \regparam^{(\ell)}^2\right)}W^{(j)}\right]\trans{S}\trans{U}. 
 \end{equation}
 The windowed regularized residual $\rVec_\text{win}(\regparamVec) = (A_\text{win}(\regparamVec) - I)\dVec$ can be written as
 \begin{equation}
@@ -884,16 +884,16 @@ Thus the multiparameter UPRE function for problem $\dVec = A\xVec + \noiseVec$ i
 Using $\mfilt(\regparam,\singular) := 1 - \filt(\regparam,\singular)$ with $\filt(\regparam,\singular)$ defined by \eqref{eq:TikFilt}, $\|\rVec_\text{win}(\regparamVec)\|_2^2$ can be expressed as
 \begin{equation}
 \label{eq:Windowed Regularized Residual}
-    \left\|\rVec_\text{win}(\regparamVec)\right\|_2^2 = \sum_{j=1}^{n} \left(\sum_{k=1}^{p} w_j^{(k)} \mfilt\left(\regparamVec_{k},\singular_j\right) \right)^2 \left(\dft{d}_j\right)^2.
+    \left\|\rVec_\text{win}(\regparamVec)\right\|_2^2 = \sum_{j=1}^{n} \left(\sum_{k=1}^{p} w_j^{(k)} \mfilt\left(\regparam^{(k)},\singular_j\right) \right)^2 \left(\dft{d}_j\right)^2.
 \end{equation}
 Similarly, the trace of the windowed influence matrix can be written as
 \begin{equation}
-    \trace\left(A_\text{win}(\regparamVec)\right) = \sum_{j=1}^{n} \left(\sum_{k=1}^{p} w_j^{(k)} \filt\left(\regparamVec_{k},\singular_j\right) \right).
+    \trace\left(A_\text{win}(\regparamVec)\right) = \sum_{j=1}^{n} \left(\sum_{k=1}^{p} w_j^{(k)} \filt\left(\regparam^{(k)},\singular_j\right) \right).
 \end{equation}
 Thus \eqref{eq:Multiparameter UPRE} becomes
 \begin{equation}
 \label{eq:Multiparameter UPRE 2}
-    U_\text{win}(\regparamVec) = \frac{1}{n}\sum_{j=1}^{n} \left(\sum_{k=1}^{p} w_j^{(k)} \mfilt\left(\regparamVec_{k},\singular_j\right) \right)^2 \left(\dft{d}_j\right)^2 + \frac{2\noiseSD^2}{n}\sum_{j=1}^{n} \left(\sum_{k=1}^{p} w_j^{(k)} \filt\left(\regparamVec_{k},\singular_j\right) \right) - \noiseSD^2.
+    U_\text{win}(\regparamVec) = \frac{1}{n}\sum_{j=1}^{n} \left(\sum_{k=1}^{p} w_j^{(k)} \mfilt\left(\regparam^{(k)},\singular_j\right) \right)^2 \left(\dft{d}_j\right)^2 + \frac{2\noiseSD^2}{n}\sum_{j=1}^{n} \left(\sum_{k=1}^{p} w_j^{(k)} \filt\left(\regparam^{(k)},\singular_j\right) \right) - \noiseSD^2.
 \end{equation}
 
 The MDP and GCV methods, described in Sections \ref{sec:MDP} and \ref{sec:GCV} respectively, involve the norm of a regularized residual. The exact form of this term depends upon the setting. In the single parameter, single data set case, the regularized residual $\rVec(\regparam)$ is given by \eqref{eq:Predictive Error and Regularized Residual}. In the single parameter, multiple data set case, the norm of the regularized residual $\widetilde{\rVec}(\regparam)$ can be written as a sum of terms $\|\rVec^{(j)}(\regparam)\|_2^2$ with $\rVec^{(j)}(\regparam)$ given by \eqref{eq:Single Regularized Residual}. For a multiparameter problem with a single data set, we use $\|\rVec_{\text{win}}(\regparamVec)\|_2^2$ given by \eqref{eq:Windowed Regularized Residual}. Proposition \ref{prop:Non-overlapping windows} describes how $\|\rVec_{\text{win}}(\regparamVec)\|_2^2$ can be decomposed when working with non-overlapping windows.
@@ -903,17 +903,17 @@ The MDP and GCV methods, described in Sections \ref{sec:MDP} and \ref{sec:GCV} r
 If the weight vectors $\{\wVec^{(\ell)}\}_{\ell=1}^{p}$ satisfy \eqref{eq:Non-overlapping window condition}, then $\|\rVec_{\text{win}}(\regparamVec)\|_2^2$ can be written as
 \[\left\|\rVec_{\text{win}}(\regparamVec)\right\|_2^2 = \sum_{k=1}^{p} \left\|\rVec^{(k)}(\regparam)\right\|_2^2\]
 where
-\[\left\|\rVec^{(k)}(\regparam)\right\|_2^2 = \sum_{j=1}^{n} \left( \wVec_j^{(k)} \mfilt\left(\regparamVec_{k},\singular_j\right)\dft{d}_j\right)^2..\]
+\[\left\|\rVec^{(k)}(\regparam)\right\|_2^2 = \sum_{j=1}^{n} \left( \wVec_j^{(k)} \mfilt\left(\regparam^{(k)},\singular_j\right)\dft{d}_j\right)^2..\]
 \end{proposition}
 \begin{proof}
 Using \eqref{eq:Windowed Regularized Residual}, we can write $\|\rVec_{\text{win}}(\regparamVec)\|_2^2$ as
-\[\left\|\rVec_{\text{win}}(\regparamVec)\right\|_2^2 = \sum_{j=1}^{n} \left(\sum_{k=1}^{p} \wVec_j^{(k)} \mfilt\left(\regparamVec_{k},\singular_j\right) \right)^2 \left(\dft{d}_j\right)^2.\]
+\[\left\|\rVec_{\text{win}}(\regparamVec)\right\|_2^2 = \sum_{j=1}^{n} \left(\sum_{k=1}^{p} \wVec_j^{(k)} \mfilt\left(\regparam^{(k)},\singular_j\right) \right)^2 \left(\dft{d}_j\right)^2.\]
 Since the weight vectors $\{\wVec^{(\ell)}\}_{\ell=1}^{p}$ satisfy \eqref{eq:Non-overlapping window condition}, for each index $j$ there exists exactly one index $k$ such that $\wVec^{(k)}_j \neq 0$. Thus the sum over $k$ has only one nonzero summand for each index $j$, meaning we can write
-\[\left(\sum_{k=1}^{p} \wVec_j^{(k)} \mfilt\left(\regparamVec_{k},\singular_j\right) \right)^2 = \sum_{k=1}^{p} \left( \wVec_j^{(k)} \mfilt\left(\regparamVec_{k},\singular_j\right)\right)^2.\]
+\[\left(\sum_{k=1}^{p} \wVec_j^{(k)} \mfilt\left(\regparam^{(k)},\singular_j\right) \right)^2 = \sum_{k=1}^{p} \left( \wVec_j^{(k)} \mfilt\left(\regparam^{(k)},\singular_j\right)\right)^2.\]
 Therefore $\|\rVec_{\text{win}}(\regparam)\|_2^2$ can be rewritten through a change of summation so that
-\[\|\rVec_{\text{win}}(\regparamVec)\|_2^2 = \sum_{k=1}^{p} \left[ \sum_{j=1}^{n} \left( \wVec_j^{(k)} \mfilt\left(\regparamVec_{k},\singular_j\right) \right)^2 \left(\dft{d}_j\right)^2\right] = \sum_{k=1}^{p} \left\|\rVec^{(k)}(\regparam)\right\|_2^2\]
+\[\|\rVec_{\text{win}}(\regparamVec)\|_2^2 = \sum_{k=1}^{p} \left[ \sum_{j=1}^{n} \left( \wVec_j^{(k)} \mfilt\left(\regparam^{(k)},\singular_j\right) \right)^2 \left(\dft{d}_j\right)^2\right] = \sum_{k=1}^{p} \left\|\rVec^{(k)}(\regparam)\right\|_2^2\]
 with
-\[\left\|\rVec^{(k)}(\regparam)\right\|_2^2 = \sum_{j=1}^{n} \left( \wVec_j^{(k)} \mfilt\left(\regparamVec_{k},\singular_j\right)\dft{d}_j\right)^2.\]
+\[\left\|\rVec^{(k)}(\regparam)\right\|_2^2 = \sum_{j=1}^{n} \left( \wVec_j^{(k)} \mfilt\left(\regparam^{(k)},\singular_j\right)\dft{d}_j\right)^2.\]
 \end{proof}
 
 \subsection{Morozov's discrepancy principle} \label{sec:MDP}
@@ -1000,7 +1000,10 @@ Then
 \end{proposition}
 \begin{proof}
 Under these assumptions, for the MDP method we have $\widetilde{\D}(\regparam)$ is equal to
-\[\frac{1}{R} \sum_{\ell=1}^R \D^{(\ell)}(\regparam) = \frac{1}{R}\sum_{\ell=1}^R \left[\frac{1}{n}\|\rVec^{(\ell)}(\regparam)\|_2^2 - \noiseSD_{\ell}^2\right] = R\left[\frac{1}{n}\sum_{j=1}^{n} \left(\mfilt_j\right)^2\left(\frac{1}{R^2} \sum_{\ell=1}^R |\dft{\dVec}_j^{(\ell)}|^2\right) - \frac{1}{R^2}\sum_{\ell=1}^R \noiseSD_{\ell}^2\right]\]
+\begin{align*}
+    \frac{1}{R} \sum_{\ell=1}^R \D^{(\ell)}(\regparam) &= \frac{1}{R}\sum_{\ell=1}^R \left[\frac{1}{n}\|\rVec^{(\ell)}(\regparam)\|_2^2 - \noiseSD_{\ell}^2\right] \\
+    &= R\left[\frac{1}{n}\sum_{j=1}^{n} \left(\mfilt_j\right)^2\left(\frac{1}{R^2} \sum_{\ell=1}^R |\dft{\dVec}_j^{(\ell)}|^2\right) - \frac{1}{R^2}\sum_{\ell=1}^R \noiseSD_{\ell}^2\right]
+\end{align*}
 so that using \eqref{eq:MDP of Average} results in the bound \eqref{eq:MDP Bound}.
 \end{proof}
 
@@ -1420,7 +1423,7 @@ Figure \ref{fig:Errors 1D MRI} shows the relative errors of the regularized solu
 The one-dimensional test problem demonstrates that the adapted methods have potential for selecting viable regularization parameters that can be applied to multiple sets of data. The adapted UPRE and GCV performed competitively against the learning method, which relies on knowledge of the true training solutions. As stated previously, the success of the adapted methods is predicated on the similarity of the data sets being considered. However, this is not an unreasonable condition because data from a given experiment would hopefully vary little without significant change in the experimental set-up.
 
 \subsection{Two-dimensional problems} \label{sec:2D}
-The two-dimensional test problem again uses the MRI data built into MATLAB. However, the data sets now consist of image of size $256 \times 256$. A total of 20 default MRI images were used and split into training and validation sets containing 10 images each. For each MRI image, seven more images were generate through the use of random rigid transformations (rotations and translations) so that the training set and validation set each contained 80 images. A rotation angle $\theta$ and a translation angle $\phi$ were selected randomly between 0 and $2\pi$. Another scalar $c$ was drawn randomly between 0 and 64 so that the translation vector $\tVec = \trans{[c\cos(\phi),c\sin(\phi)]}$ does not have a magnitude that exceeds 64 pixels. Figure \ref{fig:MRI Transformations} shows examples of true MRI images used in the training set. 
+The two-dimensional test problem again uses the MRI data built into MATLAB. However, the data sets now consist of images of size $256 \times 256$. A total of 20 default MRI images were used and split into training and validation sets containing 10 images each. For each MRI image, seven more images were generate through the use of random rigid transformations (rotations and translations) so that the training set and validation set each contained 80 images. A rotation angle $\theta$ and a translation angle $\phi$ were selected randomly between 0 and $2\pi$. Another scalar $c$ was drawn randomly between 0 and 64 so that the translation vector $\tVec = \trans{[c\cos(\phi),c\sin(\phi)]}$ does not have a magnitude that exceeds 64 pixels. Figure \ref{fig:MRI Transformations} shows examples of true MRI images used in the training set. 
 
 \begin{figure}[ht]
 \includegraphics[scale=0.36]{Figures/MRI_Transformations}
@@ -1436,7 +1439,7 @@ Figure \ref{fig:Parameters 2D} shows the parameters selected using each method.
 \caption{hello}
 \label{fig:Parameters 2D}
 \end{figure}
-In contrast to the one-dimensional case, the adapted MDP method returned parameters closest to the parameters chosen based on the machine learning method. The adapted UPRE and GCV method selected parameters similar parameters. Another observation from Figure \ref{fig:Parameters 2D} is that the parameter obtained from each method are stable with respect to the number of images considered. This suggest that only small subset of the training set is needed to obtain regularization parameters that can be then applied to a full validation set. Figure \ref{fig:Errors 2D} contains boxplots of the relative errors of the regularized solutions for the validation set using 10 training images. 
+In contrast to the one-dimensional case, the adapted MDP method returned parameters closest to the parameters chosen based on the machine learning method. The adapted UPRE and GCV method selected similar parameters. Another observation from Figure \ref{fig:Parameters 2D} is that the parameter obtained from each method are stable with respect to the number of images considered. This suggest that only small subset of the training set is needed to obtain regularization parameters that can be then applied to a full validation set. Figure \ref{fig:Errors 2D} contains boxplots of the relative errors of the regularized solutions for the validation set using 10 training images. 
 \begin{figure}[ht]
 \includegraphics[scale=0.36]{Figures/Errors2D_mri}
 \caption{hello}
@@ -1452,7 +1455,7 @@ The errors of the regularized solutions obtained using the adapted MDP method ar
 
 \section{Conclusions and future work} \label{sec:Conclusion}
 In conclusion, this paper demonstrate a means by which UPRE, MDP, and GCV methods can be extended to accommodate multiple data sets. The most general forms of functions associate with these methods are \eqref{eq:UPRE 3}, \eqref{eq:Big MDP}, \eqref{eq:GCV Big}, and , respectively. The adapted UPRE and MDP methods are novel in that their corresponding functions can be written as an average of the individual functions associate with each data set. None of the three adapted methods require knowledge of true solutions unlike the machine learning approach defined by \eqref{eq:Learning function}, though the MRI test problems demonstrate that the adapted methods can perform competitively. \par
-There are various directions of future investigation. Perhaps the most significant results could be obtained through approaches of determining the necessary number of data sets for a stabilization of selected parameters. Figure \ref{fig:Parameters 1D MRI} and Figure \ref{fig:Parameters 2D} suggest that obtained parameters stabilize fairly fast in relation to the number of data sets incorporate into the method functions. Another direction of future work would be to use the adapted methods on data sets containing images of differing objects. The MRI images used here are all visualizes of a human brain; it would be interesting to see how these methods perform for drastically different data sets.
+There are various directions of future investigation. Perhaps the most significant results could be obtained through approaches of determining the necessary number of data sets for a stabilization of selected parameters. Figure \ref{fig:Parameters 1D MRI} and Figure \ref{fig:Parameters 2D} suggest that obtained parameters stabilize fairly fast in relation to the number of data sets incorporate into the method functions. Another direction of future work would be to use the adapted methods on data sets containing images of differing objects. The MRI images used here are all visualizations of a human brain; it would be interesting to see how these methods perform for drastically different data sets.
 
 \bibliographystyle{siam}
 \bibliography{Parameter-Estimation}
