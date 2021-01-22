@@ -78,15 +78,19 @@
 \newcommand{\U}{U}	% UPRE function
 \newcommand{\avgU}{\overline{U}}	% UPRE function
 \newcommand{\UPRE}{\text{UPRE}}	% Text of UPRE for use in math mode
+\newcommand{\Uwin}{\U_{\text{win}}}	% Windowed UPRE function
 
 % GCV derivation notation:
 \newcommand{\G}{G}	% GCV function
 \newcommand{\GCV}{\text{GCV}}	% Text of GCV for use in math mode
+\newcommand{\Gwin}{\G_{\text{win}}}	% Windowed GCV function
 
 % Discrepancy principle derivation notation:
 \newcommand{\D}{D}	% Discrepancy principle function
 \newcommand{\MDP}{\text{MDP}}	% Text of MDP for use in math mode
 \newcommand{\safeparam}{\epsilon}	% Safety parameter for the MDP method
+\newcommand{\Dwin}{\D_{\text{win}}}	% Windowed GCV function
+
 % Rosie's commands
 \newcommand{\comment}[1]{\textcolor{red}{ \textbf{Comment}: #1}}
 \newcommand{\ToDo}[1]{\textcolor{green}{\textbf{#1}}}
@@ -1008,6 +1012,20 @@ so that using \eqref{eq:MDP of Average} results in the bound \eqref{eq:MDP Bound
 \end{proof}
 
 \subsubsection{Multiparameter MDP} \label{sec:Multiparameter MDP}
+The multiparameter MDP function is
+\begin{equation}
+\label{eq:Windowed MDP}
+    \Dwin(\regparamVec) = \left\|\rVec_\text{win}(\regparamVec)\right\|_2^2 - \noiseSD^2
+\end{equation}
+where $\rVec_\text{win}(\regparamVec)$ is defined by \eqref{eq:Windowed Regularized Residual}. Analogous to the single parameter MDP method, the multiparameter MDP method is to choose $\regparamVec \in \mathbb{R}_+^p$ such that $\Dwin(\regparamVec) = 0$. 
+
+\begin{proposition}
+The gradient of $\Dwin$, denoted $\nabla\Dwin$, is given by
+\[\nabla\Dwin(\regparamVec) = \]
+\end{proposition}
+\begin{proof}
+From \eqref{eq:Windowed MDP}, we know that $\nabla\Dwin$ is the gradient of $\left\|\rVec_\text{win}(\regparamVec)\right\|_2^2$. 
+\end{proof}
 
 \subsection{Generalized cross validation} \label{sec:GCV}
 Unlike the UPRE and MDP methods, the GCV method does not depend upon knowledge of the noise variance. For a single data set $\dVec = A\xVec + \noiseVec$, the GCV function is defined as
