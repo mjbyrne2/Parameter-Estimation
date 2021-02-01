@@ -6,15 +6,36 @@ function W = weights2(S,p,type)
 % - type specifies the type of weight vectors. Possibilites for type are
 % 'linear', 'log', 'linearCosine', and 'logCosine'.
 
+% Check number of input arguments:
+switch nargin
+    
+    case 1  % Input is only S
+        [m,n] = size(S);
+        W = eye(m,n);
+        return
+        
+    case 2  % No type specified
+        if p == 1
+            [m,n] = size(S);
+            W = eye(m,n);
+            return
+        else
+            type = 'linear';    % Default weight vectors are linear partitions
+        end
+        
+    case 3
+        if p == 1
+            [m,n] = size(S);
+            W = eye(m,n);
+            return
+        end
+    
+end
+
 sMax = max(S(:));   % Largest value in spectum
 sMin = max(min(S(:)),eps);   % Smallest value in spectrum (or eps)
 [m,n] = size(S);    % Dimension of S
 W = zeros(m,n,p);   % 3D array of weight matrices
-
-% Check number of arguments:
-if nargin == 2
-    type = 'linear';    % Default weight vectors are linear partitions
-end
 
 % Check type of windows:
 switch type
@@ -33,11 +54,6 @@ switch type
         end     
         
     case 'linearCosine'
-        if p-2 < 0
-            disp('p must be at least 2 to use cosine windows.')
-            W = eye(m,n);
-            return
-        end
         omega = linspace(sMax,sMin,p+1);  % Generate linear partitions
         omega(end) = -eps; % Set last partition value below zero
         mid = (omega(1:end-1) + omega(2:end))/2;    % Determine midpoints
@@ -76,10 +92,6 @@ switch type
         end
         
     case 'logCosine'
-        if p-2 < 0
-            disp('p must be at least 2 to use cosine windows.')
-            return
-        end
         omega = logspace(log10(sMax),log10(sMin),p+1);  % Generate log partitions
         omega(end) = -eps; % Set last partition value below zero
         mid = (omega(1:end-1) + omega(2:end))/2;    % Determine midpoints
