@@ -1,0 +1,676 @@
+\chapter{Statistical considerations} \label{ch:Stats}
+
+Since the parameter estimation methods in Chapter \ref{ch:Parameter estimation methods} involve DFT's and DCT's of the vector $\gnoiseVec = \gVec + \noiseVec$, some results regarding the distribution of the components of $\dft{\noiseVec}$ and $\dct{\noiseVec}$ will be presented. Since the DFT is a map from $\mathbb{C}^n$ to $\mathbb{C}^n$ and $\noiseVec$ is assumed to be a realization of a real random vector, some effort is necessary to carefully examine the distribution of the components of $\dft{\noiseVec}$. In contrast, the DCT (and DST) is a map from $\mathbb{R}^n$ to $\mathbb{R}^n$, so the statistics regarding the DCT of white noise are more straightforward.
+
+\section{DFT of white noise} \label{ch:DFT of white noise}
+The first results will be in regard to the real and imaginary parts of the $\dft{\noiseVec}$. Letting $A$ and $B$ be the real and imaginary parts, respectively, of the $n \times n$ DFT matrix, Euler's identity gives
+\begin{equation}
+A_{j,k} = \frac{1}{\sqrt{n}}\cos\left(\frac{-2\pi{jk}}{n}\right), \quad B_{j,k} = \frac{1}{\sqrt{n}}\sin\left(\frac{-2\pi{jk}}{n}\right),
+\label{eq:Components Re(F) and Im(F)}
+\end{equation}
+for $0 \leq j,k \leq n-1$. It is clear from \eqref{eq:Components Re(F) and Im(F)} that the matrices $A$ and $B$ are symmetric. The rows (and by symmetry, columns) of $A$ and $B$ have the following orthogonality properties. For compactness, let $\mathbf{e}_j$ denote the $n$-vector with 1 as the $j$th component and zeros elsewhere and let $J$ denote the $n \times n$ exchange matrix.
+\begin{lemma}
+\label{lem:Inner products}
+Let $A$ and $B$ be the real and imaginary parts, respectively, of the $n \times n$ DFT matrix, and let $\langle\cdot,\cdot\rangle$ denote standard inner product (dot product) of $\mathbb{R}^n$. Then for $0 \leq j,k \leq n-1$:
+\begin{enumerate}[label=(\roman*)]
+\item $\langle A_{j,\cdot}, B_{k,\cdot}\rangle = 0$.
+\item If $n$ is even, then 
+\begin{align*}
+\langle A_{j,\cdot}, A_{k,\cdot}\rangle &= \begin{cases}
+1 & j = k = 0 \text{ or } j = k = n/2 \\ 
+1/2 & j = k \neq 0 \text{ or } j = k \neq n/2 \\ 
+1/2 & j \neq k \text{ and } k = n - j \\ 
+0 & \text{otherwise} \end{cases}, \\
+\langle B_{j,\cdot}, B_{k,\cdot}\rangle &= \begin{cases}
+0 & j = k = 0 \text{ or } j = k = n/2 \\ 
+1/2 & j = k \neq 0 \text{ or } j = k \neq n/2 \\ 
+-1/2 &  j \neq k \text{ and } k = n - j \\ 
+0 & \text{otherwise} \end{cases}.
+\end{align*}
+Equivalently,
+\[AA^\trans = \frac{1}{2}I + \frac{1}{2}\left(\bm{e}_0^{}\bm{e}_0^\trans + \bm{e}_{n/2}^{}\bm{e}_{n/2}^\trans + J\right), \quad BB^\trans = \frac{1}{2}I - \frac{1}{2}\left(\bm{e}_0^{}\bm{e}_0^\trans + \bm{e}_{n/2}^{}\bm{e}_{n/2}^\trans + J\right).\]
+\item If $n$ is odd, then
+\[\langle A_{j,\cdot}, A_{k,\cdot}\rangle = \begin{cases}
+1 & j = k = 0 \\ 
+1/2 & j = k \neq 0 \\
+1/2 & j+k = n \\
+0 & \text{otherwise} \end{cases}, \quad 
+\langle B_{j,\cdot}, B_{k,\cdot}\rangle = \begin{cases}
+0 & j = k = 0 \\ 
+1/2 & j = k \neq 0 \\
+-1/2 & j+k = n \\
+0 & \text{otherwise} \end{cases}.\]
+Equivalently,
+\[AA^\trans = \frac{1}{2}I + \frac{1}{2}\left(\bm{e}_0^{}\bm{e}_0^\trans + J\right), \quad BB^\trans = \frac{1}{2}I - \frac{1}{2}\left(\bm{e}_0^{}\bm{e}_0^\trans + J\right).\]
+\end{enumerate}
+Notice that in both the even and odd cases, $AA^\trans + BB^\trans = I$.
+\end{lemma}
+\begin{proof}
+Property (i) will first be established. Letting $A$ and $B$ be as required, \eqref{eq:Components Re(F) and Im(F)} gives
+\begin{equation}
+\langle A_{j,\cdot}, B_{k,\cdot}\rangle = \frac{1}{n}\sum_{\ell=0}^{n-1}\cos\left(\frac{-2\pi{j\ell}}{n}\right)\sin\left(\frac{-2\pi{\ell{k}}}{n}\right) = \frac{1}{n}\sum_{\ell=0}^{n-1}\cos\left(-\theta_{j\ell}\right)\sin\left(-\theta_{k\ell}\right),
+\label{eq: <Re(F),Im(F)>}
+\end{equation}
+where $\theta_{j\ell} = 2\pi{j\ell}/n$. Applying the appropriate product-to-sum trigonometric identity and using the fact that sine is an odd function allows for the sum in \eqref{eq: <Re(F),Im(F)>} to be evaluated as
+\begin{align*}
+\frac{1}{n}\sum_{\ell=0}^{n-1}\cos\left(-\theta_{j\ell}\right)\sin\left(-\theta_{k\ell}\right) &= \frac{1}{2n}\sum_{\ell=0}^{n-1}\left[\sin\left(-\theta_{(j+k)\ell}\right) - \sin\left(-\theta_{(k-j)\ell}\right)\right] \\
+&= \frac{1}{2n}\sum_{\ell=0}^{n-1}\left[\sin\left(\theta_{(k-j)\ell}\right) - \sin\left(\theta_{(j+k)\ell}\right)\right] \\
+&= \frac{1}{2n}\left(s_1 - s_2\right),
+\end{align*}
+where
+\[s_1 = \sum_{\ell=0}^{n-1}\sin\left(\theta_{(k-j)\ell}\right), \quad s_2 = \sum_{\ell=0}^{n-1}\sin\left(\theta_{(j+k)\ell}\right).\]
+Both $s_1$ and $s_2$ are of the form $\sum_{\ell=0}^{n-1} \sin(\theta_{p\ell})$, where $p$ is an integer (either $k-j$ or $j+k$). This form can be written as
+\[\sum_{\ell=0}^{n-1} \sin\left(\theta_{p\ell}\right) = \Im\left(\sum_{\ell=0}^{n-1} \exp\left(i\theta_{p\ell}\right)\right).\] 
+If $p$ is a multiple of $n$, then $p = mn$ for some $m \in \mathbb{Z}$. Thus $\exp(i\theta_{p\ell}) = \exp(i2\pi{mn}\ell/n) = \exp(i2\pi{m\ell}) = 1$, and so
+\[\Im\left(\sum_{\ell=0}^{n-1} \exp\left(i\theta_{p\ell}\right)\right) = \Im\left(\sum_{\ell=0}^{n-1} 1\right) = 0.\]
+If $p$ is not a multiple of $n$, then
+\[\Im\left(\sum_{\ell=0}^{n-1} \exp\left(i\theta_{p\ell}\right)\right) = \Im\left(\frac{1-\exp(i\theta_{np})}{1-\exp(i\theta_p)}\right).\]
+However, $\theta_{np} = 2\pi{np}/n = 2\pi{p}$. Since $p$ is an integer, $\exp(i\theta_{np})  =\exp(i2\pi{p}) = 1$, meaning that the preceding equation is equal to zero. Therefore
+\begin{align*}
+s_1 &= \sum_{\ell=0}^{n-1}\sin\left(\theta_{(k-j)\ell}\right) = \Im\left(\sum_{\ell=0}^{n-1}\exp\left(i\theta_{(k-j)\ell}\right)\right) = 0, \\
+s_2 &= \sum_{\ell=0}^{n-1}\sin\left(\theta_{(j+k)\ell}\right) = \Im\left(\sum_{\ell=0}^{n-1}\exp\left(i\theta_{(j+k)\ell}\right)\right) = 0
+\end{align*}
+for all $0 \leq j,k \leq n-1$, which implies $\langle A_{j,\cdot},B_{k,\cdot}\rangle = (s_1 - s_2)/2n = 0$. \par 
+The results of properties (ii) and (iii) regarding $A$ will now be proved; the results regarding $B$ will be handled afterwards. Utilizing \eqref{eq:Components Re(F) and Im(F)} again,
+\[\langle A_{j,\cdot}, A_{k,\cdot}\rangle = \frac{1}{n}\sum_{\ell=0}^{n-1}\cos\left(\frac{-2\pi{j\ell}}{n}\right)\cos\left(\frac{-2\pi{\ell{k}}}{n}\right) = \frac{1}{n}\sum_{\ell=0}^{n-1}\cos\left(-\theta_{j\ell}\right)\cos\left(-\theta_{k\ell}\right).\]
+By the fact that cosine is an even function and applying another product-to-sum identity gives $\langle A_{j\cdot}, A_{k\cdot}\rangle = (c_1 + c_2)/2n$, where
+\begin{equation}
+c_1 = \sum_{\ell=0}^{n-1}\cos\left(\theta_{(j-k)\ell}\right), \quad c_2 = \sum_{\ell=0}^{n-1}\cos\left(\theta_{(j+k)\ell}\right).
+\label{eq:c_1 and c_2}
+\end{equation} 
+Both $c_1$ and $c_2$ are of the form $\sum_{\ell=0}^{n-1} \cos(\theta_{p\ell})$, where $p$ is an integer (either $j-k$ or $j+k$). This form can be written as
+\[\sum_{\ell=0}^{n-1} \cos\left(\theta_{p\ell}\right) = \Re\left(\sum_{\ell=0}^{n-1} \exp\left(i\theta_{p\ell}\right)\right).\] 
+If $p$ is a multiple of $n$, then $p = mn$ for some $m \in \mathbb{Z}$. Thus $\exp(i\theta_{p\ell}) = \exp(i2\pi{mn}\ell/n) = \exp(i2\pi{m\ell}) = 1$, and so
+\[\Re\left(\sum_{\ell=0}^{n-1} \exp\left(i\theta_{p\ell}\right)\right) = \Re\left(\sum_{\ell=0}^{n-1} 1\right) = n.\]
+If $p$ is not a multiple of $n$, then
+\[\Re\left(\sum_{\ell=0}^{n-1} \exp\left(i\theta_{p\ell}\right)\right) = \Re\left(\frac{1-\exp(i\theta_{np})}{1-\exp(i\theta_p)}\right).\]
+However, $\theta_{np} = 2\pi{np}/n = 2\pi{p}$. Since $p$ is an integer, $\exp(i\theta_{np})  =\exp(i2\pi{p}) = 1$, meaning that the preceding equation is equal to zero. Thus 0 and $n$ are the two possible values of $c_1$ and $c_2$, which depend upon whether or not $j-k$ and $j+k$ are multiples of $n$. \par 
+First consider property (ii), the case where $n$ is even.
+\begin{itemize}
+\item If $j = k = 0$ or $j = k = n/2$, then $j-k = 0$ and $j+k$ is either 0 or $n$. In other words, both $j-k$ and $j+k$ are multiples of $n$, and so $c_1 = c_2 = n$. This implies that $\langle A_{j,\cdot},A_{k,\cdot} \rangle = (c_1 + c_2)/2n = (n+n)/2n = 1$.
+\item If $j = k \neq 0$ or $j = k \neq n/2$, then $j-k = 0$ but $j+k$ is not a multiple of $n$. Thus $c_1 = n$ and $c_2 = 0$, and so $\langle A_{j,\cdot},A_{k,\cdot} \rangle = (c_1 + c_2)/2n = (n+0)/2n = 1/2$.
+\item If $j \neq k$ and $k = n-j$, then $j-k$ is not a multiple of $n$ but $j+k = n$. Thus $c_1 = 0$ and $c_2 = n$, and so $\langle A_{j,\cdot},A_{k,\cdot} \rangle = (c_1 + c_2)/2n = (0+n)/2n = 1/2$.
+\item If $j \neq k$ and $k \neq n-j$, then neither $j-k$ nor $j+k$ are multiples of $n$. Thus $c_1 = c_2 = 0$, and so $\langle A_{j,\cdot},A_{k,\cdot} \rangle = (c_1 + c_2)/2n = (0+0)/2n = 0$.
+\end{itemize}
+For property (iii), the case where $n$ is odd, $n/2$ need not be considered and the preceding argument holds. \par 
+For the results regarding $B$,
+\[\langle B_{j,\cdot}, B_{k,\cdot} \rangle = \frac{1}{n}\sum_{\ell=0}^{n-1}\sin\left(\frac{-2\pi{j\ell}}{n}\right)\sin\left(\frac{-2\pi{\ell{k}}}{n}\right) = \frac{1}{n}\sum_{\ell=0}^{n-1}\sin\left(-\theta_{j\ell}\right)\sin\left(-\theta_{k\ell}\right).\]
+By the fact that sine is an odd function and applying another product-to-sum identity gives $\langle B_{j,\cdot}, B_{k,\cdot}\rangle = (c_1 - c_2)/2n$, where $c_1$ and $c_2$ are defined by \eqref{eq:c_1 and c_2}. Again 0 and $n$ are the two possible values of $c_1$ and $c_2$, which depend upon whether or not $j-k$ and $j+k$ are multiples of $n$. \par 
+First consider property (ii), the case where $n$ is even.
+\begin{itemize}
+\item If $j = k = 0$ or $j = k = n/2$, then $j-k = 0$ and $j+k$ is either 0 or $n$. In other words, both $j-k$ and $j+k$ are multiples of $n$, and so $c_1 = c_2 = n$. This implies that $\langle B_{j,\cdot},B_{k,\cdot} \rangle = (c_1 - c_2)/2n = (n-n)/2n = 0$.
+\item If $j = k \neq 0$ or $j = k \neq n/2$, then $j-k = 0$ but $j+k$ is not a multiple of $n$. Thus $c_1 = n$ and $c_2 = 0$, and so $\langle B_{j,\cdot},B_{k,\cdot} \rangle = (c_1 - c_2)/2n = (n-0)/2n = 1/2$.
+\item If $j \neq k$ and $k = n-j$, then $j-k$ is not a multiple of $n$ but $j+k = n$. Thus $c_1 = 0$ and $c_2 = n$, and so $\langle B_{j,\cdot},B_{k,\cdot} \rangle = (c_1 - c_2)/2n = (0-n)/2n = -1/2$.
+\item If $j \neq k$ and $k \neq n-j$, then neither $j-k$ nor $j+k$ are multiples of $n$. Thus $c_1 = c_2 = 0$, and so $\langle B_{j,\cdot},B_{k,\cdot} \rangle = (c_1 - c_2)/2n = (0+0)/2n = 0$.
+\end{itemize}
+For property (iii), the case where $n$ is odd, $n/2$ need not be considered and again the preceding argument holds.
+\end{proof}
+
+There are some important consequences of Lemma \ref{lem:Inner products}. First, it provides a means to visualize the structure of the matrices $A^2 = AA^\trans$ and $B^2 = BB^\trans$. For example, if $n = 6$ then the matrices $A^2$ and $B^2$ are
+\[A^2 = \begin{bmatrix}
+1 & 0 & 0 & 0 & 0 & 0 \\
+0 & \frac{1}{2} & 0 & 0 & 0 & \frac{1}{2} \\
+0 & 0 & \frac{1}{2} & 0 & \frac{1}{2} & 0 \\
+0 & 0 & 0 & 1 & 0 & 0 \\
+0 & 0 & \frac{1}{2} & 0 & \frac{1}{2} & 0 \\
+0 & \frac{1}{2} & 0 & 0 & 0 & \frac{1}{2} \\
+\end{bmatrix}, \quad B^2 = \begin{bmatrix}
+0 & 0 & 0 & 0 & 0 & 0 \\
+0 & \frac{1}{2} & 0 & 0 & 0 & -\frac{1}{2} \\
+0 & 0 & \frac{1}{2} & 0 & -\frac{1}{2} & 0 \\
+0 & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & -\frac{1}{2} & 0 & \frac{1}{2} & 0 \\
+0 & -\frac{1}{2} & 0 & 0 & 0 & \frac{1}{2} \\
+\end{bmatrix}.\]
+Second, Lemma \ref{lem:Inner products} shows that while the rows (columns) of $F$ form an orthonormal basis for $\mathbb{C}^n$, the orthogonality of the rows of $A$ and $B$ are limited by conditions on the row indices. Another consequence is that while $F$ is invertible and therefore has full rank, the matrices $A$ and $B$ are rank-deficient. Just as the components of $A$ and $B$ depend upon the parity of $n$, Lemma \ref{lem:Rank of A and B} illustrates that the rank of $A$ and $B$ depend upon $n$ as well.
+
+\begin{lemma}
+\label{lem:Rank of A and B}
+Let $A$ and $B$ be the real and imaginary parts, respectively, of the $n \times n$ DFT matrix. If $n$ is even, then $\rank(A) = (n/2)+1$ and $\rank(B) = (n/2)-1$. If $n$ is odd, then $\rank(A) = (n+1)/2$ and $\rank(B) = (n-1)/2$. 
+\begin{proof}
+Let the matrices $A$, and $B$ be as required. By applying various properties of the rank of a matrix, all of the effort can be dedicated to finding the rank of $A$. Since the rank of a matrix is equal to the dimension of the row space (or column space), the approach that will be taken is to determine the dimension of the row space of $A$ using Lemma \ref{lem:Rank of A and B}. The dimension of the row space will be determined by counting the number of linearly independent rows of $A$. \par 
+Assuming that $n$ is even, let $0 \leq j,\ell \leq n/2$ with $j \neq \ell$. From Lemma \ref{lem:Inner products},
+\[\langle A_{j,\cdot},A_{\ell,\cdot}\rangle = \begin{cases}
+1/2 & j+\ell \equiv 0 \bmod n \\
+0 & j+\ell \not\equiv 0 \bmod n
+\end{cases}.\]
+However, $0 \leq j,\ell \leq n/2$ implies that $j+\ell \not\equiv 0 \bmod n$ because congruence is only achieved if both $j$ and $\ell$ are zero or $n/2$, and this would violate the condition that $j \neq \ell$. Thus the first $(n/2)+1$ rows of $A$ form an orthogonal set of vectors, and so they are linearly independent. \par 
+However, this only shows that $\rank(A) \geq (n/2)+1$. In order to show equality, it will now be shown that the remaining $(n/2)-1$ rows of $A$ are copies of preceding rows. Let $0 \leq j \leq n/2$, and consider row $\ell = n - j$. From \eqref{eq:Components Re(F) and Im(F)} and the parity of cosine, the components of row $\ell$ are
+\[A_{\ell,{k}} = \frac{1}{\sqrt{n}}\cos\left(\frac{-2\pi{\ell{k}}}{n}\right) = \frac{1}{\sqrt{n}}\cos\left(\frac{-2\pi{(n-j){k}}}{n}\right) = \frac{1}{\sqrt{n}}\cos\left(\frac{-2\pi{jk}}{n} + 2\pi{k}\right).\]
+Since the column index $k$ is an integer, the periodicity of cosine gives $A_{\ell,{k}} = A_{j,k}$. Thus rows $j$ and $n-j$ of the matrix $A$ are the same for all $0 \leq j \leq n/2$, and therefore $\rank(A) = (n/2)+1$.  The argument that $\rank(A) = (n+1)/2$ for odd $n$ is identical with the exception that $j$ and $\ell$ are restricted so $j \neq \ell$ and $0 \leq j,\ell \leq (n-1)/2$. \par 
+A similar argument for the rank of $B$ could be made, but for the sake of brevity a different approach can be taken which uses some matrix rank inequalities and  the result from Lemma \ref{lem:Inner products} that $AB^\trans$ is a zero matrix (regardless of the parity of $n$). Recalling that an invertible matrix has full rank and using the subadditive property of rank,
+\[n = \rank(F) = \rank(A + iB) \leq \rank(A) + \rank(iB) = \rank(A) + \rank(B).\] 
+Applying Sylvester's rank inequality to the product $AB^\trans$ gives
+\[\rank(A) + \rank(B) - n = \rank(A) + \rank(B^\trans) - n \leq \rank(AB^\trans) = 0,\]
+which implies that $\rank(A) + \rank(B) \leq n$. Thus $\rank(A) + \rank(B) = n$, and since the rank of $A$ has been determined for both even and odd $n$, the rank of $B$ immediately follows. 
+\end{proof}
+\end{lemma} 
+
+The rank deficiency of $A$ and $B$ have statistical significance as well.  Given $\noiseVec \sim \mathcal{N}(\bm{0},\noiseSD^2I)$ and using the properties of the multivariate normal distribution, 
+\begin{equation}
+\Re(\dft{\noiseVec}) = A\noise \sim \mathcal{N}(\bm{0},\noiseSD^2 AA^\trans), \quad \Im(\dft{\noiseVec}) = B\noiseVec \sim \mathcal{N}(\bm{0},\noiseSD^2 BB^\trans), \quad
+\label{eq:Real and imaginary distributions}
+\end{equation}
+However, the covariance matrices of $\Re(\dft{\noiseVec})$ and $\Im(\dft{\noiseVec})$ are rank-deficient, and therefore do not have density functions in the traditional sense; their density functions exist in $\rank(AA^\trans)$ and $\rank(BB^\trans)$-dimensional subspaces of $\mathbb{R}^n$. These density functions can be expressed using the pseudoinverses of the covariance matrices or, equivalently, by defining new transformations based on the rank of $AA^\trans$ and $BB^\trans$ \cite[p.~527-528]{Rao1973}. \par 
+Instead of dealing with density functions of multivariate distributions, the distribution of the components of $\Re(\dft{\noiseVec})$ and $\Im(\dft{\noiseVec})$ will be determined individually. As a step towards this goal, the independence of the components of $\Re(\dft{\noiseVec})$ and $\Im\{\dft{\noiseVec}\}$ can be established by applying the following result regarding independence of linear combinations of random variables \cite{LukacsKing}.
+
+\begin{theorem}[Lukacs \& King, 1954]
+\label{thm:Independence Theorem}
+Let $Z_1,\ldots,Z_n$ be $n$ independently distributed random variables, and assume that the $n$th moment of each $Z_{\ell}$ exists, i.e. $\E(Z_\ell^n)$ exists for each $\ell = 1,\ldots,n$. The necessary and sufficient conditions for the existence of two statistically independent linear forms $\sum_{\ell=1}^n a_{\ell}Z_{\ell}$ and $\sum_{\ell=1}^n b_{\ell}Z_{\ell}$ are:
+\begin{enumerate}[label=(\roman*)]
+\item Each random variable which has a nonzero coefficient in both forms is normally distributed.
+\item $\sum_{\ell=1}^n a_{\ell}b_{\ell}\sigma_{\ell}^2 = 0$, where $\sigma_{\ell}^2$ denotes the variance of $Z_{\ell}$ $(\ell = 1,\ldots,n)$.
+\end{enumerate}
+\end{theorem}
+
+\begin{lemma}
+\label{lem:App of Ind Thm}
+Let $\noiseVec$ be a random $n$-vector with $\noiseVec \sim \mathcal{N}(\bm{0},\noiseSD^2 I)$, $X = \Re(\dft{\noiseVec})$ and $Y = \Im(\dft{\noiseVec})$. Then $X_j$ and $Y_k$ are independent random variables for each $0 \leq j,k \leq n-1$.
+\begin{proof}
+Let $X$ and $Y$ be as required. For each $0 \leq j,k \leq n-1$, the components $X_j$ and $Y_k$ are linear combinations of the components of $\noiseVec$, with coefficients given by \eqref{eq:Components Re(F) and Im(F)}:
+\[X_j = \sum_{\ell=0}^{n-1} \frac{1}{\sqrt{n}}\cos\left(\frac{-2\pi{j\ell}}{n}\right)\noise_{\ell}, \quad Y_k = \sum_{\ell=0}^{n-1} \frac{1}{\sqrt{n}}\sin\left(\frac{-2\pi{k\ell}}{n}\right)\noise_{\ell}.\]
+Since the covariance matrix of $\noiseVec$ is $\noiseSD^2 I$, the components of $\noiseVec$ are independent. Furthermore, $\noise_{\ell} \sim \mathcal{N}(0,\noiseSD^2)$ and so each component has an $n$th moment. Thus the first condition of Theorem \ref{thm:Independence Theorem} is satisfied. As for the final condition, the following sum must be shown to be equal to zero:
+\[\sum_{\ell=0}^{n-1} \left[\frac{1}{\sqrt{n}}\cos\left(\frac{-2\pi{j\ell}}{n}\right)\right]\left[\frac{1}{\sqrt{n}}\sin\left(\frac{-2\pi{k\ell}}{n}\right)\right]\noiseSD_{\ell}^2.\]
+The $\noise_{\ell}$ are identically distributed with $\noiseSD_{\ell}^2 = \noiseSD^2$ for all $0 \leq \ell \leq n-1$. Thus
+\[\sum_{\ell=0}^{n-1} \left[\frac{1}{\sqrt{n}}\cos\left(\frac{-2\pi{j\ell}}{n}\right)\right]\left[\frac{1}{\sqrt{n}}\sin\left(\frac{-2\pi{k\ell}}{n}\right)\right]\noiseSD_\ell^2 = \noiseSD^2 \langle A_{j\cdot},B_{k\cdot}\rangle = 0,\]
+where the last equality follows from Lemma \ref{lem:Inner products}. Therefore $X_j$ and $Y_k$ are independent for each $0 \leq j,k \leq n-1$.
+\end{proof}
+\end{lemma}
+
+Having established the independence of the components of $\Re(\dft{\noiseVec})$ and $\Im(\dft{\noiseVec})$, their individual distributions will be determined. 
+
+\begin{lemma}
+\label{lem:Component distributions}
+Let $X = \Re(\dft{\noiseVec})$ and $Y = \Im(\dft{\noiseVec})$, where $\noiseVec$ is a random $n$-vector with $\noiseVec \sim \mathcal{N}(\bm{0},\noiseSD^2 I)$. Also let $J = \{0,n/2\}$ if $n$ is even and $J = \{0\}$ if $n$ is odd. Then for $0 \leq j \leq n-1$, the distribution of $X_j$ and $Y_j$ is as follows.  
+\[X_j \sim \begin{cases}
+\mathcal{N}(0,\noiseSD^2), & j \in J \\
+\mathcal{N}(0,\noiseSD^2/2), & j \not\in J \end{cases}, \quad Y_j \sim \begin{cases}
+0, & j \in J \\
+\mathcal{N}(0,\noiseSD^2/2), & j \not\in J
+\end{cases}.\]
+(The notation $Y_j \sim 0$ means that $Y_j$ is a constant random variable with value $0$.)
+\begin{proof}
+Let $X$ and $Y$ be as required. Using \eqref{eq:Components Re(F) and Im(F)}, $X_j$ can be written as
+\[X_j = \sum_{k=0}^{n-1} \frac{1}{\sqrt{n}}\cos\left(\frac{-2\pi{jk}}{n}\right)\noise_k.\]
+Since the covariance matrix of $\noiseVec$ is $\noiseSD^2 I$, the components of $\noiseVec$ are independent and identically distributed $\mathcal{N}(0,\noiseSD^2)$. Thus by the properties of a sum of independent normal random variables \cite[p.~184]{CasellaBerger02},
+\[X_j \sim \mathcal{N}\left(0, \noiseSD^2\sum_{k=0}^{n-1} \left(\frac{1}{\sqrt{n}}\cos\left(\frac{-2\pi{jk}}{n}\right)\right)^2\right) = \mathcal{N}\left(0, \noiseSD^2 \langle A_{j\cdot},A_{j\cdot} \rangle\right) = \mathcal{N}\left(0, \noiseSD^2 (AA^\trans)_{jj}\right).\]
+Lemma \ref{lem:Inner products} then provides the cases for evaluation of the inner product. Determination of the distribution of $Y_k$ is similar.
+\end{proof}
+\end{lemma}
+
+Before discussing the distribution of the components of $|\dft{\noiseVec}|^2$, distributions other than the Gaussian distribution will be introduced. First, the gamma distribution with shape parameter $\alpha > 0$ and scale parameter $\beta > 0$ has the probability density function
+\begin{equation}
+\label{eq:Gamma PDF}
+f(x) = \frac{1}{\Gamma(\alpha)\beta^\alpha} x^{\alpha-1} \exp(-x/\beta), \quad x > 0.
+\end{equation}
+A specific case of the gamma distribution is the exponential distribution, for which $\alpha = 1$; the probability density function of the exponential distribution is
+\begin{equation}
+\label{eq:Exp PDF}
+f(x) =  \frac{1}{\beta} \exp(-x/\beta), \quad x > 0,
+\end{equation}
+where again $\beta$ is considered the scale parameter. Another specific case of the gamma distribution occurs when $\alpha = p/2$ and $\beta = 2$, where $p$ is a positive integer. The resulting distribution is the chi-squared distribution with $p$ degrees of freedom, commonly denoted $\chi^2(p)$. The probability density function of the $\chi^2(p)$ distribution is
+\begin{equation}
+\label{eq:chi^2 PDF}
+f(x) = \frac{1}{\Gamma(p/2)2^{p/2}} x^{(p/2)-1} \exp(-x/2), \quad x > 0.
+\end{equation}
+A generalization of the chi-squared distribution is the noncentral chi-squared distribution. As suggested by the term ``noncentral", the noncentral chi-squared distribution has a noncentrality parameter $\lambda$ in addition to $p$ degrees of freedom; the distribution is denoted by $\NCchi^2(p,\lambda)$. One representation of the probability density function of the $\NCchi^2(p,\lambda)$ distribution is found in \cite[p.~166]{CasellaBerger02}, which is
+\begin{equation}
+\label{eq:NCchi^2 PDF}
+f(x) = \sum_{\ell=0}^{\infty} \frac{x^{(p/2)+\ell-1}\exp(-x/2)}{\Gamma((p/2)+\ell)2^{(p/2)+\ell}} \frac{\lambda^\ell\exp(-\lambda)}{\ell!}, \quad x > 0.
+\end{equation}
+Here the notation for the noncentrality parameter is not to be confused with $\lambda$ defined by \eqref{eq:GSVD lambda} part of the GSVD in Section \ref{sec:Tikhonov reg.}. When $\lambda = 0$, the term $\lambda^\ell$ in the series \eqref{eq:NCchi^2 PDF} forces the series to simplify to the $\ell = 0$ term
+\[\frac{x^{(p/2)-1}\exp(-x/2)}{\Gamma(p/2)2^{p/2}},\]
+which matches \eqref{eq:chi^2 PDF}. In other words, a zero noncentrality parameter means that the noncentral chi-squared distribution is reduced to the (central) chi-squared distribution. \par
+With the pertinent probability distributions introduced, Theorem \ref{thm:Mag. squared theorem} summarizes the results regarding the distribution of the components of $|\dft{\noiseVec}|^2$.
+
+\begin{theorem}
+\label{thm:Mag. squared theorem}
+Let $\noiseVec$ be a random $n$-vector with $\noiseVec \sim \mathcal{N}(\bm{0},\noiseSD^2 I)$. Also let $J = \{0,n/2\}$ if $n$ is even and $J = \{0\}$ if $n$ is odd. Then for $0 \leq j \leq n-1$, the distribution of $|\dft{\noise}_j|^2 = \Re(\dft{\noise}_j)^2 + \Im(\dft{\noise}_j)^2$ is as follows.
+\[|\dft{\noise}_j|^2 \sim \begin{cases}
+\emph{gamma}(1/2,2\noiseSD^2), & j \in J \\
+\emph{exponential}(\noiseSD^2), & j \not\in J \end{cases}.\]
+\begin{proof}
+Let $\noiseVec \sim \mathcal{N}(\bm{0},\noiseSD^2 I)$, $\bm{X} = \Re(\dft{\noiseVec})$, and $\bm{Y} = \Im(\dft{\noiseVec})$. The proof relies on determining the distribution of the components of $\bm{X}^2$ and $\bm{Y}^2$ (here the exponent indicates that the components are individually squared) and then looking at their sum. Determination of the distribution of the components of $\bm{X}^2$ and $\bm{Y}^2$ is carried out by applying a result regarding univariate one-to-one transformations \cite[p.~53]{CasellaBerger02}. Without loss of generality, we assume that $n$ is odd. \par
+First consider the components of $\bm{X}^2$. Since $n$ is odd, the two cases of $X^2_j$ to be considered are for $j = 0$ and $j \neq 0$, both of which are handled by Lemma \ref{lem:Component distributions}. If $j = 0$, then $X_j \sim \mathcal{N}(0,\noiseSD^2)$. Letting $g(x) = x^2$, the transformation $U = g(X_j) = X^2_j$ is not one-to-one on the entire sample space $\mathbb{R}$. However, $\mathbb{R}$ can be partitioned as $A_0 \cup A_1 \cup A_2$ with $A_0 = \{0\}$, $A_1 = (-\infty,0)$, and $A_2 = (0,\infty)$. Defining $g_1(x) = x^2$ and $g_2(x) = x^2$ with $g_1^{-1}(u) = -\sqrt{u}$ and $g_2^{-1}(u) = \sqrt{u}$,
+\begin{enumerate}
+\item $g(x) = g_1(x) = g_2(x)$ for all $x \in A_1 \cup A_2$,
+\item $g_1$ and $g_2$ are monotone on $A_1$ and $A_2$, respectively,
+\item $g_1(A_1) = g_2(A_2) = (0,\infty)$, and
+\item the derivatives $g_1^{-1}$ and $g_2^{-1}$ are continuous on $(0,\infty)$.
+\end{enumerate}
+Lastly the set $A_0$ is of no concern since $P(X_j \in A_0) = P(X_j = 0) = 0$. Then using the probability density function of the normal distribution, the density function of $U$ is
+\begin{align*}
+f_U(u) &= \frac{1}{\sqrt{2\pi\noiseSD^2}}\exp\left(\frac{-(g_1^{-1}(u))^2}{2\noiseSD^2}\right)\left|\frac{d}{du}g_1^{-1}(u)\right| + \frac{1}{\sqrt{2\pi\noiseSD^2}}\exp\left(\frac{-(g_2^{-1}(u))^2}{2\noiseSD^2}\right)\left|\frac{d}{du}g_2^{-1}(u)\right| \\
+&= \frac{1}{\sqrt{2\pi\noiseSD^2}}\exp\left(\frac{-u}{2\noiseSD^2}\right)\left|\frac{-1}{2\sqrt{u}}\right| + \frac{1}{\sqrt{2\pi\noiseSD^2}}\exp\left(\frac{-u}{2\noiseSD^2}\right)\left|\frac{1}{2\sqrt{u}}\right| \\
+&= \frac{1}{\sqrt{2\pi\noiseSD^2}} \frac{1}{\sqrt{u}} \exp\left(\frac{-u}{2\noiseSD^2}\right).
+\end{align*}
+This is the probability density function of the gamma distribution with shape parameter $1/2$ and scale parameter $2\noiseSD^2$. The same argument holds for $j \neq 0$, with scale parameter instead being $\noiseSD^2$. The argument can also be applied for $Y_j^2$ when $j \neq 0$ since $X_j$ and $Y_j$ are identically distributed in this case. When $j = 0$, $Y_j$ is a constant random variable with $Y_j = 0$, and so $Y_j^2 = 0$ as well. \par 
+Now that the distribution of $X_j^2$ and $Y_j^2$ is known, the distribution of their sum can be established. If $j = 0$, then $X_j^2 + Y_j^2$ has the same distribution as just $X_j^2$. The situation is more interesting when $j \neq 0$ since $Y_j^2$ is no longer a constant random variable. By Lemma \ref{lem:App of Ind Thm}, $X_j$ and $Y_j$ are independent for all $0 \leq j \leq n-1$. As a consequence, $X_j^2$ and $Y_j^2$ are independent for all $0 \leq j \leq n-1$. Let $f_{X_j^2}$ and $f_{Y_j^2}$ denotes the probability density functions of $X_j^2$ and $Y_j^2$, respectively. Since the probability density function of a sum of two independent continuous random variables is equal to the convolution of their individual density functions \cite[p.~215]{CasellaBerger02}, the density function of $V = X_j^2 + Y_j^2$ is given by 
+\[f_V(v) = \int_{-\infty}^{\infty} f_{X_j^2}(w)f_{Y_j^2}(v-w) \: dw.\]
+Fortunately $X_j^2$ and $Y_j^2$ are non-negative, meaning that the interval of integration of the convolution can be reduced; $f_{X_j^2}(w) = 0$ for $w < 0$ and $f_{Y_j^2}(v-w) = 0$ for $w > v$ implies an interval of integration of $[0,v]$. Using the density functions and the substitution $t = w/v$ then gives
+\begin{align*}
+f_V(v) &= \int_0^v \left[\frac{1}{\sqrt{\pi\noiseSD^2}} \frac{1}{\sqrt{w}} \exp\left(\frac{-w}{\noiseSD^2}\right)\right]\left[\frac{1}{\sqrt{\pi\noiseSD^2}} \frac{1}{\sqrt{v-w}} \exp\left(\frac{-(v-w)}{\noiseSD^2}\right)\right] \: dw \\
+&= \frac{1}{\pi\noiseSD^2} \exp\left(\frac{-v}{\noiseSD^2}\right) \int_0^v \frac{1}{\sqrt{w}} \frac{1}{\sqrt{v-w}} \: dw \\
+&= \frac{1}{\pi\noiseSD^2} \exp\left(\frac{-v}{\noiseSD^2}\right) \int_0^1 \frac{1}{\sqrt{vt}} \frac{1}{\sqrt{v-vt}}v \: dt \\
+&= \frac{1}{\pi\noiseSD^2} \exp\left(\frac{-v}{\noiseSD^2}\right) \int_0^1 \frac{1}{\sqrt{t}} \frac{1}{\sqrt{1-t}} \: dt.
+\end{align*}
+The last integral represents $B(1/2,1/2)$, the beta function evaluated at $(1/2,1/2)$. Since $B(1/2,1/2) = \pi$, the probability density function of $V_j$ is
+\[f_V(v) = \frac{1}{\noiseSD^2} \exp\left(\frac{-v}{\noiseSD^2}\right).\]
+This is the density function of the exponential distribution with scale parameter $\noiseSD^2$.
+\end{proof}
+\end{theorem}
+
+The statistics of the DFT of white noise are now established, which allows the focus to be shifted towards analyzing the combination $\gVec + \noiseVec = \gnoiseVec$. By the properties of the multivariate normal distribution, if $\noiseVec \sim \mathcal{N}(\bm{0},\noiseSD^2 I)$ then $\gnoiseVec \sim \mathcal{N}(\gVec,\noiseSD^2 I)$ because $\gVec$ is a constant vector. Thus the distribution of the components of $\Re(\dft{\gnoiseVec})$ and $\Im(\dft{\gnoiseVec})$ are readily obtained by extending previous results.
+
+\begin{lemma}[Extension of Lemma \ref{lem:Component distributions}]
+\label{lem:Component distributions ext.}
+Let $\bm{X} = \Re(\dft{\gnoiseVec})$ and $\bm{Y} = \Im(\dft{\gnoiseVec})$, where $\gnoiseVec$ is a random $n$-vector with $\gnoiseVec \sim \mathcal{N}(\gVec,\noiseSD^2 I)$. Also let $J = \{0,n/2\}$ if $n$ is even and $J = \{0\}$ if $n$ is odd. Then for $0 \leq j \leq n-1$, the distribution of $X_j$ and $Y_j$ is as follows.  
+\[X_j \sim \begin{cases}
+\mathcal{N}(\Re(\dft{g}_j),\noiseSD^2), & j \in J \\
+\mathcal{N}(\Re(\dft{g}_j),\noiseSD^2/2), & j \not\in J \end{cases}, \quad Y_j \sim \begin{cases}
+0, & j \in J \\
+\mathcal{N}(\Im(\dft{g}_j),\noiseSD^2/2), & j \not\in J
+\end{cases}.\]
+\begin{proof}
+Let $X$ and $Y$ be as required. Using \eqref{eq:Components Re(F) and Im(F)}, $X_j$ can be written as
+\[X_j = \sum_{k=0}^{n-1} \frac{1}{\sqrt{n}}\cos\left(\frac{-2\pi{jk}}{n}\right)\gnoise_k.\]
+Since the covariance matrix of $\gnoiseVec$ is $\noiseSD^2 I$, the components $\gnoise_k$ are independent and distributed $\mathcal{N}(\gVec_k,\noiseSD^2)$ for all $0 \leq k \leq n-1$. Thus by the properties of a sum of independent normal random variables \cite[p.~184]{CasellaBerger02},
+\begin{align*}
+X_j &\sim \mathcal{N}\left(\sum_{k=0}^{n-1} \frac{1}{\sqrt{n}}\cos\left(\frac{-2\pi{jk}}{n}\right)g_k, \noiseSD^2\sum_{k=0}^{n-1} \left(\frac{1}{\sqrt{n}}\cos\left(\frac{-2\pi{jk}}{n}\right)\right)^2\right) \\
+&= \mathcal{N}\left(\Re(\dft{g}_j), \noiseSD^2 \langle A_{j\cdot},A_{j\cdot} \rangle\right) \\
+&= \mathcal{N}\left(\Re(\dft{g}_j), \noiseSD^2 (AA^\trans)_{jj} \right) 
+\end{align*}
+Lemma \ref{lem:Inner products} then provides the cases for evaluation of the inner product. Determination of the distribution of $Y_k$ is similar.
+\end{proof}
+\end{lemma}
+
+In contrast, however, to the results regarding the components of $|\dft{\noiseVec}|^2$, the distribution of the components of $|\dft{\gnoiseVec}|^2$ is somewhat  complicated. To illustrate this, consider $U = X_0^2$, where $\bm{X} = \Re(\dft{\gnoiseVec})$ for odd-length $\gnoiseVec$ distributed $\mathcal{N}(\gVec,\noiseSD^2 I)$. To simplify notation, let $\bm{\mu} = \Re(\dft{\gVec})$ so that by Lemma \ref{lem:Component distributions ext.}, $X_0 \sim \mathcal{N}(\mu_0,\noiseSD^2)$. Applying the same transformation technique from Theorem \ref{thm:Mag. squared theorem}, the probability density function of $U$ is 
+\begin{align*}
+f_U(u) &= \frac{1}{\sqrt{2\pi\noiseSD^2}}\exp\left(\frac{-(-\sqrt{u} - \mu_0)^2}{2\noiseSD^2}\right)\left|\frac{-1}{2\sqrt{u}}\right| + \frac{1}{\sqrt{2\pi\noiseSD^2}}\exp\left(\frac{-(\sqrt{u} - \mu_0)^2}{2\noiseSD^2}\right)\left|\frac{1}{2\sqrt{u}}\right| \\
+&= \frac{1}{2\sqrt{2\pi\noiseSD^2}} \frac{1}{\sqrt{u}} \left[\exp\left(\frac{-(\sqrt{u} + \mu_0)^2}{2\noiseSD^2}\right) + \exp\left(\frac{-(\sqrt{u} - \mu_0)^2}{2\noiseSD^2}\right)\right].
+\end{align*}
+Unfortunately this density function is not easily identified. However, rescaling $X_0$ as $X_0/\noiseSD$ before applying the square transformation results in a random variable that has a more tractable density function. The density function of $V = (X_0/\noiseSD)^2$ can be equated to that of the noncentered chi-squared distribution with 1 degree of freedom and noncentrality parameter $\lambda = (\mu_0/\noiseSD)^2/2$. \par 
+Before the distribution of the scaled components of $\dft{\gnoiseVec}$ is stated, Lemma \ref{lem:App of Ind Thm 2} establishes the independence of the (squared) real and imaginary parts.
+
+\begin{lemma}
+\label{lem:App of Ind Thm 2}
+Let $\gnoiseVec$ be a random $n$-vector with $\gnoiseVec \sim \mathcal{N}(\gVec,\noiseSD^2 I)$, $J = \{0,n/2\}$ if $n$ is even and $J = \{0\}$ if $n$ is odd. Define the diagonal matrix $M$ by
+\[M_{j,j} = \begin{cases}
+1/\noiseSD & j \in J \\
+\sqrt{2}/\noiseSD & j \not\in J
+\end{cases}.\]
+Then $\Re((M\dft{\gnoiseVec})_j)^2$ and $\Im((M\dft{\gnoiseVec})_k)^2$ are independent for all $0 \leq j,k \leq n-1$.
+\end{lemma}
+\begin{proof}
+Let $\gnoiseVec \sim \mathcal{N}(\gVec,\noiseSD^2 I)$, $\mathbf{X} = \Re(M\dft{\gnoiseVec})$, and $\mathbf{Y} = \Im(M\dft{\gnoiseVec})$. Since $\dft{\gnoiseVec} = \dft{\gVec} + \dft{\noiseVec}$, $X_j^2$ and $Y_k^2$ can be expressed as 
+\[X_j^2 = [M_{j,j}(\Re(\dft{g}_j) + \Re(\dft{\noise}_j))]^2, \quad Y_k^2 = [M_{k,k}(\Im(\dft{g}_k) + \Im(\dft{\noise}_k))]^2.\]
+$X_j^2$ and $Y_k^2$ are thus functions of only the random variables $\Re(\dft{\noise}_j)$ and $\Im(\dft{\noise}_k)$, respectively. $\Re(\dft{\noise}_j)$ and $\Im(\dft{\noise}_k)$ are independent by Lemma \ref{lem:App of Ind Thm}, and therefore $X_j^2 = \Re((M\dft{\gnoiseVec})_j)^2$ and $Y_k^2 = \Im((M\dft{\gnoiseVec})_k)^2$ are independent as well.
+\end{proof}
+
+The distribution of the scaled components of $\dft{\gnoiseVec}$ can now be stated. 
+
+\begin{theorem}[Extension of Theorem \ref{thm:Mag. squared theorem}]
+Let $\gnoiseVec$ be a random $n$-vector with $\gnoiseVec \sim \mathcal{N}(\gVec,\noiseSD^2 I)$, $J = \{0,n/2\}$ if $n$ is even and $J = \{0\}$ if $n$ is odd. Define the diagonal matrix $M$ by
+\[M_{j,j} = \begin{cases}
+1/\noiseSD & j \in J \\
+\sqrt{2}/\noiseSD & j \not\in J
+\end{cases}.\]
+Then for $0 \leq j \leq n-1$, the distribution of $|(M\dft{\gnoiseVec})_j|^2 = \Re((M\dft{\gnoiseVec})_j)^2 + \Im((M\dft{\gnoiseVec})_j)^2$ is as follows.
+\[|(M\dft{\gnoiseVec})_j|^2 \sim \begin{cases}
+\NCchi^2\left(1,\dfrac{1}{2}\left(\dfrac{\Re(\dft{g}_j)}{\noiseSD}\right)^2\right), & j \in J \\
+\NCchi^2\left(2,\dfrac{|\dft{g}_j|^2}{\noiseSD^2}\right), & j \not\in J \end{cases},\]
+where $\NCchi^2(k,\lambda)$ denotes the noncentral chi-squared distribution with $k$ degrees of freedom and noncentrality parameter $\lambda$.
+\label{thm:Mag. squared theorem ext.}
+\end{theorem}
+\begin{proof}
+Let $\gnoiseVec \sim \mathcal{N}(\gVec,\noiseSD^2 I)$, $\bm{X} = \Re(M\dft{\gnoiseVec})$, and $\bm{Y} = \Im(M\dft{\gnoiseVec})$. Again without loss of generality, we assume that $n$ is odd so that the two cases to be considered are $j = 0$ and $j \neq 0$. \par
+First, the components of $\bm{X}^2$ will be determined. If $j = 0$, then $\Re(\dft{\gnoise}_j) \sim \mathcal{N}(\mu_j,\noiseSD^2)$ from Lemma \ref{lem:Component distributions ext.}, where $\bm{\mu} = \Re(\dft{\gVec})$ for readability. Thus by the properties of the normal distribution \cite[p.~184]{CasellaBerger02}, $\Re(\dft{\gnoise}_j/\noiseSD) = \Re((M\dft{\gnoiseVec})_j) = X_j \sim \mathcal{N}(\sqrt{2\lambda},1)$ where $\lambda = (\mu_j/\noiseSD)^2/2$. Applying the transformation technique used in Theorem \ref{thm:Mag. squared theorem}, the probability density function of $V = X_j^2$ is
+\[f_V(v) = \frac{1}{2\sqrt{2\pi}} \frac{1}{\sqrt{v}} \left[\exp\left(\frac{-(\sqrt{v} + \sqrt{2\lambda})^2}{2}\right) + \exp\left(\frac{-(\sqrt{v} - \sqrt{2\lambda})^2}{2}\right)\right].\]
+Expanding the arguments of the exponential terms allows for the function to be rewritten as
+\begin{align*}
+f_V(v) &= \frac{1}{2\sqrt{2\pi}} \frac{1}{\sqrt{v}} \left[\exp\left(\frac{-(\sqrt{v} + \sqrt{2\lambda})^2}{2}\right) + \exp\left(\frac{-(\sqrt{v} - \sqrt{2\lambda})^2}{2}\right)\right] \\
+&= \frac{1}{2\sqrt{2\pi}} \frac{1}{\sqrt{v}} \left[\exp\left(-\frac{v}{2} - \sqrt{2\lambda{v}} - \lambda\right) + \exp\left(-\frac{v}{2} + \sqrt{2\lambda{v}} - \lambda\right)\right] \\
+&= \frac{1}{\sqrt{2\pi}} \frac{1}{\sqrt{v}}\exp\left(\frac{-v}{2}-\lambda\right) \left[\frac{\exp(-\sqrt{2\lambda{v}}) + \exp(\sqrt{2\lambda{v}})}{2}\right] \\ 
+&= \frac{1}{\sqrt{2\pi}} \frac{1}{\sqrt{v}}\exp\left(\frac{-v}{2}-\lambda\right)\cosh(\sqrt{2\lambda{v}}).
+\end{align*}
+Hyperbolic cosine is an entire function with Taylor expansion $\cosh(z) = \sum_{\ell=0}^{\infty} z^{2\ell}/(2\ell)!$. From \cite[p.~255]{AS}, 
+\begin{equation}
+\label{eq:Gamma relation}
+\Gamma\left(\ell + \frac{1}{2}\right) = \frac{1\cdot3\cdot5\cdot7\cdot\ldots\cdot(2\ell-1)}{2^\ell}\Gamma\left(\frac{1}{2}\right) = \frac{(2\ell-1)!!}{2^\ell}\sqrt{\pi}
+\end{equation} 
+for all integers $\ell$. Thus as an intermediate step, the double factorial $(2\ell-1)!!$ must be related to $(2\ell)!$ in order to modify the density function to the desired form. This is accomplished by using the relation 
+\begin{equation}
+\label{eq:Factorial relation}
+(2\ell-1)!!2^\ell\ell! = (2\ell)!,
+\end{equation}
+which is validated by noting that
+\begin{align*}
+(2\ell-1)!!2^\ell\ell! &= \left[(2\ell-1)(2\ell-3)(2\ell-5)\cdots(1)\right]2^\ell\left[(\ell)(\ell-1)(\ell-2)\cdots(1)\right] \\
+&= \left[(2\ell-1)(2\ell-3)(2\ell-5)\cdots(1)\right]\left[(2\ell)(2(\ell-1))(2(\ell-2))\cdots(2)\right] \\
+&=  \left[(2\ell-1)(2\ell-3)(2\ell-5)\cdots(1)\right]\left[(2\ell)(2\ell-2)(2\ell-4)\cdots(2)\right] \\
+&= (2\ell)(2\ell-1)(2\ell-2)(2\ell-3)(2\ell-4)(2\ell-5)\cdots(2)(1) \\
+&= (2\ell)!.
+\end{align*}
+In light of \eqref{eq:Factorial relation}, \eqref{eq:Gamma relation} becomes the identity $\Gamma(\ell + 1/2) = (2\ell)!\sqrt{\pi}/4^\ell{\ell!}$. Therefore,
+\begin{align*}
+f_V(v) &= \frac{1}{\sqrt{2\pi}} \frac{1}{\sqrt{v}}\exp\left(\frac{-v}{2}-\lambda\right) \sum_{\ell=0}^{\infty} \frac{(\sqrt{2\lambda{v}})^{2\ell}}{(2\ell)!} \\
+&= \frac{1}{\sqrt{2\pi}} \frac{1}{\sqrt{v}}\exp\left(\frac{-v}{2}-\lambda\right) \sum_{\ell=0}^{\infty} \frac{(2\lambda{v})^{\ell}\sqrt{\pi}}{\Gamma(n + 1/2)4^n{n!}} \\
+&= \sum_{\ell=0}^{\infty} \exp\left(\frac{-v}{2}-\lambda\right)\frac{(\lambda{v})^{\ell}v^{-1/2}}{\Gamma(n + 1/2)2^n{n!}\sqrt{2}} \\
+&= \sum_{\ell=0}^{\infty} \frac{v^{\ell - 1/2}\exp(-v/2)\lambda^\ell\exp(-\lambda)}{\Gamma(\ell + 1/2)2^{\ell+1/2}\ell!},
+\end{align*}
+matching the probability density function \eqref{eq:NCchi^2 PDF} of the noncentral chi-squared distribution with 1 degree of freedom and noncentrality parameter $\lambda = (\mu_j/\noiseSD)^2/2 = (\Re(\dft{g}_j)/\noiseSD)^2/2$. \par
+If $j \neq 0$, then Lemma \ref{lem:Component distributions ext.} gives that $\Re(\dft{\gnoise}_j) \sim \mathcal{N}(\Re(\dft{g}_j),\noiseSD^2/2)$. This implies that $\Re((\sqrt{2}\dft{\gnoise}/\noiseSD)_j) = \Re((M\dft{\gnoise})_j) = X_j \sim \mathcal{N}(\sqrt{2\lambda},1)$, now with $\lambda = (\mu_j/\noiseSD)^2$. Thus the same argument can be applied so that $X_j^2 \sim \NCchi^2(1,(\mu_j/\noiseSD)^2) = \NCchi^2(1,(\Re(\dft{g}_j)/\noiseSD)^2)$. \par 
+With the components of $\bm{X}^2$ examined, focus can directed towards the components of $\bm{Y}^2$. If $j = 0$, then Lemma \ref{lem:Component distributions ext.} gives that $\Im(\dft{\gnoise}_j) = 0$ (a constant random variable). This implies that $\Im(\dft{\gnoise}_j/\noiseSD) = \Im((M\dft{\gnoiseVec})_j) = Y_j = 0$, meaning $Y_j^2 = 0$ as well. If $j \neq 0$, then $\Im(\dft{\gnoise}_j) \sim \mathcal{N}(\Im(\dft{g}_j),\noiseSD^2/2)$. Thus by the argument for $X_j$, $Y_j^2 \sim \NCchi^2(1,(\Im(\dft{g}_j)/\noiseSD)^2)$. \par 
+The final part of the proof is to establish the distribution of $X_j^2 + Y_j^2$ for the two cases of $j$. If $j = 0$, then $Y_j^2 = 0$ and so $X_j^2 + Y_j^2$ has the same distribution of $X_j^2$, which is $\NCchi^2(1,(\Re(\dft{g}_j)/\noiseSD)^2/2)$. If $j \neq 0$, then $X_j^2$ and $Y_j^2$ are distributed $\NCchi^2(1,(\Re(\dft{g}_j)/\noiseSD)^2)$ and $\NCchi^2(1,(\Im(\dft{g}_j)/\noiseSD)^2)$, respectively. Their independence is given by Lemma \ref{lem:App of Ind Thm 2}, and so the reproductive property of the noncentral chi-squared distribution \cite[p.~182]{Rao1973} produces
+\[X_j^2 + Y_j^2 \sim \NCchi^2\left(1 + 1,\left(\frac{\Re(\dft{g}_j)}{\noiseSD}\right)^2 + \left(\frac{\Im(\dft{g}_j)}{\noiseSD}\right)^2\right) = \NCchi^2\left(2,\frac{|\dft{g}_j|^2}{\noiseSD^2}\right).\]
+\end{proof}
+
+From Theorem \ref{thm:Mag. squared theorem ext.}, there are conditions which simplify the distribution of $|(M\dft{\gnoiseVec})_j|^2$. If $j = 0$ (or $n/2$ when $n$ is even), the noncentrality parameter of the noncentral chi-squared distribution is $(\Re(\dft{g}_0))^2/2\noiseSD^2$. By the definition of the DFT,
+\[\Re(\dft{g}_0) = \frac{1}{\sqrt{n}}\sum_{\ell=0}^{n-1} \cos\left(\frac{-2\pi(0)\ell}{n}\right)g_\ell = \frac{1}{\sqrt{n}}\sum_{\ell=0}^{n-1} g_\ell.\]
+It is certainly possible that $\sum_{\ell=0}^{n-1} g_\ell = 0$. A situation that would lend itself to this possibility would be a function $g(t)$ whose integral over the interval being considered is zero, e.g. $\sin(2\pi{t})$ defined on the interval $[0,1]$. Even if $\Re(\dft{g}_0)$ is nonzero, $\lambda = (\Re(\dft{g}_0))^2/2\noiseSD^2$ can be near zero when $\Re(\dft{g}_0)$ is small or the variance $\noiseSD^2$ is large. Extending these observations for general indices $j$, a zero noncentrality parameter means
+\begin{equation}
+\label{eq:Central chi}
+|(M\dft{\gnoiseVec})_j|^2 \sim \begin{cases}
+\NCchi^2\left(1,0\right) = \chi^2(1), & j = 0 \\
+\NCchi^2\left(2,0\right) = \chi^2(2), & \text{otherwise} \end{cases},
+\end{equation}
+again for $n$ being even; the same holds for odd $n$, with the inclusion of the $n/2$ case.  Recalling that $M$ in Theorem \ref{thm:Mag. squared theorem ext.} is a diagonal matrix, \eqref{eq:Central chi} can be restated as
+\[|(M\dft{\gnoiseVec})_j|^2 = \begin{cases}
+|\dft{\tilde{g}}_j|^2/\noiseSD^2 \sim \chi^2(1), & j = 0 \\
+2|\dft{\tilde{g}}_j|^2/\noiseSD^2 \sim \chi^2(2), & \text{otherwise} \end{cases}.\]
+Fortunately, this result agrees with Theorem \ref{thm:Mag. squared theorem}. The connection can be stated as a lemma.
+
+\begin{lemma}
+\label{lem:Thm connection}
+Let $\noiseSD^2 > 0$, $Z_1 \sim \chi^2(1)$, and $Z_2 \sim \chi^2(2)$. Then $V_1 = \noiseSD^2 Z_1 \sim \emph{gamma}(1/2,2\noiseSD^2)$ and $V_2 = \noiseSD^2 Z_1/2 \sim \emph{exponential}(\noiseSD^2)$. 
+\end{lemma}
+\begin{proof}
+Let $\noiseSD^2 > 0$, $Z_1 \sim \chi^2(1)$, $Z_2 \sim \chi^2(2)$, and define $V_1 = \noiseSD^2 Z_1$ and $V_2 = \noiseSD^2 Z_1/2$. In addition, let $g_1(z) = \noiseSD^2 z$ and $g_2(z) = \noiseSD^2 z/2$. Then $V_1 = g_1(Z_1)$ and $V_2 = g_2(Z_2)$, both $g_1$ and $g_2$ are monotone on the sample space $(0,\infty)$ of chi-squared random variables, and $g_1^{-1}(v) = v/\noiseSD^2$ and $g_2^{-1}(v) = 2v/\noiseSD^2$. Using $g_1^{-1}$ and the probability density function of the $\chi^2(1)$ distribution, the density function of $V_1$ is
+\[f_{V_1}(v) = \frac{1}{\Gamma(1/2)\sqrt{2}}\left(\frac{v}{\noiseSD^2}\right)^{-1/2}\exp\left(\frac{-v}{2\noiseSD^2}\right)\left|\frac{1}{\noiseSD^2}\right| = \frac{1}{\Gamma(1/2)\sqrt{2\noiseSD^2}}v^{-1/2}\exp\left(\frac{-v}{2\noiseSD^2}\right),\]
+which is the density function of the $\text{gamma}(1/2,2\noiseSD^2)$ distribution. Similarly using $g_2^{-1}$ and the probability density function of the $\chi^2(2)$ distribution, the density function of $V_2$ is
+\[f_{V_2}(v) = \frac{1}{\Gamma(1)\cdot 2}\exp\left(\frac{-2v}{2\noiseSD^2}\right)\left|\frac{2}{\noiseSD^2}\right| = \frac{1}{\noiseSD^2}\exp\left(\frac{-v}{\noiseSD^2}\right),\]
+which is the density function of the $\text{exponential}(\noiseSD^2)$ distribution. An alternative method for showing $V_2 \sim \text{exponential}(\noiseSD^2)$ would be to note that the $\chi^2(2)$ distribution is the same as the $\text{exponential}(1/2)$ distribution and then perform the scalar transformation.
+\end{proof}
+
+Ultimately there is a trade-off between the frequency content of the function $g(t)$ and the variance in the added noise. If the function $g(t)$ has a small amount of high frequency content (relative to the variance of the noise), then the statistics of corresponding terms $|(M\dft{\gnoiseVec})_j|^2$ will resemble those of chi-squared random variables. \par 
+Since Theorem \ref{thm:Mag. squared theorem ext.} will be used in Sections \ref{sec:Unbiased Predictive Risk Estimator} and \ref{sec:Discrepancy Principle}, some statistics regarding the noncentral chi-squared distribution will be stated for later convenience. 
+\begin{theorem}
+\label{thm:NCchi Mean and Var}
+Let $X \sim \NCchi^2(p,\lambda)$. Then $\E(X) = p + \lambda$ and $\Var(X) = 2p + 4\lambda$.
+\end{theorem} 
+\begin{proof}
+Let $X \sim \NCchi^2(p,\lambda)$. As noted in \cite[p.~167]{CasellaBerger02}, the probability density function \eqref{eq:NCchi^2 PDF} of the noncentral chi-squared distribution can be considered a mixture distribution; for the hierarchy $X | Y \sim \chi^2(p+2Y)$ and $Y \sim \text{Poisson}(\lambda)$, the marginal distribution of $X$ is \eqref{eq:NCchi^2 PDF}. Then by the properties of expected value and the chi-squared and Poisson distributions,
+\[\E(X) = \E(\E(X|Y)) = \E(p + 2Y) = p + 2\E(Y) = p + 2\lambda.\]
+The variance of $X$ is calculated in a similar way:
+\begin{align*}
+\Var(X) &= \E(\Var(X|Y)) + \Var(\E(X|Y)) \\
+&= \E(2p) + \Var(p + 2Y) \\
+&= 2p + 4\Var(Y) \\
+&= 2p + 4\lambda.
+\end{align*}
+\end{proof}
+\noindent Using the results from Theorem \ref{thm:Mag. squared theorem ext.}, Theorem \ref{thm:NCchi Mean and Var} has the following corollary. 
+\begin{corollary}
+\label{cor:gnoise Mean and Var}
+Let $\gnoiseVec$ be a random $n$-vector with $\gnoiseVec \sim \mathcal{N}(\gVec,\noiseSD^2 I)$, $J = \{0,n/2\}$ if $n$ is even and $J = \{0\}$ if $n$ is odd. Define the diagonal matrix $M$ by
+\[M_{j,j} = \begin{cases}
+1/\noiseSD & j \in J \\
+\sqrt{2}/\noiseSD & j \not\in J
+\end{cases}.\]
+Then 
+\[\E\left(|(M\dft{\gnoiseVec})_j|^2\right) = \begin{cases}
+\dfrac{1}{2}\left(2 + \dfrac{|\dft{g}_j|^2}{\noiseSD^2}\right), & j \in J \\
+2 + \dfrac{|\dft{g}_j|^2}{\noiseSD^2}, & j \not\in J \end{cases}\]
+and
+\[\Var\left(|(M\dft{\gnoiseVec})_j|^2\right) = \begin{cases}
+2\left(1 + \dfrac{|\dft{g}_j|^2}{\noiseSD^2}\right), & j \in J \\
+4\left(1 + \dfrac{|\dft{g}_j|^2}{\noiseSD^2}\right), & j \not\in J \end{cases}.\]
+\end{corollary}
+
+The final statistical result presented here is the covariance of $|M_j\dft{\gnoise}_j|^2$ and $|M_k\dft{\gnoise}_k|^2$, which will be used in Chapter \ref{ch:Parameter estimation methods}.  
+
+% Here is the univariate approach
+A step in Theorem \ref{thm:Cov of mag squared} is to determine covariances between components of $M\dft{\gnoiseVec} = M\dft{\gVec} + M\dft{\noiseVec}$. Lemma \ref{lem:App of Ind Thm 2} establishes that the real and imaginary parts of $M\dft{\noiseVec}$ are independent, but Lemma \ref{lem:App of Ind Thm 3} establishes the relationship between any two real or imaginary components of $M\dft{\noiseVec}$.
+
+\begin{lemma}
+\label{lem:App of Ind Thm 3}
+Let $\noise \sim \mathcal{N}(\bm{0},\noiseSD^2 I)$, $A$ and $B$ be the real and imaginary parts, respectively, of the $n \times n$ DFT matrix, $J = \{0,n/2\}$ if $n$ is even and $J = \{0\}$ if $n$ is odd. Define the diagonal matrix $M$ by
+\[M_{j,j} = \begin{cases}
+1/\noiseSD & j \in J \\
+\sqrt{2}/\noiseSD & j \not\in J
+\end{cases}.\]
+Then $(MA\noiseVec)_j$ and $(MA\noiseVec)_k$ are independent for all $0 \leq j < k \leq n-1$ with $j + k \neq n$. When $j + k = n$, $(MA\noiseVec)_j = (MA\noiseVec)_k$. The same result holds for the components of $MB\noiseVec$.
+\end{lemma}
+\begin{proof}
+Let $0 \leq j < k \leq n-1$ with $j + k \neq n$. The components $(MA\noiseVec)_j$ and $(MA\noiseVec)_k$ are
+\[(MA\noiseVec)_j = \sum_{\ell=0}^{n-1} \frac{M_{j,j}}{\sqrt{n}}\cos\left(\frac{-2\pi{j\ell}}{n}\right)\noise_{\ell}, \quad (MA\noiseVec)_k = \sum_{\ell=0}^{n-1} \frac{M_{k,k}}{\sqrt{n}}\cos\left(\frac{-2\pi{k\ell}}{n}\right)\noise_{\ell}.\]
+As stated in Lemma \ref{lem:App of Ind Thm}, the $\noise_\ell$ are independent and their $n$th moments exist for each $0 \leq \ell \leq n-1$. Thus the first condition of Theorem \ref{thm:Independence Theorem} is satisfied. The second condition follows from
+\[\sum_{\ell=0}^{n-1} \left[\frac{M_{j,j}}{\sqrt{n}}\cos\left(\frac{-2\pi{j\ell}}{n}\right)\right]\left[\frac{M_{k,k}}{\sqrt{n}}\cos\left(\frac{-2\pi{k\ell}}{n}\right)\right] = M_{j,j}M_{k,k} \langle A_{j,\cdot}A_{k,\cdot} \rangle = 0,\]
+where the last equality is given by Lemma \ref{lem:Inner products}. The proof of $(MA\noiseVec)_j = (MA\noiseVec)_k$ when $j+k = n$ is contained in the proof of Lemma \ref{lem:Rank of A and B}. The same argument applies to $(MB\noiseVec)_j$ and $(MB\noiseVec)_k$.
+\end{proof}
+
+% Here is the start of the density function approach
+%A step in Theorem \ref{thm:Cov of mag squared} is to calculate the \textit{pseudo-determinant} of a covariance matrix $\Sigma$, which is defined as the product of its nonzero eigenvalues. Adopting the notation used for pseudo-inverses, the pseudo-determinant of a matrix $\Sigma$ will be denoted $\pdet(\Sigma)$. Theorem \ref{thm:Covariance eigenvalues} gives nonzero eigenvalues of the covariance matrices used in Theorem \ref{thm:Cov of mag squared}, which will then be used to evaluate the pseudo-determinants. The algebraic multiplicity of an eigenvalue $\lambda$ is denoted $\mu(\lambda)$.
+%
+%\begin{theorem}
+%\label{thm:Covariance eigenvalues}
+%Let $A$ and $B$ be the real and imaginary parts, respectively, of the $n \times n$ DFT matrix, $J = \{0,n/2\}$ if $n$ is even and $J = \{0\}$ if $n$ is odd, and let $\noiseSD^2 > 0$. Define the diagonal matrix $M$ by
+%\[M_{j,j} = \begin{cases}
+%1/\noiseSD & j \in J \\
+%\sqrt{2}/\noiseSD & j \not\in J
+%\end{cases}.\]
+%The only nonzero eigenvalues of the matrix $\noiseSD^2 MA^2M$ are 1 and 2 with algebraic multiplicities
+%\[\mu(1) = \begin{cases}
+%1, & n \text{ odd} \\
+%2, & n \text{ even}
+%\end{cases},\quad \mu(2) = \rank(A) - \mu(1).\]
+%The only nonzero eigenvalue of the matrix $\noiseSD^2 MB^2M$, existing only for $n \geq 3$, is 2 with algebraic multiplicity equal to $\rank(B)$.
+%\end{theorem}
+%\begin{proof}
+%The nonzero eigenvalues of $\noiseSD^2MA^2M$ will be calculated first. For simplification, let $\Sigma = \noiseSD^2MA^2M$. Due to the structure of $\Sigma$, its characteristic polynomial $\det(\Sigma - \lambda I)$ can be expressed without much difficulty. Since $M$ is diagonal, pre-multiplication scales each row of $A^2$ by the corresponding diagonal entries of $M$; post-multiplication scales the columns of $A^2$ in the same way. $A^2$ is symmetric with elements given by Lemma \ref{lem:Inner products}, and so the matrix $\Sigma$ has the structure
+%\[\Sigma_{j,k} = \begin{cases}
+%1, & j = k \\ 
+%1, & j \neq k \text{ and } j + k = n \\ 
+%0, & \text{otherwise} \end{cases}, \qquad 0 \leq j,k \leq n-1.\]
+%The structure of $\Sigma - \lambda I$ is then
+%\[(\Sigma - \lambda I)_{j,k} = \begin{cases}
+%1-\lambda, & j = k \\ 
+%1, & j \neq k \text{ and } j + k = n \\ 
+%0, & \text{otherwise} \end{cases}, \qquad 0 \leq j,k \leq n-1.\]
+%The approach to finding the determinant of $\Sigma - \lambda I$ is to perform a cofactor expansion to reduce $\Sigma - \lambda I$ to expression involving a minor that has simpler structure and then uses combinatorial argument along with Leibniz's formula for matrix determinants. The cofactor expansion depends upon the parity of $n$. \par 
+%If $n$ is odd, then every row (and by symmetry, column) of $\Sigma - \lambda I$ has exactly two nonzero elements except for the zeroth row, which has only $(\Sigma - \lambda I)_{0,0}$ as a nonzero element. Exploiting this observation, a cofactor expansion along the zeroth row results in
+%\begin{equation}
+%\label{eq:Cofactor expansion}
+%\det(\Sigma - \lambda I) = (1 - \lambda)\det((1 - \lambda)I + J),
+%\end{equation}
+%where the identity $I$ and exchange matrix $J$ are dimension $m \times m$ with $m = n-1$. The minor $(1 - \lambda)I + J$ has the property that each row (column) has exactly two nonzero elements: $1 - \lambda$ and 1. Explicitly, the structure is
+%\[((1 - \lambda)I + J)_{j,k} = \begin{cases}
+%1 - \lambda, & j = k \\
+%1, & j \neq k \text{ and } j + k = m - 1 \\
+%0, & \text{otherwise}
+%\end{cases}, \qquad 0 \leq j,k \leq m-1,\]
+%after relabeling the indices to agree with the dimension of the minor. To calculate $\det((1 - \lambda)I + J)$, Leibniz's formula for matrix determinants can be utilized:
+%\begin{equation}
+%\label{eq:Leibniz}
+%\det((1 - \lambda)I + J) = \sum_{\tau \in S_m} \left(\sgn(\tau) \prod_{j=0}^{m-1} ((1 - \lambda)I + J)_{j,\tau(j)} \right).
+%\end{equation}
+%Here $S_m$ denotes the symmetric group on $m$ objects (in this case represented by the set of permuations of the elements of $\{0,\ldots,m-1\}$), $\tau$ is a specific permutation, $\sgn(\tau)$ is either 1 or $-1$ depending upon the parity of the permutation, and $\tau(j)$ is the element of $\{0,\ldots,m-1\}$ in the $j$th position of the permutation \cite[p.~106-110]{DummitFoote3}. While there are $m!$ (the order of $S_m$) summands in \eqref{eq:Leibniz}, the sparse structure of $(1 - \lambda)I + J$ reduces the number of summands to $2^{m/2} \cdot 1^{m/2} = 2^{m/2}$. This is because there are exactly two nonzero elements in each row of the minor and choosing a nonzero element in each of the first $m/2$ rows leaves only one choice of a nonzero element in each of the remaining rows. For example, a permutation $\tau$ with
+%\[((1 - \lambda)I + J)_{0,\tau(0)} = ((1 - \lambda)I + J)_{0,0} = (1-\lambda)\]
+%must be such that
+%\[((1 - \lambda)I + J)_{m-1,\tau(m-1)} = ((1 - \lambda)I + J)_{m-1,m-1} = (1-\lambda)\]
+%so that the product in \eqref{eq:Leibniz} is nonzero. Any permutation that results in a zero element from $(1 - \lambda)I + J$ causes the product in \eqref{eq:Leibniz} to be zero and can therefore be ignored in the sum. \par 
+%The symmetry of $(1 - \lambda)I + J$ forces nonzero products in \eqref{eq:Leibniz} to take the form
+%\[(1-\lambda)^{2((m/2)-\ell)}1^{2\ell}\]
+%where $\ell$ is the number of the first $m/2$ rows where $1-\lambda$ and 1 have been transposed by given permutation. Of the $m/2$ rows, the number of ways to choose $\ell$ rows for the transposition of $1-\lambda$ and 1 is $\binom{m/2}{\ell}$. As for the $\sgn(\tau)$ term in \eqref{eq:Leibniz}, $\ell$ represents the number of transpositions in the cycle decomposition of $\tau$. Since the sign of a transposition is $-1$ and the sign of a permutation is multiplicative with respect to cycles (in this case, transpositions) in a cycle decomposition \cite[p.~109-110]{DummitFoote3}, $\sgn(\tau) = (-1)^{\ell}$. Thus \eqref{eq:Leibniz} simplifies to 
+%\begin{equation}
+%\label{eq:Leibniz simp.}
+%\det((1 - \lambda)I + J) = \sum_{\ell=0}^{m/2} \binom{m/2}{\ell}(1-\lambda)^{2((m/2)-\ell)}1^{2\ell}(-1)^{\ell}.
+%\end{equation}
+%Notice that 
+%\[\sum_{\ell=0}^{m/2} \binom{m/2}{\ell} = 2^{m/2},\]
+%agreeing with the number of permutations that result in nonzero products in \eqref{eq:Leibniz}. By rearranging exponents, the binomial theorem allows for \eqref{eq:Leibniz simp.} to be rewritten as
+%\[\det((1 - \lambda)I + J) = \sum_{\ell=0}^{m/2} \binom{m/2}{\ell}(1-\lambda)^{2((m/2)-\ell)}(-1^2)^{\ell} = \left((1-\lambda)^2 + (-1^2)\right)^{m/2}.\]
+%Thus by \eqref{eq:Cofactor expansion}, the characteristic polynomial of $\Sigma$ is
+%\[\det(\Sigma - \lambda I) = (1 - \lambda)\left((1-\lambda)^2 + (-1^2)\right)^{m/2} = \lambda^{m/2}(1-\lambda)(\lambda - 2)^{m/2}.\]
+%The eigenvalues of $\Sigma$ and their algebraic multiplicities are now apparent. \par 
+%If $n$ is even, then every row (column) of $\Sigma - \lambda I$ has exactly two nonzero elements except for the zeroth row and the $(n/2)$th row. These rows only have one nonzero element each, and so two cofactor expansions (along the zeroth and $(n/2)$th rows) yield
+%\begin{equation}
+%\label{eq:Cofactor expansion 2}
+%\det(\Sigma - \lambda I) = (1 - \lambda)^2\det((1 - \lambda)I + J).
+%\end{equation}
+%The argument used for the odd $n$ case can now be used for the determinant of the $m \times m$ matrix minor $(1 - \lambda)I + J$, with the exception that $m = n-2$ instead of $n-1$. The resulting characteristic polynomial is then
+%\[\det(\Sigma - \lambda I) = \lambda^{m/2}(1-\lambda)^2(\lambda - 2)^{m/2}.\]
+%\indent Now let $\Sigma = \noiseSD^2 MB^2M$. The structure of $\Sigma$ is now more complicated. For simplicity, let $J = \{0,n/2\}$ if $n$ is even and $J  = \{0\}$ if $n$ is odd. $\Sigma$ has the structure
+%\[\Sigma_{j,k} = \begin{cases}
+%0, & j = k \text{ and } j,k \in J \\ 
+%1, & j = k \text{ and } j,k \not\in J \\ 
+%-1, & j + k = n \text{ and } j,k \not\in J \\
+%0, & \text{otherwise} \end{cases}, \qquad 0 \leq j,k \leq n-1.\]
+%When $n = 1$ or $n = 2$, $\Sigma$ is the zero matrix and has no nonzero eigenvalues. Fortunately the argument made for $\noiseSD^2 MA^2M$ can be applied for both even and odd $n$ when $n \geq 3$, with some differences. First, the zeroth row (as well as the $(n/2)$th row if $n$ is even) contains all zeros, and so cofactor expansions produce factors of $-\lambda$ instead of $1-\lambda$ such as in \eqref{eq:Cofactor expansion} and \eqref{eq:Cofactor expansion 2}.  Second, the matrix minor resulting from cofactor expansions is $(1-\lambda)I - J$ instead of $(1-\lambda)I + J$. Thus the nonzero products in Leibniz's formula take the form
+%\[(1-\lambda)^{2((m/2)-\ell)}(-1)^{2\ell}.\]
+%However, $(-1)^{2\ell} = 1^{2\ell}$ for all integers $\ell$, and so $\det((1-\lambda)I - J)$ is equal to \eqref{eq:Leibniz simp.}. Therefore the characteristic polynomial of $\Sigma$ is
+%\[\det((1-\lambda)I - J) = (-\lambda)\lambda^{m/2}(\lambda - 2)^{m/2}, \qquad m = n-1\]
+%when $n$ is odd and 
+%\[\det((1-\lambda)I - J) = (-\lambda)^{2}\lambda^{m/2}(\lambda - 2)^{m/2}, \qquad m = n-2\]
+%when $n$ is even. Both polynomials confirm that $\lambda = 2$ is the only nonzero eigenvalue of $\Sigma = \noiseSD^2 MB^2M$ with algebraic multiplicity equal to $\rank(B)$.
+%\end{proof}
+%
+%The pseudo-determinants of $\noiseSD^2 MA^2M$ and $\noiseSD^2 MB^2M$ follow as a corollary to Theorem \ref{thm:Covariance eigenvalues} in combination with Lemma \ref{lem:Rank of A and B}.
+%
+%\begin{corollary}
+%\label{cor:Covariance eigenvalues}
+%Let $A$ and $B$ be the real and imaginary parts, respectively, of the $n \times n$ DFT matrix, $J = \{0,n/2\}$ if $n$ is even and $J = \{0\}$ if $n$ is odd, and let $\noiseSD^2 > 0$. Define the diagonal matrix $M$ by
+%\[M_{j,j} = \begin{cases}
+%1/\noiseSD & j \in J \\
+%\sqrt{2}/\noiseSD & j \not\in J
+%\end{cases}.\]
+%Then
+%\[\pdet(\noiseSD^2 MA^2M) = \begin{cases}
+%2^{(n/2)-1}, & n \text{ even} \\
+%2^{(n-1)/2}, & n \text{ odd}
+%\end{cases},\]
+%and $\pdet(\noiseSD^2 MB^2M) = \pdet(\noiseSD^2 MA^2M)$ for $n \geq 3$.
+%\end{corollary}
+
+The covariance of $|M_j\dft{\gnoise}_j|^2$ and $|M_k\dft{\gnoise}_k|^2$ for $0 \leq j < k \leq n-1$ can now be determined.
+
+\begin{theorem}
+\label{thm:Cov of mag squared}
+Let $\gnoiseVec$ be a random $n$-vector with $\gnoiseVec \sim \mathcal{N}(\gVec,\noiseSD^2 I)$, $J = \{0,n/2\}$ if $n$ is even and $J = \{0\}$ if $n$ is odd. Define the diagonal matrix $M$ by
+\[M_{j,j} = \begin{cases}
+1/\noiseSD & j \in J \\
+\sqrt{2}/\noiseSD & j \not\in J
+\end{cases}.\]
+Then for $0 \leq j < k \leq n-1$,
+\[\Cov\left(|M_j\dft{\gnoise}_j|^2,|M_k\dft{\gnoise}_k|^2\right) = \begin{cases}
+4\left(1 + \dfrac{|\dft{g}_j|^2}{\noiseSD^2}\right), & j + k = n \\
+0, & j + k \neq 0
+\end{cases}.\]
+\end{theorem}
+\begin{proof}
+By the linearity of covariance and rewriting the magnitudes squared in terms of real and imaginary parts,
+\begin{align*}
+\Cov\left(|M_j\dft{\gnoise}_j|^2,|M_k\dft{\gnoise}_k|^2\right) &= \Cov\left(\Re(M_j\dft{\gnoise}_j)^2 + \Im(M_j\dft{\gnoise}_j)^2, \Re(M_k\dft{\gnoise}_k)^2 + \Im(M_k\dft{\gnoise}_k)^2\right) \\
+&= \Cov\left(\Re(M_j\dft{\gnoise}_j)^2 ,\Re(M_k\dft{\gnoise}_k)^2\right) + \Cov\left(\Re(M_j\dft{\gnoise}_j)^2 ,\Im(M_k\dft{\gnoise}_k)^2\right) \\
+&+ \Cov\left(\Im(M_j\dft{\gnoise}_j)^2 ,\Re(M_k\dft{\gnoise}_k)^2\right) + \Cov\left(\Im(M_j\dft{\gnoise}_j)^2 ,\Im(M_k\dft{\gnoise}_k)^2\right).
+\end{align*}
+By Lemma \ref{lem:App of Ind Thm 2}, $\Re(M_j\dft{\gnoise}_j)^2$ and $\Im(M_k\dft{\gnoise}_k)^2$ are independent for all $0 \leq j,k \leq n-1$, meaning that their covariance is zero. Thus the covariance simplifies to
+\[\Cov\left(|M_j\dft{\gnoise}_j|^2,|M_k\dft{\gnoise}_k|^2\right) = \Cov\left(\Re(M_j\dft{\gnoise}_j)^2 ,\Re(M_k\dft{\gnoise}_k)^2\right) + \Cov\left(\Im(M_j\dft{\gnoise}_j)^2 ,\Im(M_k\dft{\gnoise}_k)^2\right).\]
+A further simplification can be made by using $\dft{\gnoiseVec} = \dft{\gVec} + \dft{\noiseVec}$ and expanding the squared terms:
+\begin{align*}
+\Cov\left(\Re(M_j\dft{\gnoise}_j)^2 ,\Re(M_k\dft{\gnoise}_k)^2\right) &= \Cov\left([\Re(M_j\dft{g}_j) + \Re(M_j\dft{\noise}_j)]^2,[\Re(M_k\dft{g}_k) + \Re(M_k\dft{\noise}_k)]^2\right) \\
+&= \Cov\left(\Re(M_j\dft{g}_j)^2,\Re(M_k\dft{g}_k)^2\right) \\
+&+ \Cov\left(\Re(M_j\dft{g}_j)^2, 2\Re(M_k\dft{g}_k)\Re(M_k\dft{\noise}_k)\right) \\
+&+ \Cov\left(\Re(M_j\dft{g}_j)^2, \Re(M_k\dft{\noise}_k)^2\right) \\
+&+ \Cov\left(2\Re(M_j\dft{g}_j)\Re(M_j\dft{\noise}_j), \Re(M_k\dft{g}_k)^2 )\right) \\
+&+ \Cov\left(2\Re(M_j\dft{g}_j)\Re(M_j\dft{\noise}_j), 2\Re(M_k\dft{g}_k)\Re(M_k\dft{\noise}_k)\right) \\
+&+ \Cov\left(2\Re(M_j\dft{g}_j)\Re(M_j\dft{\noise}_j), \Re(M_k\dft{\noise}_k)^2 )\right) \\
+&+ \Cov\left(\Re(M_j\dft{\noise}_j)^2,\Re(M_k\dft{g}_k)^2\right) \\
+&+ \Cov\left(\Re(M_j\dft{\noise}_j)^2, 2\Re(M_k\dft{g}_k)\Re(M_k\dft{\noise}_k)\right) \\
+&+ \Cov\left(\Re(M_j\dft{\noise}_j)^2,\Re(M_k\dft{\noise}_k)^2\right).
+\end{align*}
+While this certainly appears to be the opposite of a simplification, any covariance term with an argument not containing $\dft{\noise}_j$ or $\dft{\noise}_k$ is zero. Five of the nine covariance terms are thus removed, leaving
+\begin{align*}
+\Cov\left(\Re(M_j\dft{\gnoise}_j)^2 ,\Re(M_k\dft{\gnoise}_k)^2\right) 
+&= \Cov\left(2\Re(M_j\dft{g}_j)\Re(M_j\dft{\noise}_j), 2\Re(M_k\dft{g}_k)\Re(M_k\dft{\noise}_k)\right) \\
+&+ \Cov\left(2\Re(M_j\dft{g}_j)\Re(M_j\dft{\noise}_j), \Re(M_k\dft{\noise}_k)^2 )\right) \\
+&+ \Cov\left(\Re(M_j\dft{\noise}_j)^2, 2\Re(M_k\dft{g}_k)\Re(M_k\dft{\noise}_k)\right) \\
+&+ \Cov\left(\Re(M_j\dft{\noise}_j)^2,\Re(M_k\dft{\noise}_k)^2\right).
+\end{align*}
+The constant coefficients can be factored and combined so that
+\begin{align*}
+\Cov\left(\Re(M_j\dft{\gnoise}_j)^2 ,\Re(M_k\dft{\gnoise}_k)^2\right) 
+&= [4\Re(M_j\dft{g}_j)\Re(M_k\dft{g}_k)]\Cov\left(\Re(M_j\dft{\noise}_j), \Re(M_k\dft{\noise}_k)\right) \\
+&+ [2\Re(M_j\dft{g}_j)]\Cov\left(\Re(M_j\dft{\noise}_j), \Re(M_k\dft{\noise}_k)^2 )\right) \\
+&+ [2\Re(M_k\dft{g}_k)]\Cov\left(\Re(M_j\dft{\noise}_j)^2, \Re(M_k\dft{\noise}_k)\right) \\
+&+ \Cov\left(\Re(M_j\dft{\noise}_j)^2,\Re(M_k\dft{\noise}_k)^2\right).
+\end{align*}
+Let $A$ be the real part of the Fourier matrix \eqref{eq:DFT-Matrix}. Then $\Re(M_j\dft{\noise}_j) = (MA\noiseVec)_j$ for all $0 \leq j \leq n-1$. Lemma \ref{lem:App of Ind Thm 2} states that $(MA\noiseVec)_j$ and $(MA\noiseVec)_k$ are independent for all $0 \leq j < k \leq n-1$ with $j+k \neq n$ and $(MA\noiseVec)_j = (MA\noiseVec)_k$ when $j+k = n$. Thus all of the covariance terms above are zero when $j + k \neq n$. As for the $j + k = n$ case, Theorem \ref{thm:Mag. squared theorem ext.} yields the final result:
+\[\Cov\left(|M_j\dft{\gnoise}_j|^2,|M_k\dft{\gnoise}_k|^2\right) = \Var\left(|M_j\dft{\gnoise}_j|^2\right) = 4\left(1 + \frac{|\dft{g}_j|^2}{\noiseSD^2}\right), \qquad j+k = n.\]
+
+% Looking at the joint distributions:
+
+%Since $\noiseVec \sim \mathcal{N}(\mathbf{0},\noiseSD^2 I)$, the covariance matrices of $MA\noiseVec$ and $MB\noiseVec$ are $MA(\noiseSD^2 I)A^\trans M^\trans = \noiseSD^2 MA^2M$ and $\noiseSD^2 MB^2M$, respectively (because the matrices $M$, $A$, and $B$ are symmetric). \par 
+%Unfortunately the matrices $\noiseSD^2 MA^2M$ and $\noiseSD^2 MB^2M$  are rank-deficient. In fact they have the same ranks as $A$ and $B$, respectively, which are given by Lemma \ref{lem:Rank of A and B}. To see this for $\noiseSD^2 MA^2M$, note that $\noiseSD^2 MA^2M = CC^\trans$ with $C = \noiseSD MA$. Since $\rank(CC^\trans) = \rank(C)$, it only has to be shown that $\rank(C) = \rank(A)$. However, $\rank(C) = \rank(A)$ because $C = MA$ and $M$ has full rank. Thus $\rank(CC^\trans) = \rank(\noiseSD^2 MA^2M) = \rank(A)$ and the same can be done for $B$. \par 
+%As stated in the discussion following Lemma \ref{lem:Rank of A and B}, a consequence of the rank-deficiency of $\noiseSD^2 MA^2M$ and $\noiseSD^2 MB^2M$ is that the density functions of $MA\noiseVec$ and $MB\noiseVec$ do not exist in $\mathbb{R}^n$, but instead exists on subspaces. Specifically, the density functions of $MA\noiseVec$ and $MB\noiseVec$ exist on $\rank(A)$-dimensional and $\rank(B)$-dimensional subspaces of $\mathbb{R}^n$, respectively. \par 
+%The approach in \cite[p.~527-528]{Rao1973} will be used to determine the density functions of $MA\noiseVec$ and $MB\noiseVec$. Starting with $MA\noiseVec$, let $\Sigma = \noiseSD^2 MA^2M$, $r = \rank(A)$, and define the $n \times r$ matrix $P$ by
+%\[P_{j,k} = \begin{cases}
+%1, & j = k \text{ and } j,k \in J \\ 
+%\frac{1}{\sqrt{2}}, & j = k \text{ and } j,k \not\in J \\
+%\frac{1}{\sqrt{2}}, & j \neq k \text{ and } j+k = n \\
+%0, & \text{otherwise}
+%\end{cases}, \qquad 0 \leq j \leq n, \quad 0 \leq k \leq r.\]
+%In other words, the columns of $P$ are normalizations of the first $r$ columns of $\Sigma$. As such, the columns are $P$ are orthonormal vectors belonging to column space of $\Sigma$. Next, define the $n \times (n-r)$ matrix $Q$ by
+%\[Q_{j,k} = \begin{cases}
+%0, & j = k \text{ or } j+k = n \\ 
+%1, & \text{otherwise}
+%\end{cases}, \qquad 0 \leq j \leq n, \quad 0 \leq k \leq (n-r).\]
+%Defining $Q$ in this way ensures that $\rank(Q) = (n - r)$ and $Q^\trans \Sigma$ is the $(n-r) \times n$ zero matrix. Let $\bm{\nu} = P^\trans MA\noiseVec$ and $\bm{\xi} = Q^\trans MA\noiseVec$, so that
+%\[\begin{bmatrix}
+%\bm{\nu} \\
+%\bm{\xi}
+%\end{bmatrix} = \begin{bmatrix}
+%P^\trans MA\noiseVec \\ 
+%Q^\trans MA\noiseVec
+%\end{bmatrix} = \begin{bmatrix}
+%P & Q
+%\end{bmatrix}^\trans MA\noiseVec.\]
+%Recalling that $\noiseVec \sim \mathcal{N}(\mathbf{0},\noiseSD^2 I)$, $\E(\bm{\xi}) = Q^\trans\mathbf{0} = \mathbf{0}$ (the dimension of the zero vector changes from $n \times 1$ to $(n-r) \times 1$). By the construction of $Q$, $\Var(\bm{\xi}) = Q^\trans \Sigma Q = \mathbf{0}$, which is the $(n-r) \times (n-r)$ zero matrix. Thus $\bm{\xi}$ is equal to the $(n-r) \times 1$ zero vector with probability 1. \par 
+%In contrast, $\bm{\nu} \sim \mathcal{N}(P^\trans\bm{0},P^\trans \Sigma P) = \mathcal{N}(\bm{0},P^\trans \Sigma P)$; here the second zero vector $\bm{0}$ has dimension $r \times 1$. Since the columns of $P$ belonging in the columns space of $\Sigma$ are orthonormal, $\det(P^\trans \Sigma P) = \pdet(\Sigma) \neq 0$. Therefore $P^\trans \Sigma P$ is nonsingular, and so the probability density function of $\bm{\nu}$ is
+%\begin{equation}
+%\label{eq:Nu density}
+%f(\bm{\nu}) = \frac{1}{(2\pi)^{r/2}\pdet(\Sigma)}\exp\left(-\bm{\nu}^\trans(P^\trans \Sigma P)^{-1}\bm{\nu}\right).
+%\end{equation}
+\end{proof}
+
+\section{DCT of white noise} \label{ch:DCT of white noise}
+
+The primary challenge in dealing with statistics of the DFT applied to white noise is that the covariance matrices of $A\gnoiseVec$ and $B\gnoiseVec$ ($A$ and $B$ representing the real and imaginary parts of the DFT matrix $F$, respectively) are singular. Fortunately, this is not the case for the DCT. \par 
+Let $C$ be the $n \times n$ DCT matrix defined by \eqref{eq:DCT matrix}, $\noiseVec \sim \mathcal{N}(\mathbf{0},\noiseSD^2 I)$, and $\dct{\noiseVec} = C\noiseVec$. By the orthogonality of $C$ and properties of the multivariate normal distribution, 
+\begin{equation}
+\dct{\noiseVec} \sim \mathcal{N}(C\mathbf{0},\noiseSD^2 C^\trans{C}) = \mathcal{N}\left(\mathbf{0},\noiseSD^2 I\right).
+\label{eq:DCT Noise}
+\end{equation}
+Thus the distribution of $\noiseVec$ is preserved under the DCT. More generally,
+\[\dct{\gnoiseVec} \sim \mathcal{N}\left(\dct{\gnoiseVec},\noiseSD^2 I\right)\]
+where $\gnoiseVec = \gVec + \noiseVec$. Therefore the DCT-version of Theorem \ref{thm:Mag. squared theorem ext.} is more simple.
+\begin{theorem}
+Let $\gnoiseVec$ be a random $n$-vector with $\gnoiseVec \sim \mathcal{N}(\gVec,\noiseSD^2 I)$ and let $\dct{\gnoiseVec}$ denote the DCT of $\gnoiseVec$. Then for all $0 \leq j \leq n-1$,
+\[\frac{1}{\noiseSD^2}\left|\dct{\gnoise}_j\right|^2 \sim \NCchi\left(1,\frac{1}{2\noiseSD^2}\left(\dct{g}_j\right)^2\right)\]
+where $\NCchi^2(k,\lambda)$ denotes the noncentral chi-squared distribution with $k$ degrees of freedom and noncentrality parameter $\lambda$.
+\label{thm:DCT Dist}
+\end{theorem}
+\begin{proof}
+For $0 \leq j \leq n-1$, the properties of the univariate normal distribution give
+\[\frac{1}{\noiseSD}\dct{g}_j \sim \mathcal{N}\left(\sqrt{2\lambda},1\right), \quad \lambda = \frac{1}{2\noiseSD^2}\left(\dct{g}_j\right)^2.\]
+The techniques utilized in the proof of Theorem \ref{thm:Mag. squared theorem} can now be applied to yield
+\[\frac{1}{\noiseSD^2}\left(\dct{g}_j\right)^2 \sim \NCchi\left(1,\lambda\right) = \NCchi\left(1,\frac{1}{2\noiseSD^2}\left(\dct{g}_j\right)^2\right).\]
+\end{proof}
+
+The expected value and variance then follow directly from Theorem \ref{thm:NCchi Mean and Var}.
+
+\begin{lemma}
+Let $\gnoiseVec$ be a random $n$-vector with $\gnoiseVec \sim \mathcal{N}(\gVec,\noiseSD^2 I)$ and let $\dct{\gnoiseVec}$ denote the DCT of $\gnoiseVec$. Then for all $0 \leq j \leq n-1$,
+\[\E\left(\frac{1}{\noiseSD^2}\left(\dct{g}_j\right)^2\right) = 1 + \frac{1}{2\noiseSD^2}\left(\dct{g}_j\right)^2, \quad \Var\left(\frac{1}{\noiseSD^2}\left(\dct{g}_j\right)^2\right) = 2 + \frac{2}{\noiseSD^2}\left(\dct{g}_j\right)^2.\]
+\label{lem:DCT Exp and Var}
+\end{lemma}
