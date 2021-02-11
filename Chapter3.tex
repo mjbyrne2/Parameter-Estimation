@@ -146,9 +146,9 @@ which implies that $\rank(A) + \rank(B) \leq n$. Thus $\rank(A) + \rank(B) = n$,
 \end{proof}
 \end{lemma} 
 
-The rank deficiency of $A$ and $B$ have statistical significance as well.  Given $\noiseVec \sim \mathcal{N}(\bm{0},\noiseSD^2I)$ and using the properties of the multivariate normal distribution, 
+The rank deficiency of $A$ and $B$ have statistical significance as well.  Given $\noiseVec \sim \mathcal{N}(\zeroVec,\noiseSD^2I)$ and using the properties of the multivariate normal distribution, 
 \begin{equation}
-\Re(\dft{\noiseVec}) = A\noise \sim \mathcal{N}(\bm{0},\noiseSD^2 AA^\trans), \quad \Im(\dft{\noiseVec}) = B\noiseVec \sim \mathcal{N}(\bm{0},\noiseSD^2 BB^\trans), \quad
+\Re(\dft{\noiseVec}) = A\noise \sim \mathcal{N}(\zeroVec,\noiseSD^2 AA^\trans), \quad \Im(\dft{\noiseVec}) = B\noiseVec \sim \mathcal{N}(\zeroVec,\noiseSD^2 BB^\trans), \quad
 \label{eq:Real and imaginary distributions}
 \end{equation}
 However, the covariance matrices of $\Re(\dft{\noiseVec})$ and $\Im(\dft{\noiseVec})$ are rank-deficient, and therefore do not have density functions in the traditional sense; their density functions exist in $\rank(AA^\trans)$ and $\rank(BB^\trans)$-dimensional subspaces of $\mathbb{R}^n$. These density functions can be expressed using the pseudoinverses of the covariance matrices or, equivalently, by defining new transformations based on the rank of $AA^\trans$ and $BB^\trans$ \cite[p.~527-528]{Rao1973}. \par 
@@ -165,7 +165,7 @@ Let $Z_1,\ldots,Z_n$ be $n$ independently distributed random variables, and assu
 
 \begin{lemma}
 \label{lem:App of Ind Thm}
-Let $\noiseVec$ be a random $n$-vector with $\noiseVec \sim \mathcal{N}(\bm{0},\noiseSD^2 I)$, $X = \Re(\dft{\noiseVec})$ and $Y = \Im(\dft{\noiseVec})$. Then $X_j$ and $Y_k$ are independent random variables for each $0 \leq j,k \leq n-1$.
+Let $\noiseVec$ be a random $n$-vector with $\noiseVec \sim \mathcal{N}(\zeroVec,\noiseSD^2 I)$, $X = \Re(\dft{\noiseVec})$ and $Y = \Im(\dft{\noiseVec})$. Then $X_j$ and $Y_k$ are independent random variables for each $0 \leq j,k \leq n-1$.
 \begin{proof}
 Let $X$ and $Y$ be as required. For each $0 \leq j,k \leq n-1$, the components $X_j$ and $Y_k$ are linear combinations of the components of $\noiseVec$, with coefficients given by \eqref{eq:Components Re(F) and Im(F)}:
 \[X_j = \sum_{\ell=0}^{n-1} \frac{1}{\sqrt{n}}\cos\left(\frac{-2\pi{j\ell}}{n}\right)\noise_{\ell}, \quad Y_k = \sum_{\ell=0}^{n-1} \frac{1}{\sqrt{n}}\sin\left(\frac{-2\pi{k\ell}}{n}\right)\noise_{\ell}.\]
@@ -181,7 +181,7 @@ Having established the independence of the components of $\Re(\dft{\noiseVec})$ 
 
 \begin{lemma}
 \label{lem:Component distributions}
-Let $X = \Re(\dft{\noiseVec})$ and $Y = \Im(\dft{\noiseVec})$, where $\noiseVec$ is a random $n$-vector with $\noiseVec \sim \mathcal{N}(\bm{0},\noiseSD^2 I)$. Also let $J = \{0,n/2\}$ if $n$ is even and $J = \{0\}$ if $n$ is odd. Then for $0 \leq j \leq n-1$, the distribution of $X_j$ and $Y_j$ is as follows.  
+Let $X = \Re(\dft{\noiseVec})$ and $Y = \Im(\dft{\noiseVec})$, where $\noiseVec$ is a random $n$-vector with $\noiseVec \sim \mathcal{N}(\zeroVec,\noiseSD^2 I)$. Also let $J = \{0,n/2\}$ if $n$ is even and $J = \{0\}$ if $n$ is odd. Then for $0 \leq j \leq n-1$, the distribution of $X_j$ and $Y_j$ is as follows.  
 \[X_j \sim \begin{cases}
 \mathcal{N}(0,\noiseSD^2), & j \in J \\
 \mathcal{N}(0,\noiseSD^2/2), & j \not\in J \end{cases}, \quad Y_j \sim \begin{cases}
@@ -225,12 +225,12 @@ With the pertinent probability distributions introduced, Theorem \ref{thm:Mag. s
 
 \begin{theorem}
 \label{thm:Mag. squared theorem}
-Let $\noiseVec$ be a random $n$-vector with $\noiseVec \sim \mathcal{N}(\bm{0},\noiseSD^2 I)$. Also let $J = \{0,n/2\}$ if $n$ is even and $J = \{0\}$ if $n$ is odd. Then for $0 \leq j \leq n-1$, the distribution of $|\dft{\noise}_j|^2 = \Re(\dft{\noise}_j)^2 + \Im(\dft{\noise}_j)^2$ is as follows.
+Let $\noiseVec$ be a random $n$-vector with $\noiseVec \sim \mathcal{N}(\zeroVec,\noiseSD^2 I)$. Also let $J = \{0,n/2\}$ if $n$ is even and $J = \{0\}$ if $n$ is odd. Then for $0 \leq j \leq n-1$, the distribution of $|\dft{\noise}_j|^2 = \Re(\dft{\noise}_j)^2 + \Im(\dft{\noise}_j)^2$ is as follows.
 \[|\dft{\noise}_j|^2 \sim \begin{cases}
 \emph{gamma}(1/2,2\noiseSD^2), & j \in J \\
 \emph{exponential}(\noiseSD^2), & j \not\in J \end{cases}.\]
 \begin{proof}
-Let $\noiseVec \sim \mathcal{N}(\bm{0},\noiseSD^2 I)$, $\bm{X} = \Re(\dft{\noiseVec})$, and $\bm{Y} = \Im(\dft{\noiseVec})$. The proof relies on determining the distribution of the components of $\bm{X}^2$ and $\bm{Y}^2$ (here the exponent indicates that the components are individually squared) and then looking at their sum. Determination of the distribution of the components of $\bm{X}^2$ and $\bm{Y}^2$ is carried out by applying a result regarding univariate one-to-one transformations \cite[p.~53]{CasellaBerger02}. Without loss of generality, we assume that $n$ is odd. \par
+Let $\noiseVec \sim \mathcal{N}(\zeroVec,\noiseSD^2 I)$, $\bm{X} = \Re(\dft{\noiseVec})$, and $\bm{Y} = \Im(\dft{\noiseVec})$. The proof relies on determining the distribution of the components of $\bm{X}^2$ and $\bm{Y}^2$ (here the exponent indicates that the components are individually squared) and then looking at their sum. Determination of the distribution of the components of $\bm{X}^2$ and $\bm{Y}^2$ is carried out by applying a result regarding univariate one-to-one transformations \cite[p.~53]{CasellaBerger02}. Without loss of generality, we assume that $n$ is odd. \par
 First consider the components of $\bm{X}^2$. Since $n$ is odd, the two cases of $X^2_j$ to be considered are for $j = 0$ and $j \neq 0$, both of which are handled by Lemma \ref{lem:Component distributions}. If $j = 0$, then $X_j \sim \mathcal{N}(0,\noiseSD^2)$. Letting $g(x) = x^2$, the transformation $U = g(X_j) = X^2_j$ is not one-to-one on the entire sample space $\mathbb{R}$. However, $\mathbb{R}$ can be partitioned as $A_0 \cup A_1 \cup A_2$ with $A_0 = \{0\}$, $A_1 = (-\infty,0)$, and $A_2 = (0,\infty)$. Defining $g_1(x) = x^2$ and $g_2(x) = x^2$ with $g_1^{-1}(u) = -\sqrt{u}$ and $g_2^{-1}(u) = \sqrt{u}$,
 \begin{enumerate}
 \item $g(x) = g_1(x) = g_2(x)$ for all $x \in A_1 \cup A_2$,
@@ -260,7 +260,7 @@ This is the density function of the exponential distribution with scale paramete
 \end{proof}
 \end{theorem}
 
-The statistics of the DFT of white noise are now established, which allows the focus to be shifted towards analyzing the combination $\gVec + \noiseVec = \gnoiseVec$. By the properties of the multivariate normal distribution, if $\noiseVec \sim \mathcal{N}(\bm{0},\noiseSD^2 I)$ then $\gnoiseVec \sim \mathcal{N}(\gVec,\noiseSD^2 I)$ because $\gVec$ is a constant vector. Thus the distribution of the components of $\Re(\dft{\gnoiseVec})$ and $\Im(\dft{\gnoiseVec})$ are readily obtained by extending previous results.
+The statistics of the DFT of white noise are now established, which allows the focus to be shifted towards analyzing the combination $\gVec + \noiseVec = \gnoiseVec$. By the properties of the multivariate normal distribution, if $\noiseVec \sim \mathcal{N}(\zeroVec,\noiseSD^2 I)$ then $\gnoiseVec \sim \mathcal{N}(\gVec,\noiseSD^2 I)$ because $\gVec$ is a constant vector. Thus the distribution of the components of $\Re(\dft{\gnoiseVec})$ and $\Im(\dft{\gnoiseVec})$ are readily obtained by extending previous results.
 
 \begin{lemma}[Extension of Lemma \ref{lem:Component distributions}]
 \label{lem:Component distributions ext.}
@@ -434,7 +434,7 @@ A step in Theorem \ref{thm:Cov of mag squared} is to determine covariances betwe
 
 \begin{lemma}
 \label{lem:App of Ind Thm 3}
-Let $\noise \sim \mathcal{N}(\bm{0},\noiseSD^2 I)$, $A$ and $B$ be the real and imaginary parts, respectively, of the $n \times n$ DFT matrix, $J = \{0,n/2\}$ if $n$ is even and $J = \{0\}$ if $n$ is odd. Define the diagonal matrix $M$ by
+Let $\noise \sim \mathcal{N}(\zeroVec,\noiseSD^2 I)$, $A$ and $B$ be the real and imaginary parts, respectively, of the $n \times n$ DFT matrix, $J = \{0,n/2\}$ if $n$ is even and $J = \{0\}$ if $n$ is odd. Define the diagonal matrix $M$ by
 \[M_{j,j} = \begin{cases}
 1/\noiseSD & j \in J \\
 \sqrt{2}/\noiseSD & j \not\in J
@@ -636,7 +636,7 @@ Let $A$ be the real part of the Fourier matrix \eqref{eq:DFT-Matrix}. Then $\Re(
 %P & Q
 %\end{bmatrix}^\trans MA\noiseVec.\]
 %Recalling that $\noiseVec \sim \mathcal{N}(\mathbf{0},\noiseSD^2 I)$, $\E(\bm{\xi}) = Q^\trans\mathbf{0} = \mathbf{0}$ (the dimension of the zero vector changes from $n \times 1$ to $(n-r) \times 1$). By the construction of $Q$, $\Var(\bm{\xi}) = Q^\trans \Sigma Q = \mathbf{0}$, which is the $(n-r) \times (n-r)$ zero matrix. Thus $\bm{\xi}$ is equal to the $(n-r) \times 1$ zero vector with probability 1. \par 
-%In contrast, $\bm{\nu} \sim \mathcal{N}(P^\trans\bm{0},P^\trans \Sigma P) = \mathcal{N}(\bm{0},P^\trans \Sigma P)$; here the second zero vector $\bm{0}$ has dimension $r \times 1$. Since the columns of $P$ belonging in the columns space of $\Sigma$ are orthonormal, $\det(P^\trans \Sigma P) = \pdet(\Sigma) \neq 0$. Therefore $P^\trans \Sigma P$ is nonsingular, and so the probability density function of $\bm{\nu}$ is
+%In contrast, $\bm{\nu} \sim \mathcal{N}(P^\trans\zeroVec,P^\trans \Sigma P) = \mathcal{N}(\zeroVec,P^\trans \Sigma P)$; here the second zero vector $\zeroVec$ has dimension $r \times 1$. Since the columns of $P$ belonging in the columns space of $\Sigma$ are orthonormal, $\det(P^\trans \Sigma P) = \pdet(\Sigma) \neq 0$. Therefore $P^\trans \Sigma P$ is nonsingular, and so the probability density function of $\bm{\nu}$ is
 %\begin{equation}
 %\label{eq:Nu density}
 %f(\bm{\nu}) = \frac{1}{(2\pi)^{r/2}\pdet(\Sigma)}\exp\left(-\bm{\nu}^\trans(P^\trans \Sigma P)^{-1}\bm{\nu}\right).

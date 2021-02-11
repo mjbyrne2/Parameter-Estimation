@@ -68,7 +68,7 @@ where $D$ is the matrix representation of a linear operator and $\|\cdot\|$ is t
 \regparam D
 \end{bmatrix}\fVec - \begin{bmatrix}
 \gnoiseVec \\
-\bm{0}
+\zeroVec
 \end{bmatrix} \right\|^2.
 \label{eq:TikSol3}
 \end{equation}
@@ -117,7 +117,7 @@ M^{-1} \\
 \mathbf{0}
 \end{bmatrix}V^\trans, \quad \fVec_0 = \sum_{\ell=m+1}^{n} U_{\cdot,\ell}^\trans\gnoiseVec X_{\cdot,\ell}
 \end{equation}
-where $\bm{0}$ is the zero matrix of appropriate dimension. The form of the regularized solution can be expressed as \eqref{eq:TikSol Standard Form} with substitutions $\mathbf{y} = D\fVec$, $A = \kMat{D_{\kMat}^\dagger}$, and $\mathbf{b} = \gnoiseVec - \kMat\fVec_0$. 
+where $\zeroVec$ is the zero matrix of appropriate dimension. The form of the regularized solution can be expressed as \eqref{eq:TikSol Standard Form} with substitutions $\mathbf{y} = D\fVec$, $A = \kMat{D_{\kMat}^\dagger}$, and $\mathbf{b} = \gnoiseVec - \kMat\fVec_0$. 
 %This is shown by writing
 %\begin{align*}
 %\|A\mathbf{y} - \mathbf{b}\|^2 + \regparam^2\|\mathbf{y}\|^2 &= \|\kMat{D_{\kMat}^\dagger}D\fVec - (\gnoiseVec - \kMat\fVec_0)\|^2 + \regparam^2\|D\fVec\|^2 \\
@@ -347,12 +347,12 @@ Again a modification of the scale factor and rewriting the argument of sine prod
 \section{Downsampling and white noise} \label{sec:Downsampling and white noise}
 While analysis has been conducted regarding the convergence of predictive and estimation error for Tikhonov regularization as the number of sample points becomes large \cite[p.~109-126]{Vogel:2002}, the effects of reducing the number of sample points must be explored. \par  
 To formalize the concept of downsampling, consider $\mathbf{z} = [z_0,z_2,\ldots,z_{n-1}]$. Then a vector $\mathbf{y}$ is called a downsampling of $\mathbf{z}$ if $\mathbf{y} = [z_{n_0},z_{n_1},\ldots,z_{n_{m-1}}]$, where $m \leq n$ and $n_j:\{0,1,\ldots,{m-1}\}\rightarrow\{0,1,\ldots,{n-1}\}$ is a strictly increasing function. This definition is analogous to the definition of a subsequence except with a finite number of terms. \par
-Theoretically, the variance of the noise vector does not change when a vector is downsampled because of the properties of variance. For any $m\times n$ matrix $M$ and $n$-vector $\noiseVec \sim \mathcal{N}(\bm{0},\noiseSD^2I)$
+Theoretically, the variance of the noise vector does not change when a vector is downsampled because of the properties of variance. For any $m\times n$ matrix $M$ and $n$-vector $\noiseVec \sim \mathcal{N}(\zeroVec,\noiseSD^2I)$
 \begin{equation}
 \Var(M\noiseVec) = M\Var(\noiseVec)M^{\trans} = \noiseSD^2MIM^{\trans} = \noiseSD^2MM^{\trans}
 \label{eq:VarProp}
 \end{equation}
-where $MM^\trans$ is an $m \times m$ matrix. Certainly for arbitrary $M$, $MM^\trans$ can differ from an $m \times m$ identity matrix, which would mean that the new noise vector $M\noiseVec$ no longer represents white noise. However, given an $n$-vector $\noiseVec \sim \mathcal{N}(\bm{0},\noiseSD^2I)$ and the goal of obtaining a downsampled version of $\noiseVec$, a matrix $E$ can be found such that $E\noiseVec$ is the downsampled vector. Since the DFT and DCT are utilized in the regularization process, a downsampled vector whose components are still equidistant from adjacent components is desirable. If the finest sampling $\tVec$ of the interval $[0,1]$ has $N = 2^L$ points, a natural downsampling with this property would be to select every other component of $\tVec$. The resulting downsampled vector would then have length $N/2 = 2^{L-1}$. A matrix $E$ that accomplishes this downsampling is the $N/2 \times N$ matrix defined as
+where $MM^\trans$ is an $m \times m$ matrix. Certainly for arbitrary $M$, $MM^\trans$ can differ from an $m \times m$ identity matrix, which would mean that the new noise vector $M\noiseVec$ no longer represents white noise. However, given an $n$-vector $\noiseVec \sim \mathcal{N}(\zeroVec,\noiseSD^2I)$ and the goal of obtaining a downsampled version of $\noiseVec$, a matrix $E$ can be found such that $E\noiseVec$ is the downsampled vector. Since the DFT and DCT are utilized in the regularization process, a downsampled vector whose components are still equidistant from adjacent components is desirable. If the finest sampling $\tVec$ of the interval $[0,1]$ has $N = 2^L$ points, a natural downsampling with this property would be to select every other component of $\tVec$. The resulting downsampled vector would then have length $N/2 = 2^{L-1}$. A matrix $E$ that accomplishes this downsampling is the $N/2 \times N$ matrix defined as
 \begin{equation}
 E = [\mathbf{e}_0 \: \mathbf{0} \: \mathbf{e}_1 \: \mathbf{0} \: \mathbf{e}_2 \: \mathbf{0} \ldots \mathbf{e}_{N-2} \: \mathbf{0}]
 \label{eq:Downsampling matrix}
