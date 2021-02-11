@@ -1,8 +1,5 @@
 \documentclass[12pt,letterpaper]{report}
-\usepackage{amsmath,amssymb,amsthm,bm,enumitem}
-\usepackage{geometry,graphicx,subcaption,sidecap}
-\geometry{margin = 1 in}
-\usepackage{color}
+
 \usepackage{natbib}
 \usepackage{geometry}
 \usepackage{fancyhdr}
@@ -11,8 +8,7 @@
 \usepackage{dcolumn,array}
 \usepackage{tocloft}
 \usepackage{asudis}
-%\usepackage[pageanchor=true,plainpages=false,pdfpagelabels,bookmarks,bookmarksnumbered]{hyperref}
-\usepackage{hyperref}
+\usepackage[pageanchor=true,plainpages=false,pdfpagelabels,bookmarks,bookmarksnumbered]{hyperref}
 
 %%%%%%%%%%%%%%%%%%%% Package  %%%%%%%%%%%%%%%%%%%%
 \usepackage[T1]{fontenc}
@@ -21,7 +17,7 @@
 \usepackage{tikz}
 \usepackage{theorem}
 \usepackage{color}               
-\usepackage{fancybox}           % pour \ovalbox
+\usepackage{fancybox}
 \usepackage[active]{srcltx}
 \usepackage{romannum}
 \usepackage{subfig}
@@ -31,89 +27,140 @@
 \usepackage{amsmath}
  \usepackage{paralist}
 %\usepackage{subfigure}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\argmax}{arg\,max}
 \usepackage{rotating}
 
 %%%%%%%%%%%%%%%%%%%% Environnement  %%%%%%%%%%%%%%%%%%%%
-\theorembodyfont{\normalfont\slshape} % on remet la config normal
+\theorembodyfont{\normalfont\slshape}
 \newtheorem{definition}{Definition}
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}{Proposition}[section]
+\newtheorem{corollary}[proposition]{Corollary}
+\newtheorem{propriety}[proposition]{Propriety}
+\newtheorem{lemma}[proposition]{Lemma}
+\newtheorem{remark}[proposition]{Remark}
+\newtheorem{remarks}[proposition]{Remarks}
+\newtheorem{example}[proposition]{Example}
+\newenvironment{proof}%
+{{\par\noindent \bf Proof. \nobreak}}%
+{\nobreak \removelastskip \nobreak \hfill $\Box$ \medbreak}
+\newenvironment{proof2}%
+{{\par\noindent \bf Proof \nobreak}}%
+{\nobreak \removelastskip \nobreak \hfill $\Box$ \medbreak}
+\newenvironment{proof_lem}%
+{{\par\noindent \bf Proof lemma. \nobreak}}%
+{\nobreak \removelastskip \nobreak \bf End proof lemma. \medbreak}
 %%%%%%%%%%%%%%%%%%%% Numbers equation  %%%%%%%%%%%%%%%%%%%%
 \def\theequation{\thesection.\arabic{equation}}
-\def\Section#1{\setcounter{equation}{0} \section{#1} \markboth{#1}{#1}\leavevmode\par}
+\def\Section#1{\setcounter{equation}{0} \section{#1} \markboth{#1}{#1}
+  \leavevmode\par}
 \def\paragraph#1{{\bf #1\ }}
 
 %%%%%%%%%%%%%%%%%%%% Macros  %%%%%%%%%%%%%%%%%%%%
+\newcommand{\expo}{\mathrm{e}}
+\newcommand{\ds}{\displaystyle}
+\newcommand{\nb}{\nonumber}
+\newcommand{\Esp}{\mathrm{E}}
+\newcommand{\Cor}{\mathrm{Cor}}
+\newcommand{\dd}{\mathrm{d}}
+
+%%%%%%%%%%%%%%%%%%%% My Commands  %%%%%%%%%%%%%%%%%%%%
+\renewcommand{\arraystretch}{1.5}	% Change of table scale factor
+
 % Discrete notation:
-\newcommand{\gVec}{\mathbf{g}}	% Vector
-\newcommand{\gnoise}{\widetilde{g}}	% Component
-\newcommand{\gnoiseVec}{\widetilde{\mathbf{g}}}	% Vector
+\newcommand{\aVec}{\mathbf{a}}	% Vector
+\newcommand{\bVec}{\mathbf{b}}	% Vector
+\newcommand{\cVec}{\mathbf{c}}	% Vector
+\newcommand{\dVec}{\mathbf{d}}	% Vector
 \newcommand{\kVec}{\mathbf{k}}	% Vector
-\newcommand{\kMat}{K}	% Matrix K
+\newcommand{\kMat}{K}				% Matrix
+\newcommand{\pVec}{\mathbf{p}}	% Vector
+\newcommand{\rVec}{\mathbf{r}}	% Vector
 \newcommand{\fVec}{\mathbf{f}}	% Vector
+\newcommand{\gVec}{\mathbf{g}}	% Vector
+\newcommand{\xVec}{\mathbf{x}}	% Vector
+\newcommand{\xTrue}{\mathbf{x}_{\text{true}}}	% Vector (true solution)
+\newcommand{\yVec}{\mathbf{y}}	% Vector
 \newcommand{\tVec}{\mathbf{t}}	% Vector
-\newcommand{\dVec}{\mathbf{d}}	% Differential operator vector
-\newcommand{\trans}{\mathrm{T}}	% Matrix transpose
-\newcommand{\ctrans}{*}	% Conjugate transpose
+\newcommand{\uVec}{\mathbf{u}}	% Vector
+\newcommand{\wVec}{\mathbf{w}}	% Vector
+\newcommand{\trans}[1]{{#1}^\mathsf{T}}	% Matrix transpose
+\newcommand{\ctrans}[1]{{#1}^\mathsf{H}}	% Hermitian transpose
+\newcommand{\inv}[1]{{#1}^{-1}}	% Inverse of a matrix
+\newcommand{\pinv}[1]{{#1}^\dagger}	% Inverse of a matrix
+\newcommand{\partition}{\omega}  % Partition values
+\newcommand{\midpoint}{\partition_{\text{m}}}   % Midpoint partition values
 \DeclareMathOperator{\trace}{trace}		% Trace
 \DeclareMathOperator{\diag}{diag}	% Diagonal matrix
 \DeclareMathOperator{\rank}{rank}	% Rank of a matrix
 \DeclareMathOperator{\range}{range}	% Range (space) of a matrix
 \DeclareMathOperator{\nullspace}{null}	% Null (space) of a matrix
+\DeclareMathOperator{\proj}{proj}	% Projection
 \DeclareMathOperator{\pdet}{det^\dagger}	
 \DeclareMathOperator{\sgn}{sgn}	% Signum function
 \DeclareMathOperator{\alias}{A}	% Aliasing operator
 \newcommand{\dct}[1]{\breve{#1}}	% DCT of vector
-\newcommand{\dft}[1]{\dft{#1}}	% DFT of vector
+\newcommand{\dft}[1]{\widehat{#1}}	% DFT of vector
+\DeclareMathOperator{\vcat}{vcat}	% Concatenation of vector
 \DeclareMathOperator{\shift}{\sigma}	% Shift operator
+
 % Regularization notation:
-\newcommand{\regparam}{\alpha}
+\newcommand{\regparam}{\alpha}  % Regularization parameter
+\newcommand{\regparamVec}{\bm{\regparam}}   % Vector of regularization parameters
 \newcommand{\R}{R_{\regparam}}	% Regularization matrix
 \newcommand{\regf}{\fVec_{\regparam}}	% Regularized solution
-\DeclareMathOperator*{\argmax}{arg\,max}
-\DeclareMathOperator*{\argmin}{arg\,min}
+\newcommand{\xReg}{\xVec(\regparam)}	% Regularized solution
+\newcommand{\xWin}{\xVec_{\text{win}}(\regparam)}	% Windowed regularized solution
+\newcommand{\xSol}{\xVec}	% True solution
+
 % Filter function:
 \newcommand{\filt}{\phi}
 \newcommand{\mfilt}{\psi}
+
 % Statistics notation:
 \newcommand{\noise}{\eta}	% Noise (single component/variable)
 \newcommand{\noiseSD}{\sigma}	% Standard deviation
-\newcommand{\noiseVec}{\bm{\noise}}	% Noise vector
+\newcommand{\noiseVec}{\boldsymbol{\noise}}	% Noise vector
+\newcommand{\gnoiseVec}{\widetilde{\gVec}}	% Vector
 \DeclareMathOperator{\Var}{Var}	% Variance
 \DeclareMathOperator{\Cov}{Cov}	% Covariance
 \DeclareMathOperator{\E}{E}	% Expected value
 \renewcommand{\Re}{\operatorname{Re}}	% Real part
 \renewcommand{\Im}{\operatorname{Im}}	% Imaginary part
 \newcommand{\NCchi}{\chi'\:}	% Noncentral chi-squared
-% Singular values and vectors:
+\newcommand{\zeroVec}{\boldsymbol{0}}	% Noise (single component/variable)
+
+% SVD notation:
 \newcommand{\singular}{s}	% Singular values
+\newcommand{\svd}[1]{\widehat{#1}}	% Notation for (U^T)d
+
 % UPRE derivation notation:
-\newcommand{\PE}{\mathbf{p}_{\regparam}}	% Predictive error
 \newcommand{\regres}{\mathbf{r}_{\regparam}}	% Regularized residual
 \newcommand{\A}{A_{\regparam}}	% Influence matrix
 \newcommand{\U}{U}	% UPRE function
+\newcommand{\avgU}{\overline{U}}	% UPRE function
+\newcommand{\UPRE}{\text{UPRE}}	% Text of UPRE for use in math mode
+\newcommand{\Uwin}{\U_{\text{win}}}	% Windowed UPRE function
+
 % GCV derivation notation:
-\newcommand{\GCV}{G}	% GCV function
+\newcommand{\G}{G}	% GCV function
+\newcommand{\GCV}{\text{GCV}}	% Text of GCV for use in math mode
+\newcommand{\Gwin}{\G_{\text{win}}}	% Windowed GCV function
+
 % Discrepancy principle derivation notation:
 \newcommand{\D}{D}	% Discrepancy principle function
-% Rosie's commands
-\newcommand{\comment}[1]{\textcolor{red}{ \textbf{Comment}: #1}}
-\newcommand{\ToDo}[1]{\textcolor{green}{\textbf{#1}}}
-% Defining Trace Lemma
-\newtheorem*{TL}{Trace Lemma}
-% Defining Complex Trace Lemma
-\newtheorem*{CTL}{Trace Lemma (DFT version)}
-% General Lemma
-%\newtheorem{lemma}{Lemma}[section]
-% Sampling Theorem
-%\newtheorem*{SWST}{Shannon-Whittaker Sampling Theorem}
-% General Theorem
-%\newtheorem{theorem}{Theorem}[section]
-% General Corollary
-\newtheorem{corollary}{Corollary}[theorem]
+\newcommand{\MDP}{\text{MDP}}	% Text of MDP for use in math mode
+\newcommand{\safeparam}{\epsilon}	% Safety parameter for the MDP method
+\newcommand{\Dwin}{\D_{\text{win}}}	% Windowed GCV function
+
+\newtheorem{assumption}{Assumption}
+
 
 \begin{document}
 %-----------------------front matter
 \pagenumbering{roman}
-\title{Resolution analyses and estimation of regularization parameters for the inversion of integral equations}
+\title{Mathematical Modeling of Novel Cancer Therapies}
 \author{Michael Byrne}
 \degreeName{Doctor of Philosophy}
 \paperType{Dissertation}
@@ -122,20 +169,16 @@
 \gradmonth{May }
 \gradyear{2021}
 \chair{Rosemary Renaut}
-\memberOne{Carl Gardner}
+\memberOne{Bruno Welfert}
 \memberTwo{Jana Gevertz}
 \memberThree{Yun Kang}
 \memberFour{Eric Kostellich}
 
 \maketitle
 \doublespace
-
-\begin{abstract}
-Integral equations and their solutions have been studied since the development of integral calculus. A specific class of integral equations are the Fredholm equations of the first kind, where the desired solution is contained in the integrand. In a discrete setting, numerical quadrature can be utilized to approximate finite values of the integral equation. Methods such as the singular value decomposition can be used to find approximate discrete solutions. However, applications involving integral equations often result in data that are corrupted by additive noise inherent in the collecting physical measurements. During the inversion process, this noise can be amplified which results in solutions that are of severely poor quality. The intractability of this phenomenon can be mitigated using regularization, in which assumptions about desired solution properties are mathematically implemented during the inversion process. The influence of these properties are controlled by a regularization parameter $\regparam$. The determination of an appropriate value of $\regparam$ involves additional mathematical methods. Thus for large scale problems it would be beneficial to reduce the computational cost of such methods. In this prospectus, Tikhonov regularization is considered for the solution of convolution-type integral equations in one and two dimensions. The unbiased predictive risk estimator method, the generalized cross validation method, and the discrepancy principle are the methods selected to determine regularization parameters. The generated data are downsampled and the efficacy of the resulting regularization parameters is evaluated. The discrete cosine and Fourier transforms are used during the implementation of the methods used to select the regularization parameters; these transforms also serve as possible means for analyzing the effects of downsampling.
-\end{abstract}
-
+\include{Abstract}
 \tableofcontents
-% This puts the word "Page" right justified above everything else:
+% This puts the word "Page" right justified above everything else.
 \addtocontents{toc}{~\hfill Page\par}
 % Asking LaTeX for a new page here guarantees that the LOF is on a separate page
 % after the TOC ends.
@@ -162,11 +205,6 @@ Integral equations and their solutions have been studied since the development o
 \doublespace
 \pagenumbering{arabic}
 \include{Chapter1}
-\include{Chapter2}
-\include{Chapter3}
-\include{Chapter4}
-\include{Chapter5}
-\include{Conclusion}
 
 %-----------------------back matter
 
@@ -175,12 +213,14 @@ Integral equations and their solutions have been studied since the development o
 % level -1 according to the chart: top of page 4 of the document at
 % ftp://tug.ctan.org/pub/tex-archive/macros/latex/contrib/tocloft/tocloft.pdf
 \addcontentsline{toc}{part}{REFERENCES}
-\bibliographystyle{asudis}  % Or siam
-\bibliography{Parameter-Estimation}}
+\bibliographystyle{asudis}
+\bibliography{mybib}}
 
 \renewcommand{\chaptername}{APPENDIX}
 \addtocontents{toc}{APPENDIX \par}
 \appendix
 \include{Appendix}
+%\include{appendices/appendix4}
 
 \end{document}
+%
