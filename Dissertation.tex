@@ -31,34 +31,14 @@
 \usepackage{amsmath}
  \usepackage{paralist}
 %\usepackage{subfigure}
-\DeclareMathOperator*{\argmin}{arg\,min}
-\DeclareMathOperator*{\argmax}{arg\,max}
 \usepackage{rotating}
 
 %%%%%%%%%%%%%%%%%%%% Environnement  %%%%%%%%%%%%%%%%%%%%
 \theorembodyfont{\normalfont\slshape} % on remet la config normal
 \newtheorem{definition}{Definition}
-\newtheorem{theorem}{Theorem}
-\newtheorem{proposition}{Proposition}[section]
-\newtheorem{corollary}[proposition]{Corollary}
-\newtheorem{propriety}[proposition]{Propriety}
-\newtheorem{lemma}[proposition]{Lemma}
-\newtheorem{remark}[proposition]{Remark}
-\newtheorem{remarks}[proposition]{Remarks}
-\newtheorem{example}[proposition]{Example}
-\newenvironment{proof}%
-{{\par\noindent \bf Proof. \nobreak}}%
-{\nobreak \removelastskip \nobreak \hfill $\Box$ \medbreak}
-\newenvironment{proof2}%
-{{\par\noindent \bf Proof \nobreak}}%
-{\nobreak \removelastskip \nobreak \hfill $\Box$ \medbreak}
-\newenvironment{proof_lem}%
-{{\par\noindent \bf Proof lemma. \nobreak}}%
-{\nobreak \removelastskip \nobreak \bf End proof lemma. \medbreak}
 %%%%%%%%%%%%%%%%%%%% Numbers equation  %%%%%%%%%%%%%%%%%%%%
 \def\theequation{\thesection.\arabic{equation}}
-\def\Section#1{\setcounter{equation}{0} \section{#1} \markboth{#1}{#1}
-  \leavevmode\par}
+\def\Section#1{\setcounter{equation}{0} \section{#1} \markboth{#1}{#1}\leavevmode\par}
 \def\paragraph#1{{\bf #1\ }}
 
 %%%%%%%%%%%%%%%%%%%% Macros  %%%%%%%%%%%%%%%%%%%%
@@ -122,11 +102,11 @@
 % Defining Complex Trace Lemma
 \newtheorem*{CTL}{Trace Lemma (DFT version)}
 % General Lemma
-\newtheorem{lemma}{Lemma}[section]
+%\newtheorem{lemma}{Lemma}[section]
 % Sampling Theorem
-\newtheorem*{SWST}{Shannon-Whittaker Sampling Theorem}
+%\newtheorem*{SWST}{Shannon-Whittaker Sampling Theorem}
 % General Theorem
-\newtheorem{theorem}{Theorem}[section]
+%\newtheorem{theorem}{Theorem}[section]
 % General Corollary
 \newtheorem{corollary}{Corollary}[theorem]
 
