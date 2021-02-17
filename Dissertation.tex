@@ -33,6 +33,7 @@
 
 %%%%%%%%%%%%%%%%%%%% Environnement  %%%%%%%%%%%%%%%%%%%%
 \theorembodyfont{\normalfont\slshape}
+\newtheorem{assumption}{Assumption}
 \newtheorem{definition}{Definition}
 \newtheorem{theorem}{Theorem}
 \newtheorem{proposition}{Proposition}[section]
@@ -154,9 +155,6 @@
 \newcommand{\safeparam}{\epsilon}	% Safety parameter for the MDP method
 \newcommand{\Dwin}{\D_{\text{win}}}	% Windowed GCV function
 
-\newtheorem{assumption}{Assumption}
-
-
 \begin{document}
 %-----------------------front matter
 \pagenumbering{roman}
@@ -205,6 +203,10 @@
 \doublespace
 \pagenumbering{arabic}
 \include{Chapter1}
+\include{Chapter2}
+\include{Chapter3}
+\include{Chapter4}
+\include{Chapter5}
 
 %-----------------------back matter
 
@@ -214,7 +216,7 @@
 % ftp://tug.ctan.org/pub/tex-archive/macros/latex/contrib/tocloft/tocloft.pdf
 \addcontentsline{toc}{part}{REFERENCES}
 \bibliographystyle{asudis}
-\bibliography{mybib}}
+\bibliography{Parameter-Estimation}}
 
 \renewcommand{\chaptername}{APPENDIX}
 \addtocontents{toc}{APPENDIX \par}
