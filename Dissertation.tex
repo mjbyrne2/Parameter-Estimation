@@ -25,7 +25,7 @@
 \usepackage{algpseudocode}
 %\usepackage[inline]{enumitem}
 \usepackage{amsmath}
- \usepackage{paralist}
+\usepackage{paralist}
 %\usepackage{subfigure}
 \DeclareMathOperator*{\argmin}{arg\,min}
 \DeclareMathOperator*{\argmax}{arg\,max}
@@ -88,6 +88,7 @@
 \newcommand{\wVec}{\mathbf{w}}	% Vector
 \newcommand{\trans}[1]{{#1}^\mathsf{T}}	% Matrix transpose
 \newcommand{\ctrans}[1]{{#1}^\mathsf{H}}	% Hermitian transpose
+\newcommand{\invTrans}[1]{{#1}^{-\mathsf{T}}}	% Inverse of transposed matrix
 \newcommand{\inv}[1]{{#1}^{-1}}	% Inverse of a matrix
 \newcommand{\pinv}[1]{{#1}^\dagger}	% Inverse of a matrix
 \newcommand{\partition}{\omega}  % Partition values
@@ -158,7 +159,7 @@
 \begin{document}
 %-----------------------front matter
 \pagenumbering{roman}
-\title{Mathematical Modeling of Novel Cancer Therapies}
+\title{Adaptive methods for the selection of regularization parameters}
 \author{Michael Byrne}
 \degreeName{Doctor of Philosophy}
 \paperType{Dissertation}

@@ -9,104 +9,104 @@ Here ``best'' is used to indicate the fact that the parameter is chosen to minim
 
 \section{Unbiased Predictive Risk Estimator} \label{sec:Unbiased Predictive Risk Estimator}
 The unbiased predictive risk estimator (UPRE) method \cite{Mallows1973} is derived by considering the quantity
-\[\PE := \kMat(\regf - \fVec).\]
-This quantity $\PE$ is known as the \textit{predictive error}, and is an alternative to solution error defined as $\regf - \fVec$. Given the above definition, the mean squared norm of the predictive error is
-\[\frac{1}{n}\|\PE\|^2 = \frac{1}{n}\|\kMat(\regf - \fVec)\|^2\]
-which is called the predictive risk.  As a first step in deriving the UPRE method, assume that the noise $\noiseVec$ is a random vector, instead of a realization of a random vector. Direct consequences of this assumption are that $\gVec$ and $\regf$ are random vectors and the predictive risk $(1/n)\|\PE\|^2$ is a random variable. \par
+\[\pVec(\regparam) := \kMat(\regf - \fVec).\]
+This quantity $\pVec(\regparam)$ is known as the \textit{predictive error}, and is an alternative to solution error defined as $\regf - \fVec$. Given the above definition, the mean squared norm of the predictive error is
+\[\frac{1}{n}\|\pVec(\regparam)\|^2 = \frac{1}{n}\|\kMat(\regf - \fVec)\|^2\]
+which is called the predictive risk.  As a first step in deriving the UPRE method, assume that the noise $\noiseVec$ is a random vector, instead of a realization of a random vector. Direct consequences of this assumption are that $\gVec$ and $\regf$ are random vectors and the predictive risk $(1/n)\|\pVec(\regparam)\|^2$ is a random variable. \par
 Next, an $n \times n$ matrix $\A$ is defined as $\A = \kMat\R$ where $\R$ is a regularization matrix. The notation $\A$ is chosen to indicate that the matrix depends upon the regularization parameter contained in $\R$. Using the influence matrix with $\regf = \R\gnoiseVec$, the predictive error can be rewritten:
 \begin{align*}
-\PE &= \kMat\regf - \kMat\fVec \\
+\pVec(\regparam) &= \kMat\regf - \kMat\fVec \\
 &= \A\gnoiseVec - \kMat\fVec \\
 &= \A(\kMat\fVec + \noiseVec) - \kMat\fVec \\
 &= (\A - I)\kMat\fVec + \A\noiseVec
 \end{align*}
 By the assumption that $\noiseVec$ is a discrete white noise vector, the Trace Lemma can be utilized to obtain an expression for the expected value of predictive risk.
 
-\begin{TL}[{{\cite[p.~98]{Vogel:2002}}}]
+\begin{lemma}[{{\cite[p.~98]{Vogel:2002}}}]
 Let $f \in \mathcal{H}$, where $\mathcal{H}$ is a deterministic real Hilbert space, let $\noiseVec$ be a discrete noise vector with $\noiseVec \sim \mathcal{N}(0,\noiseSD^2)$, and let $B: \mathbb{R}^n \rightarrow \mathcal{H}$ be a bounded linear operator. Then
 \[\E(\|f + B\noise\|_{\mathcal{H}}^2) = \|f\|_{\mathcal{H}}^2 + \noiseSD^2\trace({B^*}B)\]
 where $B^*$ denotes the adjoint of $B$.
-\end{TL}
+\end{lemma}
 \begin{proof}
 By the linearity of inner products and the expected value operator,
 \[\E(\|f + B\noiseVec\|_{\mathcal{H}}^2) = \E(\langle f + B\noiseVec, f + B\noiseVec\rangle_{\mathcal{H}}) = \E(\|f\|_{\mathcal{H}}^2) + 2\E(\langle f, B\noiseVec\rangle_{\mathcal{H}}) + \E(\langle B\noiseVec, B\noiseVec\rangle_{\mathcal{H}}).\]
 The term $\E(\|f\|_{\mathcal{H}}^2)$ reduces to $\|f\|_{\mathcal{H}}^2$ because $f$ is an element of a deterministic Hilbert space. Next, the inner products can be rewritten using the adjoint of $B$:
 \begin{align*}
 \E(\|f + B\noiseVec\|_{\mathcal{H}}^2) &= \|f\|_{\mathcal{H}}^2 + 2\E(\langle f, B\noiseVec\rangle_{\mathcal{H}}) + \E(\langle B\noiseVec, B\noiseVec\rangle_{\mathcal{H}}) \\
-&= \|f\|_{\mathcal{H}}^2 + 2\E(({B^*}f)^\trans\noiseVec) + \E({\noiseVec^\trans}{B^*}B\noiseVec) \\
-&= \|f\|_{\mathcal{H}}^2 + 2\sum_{j=1}^n ({B^*}f)_j \E(\noise_j) + \sum_{j=1}^n\sum_{k=1}^n ({B^*}B)_{jk} \E({\noise_j}{\noise_k})
+&= \|f\|_{\mathcal{H}}^2 + 2\E(\trans{({\ctrans{B}}f)}\noiseVec) + \E({\trans{\noiseVec}}{\ctrans{B}}B\noiseVec) \\
+&= \|f\|_{\mathcal{H}}^2 + 2\sum_{j=1}^n ({B^*}f)_j \E(\noise_j) + \sum_{j=1}^n\sum_{k=1}^n ({\ctrans{B}}B)_{jk} \E({\noise_j}{\noise_k})
 \end{align*}
 Since $\noiseVec \sim \mathcal{N}(0,\noiseSD^2)$, the expected values of $\noise_j$ and ${\noise_j}{\noise_k}$ are zero and $\noiseSD^2\delta_{jk}$, respectively. Therefore the second term above is zero and the third term is a summation expression for $\noiseSD^2\trace({B^*}B)$.
 \end{proof}
 
 \noindent Applying the Trace Lemma to the expression for predictive risk yields
-\[\E\left(\frac{1}{n}\|\PE\|^2\right) = \frac{1}{n}\E\left(\|(\A-I)\kMat\fVec + \A\noiseVec\|^2\right) = \frac{1}{n}\|(\A-I)\kMat\fVec\|^2 + \frac{\noiseSD^2}{n}\trace({\A^\trans}\A).\]
-If Tikhonov regularization is used, then the influence matrix $\A$ is $\kMat(\kMat^\ctrans\kMat + \regparam{D^\ctrans}D)^{-1}\kMat^\ctrans$. The matrix $(\kMat^\ctrans\kMat + \regparam{D^\ctrans}D)^{-1}$ is symmetric as a result of $\kMat^\ctrans\kMat$ and $\regparam{D^\ctrans}D$ being individually symmetric, and thus the corresponding influence matrix $\A$ is symmetric.  With a symmetric matrix $\A$, the expected value of predictive risk is simplified to
+\[\E\left(\frac{1}{n}\|\pVec(\regparam)\|^2\right) = \frac{1}{n}\E\left(\|(\A-I)\kMat\fVec + \A\noiseVec\|^2\right) = \frac{1}{n}\|(\A-I)\kMat\fVec\|^2 + \frac{\noiseSD^2}{n}\trace({\trans{\A}}\A).\]
+If Tikhonov regularization is used, then the influence matrix $\A$ is $\kMat(\ctrans{\kMat}\kMat + \regparam{\ctrans{D}}D)^{-1}\ctrans{\kMat}$. The matrix $(\ctrans{\kMat}\kMat + \regparam{\ctrans{D}}D)^{-1}$ is symmetric as a result of $\ctrans{\kMat}\kMat$ and $\regparam\ctrans{D}D$ being individually symmetric, and thus the corresponding influence matrix $\A$ is symmetric.  With a symmetric matrix $\A$, the expected value of predictive risk is simplified to
 \begin{equation}
 \label{eq:PR}
-\E\left(\frac{1}{n}\|\PE\|^2\right) = \frac{1}{n}\|(\A-I)\kMat\fVec\|^2 + \frac{\noiseSD^2}{n}\trace(\A^2).
+\E\left(\frac{1}{n}\|\pVec(\regparam)\|^2\right) = \frac{1}{n}\|(\A-I)\kMat\fVec\|^2 + \frac{\noiseSD^2}{n}\trace(\A^2).
 \end{equation}
 \indent The last step in the derivation of the UPRE method is to introduce the \textit{regularized residual}, which is defined as $\regres = \kMat\regf - \gnoiseVec$. The regularized residual is important because it is also used in the derivation of the generalized cross validation and discrepancy principle methods. Using the influence matrix $\A$, the expression for $\regres$ can also be written as
 \[\regres = (\A-I)\gnoiseVec = (\A-I)(\kMat\fVec + \noiseVec) = (\A-I)\kMat\fVec + (\A-I)\noiseVec.\]
 By the Trace Lemma and the expression for $\regres$, the expected value of $(1/n)\|\regres\|^2$ is
-\[\E\left(\frac{1}{n}\|\regres\|^2\right) = \frac{1}{n}\|(\A-I)\kMat\fVec\|^2 + \frac{\noiseSD^2}{n}\trace({(\A-I)^\trans}(\A-I))\]
-For symmetric $\A$, the term $(\A-I)^\trans(\A-I)$ becomes $(\A-I)^2 = \A^2 - 2\A + I$ and so by the linearity of the trace operator,
+\[\E\left(\frac{1}{n}\|\regres\|^2\right) = \frac{1}{n}\|(\A-I)\kMat\fVec\|^2 + \frac{\noiseSD^2}{n}\trace({\trans{(\A-I)}}(\A-I))\]
+For symmetric $\A$, the term $\trans{(\A-I)}(\A-I)$ becomes $(\A-I)^2 = \A^2 - 2\A + I$ and so by the linearity of the trace operator,
 \begin{equation}
 \label{eq:RR}
 \E\left(\frac{1}{n}\|\regres\|^2\right) = \frac{1}{n}\|(\A-I)\kMat\fVec\|^2 + \frac{\noiseSD^2}{n}\trace(\A^2) - \frac{2\noiseSD^2}{n}\trace(\A) + \noiseSD^2.
 \end{equation}
-By comparing \eqref{eq:PR} and \eqref{eq:RR}, the equation for the expected value of $(1/n)\|\PE\|^2$ can be expressed as
-\[\E\left(\frac{1}{n}\|\PE\|^2\right) = \E\left(\frac{1}{n}\|\regres\|^2\right) + \frac{2\noiseSD^2}{n}\trace(\A) - \noiseSD^2.\]
+By comparing \eqref{eq:PR} and \eqref{eq:RR}, the equation for the expected value of $(1/n)\|\pVec(\regparam)\|^2$ can be expressed as
+\[\E\left(\frac{1}{n}\|\pVec(\regparam)\|^2\right) = \E\left(\frac{1}{n}\|\regres\|^2\right) + \frac{2\noiseSD^2}{n}\trace(\A) - \noiseSD^2.\]
 The UPRE is defined to be
 \begin{equation}
 \label{eq:UPRE}
 \U_n(\regparam) = \frac{1}{n}\|\regres\|^2 + \frac{2\noiseSD^2}{n}\trace(\A) - \noiseSD^2
 \end{equation}
 and the UPRE method is to pick $\regparam_{\text{UPRE}} = \argmin_{\regparam \geq 0} \U(\regparam)$. The subscript of $\U_n(\regparam)$ indicates the function also depends upon $n$. \par 
-Since the DFT is a the primary tool in the report, a spectral form of the UPRE function (one that involves DFT's) is desirable, as are spectral forms of the GCV and discrepancy principal functions in Sections \ref{sec:Generalized Cross Validation} and \ref{sec:Discrepancy Principle}. To derive a spectral form of \eqref{eq:UPRE}, first recall that for Tikhonov regularization, $\A = \kMat(\kMat^\ctrans\kMat + \regparam{D^\ctrans}D)^{-1}\kMat^\ctrans$. Assuming $\kMat$ is circulant, \eqref{eq:CircDiag} gives $\kMat = F^\ctrans\Delta{F}$ where $\Delta = \diag(\sqrt{n}\dft{\kVec})$. If $D = F^\ctrans\Lambda{F}$ as well (with $\Lambda = \diag(\sqrt{n}\dft{\dVec})$), then
+Since the DFT is a the primary tool in the report, a spectral form of the UPRE function (one that involves DFT's) is desirable, as are spectral forms of the GCV and discrepancy principal functions in Sections \ref{sec:Generalized Cross Validation} and \ref{sec:Discrepancy Principle}. To derive a spectral form of \eqref{eq:UPRE}, first recall that for Tikhonov regularization, $\A = \kMat(\ctrans{\kMat}\kMat + \regparam\ctrans{D}D)^{-1}\ctrans{\kMat}$. Assuming $\kMat$ is circulant, \eqref{eq:CircDiag} gives $\kMat = \ctrans{F}\Delta{F}$ where $\Delta = \diag(\sqrt{n}\dft{\kVec})$. If $D = \ctrans{F}\Lambda{F}$ as well (with $\Lambda = \diag(\sqrt{n}\dft{\dVec})$), then
 \begin{align*}
-\A &= \kMat(\kMat^\ctrans\kMat + \regparam{D^\ctrans}D)^{-1}\kMat^\ctrans \\
-&= F^\ctrans\Delta{F}((F^\ctrans\Delta{F})^\ctrans F^\ctrans\Delta{F} + \regparam(F^\ctrans\Lambda{F})^\ctrans F^\ctrans\Lambda{F})^{-1}(F^\ctrans\Delta{F})^\ctrans \\
-&= F^\ctrans\Delta{F}(F^\ctrans\Delta^\ctrans\Delta{F} + \regparam{F^\ctrans\Lambda^\ctrans\Lambda{F}})^{-1}F^\ctrans\Delta^\ctrans{F} \\
-&= F^\ctrans\Delta{F}(F^\ctrans(\Delta^\ctrans\Delta + \regparam\Lambda^\ctrans\Lambda)F)^{-1}F^\ctrans\Delta^\ctrans{F} \\
-&= F^\ctrans\Delta{F}F^\ctrans(\Delta^\ctrans\Delta + \regparam\Lambda^\ctrans\Lambda)^{-1}FF^\ctrans\Delta^\ctrans{F} \\
-&= F^\ctrans\Delta(\Delta^\ctrans\Delta + \regparam\Lambda^\ctrans\Lambda)^{-1}\Delta^\ctrans{F}.
+\A &= \kMat(\ctrans{\kMat}\kMat + \regparam{\ctrans{D}}D)^{-1}\ctrans{\kMat} \\
+&= \ctrans{F}\Delta{F}(\ctrans{(\ctrans{F}\Delta{F})} \ctrans{F}\Delta{F} + \regparam\ctrans{(\ctrans{F}\Lambda{F})} \ctrans{F}\Lambda{F})^{-1}\ctrans{(\ctrans{F}\Delta{F})} \\
+&= \ctrans{F}\Delta{F}(\ctrans{F}\ctrans{\Delta}\Delta{F} + \regparam{\ctrans{F}\ctrans{\Lambda}\Lambda{F}})^{-1}\ctrans{F}\ctrans{\Delta}{F} \\
+&= \ctrans{F}\Delta{F}(\ctrans{F}(\ctrans{\Delta}\Delta + \regparam\ctrans{\Lambda}\Lambda)F)^{-1}\ctrans{F}\ctrans{\Delta}{F} \\
+&= \ctrans{F}\Delta{F}\ctrans{F}(\ctrans{\Delta}\Delta + \regparam\ctrans{\Lambda}\Lambda)^{-1}F\ctrans{F}\ctrans{\Delta}{F} \\
+&= \ctrans{F}\Delta(\ctrans{\Delta}\Delta + \regparam\ctrans{\Lambda}\Lambda)^{-1}\ctrans{\Delta}{F}.
 \end{align*}
-The matrix $\Delta(\Delta^\ctrans\Delta + \regparam\Lambda^\ctrans\Lambda)^{-1}\Delta^\ctrans$ is diagonal, and so its diagonal entries are the the eigenvalues of $\A$. Then by definition of $\Delta$ and $\Lambda$, the $j$th diagonal entry of $\Delta(\Delta^\ctrans\Delta + \regparam\Lambda^\ctrans\Lambda)^{-1}\Delta^\ctrans$ is $|\dft{k}_j|^2/(|\dft{k}_j|^2 + \regparam|\dft{d}_j|^2)$. Therefore,
+The matrix $\Delta(\ctrans{\Delta}\Delta + \regparam\ctrans{\Lambda}\Lambda)^{-1}\ctrans{\Delta}$ is diagonal, and so its diagonal entries are the the eigenvalues of $\A$. Then by definition of $\Delta$ and $\Lambda$, the $j$th diagonal entry of $\Delta(\ctrans{\Delta}\Delta + \regparam\ctrans{\Lambda}\Lambda)^{-1}\ctrans{\Delta}$ is $|\dft{k}_j|^2/(|\dft{k}_j|^2 + \regparam|\dft{d}_j|^2)$. Therefore,
 \begin{equation}
 \trace(\A) = \sum_{j = 0}^{n-1} \frac{|\dft{k}_j|^2}{|\dft{k}_j|^2 + \regparam|\dft{d}_j|^2} = \sum_{j = 0}^{n-1} \filt(\regparam,|\dft{k}_j|)
 \label{eq:TraceUPRE}
 \end{equation}
 where $\filt$ is the Tikhonov filter function \eqref{eq:TikFilt}. Since the operator $D$ is fixed, the vector $\dft{\dVec}$ can be pre-computed; this is reflected by the notation $\filt(\regparam,|\dft{k}_j|)$. \par
 Next, the definition of $\regres$ gives
-\[\frac{1}{n}\|\regres\|^2 = \frac{1}{n}\|\kMat\regf - \gnoiseVec\|^2 = \frac{1}{n}\sum_{j = 0}^{n-1} |\dft{k}_j\dft{(\regf)}_j - \dft{\gnoise}_j|^2,\]
+\[\frac{1}{n}\|\regres\|^2 = \frac{1}{n}\|\kMat\regf - \gnoiseVec\|^2 = \frac{1}{n}\sum_{j = 0}^{n-1} |\dft{k}_j\dft{(\regf)}_j - \dft{\gnoiseVec}_j|^2,\]
 and \eqref{eq:TikFiltPsi} and \eqref{eq:TikSol} then produce
 \begin{equation}
-\frac{1}{n}\|\regres\|^2 = \frac{1}{n}\sum_{j = 0}^{n-1} |\filt(\regparam,|\dft{k}_j|)\dft{\gnoise}_j - \dft{\gnoise}_j|^2 = \frac{1}{n}\sum_{j = 0}^{n-1} |\dft{\gnoise}_j|^2(\mfilt(\regparam,|\dft{k}_j|))^2.
+\frac{1}{n}\|\regres\|^2 = \frac{1}{n}\sum_{j = 0}^{n-1} |\filt(\regparam,|\dft{k}_j|)\dft{\gnoiseVec}_j - \dft{\gnoiseVec}_j|^2 = \frac{1}{n}\sum_{j = 0}^{n-1} |\dft{\gnoiseVec}_j|^2(\mfilt(\regparam,|\dft{k}_j|))^2.
 \label{eq:RegResNorm}
 \end{equation}
 Combining \eqref{eq:TraceUPRE} and \eqref{eq:RegResNorm} produces the spectral form of the UPRE function:
 \begin{equation}
-\U(\regparam) = \frac{1}{n}\sum_{j = 0}^{n-1} |\dft{\gnoise}_j|^2(\mfilt(\regparam,|\dft{k}_j|))^2 + \frac{2\noiseSD^2}{n}\sum_{j = 0}^{n-1} \filt(\regparam,|\dft{k}_j|) - \noiseSD^2.
+\U(\regparam) = \frac{1}{n}\sum_{j = 0}^{n-1} |\dft{\gnoiseVec}_j|^2(\mfilt(\regparam,|\dft{k}_j|))^2 + \frac{2\noiseSD^2}{n}\sum_{j = 0}^{n-1} \filt(\regparam,|\dft{k}_j|) - \noiseSD^2.
 \label{eq:SpectralUPRE}
 \end{equation} 
 Since the UPRE method relies on finding a minimum of \eqref{eq:SpectralUPRE}, the last term $-\noiseSD^2$ can be ignored during implementation. \par
 The spectral form of the UPRE function can also be derived by starting with the DFT of the predictive error:
-\[\dft{\PE} = F\kMat(\regf - \fVec) = \Delta(\dft{\regf} - \dft{\fVec}).\]
-Since the influence matrix $\A$ is defined as $\A = \kMat\R = F^\ctrans\Delta{F}\R$ with regularization matrix $\R$, conjugation of $\A$ by $F$ gives $F\A{F^\ctrans} = \Delta{F}\R{F^\ctrans}$. Combined with $\dft{\regf} = F\R\gnoiseVec = F\R{F^\ctrans}\dft{\gnoiseVec}$, the predictive error can be rewritten as
+\[\dft{\pVec(\regparam)} = F\kMat(\regf - \fVec) = \Delta(\dft{\regf} - \dft{\fVec}).\]
+Since the influence matrix $\A$ is defined as $\A = \kMat\R = \ctrans{F}\Delta{F}\R$ with regularization matrix $\R$, conjugation of $\A$ by $F$ gives $F\A{\ctrans{F}} = \Delta{F}\R{\ctrans{F}}$. Combined with $\dft{\regf} = F\R\gnoiseVec = F\R{\ctrans{F}}\dft{\gnoiseVec}$, the predictive error can be rewritten as
 \begin{align*}
-\dft{\PE} &= \Delta\dft{\regf} - \Delta\dft{\fVec} \\
-&= F\A{F^\ctrans}\dft{\gnoiseVec} - \Delta\dft{\fVec} \\
-&= F\A{F^\ctrans}(\Delta\dft{\fVec} + \dft{\noiseVec}) - \Delta\dft{\fVec} \\
-&= [F(\A - I)F^\ctrans]\Delta\dft{\fVec} + [F\A{F^\ctrans}]\dft{\noiseVec}.
+\dft{\pVec(\regparam)} &= \Delta\dft{\regf} - \Delta\dft{\fVec} \\
+&= F\A{\ctrans{F}}\dft{\gnoiseVec} - \Delta\dft{\fVec} \\
+&= F\A{\ctrans{F}}(\Delta\dft{\fVec} + \dft{\noiseVec}) - \Delta\dft{\fVec} \\
+&= [F(\A - I)\ctrans{F}]\Delta\dft{\fVec} + [F\A{\ctrans{F}}]\dft{\noiseVec}.
 \end{align*}
 Since the components of $\dft{\fVec}$ and $\dft{\noiseVec}$ are not guaranteed to be real, the Trace Lemma as previously stated can no longer be directly applied. Instead, the Trace Lemma can be modified to accommodate the existence of complex components.
 
-\begin{CTL}
+\begin{lemma}
 Let $f \in \mathcal{H}$, where $\mathcal{H}$ is a deterministic complex Hilbert space, let $\noiseVec$ be a discrete white noise vector with $\noiseVec \sim \mathcal{N}(\mathbf{0},\noiseSD^2{I})$, and let $B: \mathbb{C}^n \rightarrow  \mathcal{H}$ be a bounded linear operator. Furthermore let $\dft{\noiseVec} = F\noiseVec$ where $F$ is the $n \times n$ unitary DFT matrix. Then
-\[\E(\|f + B\dft{\noiseVec}\|_{\mathcal{H}}^2) = \|f\|_{\mathcal{H}}^2 + \noiseSD^2\trace(B^\ctrans{B})\]
-where $B^\ctrans$ denotes the adjoint of $B$.
-\end{CTL}
+\[\E(\|f + B\dft{\noiseVec}\|_{\mathcal{H}}^2) = \|f\|_{\mathcal{H}}^2 + \noiseSD^2\trace(\ctrans{B}{B})\]
+where $\ctrans{B}$ denotes the adjoint of $B$.
+\end{lemma}
 \begin{proof}
 By the linearity of inner products and the expected value operator,
 \begin{align*}
@@ -117,34 +117,34 @@ By the linearity of inner products and the expected value operator,
 This difference between the real and complex versions of the Trace Lemma comes from the fact that the inner product on a complex Hilbert space is a sesquilinear form instead of a bilinear form. Again the term $\E(\|f\|_{\mathcal{H}}^2)$ reduces to $\|f\|_{\mathcal{H}}^2$ because $f$ is an element of a deterministic Hilbert space. The inner products can be rewritten using $\dft{\noiseVec} = F\noiseVec$ and the adjoint of $B$:
 \begin{align*}
 \E(\|f + B\dft{\noiseVec}\|_{\mathcal{H}}^2) &= \E(\|f\|_{\mathcal{H}}^2) + 2\E\left(\Re(\langle f, B\dft{\noiseVec}\rangle_{\mathcal{H}})\right) + \E(\langle B\dft{\noiseVec}, B\dft{\noiseVec}\rangle_{\mathcal{H}}) \\
-&= \E(\|f\|_{\mathcal{H}}^2) + 2\E\left(\Re((\dft{\noiseVec})^\ctrans{B^\ctrans}f)\right) + \E(\noiseVec^\trans{F^\ctrans}{B^\ctrans}BF\noiseVec) \\
-&= \E(\|f\|_{\mathcal{H}}^2) + 2\sum_{j=0}^{n-1} \E(\noise^\trans_j)(F^\ctrans{B^\ctrans}f)_j + \sum_{j=0}^{n-1}\sum_{k=0}^{n-1} ({F^\ctrans}{B^\ctrans}BF)_{j,k}\E(\noise_j\noise_k).
+&= \E(\|f\|_{\mathcal{H}}^2) + 2\E\left(\Re(\ctrans{(\dft{\noiseVec})}{\ctrans{B}}f)\right) + \E(\trans{\noiseVec}{\ctrans{F}}{\ctrans{B}}BF\noiseVec) \\
+&= \E(\|f\|_{\mathcal{H}}^2) + 2\sum_{j=0}^{n-1} \E(\trans{\noiseVec}_j)(\ctrans{F}{\ctrans{B}}f)_j + \sum_{j=0}^{n-1}\sum_{k=0}^{n-1} ({\ctrans{F}}{\ctrans{B}}BF)_{j,k}\E(\noise_j\noise_k).
 \end{align*}
-Since $\noiseVec \sim \mathcal{N}(\mathbf{0},\noiseSD^2{I})$, the expected values of $\noise_j$ and ${\noise_j}{\noise_k}$ are zero and $\noiseSD^2\delta_{j,k}$, respectively. Therefore the second term above is zero and the third term is a summation expression for $\noiseSD^2\trace(F^\ctrans{B^*}BF)$. Lastly since $F$ is unitary and the trace operation is invariant under similarity transformations, $\noiseSD^2\trace(F^\ctrans{B^*}BF) = \noiseSD^2\trace(B^\ctrans{B})$.
+Since $\noiseVec \sim \mathcal{N}(\mathbf{0},\noiseSD^2{I})$, the expected values of $\noise_j$ and ${\noise_j}{\noise_k}$ are zero and $\noiseSD^2\delta_{j,k}$, respectively. Therefore the second term above is zero and the third term is a summation expression for $\noiseSD^2\trace(\ctrans{F}{B^*}BF)$. Lastly since $F$ is unitary and the trace operation is invariant under similarity transformations, $\noiseSD^2\trace(\ctrans{F}{B^*}BF) = \noiseSD^2\trace(\ctrans{B}{B})$.
 \end{proof}
 
 Applying the DFT version of the Trace Lemma to the DFT of the predictive error yields
 \begin{align*}
-\E\left(\frac{1}{n}\left\|\dft{\PE}\right\|^2\right) &= \frac{1}{n}\E\left(\left\|[F(\A - I)F^\ctrans]\Delta\dft{\fVec} + [F\A{F^\ctrans}]\dft{\noiseVec}\right\|^2\right) \\
-&= \frac{1}{n}\left\|[F(\A - I)F^\ctrans]\Delta\dft{\fVec}\right\|^2 + \frac{\noiseSD^2}{n}\trace\left((F\A{F^\ctrans})^\ctrans{F\A{F^\ctrans}}\right) \\
-&= \frac{1}{n}\left\|[F(\A - I)F^\ctrans]\Delta\dft{\fVec}\right\|^2 + \frac{\noiseSD^2}{n}\trace\left(\A^\ctrans\A\right).
+\E\left(\frac{1}{n}\left\|\dft{\pVec(\regparam)}\right\|^2\right) &= \frac{1}{n}\E\left(\left\|[F(\A - I)\ctrans{F}]\Delta\dft{\fVec} + [F\A{\ctrans{F}}]\dft{\noiseVec}\right\|^2\right) \\
+&= \frac{1}{n}\left\|[F(\A - I)\ctrans{F}]\Delta\dft{\fVec}\right\|^2 + \frac{\noiseSD^2}{n}\trace\left(\ctrans{(F\A{\ctrans{F}})}{F\A{\ctrans{F}}}\right) \\
+&= \frac{1}{n}\left\|[F(\A - I)\ctrans{F}]\Delta\dft{\fVec}\right\|^2 + \frac{\noiseSD^2}{n}\trace\left(\ctrans{\A}\A\right).
 \end{align*}
 The DFT of the regularized residual $\regres$ is
-\[\dft{\regres} = F(\kMat\regf - \gnoiseVec) = FF^\ctrans\Delta{F}\regf - F\gnoiseVec = \Delta\dft{\regf} - \dft{\gnoiseVec}.\]
-Using $F{\A}F^\ctrans$, the expression for $\dft{\regres}$ can be rewritten as
-\[\dft{\regres} = F(\A - I){F^\ctrans}\dft{\gnoiseVec} = F(\A - I){F^\ctrans}(\Delta\dft{\fVec} + \dft{\noiseVec}) = [F(\A - I){F^\ctrans}]\Delta\dft{\fVec} + [F(\A - I){F^\ctrans}]\dft{\noiseVec}.\]
+\[\dft{\regres} = F(\kMat\regf - \gnoiseVec) = F\ctrans{F}\Delta{F}\regf - F\gnoiseVec = \Delta\dft{\regf} - \dft{\gnoiseVec}.\]
+Using $F{\A}\ctrans{F}$, the expression for $\dft{\regres}$ can be rewritten as
+\[\dft{\regres} = F(\A - I){\ctrans{F}}\dft{\gnoiseVec} = F(\A - I){\ctrans{F}}(\Delta\dft{\fVec} + \dft{\noiseVec}) = [F(\A - I){\ctrans{F}}]\Delta\dft{\fVec} + [F(\A - I){\ctrans{F}}]\dft{\noiseVec}.\]
 Applying the DFT version of the Trace Lemma produces
 \begin{align*}
-\E\left(\frac{1}{n}\left\|\dft{\regres}\right\|^2\right) &= \frac{1}{n}\left\|[F(\A - I)F^\ctrans]\Delta\dft{\fVec}\right\|^2 + \frac{\noiseSD^2}{n}\trace\left(F(\A - I)^\ctrans(\A - I){F^\ctrans}\right) \\
-&= \frac{1}{n}\left\|[F(\A - I)F^\ctrans]\Delta\dft{\fVec}\right\|^2 + \frac{\noiseSD^2}{n}\trace\left(F(\A^\ctrans\A - (\A^\ctrans + \A) + I){F^\ctrans}\right) \\
-&= \frac{1}{n}\left\|[F(\A - I)F^\ctrans]\Delta\dft{\fVec}\right\|^2 + \frac{\noiseSD^2}{n}\trace\left(\A^\ctrans\A\right) - \frac{2\noiseSD^2}{n}\trace\left(\Re(\A)\right) + \noiseSD^2.
+\E\left(\frac{1}{n}\left\|\dft{\regres}\right\|^2\right) &= \frac{1}{n}\left\|[F(\A - I)\ctrans{F}]\Delta\dft{\fVec}\right\|^2 + \frac{\noiseSD^2}{n}\trace\left(F\ctrans{(\A - I)}(\A - I){\ctrans{F}}\right) \\
+&= \frac{1}{n}\left\|[F(\A - I)\ctrans{F}]\Delta\dft{\fVec}\right\|^2 + \frac{\noiseSD^2}{n}\trace\left(F(\ctrans{\A}\A - (\ctrans{\A} + \A) + I){\ctrans{F}}\right) \\
+&= \frac{1}{n}\left\|[F(\A - I)\ctrans{F}]\Delta\dft{\fVec}\right\|^2 + \frac{\noiseSD^2}{n}\trace\left(\ctrans{\A}\A\right) - \frac{2\noiseSD^2}{n}\trace\left(\Re(\A)\right) + \noiseSD^2.
 \end{align*}
-Thus the $\E(\|\dft{\PE}\|^2/n)$ can be expressed as
-\[\E\left(\frac{1}{n}\left\|\dft{\PE}\right\|^2\right) = \E\left(\frac{1}{n}\left\|\dft{\regres}\right\|^2\right) + \frac{2\noiseSD^2}{n}\trace\left(\Re(\A)\right) - \noiseSD^2.\]
-The last step needed to obtain \eqref{eq:SpectralUPRE} to use the fact that the Tikhonov regularization matrix $\A$ is real and the assumption that $\A$ can be written as $\A = \kMat(\kMat^\ctrans\kMat + \regparam{D^\ctrans}D)^{-1}\kMat^\ctrans$. \par
+Thus the $\E(\|\dft{\pVec(\regparam)}\|^2/n)$ can be expressed as
+\[\E\left(\frac{1}{n}\left\|\dft{\pVec(\regparam)}\right\|^2\right) = \E\left(\frac{1}{n}\left\|\dft{\regres}\right\|^2\right) + \frac{2\noiseSD^2}{n}\trace\left(\Re(\A)\right) - \noiseSD^2.\]
+The last step needed to obtain \eqref{eq:SpectralUPRE} to use the fact that the Tikhonov regularization matrix $\A$ is real and the assumption that $\A$ can be written as $\A = \kMat(\ctrans{\kMat}\kMat + \regparam{\ctrans{D}}D)^{-1}\ctrans{\kMat}$. \par
 The same derivation can be applied for the DCT-version of the UPRE function under the assumption that $\kMat$ can be diagonalized by the DCT. Since the DCT maps real vectors to real vectors, the standard Trace Lemma can be utilized. The DCT-version of the UPRE function is
 \begin{equation}
-\U(\regparam) = \frac{1}{n}\sum_{j = 0}^{n-1} |\dct{\gnoise}_j|^2(\mfilt(\regparam,|\dct{k}_j|))^2 + \frac{2\noiseSD^2}{n}\sum_{j = 0}^{n-1} \filt(\regparam,|\dct{k}_j|) - \noiseSD^2.
+\U(\regparam) = \frac{1}{n}\sum_{j = 0}^{n-1} |\dct{\gnoiseVec}_j|^2(\mfilt(\regparam,|\dct{k}_j|))^2 + \frac{2\noiseSD^2}{n}\sum_{j = 0}^{n-1} \filt(\regparam,|\dct{k}_j|) - \noiseSD^2.
 \label{eq:UPRE DCT}
 \end{equation}
 In order to apply Corollary \ref{cor:gnoise Mean and Var} to \eqref{eq:SpectralUPRE}, the UPRE function must be modified. Let the factors $M_j$ for $j = 0,\ldots,n-1$ be defined by
@@ -155,18 +155,18 @@ In order to apply Corollary \ref{cor:gnoise Mean and Var} to \eqref{eq:SpectralU
 where $n/2$ is ignored if $n$ is odd. Then \eqref{eq:SpectralUPRE} can be rewritten as
 \begin{equation}
 \label{eq:SpectralUPREnModified}
-\U_n(\regparam) = \sum_{j = 0}^{n-1} |M_j\dft{\gnoise}_j|^2\left(\frac{\mfilt(\regparam,|\dft{k}_j|)}{M_j}\right)^2 + \frac{2\noiseSD^2}{n}\sum_{j = 0}^{n-1} \filt(\regparam,|\dft{k}_j|) - \noiseSD^2.
+\U_n(\regparam) = \sum_{j = 0}^{n-1} |M_j\dft{\gnoiseVec}_j|^2\left(\frac{\mfilt(\regparam,|\dft{k}_j|)}{M_j}\right)^2 + \frac{2\noiseSD^2}{n}\sum_{j = 0}^{n-1} \filt(\regparam,|\dft{k}_j|) - \noiseSD^2.
 \end{equation}
 By the properties of expected value,
 \begin{align*}
-\E(\U_n(\regparam)) &= \E\left(\sum_{j = 0}^{n-1} |M_j\dft{\gnoise}_j|^2\left(\frac{\mfilt(\regparam,|\dft{k}_j|)}{M_j}\right)^2 + \frac{2\noiseSD^2}{n}\sum_{j = 0}^{n-1} \filt(\regparam,|\dft{k}_j|) - \noiseSD^2\right) \\
-&= \sum_{j = 0}^{n-1} \E\left(|M_j\dft{\gnoise}_j|^2\right)\left(\frac{\mfilt(\regparam,|\dft{k}_j|)}{M_j}\right)^2 + \frac{2\noiseSD^2}{n}\sum_{j = 0}^{n-1} \filt(\regparam,|\dft{k}_j|) - \noiseSD^2.
+\E(\U_n(\regparam)) &= \E\left(\sum_{j = 0}^{n-1} |M_j\dft{\gnoiseVec}_j|^2\left(\frac{\mfilt(\regparam,|\dft{k}_j|)}{M_j}\right)^2 + \frac{2\noiseSD^2}{n}\sum_{j = 0}^{n-1} \filt(\regparam,|\dft{k}_j|) - \noiseSD^2\right) \\
+&= \sum_{j = 0}^{n-1} \E\left(|M_j\dft{\gnoiseVec}_j|^2\right)\left(\frac{\mfilt(\regparam,|\dft{k}_j|)}{M_j}\right)^2 + \frac{2\noiseSD^2}{n}\sum_{j = 0}^{n-1} \filt(\regparam,|\dft{k}_j|) - \noiseSD^2.
 \end{align*}
 Corollary \ref{cor:gnoise Mean and Var} then gives
 \begin{equation}
 \begin{split}
 \E(\U_n(\regparam)) &= \sum_{j = 0}^{n-1} \frac{\noiseSD^2}{2}\left(2 + \frac{|\dft{g}_j|^2}{\noiseSD^2}\right)(\mfilt(\regparam,|\dft{k}_j|))^2 + \frac{2\noiseSD^2}{n}\sum_{j = 0}^{n-1} \filt(\regparam,|\dft{k}_j|) - \noiseSD^2 \\
-&= \frac{1}{2}\sum_{j = 0}^{n-1} |\dft{\gnoise}_j|^2(\mfilt(\regparam,|\dft{k}_j|))^2 + \noiseSD^2\sum_{j = 0}^{n-1} (\mfilt(\regparam,|\dft{k}_j|))^2 + \frac{2\noiseSD^2}{n}\sum_{j = 0}^{n-1} \filt(\regparam,|\dft{k}_j|) - \noiseSD^2.
+&= \frac{1}{2}\sum_{j = 0}^{n-1} |\dft{\gnoiseVec}_j|^2(\mfilt(\regparam,|\dft{k}_j|))^2 + \noiseSD^2\sum_{j = 0}^{n-1} (\mfilt(\regparam,|\dft{k}_j|))^2 + \frac{2\noiseSD^2}{n}\sum_{j = 0}^{n-1} \filt(\regparam,|\dft{k}_j|) - \noiseSD^2.
 \end{split}
 \label{eq:UPRE Expected Value}
 \end{equation}
@@ -174,16 +174,16 @@ The variance of $\U_n$ can be determined as well. The second and third terms in 
 \begin{equation}
 \label{eq:UPRE Var Sum}
 \begin{split}
-\Var\left(\U_n(\regparam)\right) &= \Var\left(\sum_{j = 0}^{n-1} |M_j\dft{\gnoise}_j|^2\left(\frac{\mfilt(\regparam,|\dft{k}_j|)}{M_j}\right)^2\right) \\
-&= \sum_{j=0}^{n-1} \sum_{\ell=0}^{n-1} \left(\frac{\mfilt(\regparam,|\dft{k}_j|)\mfilt(\regparam,|\dft{k}_\ell|)}{M_jM_\ell}\right)^2 \Cov\left(|M_j\dft{\gnoise}_j|^2,|M_\ell\dft{\gnoise}_\ell|^2\right).
+\Var\left(\U_n(\regparam)\right) &= \Var\left(\sum_{j = 0}^{n-1} |M_j\dft{\gnoiseVec}_j|^2\left(\frac{\mfilt(\regparam,|\dft{k}_j|)}{M_j}\right)^2\right) \\
+&= \sum_{j=0}^{n-1} \sum_{\ell=0}^{n-1} \left(\frac{\mfilt(\regparam,|\dft{k}_j|)\mfilt(\regparam,|\dft{k}_\ell|)}{M_jM_\ell}\right)^2 \Cov\left(|M_j\dft{\gnoiseVec}_j|^2,|M_\ell\dft{\gnoiseVec}_\ell|^2\right).
 \end{split}
 \end{equation}
 By Theorem \ref{thm:Cov of mag squared}, the covariance terms are only nonzero when $j = \ell$ or $j + \ell = n$. In either case,
-\[\left(\frac{\mfilt(\regparam,|\dft{k}_j|)\mfilt(\regparam,|\dft{k}_\ell|)}{M_jM_\ell}\right)^2 \Cov\left(|M_j\dft{\gnoise}_j|^2,|M_\ell\dft{\gnoise}_\ell|^2\right) = \left(\frac{\mfilt(\regparam,|\dft{k}_j|)}{M_j}\right)^4 \Var\left(|M_j\dft{\gnoise}_j|^2\right),\]
+\[\left(\frac{\mfilt(\regparam,|\dft{k}_j|)\mfilt(\regparam,|\dft{k}_\ell|)}{M_jM_\ell}\right)^2 \Cov\left(|M_j\dft{\gnoiseVec}_j|^2,|M_\ell\dft{\gnoiseVec}_\ell|^2\right) = \left(\frac{\mfilt(\regparam,|\dft{k}_j|)}{M_j}\right)^4 \Var\left(|M_j\dft{\gnoiseVec}_j|^2\right),\]
 Let $J = \{0,n/2\}$ if $n$ is even and $J = \{0\}$ if $n$ is odd. Corollary \ref{cor:gnoise Mean and Var} states that
-\[\left(\frac{\mfilt(\regparam,|\dft{k}_j|)}{M_j}\right)^4 \Var\left(|M_j\dft{\gnoise}_j|^2\right) = 2\noiseSD^4\left(1 + \dfrac{|\dft{g}_j|^2}{\noiseSD^2}\right)\left(\mfilt(\regparam,|\dft{k}_j|)\right)^4, \qquad j \in J\]
+\[\left(\frac{\mfilt(\regparam,|\dft{k}_j|)}{M_j}\right)^4 \Var\left(|M_j\dft{\gnoiseVec}_j|^2\right) = 2\noiseSD^4\left(1 + \dfrac{|\dft{g}_j|^2}{\noiseSD^2}\right)\left(\mfilt(\regparam,|\dft{k}_j|)\right)^4, \qquad j \in J\]
 and similarly
-\[\left(\frac{\mfilt(\regparam,|\dft{k}_j|)}{M_j}\right)^4 \Var\left(|M_j\dft{\gnoise}_j|^2\right) = \noiseSD^4\left(1 + \dfrac{|\dft{g}_j|^2}{\noiseSD^2}\right)\left(\mfilt(\regparam,|\dft{k}_j|)\right)^4, \qquad j \not\in J\]
+\[\left(\frac{\mfilt(\regparam,|\dft{k}_j|)}{M_j}\right)^4 \Var\left(|M_j\dft{\gnoiseVec}_j|^2\right) = \noiseSD^4\left(1 + \dfrac{|\dft{g}_j|^2}{\noiseSD^2}\right)\left(\mfilt(\regparam,|\dft{k}_j|)\right)^4, \qquad j \not\in J\]
 If $j \in J$, $\ell = j$ is the only $0 \leq \ell \leq n-1$ such that $j + \ell = n$. On the other hand, if $j \not\in J$ then there are two values of $\ell$ such that $j + \ell = n$: $\ell = j$ and $\ell = n - j$. Thus \eqref{eq:UPRE Var Sum} is
 \begin{equation}
 \label{eq:UPRE Var Sum Simple}
@@ -192,22 +192,22 @@ If $j \in J$, $\ell = j$ is the only $0 \leq \ell \leq n-1$ such that $j + \ell 
 
 %The problem of finding a minimizer of \eqref{eq:SpectralUPRE} can be recast as a root-finding problem by using the derivative of the UPRE function, which is
 %\begin{equation}
-%\U'_n(\regparam) = 2\regparam^2\left[\sum_{j = 0}^{n-1} \frac{|\dft{\gnoise}_j|^2|\dft{k}_j|^2}{(|\dft{k}_j|^2 + \regparam^2)^3} - \frac{2\noiseSD^2}{n}\sum_{j = 0}^{n-1} \frac{|\dft{k}_j|^2}{(|\dft{k}_j|^2 + \regparam^2)^2}\right].
+%\U'_n(\regparam) = 2\regparam^2\left[\sum_{j = 0}^{n-1} \frac{|\dft{\gnoiseVec}_j|^2|\dft{k}_j|^2}{(|\dft{k}_j|^2 + \regparam^2)^3} - \frac{2\noiseSD^2}{n}\sum_{j = 0}^{n-1} \frac{|\dft{k}_j|^2}{(|\dft{k}_j|^2 + \regparam^2)^2}\right].
 %\label{eq:SpectralUPREnDeriv}
 %\end{equation}
 %It is clear that $\regparam = 0$ is a root of \eqref{eq:SpectralUPREnDeriv} regardless of the data and operator spectra, so this root should be ignored (since a solution generated for $\regparam = 0$ is in fact a non-regularized solution). Therefore any meaningful regularization parameter selected from the UPRE method will be a root of
 %\begin{equation}
-%V_n(\regparam) := \sum_{j = 0}^{n-1} \frac{|\dft{\gnoise}_j|^2|\dft{k}_j|^2}{(|\dft{k}_j|^2 + \regparam^2)^3} - \frac{2\noiseSD^2}{n}\sum_{j = 0}^{n-1} \frac{|\dft{k}_j|^2}{(|\dft{k}_j|^2 + \regparam^2)^2}.
+%V_n(\regparam) := \sum_{j = 0}^{n-1} \frac{|\dft{\gnoiseVec}_j|^2|\dft{k}_j|^2}{(|\dft{k}_j|^2 + \regparam^2)^3} - \frac{2\noiseSD^2}{n}\sum_{j = 0}^{n-1} \frac{|\dft{k}_j|^2}{(|\dft{k}_j|^2 + \regparam^2)^2}.
 %\label{eq:SpectralUPREnDeriv2}
 %\end{equation}
 Now consider the case where multiple data sets are available, which can arise from repeated observations of some time-invariant event. As an alternative to finding a regularization parameter for each data set, a single regularization parameter can be obtained by constructing an averaged version of \eqref{eq:SpectralUPRE}, assuming that $n$ is constant across all data sets to be considered. It is reasonable to expect that this single regularization parameter will perform worse that each individual parameter with respect to their corresponding data sets. However, computational time/resources could be saved because the method would involved solving a single minimization problem instead of solving a minimization problem for each data set. To bring this idea to fruition, some notation will be expanded. Let $R$ be the number of available data sets, and denote the $j$th data set by $\gnoiseVec^j$. Similarly, let $\U_n^j(\regparam)$ be the UPRE function associated with the $j$th data set.  The average of the UPRE functions is then 
 \begin{align*}
-\frac{1}{R}\sum_{j=1}^R \U_n^j(\regparam) &= \frac{1}{R}\sum_{j=1}^R \left(\sum_{\ell = 0}^{n-1} |\dft{\gnoise^j}_\ell|^2(\mfilt(\regparam,|\dft{k}_\ell|))^2 + \frac{2\noiseSD^2}{n}\sum_{\ell = 0}^{n-1} \filt(\regparam,|\dft{k}_\ell|) - \noiseSD^2\right) \\
-&= \frac{1}{R}\sum_{j=1}^R \left(\sum_{\ell = 0}^{n-1} |\dft{\gnoise^j}_\ell|^2(\mfilt(\regparam,|\dft{k}_\ell|))^2\right) + \frac{1}{R}\sum_{j=1}^R \left(\frac{2\noiseSD^2}{n}\sum_{\ell = 0}^{n-1} \filt(\regparam,|\dft{k}_\ell|)\right) - \noiseSD^2.
+\frac{1}{R}\sum_{j=1}^R \U_n^j(\regparam) &= \frac{1}{R}\sum_{j=1}^R \left(\sum_{\ell = 0}^{n-1} |\dft{\gnoiseVec^j}_\ell|^2(\mfilt(\regparam,|\dft{k}_\ell|))^2 + \frac{2\noiseSD^2}{n}\sum_{\ell = 0}^{n-1} \filt(\regparam,|\dft{k}_\ell|) - \noiseSD^2\right) \\
+&= \frac{1}{R}\sum_{j=1}^R \left(\sum_{\ell = 0}^{n-1} |\dft{\gnoiseVec^j}_\ell|^2(\mfilt(\regparam,|\dft{k}_\ell|))^2\right) + \frac{1}{R}\sum_{j=1}^R \left(\frac{2\noiseSD^2}{n}\sum_{\ell = 0}^{n-1} \filt(\regparam,|\dft{k}_\ell|)\right) - \noiseSD^2.
 \end{align*}
 By factoring terms from the first sum and noting that the summand of the second sum does not depend upon $j$, the function simplifies to
 \begin{equation}
-\frac{1}{R}\sum_{j=1}^R \U_n^j(\regparam) =  \sum_{\ell = 0}^{n-1} \left(\frac{1}{R}\sum_{j=1}^R |\dft{\gnoise^j}_\ell|^2\right)(\mfilt(\regparam,|\dft{k}_\ell|))^2 + \frac{2\noiseSD^2}{n}\sum_{\ell = 0}^{n-1} \filt(\regparam,|\dft{k}_\ell|) - \noiseSD^2.
+\frac{1}{R}\sum_{j=1}^R \U_n^j(\regparam) =  \sum_{\ell = 0}^{n-1} \left(\frac{1}{R}\sum_{j=1}^R |\dft{\gnoiseVec^j}_\ell|^2\right)(\mfilt(\regparam,|\dft{k}_\ell|))^2 + \frac{2\noiseSD^2}{n}\sum_{\ell = 0}^{n-1} \filt(\regparam,|\dft{k}_\ell|) - \noiseSD^2.
 \label{eq:SpectralUPREavg}
 \end{equation}
 Numerically, \eqref{eq:SpectralUPREavg} can be readily obtained by summing the DFT's of the data sets; note that $\dft{\kVec}$ is unchanged across data sets.
@@ -226,18 +226,18 @@ By the linearity of the trace operator, $\trace(I-\A) = \trace(I)-\trace(\A) = n
 \end{equation}
 Substituting \eqref{eq:RegResNorm} and \eqref{eq:TraceGCV} into \eqref{eq:GCV} produces the spectral form of the GCV function:
 \begin{equation}
-\GCV(\regparam) = \frac{\sum_{j = 0}^{n-1} |\dft{\gnoise}_j|^2(\mfilt(\regparam,|\dft{k}_j|))^2}{(\frac{1}{n}\sum_{j = 0}^{n-1} \mfilt(\regparam,|\dft{k}_j|))^2} = \frac{n^2\sum_{j = 0}^{n-1} |\dft{\gnoise}_j|^2(\mfilt(\regparam,|\dft{k}_j|))^2}{(\sum_{j = 0}^{n-1} \mfilt(\regparam,|\dft{k}_j|))^2}.
+\GCV(\regparam) = \frac{\sum_{j = 0}^{n-1} |\dft{\gnoiseVec}_j|^2(\mfilt(\regparam,|\dft{k}_j|))^2}{(\frac{1}{n}\sum_{j = 0}^{n-1} \mfilt(\regparam,|\dft{k}_j|))^2} = \frac{n^2\sum_{j = 0}^{n-1} |\dft{\gnoiseVec}_j|^2(\mfilt(\regparam,|\dft{k}_j|))^2}{(\sum_{j = 0}^{n-1} \mfilt(\regparam,|\dft{k}_j|))^2}.
 \label{eq:SpectralGCV}
 \end{equation}
 If $\kMat$ can be diagonalized by the DCT, the DCT-version of the GCV function is
 \begin{equation}
-\GCV(\regparam) = \frac{\sum_{j = 0}^{n-1} |\dct{\gnoise}_j|^2(\mfilt(\regparam,|\dct{k}_j|))^2}{(\frac{1}{n}\sum_{j = 0}^{n-1} \mfilt(\regparam,|\dct{k}_j|))^2} = \frac{n^2\sum_{j = 0}^{n-1} |\dct{\gnoise}_j|^2(\mfilt(\regparam,|\dct{k}_j|))^2}{(\sum_{j = 0}^{n-1} \mfilt(\regparam,|\dct{k}_j|))^2}.
+\GCV(\regparam) = \frac{\sum_{j = 0}^{n-1} |\dct{\gnoiseVec}_j|^2(\mfilt(\regparam,|\dct{k}_j|))^2}{(\frac{1}{n}\sum_{j = 0}^{n-1} \mfilt(\regparam,|\dct{k}_j|))^2} = \frac{n^2\sum_{j = 0}^{n-1} |\dct{\gnoiseVec}_j|^2(\mfilt(\regparam,|\dct{k}_j|))^2}{(\sum_{j = 0}^{n-1} \mfilt(\regparam,|\dct{k}_j|))^2}.
 \label{eq:GCV DCT}
 \end{equation}
 
 The case where multiple data sets are available will now be considered using notation analogous to that introduced in Section \ref{sec:Unbiased Predictive Risk Estimator}; let $\GCV_n^j(\regparam)$ be the GCV function associated with the $j$th data set $\gnoiseVec^j$ for $j = 1,\ldots,R$. Since the denominator in \eqref{eq:SpectralGCV} is independent of the data,
 \begin{equation}
-\frac{1}{R}\sum_{j=1}^R \GCV_n^j(\regparam)  = \frac{n^2\sum_{j = 0}^{n-1} \left(\sum_{j=1}^R |\dft{\gnoise^j}_j|^2\right)(\mfilt(\regparam,|\dft{k}_j|))^2}{R(\sum_{j = 0}^{n-1} \mfilt(\regparam,|\dft{k}_j|))^2}.
+\frac{1}{R}\sum_{j=1}^R \GCV_n^j(\regparam)  = \frac{n^2\sum_{j = 0}^{n-1} \left(\sum_{j=1}^R |\dft{\gnoiseVec^j}_j|^2\right)(\mfilt(\regparam,|\dft{k}_j|))^2}{R(\sum_{j = 0}^{n-1} \mfilt(\regparam,|\dft{k}_j|))^2}.
 \label{eq:SpectralGCVsum}
 \end{equation}
 
@@ -252,7 +252,7 @@ Implementation of this method requires finding a solution of $\D_n(\regparam) = 
 \end{equation}
 In other words, implementation of the discrepancy principle method is equivalent to finding a root of $\D_n(\regparam)$. The spectral form of the discrepancy principle function is obtained directly from \eqref{eq:RegResNorm} by substituting the regularized residual term:
 \begin{equation}
-\D_n(\regparam) = \sum_{j = 0}^{n-1} |\dft{\gnoise}_j|^2(\mfilt(\regparam,|\dft{k}_j|))^2 - \noiseSD^2.
+\D_n(\regparam) = \sum_{j = 0}^{n-1} |\dft{\gnoiseVec}_j|^2(\mfilt(\regparam,|\dft{k}_j|))^2 - \noiseSD^2.
 \label{eq:SpectralDP}
 \end{equation}
 Comparing the UPRE function $\U_n$ on \eqref{eq:SpectralUPRE} with $\D_n(\regparam)$, it can be seen that
@@ -262,39 +262,39 @@ Comparing the UPRE function $\U_n$ on \eqref{eq:SpectralUPRE} with $\D_n(\regpar
 \end{equation}
 If $\kMat$ can be diagonalized by the DCT, then the DCT-version of the discrepancy principle function is
 \begin{equation}
-\D_n(\regparam) = \sum_{j = 0}^{n-1} |\dct{\gnoise}_j|^2(\mfilt(\regparam,|\dct{k}_j|))^2 - \noiseSD^2.
+\D_n(\regparam) = \sum_{j = 0}^{n-1} |\dct{\gnoiseVec}_j|^2(\mfilt(\regparam,|\dct{k}_j|))^2 - \noiseSD^2.
 \label{eq:DP DCT}
 \end{equation}
 
 The function $\D_n(\regparam)$ will be near zero when the sum in \eqref{eq:SpectralDP} is close to $\noiseSD^2$.  Furthermore, $\D_n(\regparam)$ is monotone increasing on $(0,\infty)$ because for all $\regparam > 0$,
-\[\frac{d}{d\regparam}\left\{\D_n(\regparam)\right\} = 4\sum_{j = 0}^{n-1} |\dft{\gnoise}_j|^2\frac{|\dft{k}_j|^2\regparam^3}{\left(|\dft{k}_j|^2 + \regparam^2\right)^3} \geq 0.\]
+\[\frac{d}{d\regparam}\left\{\D_n(\regparam)\right\} = 4\sum_{j = 0}^{n-1} |\dft{\gnoiseVec}_j|^2\frac{|\dft{k}_j|^2\regparam^3}{\left(|\dft{k}_j|^2 + \regparam^2\right)^3} \geq 0.\]
 If the range of $\regparam$ being considered for roots of \eqref{eq:SpectralDP} is not chosen carefully, it is possible that no regularization parameter will be obtained. If \eqref{eq:SpectralDP} does not have a root in $[0,\infty)$ (recall that by definition, $\regparam \geq 0$), there is only one possibility because $\D_n(0) = -\noiseSD^2 < 0$. Since the function is monotone increasing, the function must have a root or approach some negative horizontal asymptote. By looking at \eqref{eq:TikFiltPsi}, it is clear that $(\mfilt(\regparam,|\dft{k}_i|))^2 \leq 1$ for all $\regparam \geq 0$. Thus,
-\[\sum_{j = 0}^{n-1} |\dft{\gnoise}_j|^2(\mfilt(\regparam,|\dft{k}_j|))^2 - \noiseSD^2 \leq \sum_{j = 0}^{n-1} |\dft{\gnoise}_j|^2 - \noiseSD^2,\]
-and so \eqref{eq:SpectralDP} will approach a negative horizontal asymptote if $\sum_{j = 0}^{n-1} |\dft{\gnoise}_j|^2 < \noiseSD^2$. \par
+\[\sum_{j = 0}^{n-1} |\dft{\gnoiseVec}_j|^2(\mfilt(\regparam,|\dft{k}_j|))^2 - \noiseSD^2 \leq \sum_{j = 0}^{n-1} |\dft{\gnoiseVec}_j|^2 - \noiseSD^2,\]
+and so \eqref{eq:SpectralDP} will approach a negative horizontal asymptote if $\sum_{j = 0}^{n-1} |\dft{\gnoiseVec}_j|^2 < \noiseSD^2$. \par
 Analogous to \eqref{eq:SpectralUPREnModified}, the spectral form of the $\D_n(\regparam)$ can be rewritten as
 \begin{equation}
 \label{eq:SpectralDPModified}
-\D_n(\regparam) = \sum_{j = 0}^{n-1} |M_j\dft{\gnoise}_j|^2\left(\frac{\mfilt(\regparam,|\dft{k}_j|}{M_j}\right)^2 - \noiseSD^2.
+\D_n(\regparam) = \sum_{j = 0}^{n-1} |M_j\dft{\gnoiseVec}_j|^2\left(\frac{\mfilt(\regparam,|\dft{k}_j|}{M_j}\right)^2 - \noiseSD^2.
 \end{equation}
-As with the UPRE method, the rescaling of $|\dft{\gnoise}_j|^2$ is justified by the fact that the discrepancy principle is based on prior knowledge of $\noiseSD^2$. The benefit of \eqref{eq:SpectralDPModified} is that the statistics of $\D_n(\regparam)$ can be analyzed using Corollary \ref{cor:gnoise Mean and Var}. By the properties of expected value,
-\[\E(\D_n(\regparam)) = \E\left(\sum_{j = 0}^{n-1} |M_j\dft{\gnoise}_j|^2\left(\frac{\mfilt(\regparam,|\dft{k}_j|}{M_j}\right)^2 - \noiseSD^2\right) = \sum_{j = 0}^{n-1} \E\left(|M_j\dft{\gnoise}_j|^2\right)\left(\frac{\mfilt(\regparam,|\dft{k}_j|)}{M_j}\right)^2 - \noiseSD^2.\]
+As with the UPRE method, the rescaling of $|\dft{\gnoiseVec}_j|^2$ is justified by the fact that the discrepancy principle is based on prior knowledge of $\noiseSD^2$. The benefit of \eqref{eq:SpectralDPModified} is that the statistics of $\D_n(\regparam)$ can be analyzed using Corollary \ref{cor:gnoise Mean and Var}. By the properties of expected value,
+\[\E(\D_n(\regparam)) = \E\left(\sum_{j = 0}^{n-1} |M_j\dft{\gnoiseVec}_j|^2\left(\frac{\mfilt(\regparam,|\dft{k}_j|}{M_j}\right)^2 - \noiseSD^2\right) = \sum_{j = 0}^{n-1} \E\left(|M_j\dft{\gnoiseVec}_j|^2\right)\left(\frac{\mfilt(\regparam,|\dft{k}_j|)}{M_j}\right)^2 - \noiseSD^2.\]
 Corollary \ref{cor:gnoise Mean and Var} then gives
 \begin{align*}
 \E(\D_n(\regparam)) &= \sum_{j = 0}^{n-1} \frac{\noiseSD^2}{2}\left(2 + \frac{|\dft{g}_j|^2}{\noiseSD^2}\right)(\mfilt(\regparam,|\dft{k}_j|))^2 - \noiseSD^2 \\
-&= \frac{1}{2}\sum_{j = 0}^{n-1} |\dft{\gnoise}_j|^2(\mfilt(\regparam,|\dft{k}_j|))^2 + \noiseSD^2\sum_{j = 0}^{n-1} (\mfilt(\regparam,|\dft{k}_j|))^2 - \noiseSD^2.
+&= \frac{1}{2}\sum_{j = 0}^{n-1} |\dft{\gnoiseVec}_j|^2(\mfilt(\regparam,|\dft{k}_j|))^2 + \noiseSD^2\sum_{j = 0}^{n-1} (\mfilt(\regparam,|\dft{k}_j|))^2 - \noiseSD^2.
 \end{align*}
 The derivative of $\E(\D_n(\regparam))$ with respect to $\regparam$ is
 \begin{align*}
-\frac{d}{d\regparam}\left\{\E\left(\D_n(\regparam)\right)\right\} &= \frac{1}{2}\sum_{j = 0}^{n-1} |\dft{\gnoise}_j|^2 \frac{d}{d\regparam}\left\{(\mfilt(\regparam,|\dft{k}_j|))^2\right\} + \noiseSD^2\sum_{j = 0}^{n-1} \frac{d}{d\regparam}\left\{(\mfilt(\regparam,|\dft{k}_j|))^2\right\} \\
-&= 2\sum_{j = 0}^{n-1} |\dft{\gnoise}_j|^2\frac{|\dft{k}_j|^2\regparam^3}{\left(|\dft{k}_j|^2 + \regparam^2\right)^3} + 4\noiseSD^2 \sum_{j = 0}^{n-1} \frac{|\dft{k}_j|^2\regparam^3}{\left(|\dft{k}_j|^2 + \regparam^2\right)^3},
+\frac{d}{d\regparam}\left\{\E\left(\D_n(\regparam)\right)\right\} &= \frac{1}{2}\sum_{j = 0}^{n-1} |\dft{\gnoiseVec}_j|^2 \frac{d}{d\regparam}\left\{(\mfilt(\regparam,|\dft{k}_j|))^2\right\} + \noiseSD^2\sum_{j = 0}^{n-1} \frac{d}{d\regparam}\left\{(\mfilt(\regparam,|\dft{k}_j|))^2\right\} \\
+&= 2\sum_{j = 0}^{n-1} |\dft{\gnoiseVec}_j|^2\frac{|\dft{k}_j|^2\regparam^3}{\left(|\dft{k}_j|^2 + \regparam^2\right)^3} + 4\noiseSD^2 \sum_{j = 0}^{n-1} \frac{|\dft{k}_j|^2\regparam^3}{\left(|\dft{k}_j|^2 + \regparam^2\right)^3},
 \end{align*}
 which is nonnegative for all $\regparam > 0$. Thus $\E(\D_n(\regparam))$ is monotone increasing on $(0,\infty)$. \par
 Since the last term $-\noiseSD^2$ in \eqref{eq:SpectralDPModified} is deterministic, the variance of $\D_n(\regparam)$ is reduced to
-\[\Var(\D_n(\regparam)) = \Var\left(\sum_{j = 0}^{n-1} |M_j\dft{\gnoise}_j|^2\left(\frac{\mfilt(\regparam,|\dft{k}_j|)}{M_j}\right)^2\right),\]
+\[\Var(\D_n(\regparam)) = \Var\left(\sum_{j = 0}^{n-1} |M_j\dft{\gnoiseVec}_j|^2\left(\frac{\mfilt(\regparam,|\dft{k}_j|)}{M_j}\right)^2\right),\]
 and so the variance is the same as the UPRE function given by \eqref{eq:UPRE Var Sum Simple}. This is interesting since the functions  $\D_n(\regparam)$ and $\U_n(\regparam)$ have different properties; for example, $\D_n(\regparam)$ is monotone increasing while $\U_n(\regparam)$ is not. \par 
 Again adopting the notation introduced in Section \ref{sec:Unbiased Predictive Risk Estimator}, let $\D_n^j(\regparam)$ be the MDP function associated with the $j$th data set $\gnoiseVec^j$ for $j = 1,\ldots,R$. Then 
 \begin{equation}
-\frac{1}{R}\sum_{j=1}^R \D_n^j(\regparam)  = \sum_{\ell = 0}^{n-1} \left(\frac{1}{R} \sum_{j=1}^R |\dft{\gnoise^j}_\ell|^2\right)(\mfilt(\regparam,|\dft{k}_\ell|))^2 - \noiseSD^2. 
+\frac{1}{R}\sum_{j=1}^R \D_n^j(\regparam)  = \sum_{\ell = 0}^{n-1} \left(\frac{1}{R} \sum_{j=1}^R |\dft{\gnoiseVec^j}_\ell|^2\right)(\mfilt(\regparam,|\dft{k}_\ell|))^2 - \noiseSD^2. 
 \label{eq:SpectralDPavg}
 \end{equation}
 As previously stated, the discrepancy function \eqref{eq:SpectralDP} is monotone increasing, and so the scaled sum \eqref{eq:SpectralDPavg} is monotone increasing as well. If there are data realizations that would otherwise result in discrepancy principle functions that prove difficult for finding a root, averaging these functions with better-behaved functions could provide a single function with a meaningful root (here ``better-behaved" means that the function has a root located within an interval that is not excessively large). The hope is that the poorly-behaved functions are outliers so that the average of the functions can be expected to have a root. If for some reason the better-behaved functions are themselves the outliers, then this averaging approach would not be expected to yield meaningful results.

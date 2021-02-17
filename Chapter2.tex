@@ -6,20 +6,20 @@ A number of analytic tools will be utilized. The singular value decomposition an
 
 Direct matrix inversion is not always practical, and not even possible when $\kMat$ can be singular. Fortunately, the singular value decomposition (SVD) of $\kMat$ can used instead if the system is not too large. Even for problems resulting in large discrete systems, the SVD is useful for analyzing solution methods.  Assuming $\kMat$ is a real $m \times n$ matrix, the SVD of $\kMat$ is
 \begin{equation}
-\kMat = U\Sigma{V^\trans}
+\kMat = U\Sigma\trans{V}
 \label{eq:SVD}
 \end{equation}
 where the $m \times m$ matrix $U$ and the $n \times n$ matrix $V$ have orthogonal columns and $\Sigma$ is a $m \times n$ diagonal matrix. The diagonal elements of $\Sigma$ are the singular values of $\kMat$, denoted $\singular_\ell$ and satisfying $\singular_0 \geq \singular_1 \geq \ldots \geq \singular_{n-1} \geq 0$. The columns of $U$ and $V$ will be denoted $U_{\cdot,\ell}$ and $V_{\cdot,\ell}$, respectively; these vectors are known as the left and right singular vectors of $\kMat$, respectively. A matrix of complex values has a SVD as well, the only difference being that the transpose is replaced with conjugate transpose. \par
-Let $r$ denote the rank of $\kMat$. Then $\singular_0 \geq \ldots \geq \singular_{r-1} > 0$, i.e. the number of nonzero singular values of $\kMat$ is equal to the rank of $\kMat$.  A common variation of the SVD is the compact SVD (or economy SVD \cite{GolubVanLoan2013}), in which $\Sigma = \diag(\singular_0,\ldots,\singular_{r-1})$, $U$ is an $m \times r$ matrix and $V^\trans$ is an $r \times n$ matrix. The matrices $U$ and $V$ are no longer orthogonal in the traditional sense because they are not square (unless $\kMat$ is nonsingular). Instead, $U$ and $V$ are column orthonormal. \par 
-By using $\kMat^{-1} = V\Sigma^{-1}U^\trans$ when $\kMat$ is nonsingular, the product $\kMat^{-1}\gnoiseVec$ is
+Let $r$ denote the rank of $\kMat$. Then $\singular_0 \geq \ldots \geq \singular_{r-1} > 0$, i.e. the number of nonzero singular values of $\kMat$ is equal to the rank of $\kMat$.  A common variation of the SVD is the compact SVD (or economy SVD \cite{GolubVanLoan2013}), in which $\Sigma = \diag(\singular_0,\ldots,\singular_{r-1})$, $U$ is an $m \times r$ matrix and $\trans{V}$ is an $r \times n$ matrix. The matrices $U$ and $V$ are no longer orthogonal in the traditional sense because they are not square (unless $\kMat$ is nonsingular). Instead, $U$ and $V$ are column orthonormal. \par 
+By using $\kMat^{-1} = V\Sigma^{-1}\trans{U}$ when $\kMat$ is nonsingular, the product $\kMat^{-1}\gnoiseVec$ is
 \begin{equation}
-\kMat^{-1}\gnoiseVec = \kMat^{-1}\left(\kMat\fVec + \noiseVec\right) = \fVec + \kMat^{-1}\noiseVec = \fVec + V\Sigma^{-1}{U^\trans}\noiseVec = \fVec + \sum_{\ell = 0}^{n-1} \frac{{U^\trans_\ell}\noiseVec}{\singular_\ell}V_{\cdot,\ell}. 
+\kMat^{-1}\gnoiseVec = \kMat^{-1}\left(\kMat\fVec + \noiseVec\right) = \fVec + \kMat^{-1}\noiseVec = \fVec + V\Sigma^{-1}\trans{U}\noiseVec = \fVec + \sum_{\ell = 0}^{n-1} \frac{\trans{U}_\ell\noiseVec}{\singular_\ell}V_{\cdot,\ell}. 
 \label{eq:InvProd}
 \end{equation}
-Even if $\kMat$ is singular, a solution can still be obtained by using the pseudoinverse $\kMat^\dagger = V{\Sigma^\dagger}U^\trans$, where $\Sigma^\dagger = \diag(1/\singular_0,\ldots,1/\singular_{r-1})$, and the upper bound of summation in \eqref{eq:InvProd} becomes $r-1$. In either the nonsingular or singular case for $\kMat$, however, the summands in \eqref{eq:InvProd} are numerically unstable for small $\singular_\ell$. For a visual representation of this instability, a Picard plot can be constructed. A Picard plot is a graph showing the terms $|U^\trans_{\cdot,\ell}\noiseVec|/\singular_\ell$ in decreasing order with respect to the singular values. If the terms $|U^\trans_{\cdot,\ell}\noiseVec|$ decay faster than $\singular_\ell$ as $\ell$ increases, then the terms $|U^\trans_{\cdot,\ell}\noiseVec|/\singular_\ell$ do not become excessively large; this is the discrete Picard condition \cite{ABT}. The discrete Picard condition is thus a measure of instability. If the discrete Picard condition is not met, then the terms $|U^\trans_{\cdot,\ell}\noiseVec|/\singular_\ell$ blow up as $\ell$ increases, often resulting in worthless solutions. In this report, the discrete Fourier and cosine transforms will be used to obtain solutions analogous to those obtained by \eqref{eq:InvProd}. Figure \ref{PicardPlot} in Chapter \ref{ch:DFT} is an example of a Picard plot is provided that demonstrates the relationship between the noise, the width of the Gaussian blur, and the resulting numerical instabilities related to obtaining meaningful solutions. See \cite{Hansen1990} for more information on Picard plots and the associated discrete Picard condition. \par 
+Even if $\kMat$ is singular, a solution can still be obtained by using the pseudoinverse $\kMat^\dagger = V{\Sigma^\dagger}\trans{U}$, where $\Sigma^\dagger = \diag(1/\singular_0,\ldots,1/\singular_{r-1})$, and the upper bound of summation in \eqref{eq:InvProd} becomes $r-1$. In either the nonsingular or singular case for $\kMat$, however, the summands in \eqref{eq:InvProd} are numerically unstable for small $\singular_\ell$. For a visual representation of this instability, a Picard plot can be constructed. A Picard plot is a graph showing the terms $|\trans{U}_{\cdot,\ell}\noiseVec|/\singular_\ell$ in decreasing order with respect to the singular values. If the terms $|\trans{U}_{\cdot,\ell}\noiseVec|$ decay faster than $\singular_\ell$ as $\ell$ increases, then the terms $|\trans{U}_{\cdot,\ell}\noiseVec|/\singular_\ell$ do not become excessively large; this is the discrete Picard condition \cite{ABT}. The discrete Picard condition is thus a measure of instability. If the discrete Picard condition is not met, then the terms $|\trans{U}_{\cdot,\ell}\noiseVec|/\singular_\ell$ blow up as $\ell$ increases, often resulting in worthless solutions. In this report, the discrete Fourier and cosine transforms will be used to obtain solutions analogous to those obtained by \eqref{eq:InvProd}. Figure \ref{PicardPlot} in Chapter \ref{ch:DFT} is an example of a Picard plot is provided that demonstrates the relationship between the noise, the width of the Gaussian blur, and the resulting numerical instabilities related to obtaining meaningful solutions. See \cite{Hansen1990} for more information on Picard plots and the associated discrete Picard condition. \par 
 A common approach to overcome numerical instabilities is to multiply the summands in \eqref{eq:InvProd} by \textit{filter functions} $\filt$ that depend upon $\singular_\ell$ and a non-negative \textit{regularization parameter} $\regparam$. By doing so, an approximate solution is obtained:
 \begin{equation}
-\fVec_\regparam = \sum_{\ell = 0}^{n-1} V_{\cdot,\ell}\filt(\regparam,\singular_\ell)\left(\frac{{U^\trans_\ell}\gnoiseVec}{\singular_\ell}\right) = V\Phi\Sigma^\dagger U^\trans\gnoiseVec,
+\fVec_\regparam = \sum_{\ell = 0}^{n-1} V_{\cdot,\ell}\filt(\regparam,\singular_\ell)\left(\frac{{\trans{U}_\ell}\gnoiseVec}{\singular_\ell}\right) = V\Phi\Sigma^\dagger \trans{U}\gnoiseVec,
 \label{eq:ApproxSol}
 \end{equation}
 where the matrix $\Phi$ is diagonal with $\Phi_{\ell,\ell} = \filt(\regparam,\singular_\ell)$ for $\ell = 0,\ldots,{n-1}$. The most desired property of the filter functions is that $\filt(\singular_\ell)/\singular_\ell \approx 1$  for large values of $\singular_\ell$ and $\filt(\singular_\ell)/\singular_\ell \approx 0$ for small values of $\singular_\ell$.  Perhaps the simplest filter function is
@@ -28,7 +28,7 @@ where the matrix $\Phi$ is diagonal with $\Phi_{\ell,\ell} = \filt(\regparam,\si
 0, & \singular_\ell^2 \leq \regparam
 \end{cases}\]
 Using this function in (3) gives the approximate solution
-\[\fVec_\regparam = \sum_{\singular_\ell^2 > \regparam} \frac{{U^\trans_\ell}\gnoiseVec}{\singular_\ell}V_{\cdot,\ell}\]
+\[\fVec_\regparam = \sum_{\singular_\ell^2 > \regparam} \frac{{\trans{U}_\ell}\gnoiseVec}{\singular_\ell}V_{\cdot,\ell}\]
 which actually corresponds to the solution obtained using a truncated singular value decomposition (TSVD) of the matrix $\kMat$ \cite[p.~3-5]{Vogel:2002}. \par
 
 \section{Tikhonov regularization} \label{sec:Tikhonov reg.}
@@ -53,7 +53,7 @@ to simplify notation. In contrast to \eqref{eq:TikFilt}, \eqref{eq:TikFiltPsi} i
 
 The use of the Tikhonov filter function to generate an approximate solution is known as \textit{Tikhonov regularization} \cite{Tikh1963}; in terms of an SVD, the obtained solution is
 \begin{equation}
-\fVec_\regparam = \sum_{\ell = 1}^n \filt(\regparam,\singular_\ell)\frac{{U^\trans_\ell}\gnoiseVec}{\singular_\ell}V_{\cdot,\ell} = \sum_{\ell = 0}^{n-1} \frac{\singular_\ell{U^\trans_\ell}\gnoiseVec}{\singular_\ell^2 + \regparam^2}V_{\cdot,\ell} = V\Phi\Sigma^\dagger U^\trans\gnoiseVec.
+\fVec_\regparam = \sum_{\ell = 1}^n \filt(\regparam,\singular_\ell)\frac{{\trans{U}_\ell}\gnoiseVec}{\singular_\ell}V_{\cdot,\ell} = \sum_{\ell = 0}^{n-1} \frac{\singular_\ell{\trans{U}_\ell}\gnoiseVec}{\singular_\ell^2 + \regparam^2}V_{\cdot,\ell} = V\Phi\Sigma^\dagger \trans{U}\gnoiseVec.
 \label{eq:TikSol}
 \end{equation}
 An alternative (and more general) representation of the above Tikhonov solution is
@@ -78,10 +78,10 @@ If the matrix $D$ in \eqref{eq:TikSol2} is non-singular, then the substitutions 
 \label{eq:TikSol Standard Form}
 \end{equation}
 This is known as standard form of the regularization problem. Once $\mathbf{y}$ is obtained from \eqref{eq:TikSol Standard Form}, the final solution is recovered by $\fVec = D^{-1}\mathbf{y}$.  \par 
-However, there are many examples of matrices $D$ that are singular, such as finite difference matrices that approximate derivative operators. In such cases, the regularization can still be recast in standard form, which can be accomplished in a convenient way using the generalized singular value decomposition (GSVD). To simplify the derivation of the GSVD, it will be assumed that the matrix $[\kMat, \regparam D]^\trans$ in \eqref{eq:TikSol3} has full column rank, i.e. $\nullspace(\kMat) \cap \nullspace(D) = \varnothing$, which ensures that the solution $\fVec_\regparam$ is unique. Another simplifying assumption being that the $p \times n$ matrix $D$ with $p \leq n$ has full row rank. Under these assumptions \cite[p.~104]{ABT}, the matrices $\kMat$ and $D$ can be expressed as
+However, there are many examples of matrices $D$ that are singular, such as finite difference matrices that approximate derivative operators. In such cases, the regularization can still be recast in standard form, which can be accomplished in a convenient way using the generalized singular value decomposition (GSVD). To simplify the derivation of the GSVD, it will be assumed that the matrix $\trans{[\kMat, \regparam D]}$ in \eqref{eq:TikSol3} has full column rank, i.e. $\nullspace(\kMat) \cap \nullspace(D) = \varnothing$, which ensures that the solution $\fVec_\regparam$ is unique. Another simplifying assumption being that the $p \times n$ matrix $D$ with $p \leq n$ has full row rank. Under these assumptions \cite[p.~104]{ABT}, the matrices $\kMat$ and $D$ can be expressed as
 \begin{equation}
 \label{eq:GSVD matrices}
-\kMat = U\Lambda X^\trans, \quad D = VMX^\trans
+\kMat = U\Lambda \trans{X}, \quad D = VM\trans{X}
 \end{equation}
 where the matrices $U$, $V$, $\Lambda$, $M$, and $X$ satisfy the following: 
 \begin{itemize}
@@ -91,20 +91,20 @@ where the matrices $U$, $V$, $\Lambda$, $M$, and $X$ satisfy the following:
 \[0 \leq \Lambda_{1,k+1} \leq \ldots \leq \Lambda_{m,k+m} \leq 1,\]
 where $k = 0$ if $m > n$ and $k = n-m$ otherwise. 
 \item $M$ is a diagonal $p \times n$ matrix with $M_{1,1} \geq \ldots \geq M_{p,p} \geq 0.$
-\item $M^\trans M + \Lambda^\trans \Lambda = I$ (the dimension of the identity matrix being $n \times n$).
+\item $\trans{M} M + \trans{\Lambda} \Lambda = I$ (the dimension of the identity matrix being $n \times n$).
 \item $X$ is a nonsingular $n \times n$ matrix.
 \end{itemize}
 The generalized singular values of $\kMat$ and $D$ are defined as $\gamma_\ell = \lambda_{\ell}/\mu_{\ell}$, where
 \begin{equation}
 \label{eq:GSVD lambda}
-\lambda_\ell = \sqrt{(\Lambda^\trans \Lambda)_{\ell,\ell}}, \quad \mu_\ell = \sqrt{(M^\trans M)_{\ell,\ell}}
+\lambda_\ell = \sqrt{(\trans{\Lambda} \Lambda)_{\ell,\ell}}, \quad \mu_\ell = \sqrt{(\trans{M} M)_{\ell,\ell}}
 \end{equation}
 for $\ell = 0,\ldots,{n-1}$. In contrast to the SVD, the generalized singular values are ordered $\gamma_0 \leq \ldots \leq \gamma_{n-1}$. It is also possible that $\mu_\ell = 0$ for some $\ell$, in which case $\gamma_\ell$ is not defined. Even when $\mu_\ell$ is small the resulting value of $\gamma_\ell$ can be excessively large, again emphasizing the need for regularization. By applying the orthogonality properties of the GSVD matrices \cite[p.~105-106]{ABT}, the regularized solution \eqref{eq:TikSol3} can be expressed as
 \begin{equation}
 \label{eq:TikSol GSVD}
-\fVec_\regparam = \sum_{\ell=0}^{n-1} \frac{\gamma_\ell^2}{\gamma_\ell^2 + \regparam^2} \frac{U_{\cdot,\ell+k}^\trans\gnoiseVec}{\lambda_\ell}Y_{\cdot,\ell}
+\fVec_\regparam = \sum_{\ell=0}^{n-1} \frac{\gamma_\ell^2}{\gamma_\ell^2 + \regparam^2} \frac{\trans{U}_{\cdot,\ell+k}\gnoiseVec}{\lambda_\ell}Y_{\cdot,\ell}
 \end{equation}
-where $Y = X^{-\trans}$ (the inverse of $X^\trans$). The terms $\gamma_\ell^2/(\gamma_\ell^2 + \regparam^2)$ are known as the GSVD filter factors, which are identical in form to the filter factors \eqref{eq:TikFilt}. \par 
+where $Y = \invTrans{X}$ (the inverse of $\trans{X}$). The terms $\gamma_\ell^2/(\gamma_\ell^2 + \regparam^2)$ are known as the GSVD filter factors, which are identical in form to the filter factors \eqref{eq:TikFilt}. \par 
 With the derivation of the GSVD established, an extension of the transformation that rendered \eqref{eq:TikSol Standard Form} is now stated \cite[p.~38]{Hansen:98}. First, a weighted version of the pseudoinverse $D^\dagger$ is defined as
 \[D_{\kMat}^\dagger = \left(I - \left(\kMat\left(I - D^\dagger D\right)\right)^\dagger \kMat\right)D^\dagger.\]
 If $p \geq n$, then $D_{\kMat}^\dagger$ is the same as $D^\dagger$. We must also consider
@@ -115,7 +115,7 @@ which is the component of the solution contained in $\nullspace(D)$.  Using the 
 D_{\kMat}^\dagger = X \begin{bmatrix}
 M^{-1} \\
 \mathbf{0}
-\end{bmatrix}V^\trans, \quad \fVec_0 = \sum_{\ell=m+1}^{n} U_{\cdot,\ell}^\trans\gnoiseVec X_{\cdot,\ell}
+\end{bmatrix}\trans{V}, \quad \fVec_0 = \sum_{\ell=m+1}^{n} \trans{U}_{\cdot,\ell}\gnoiseVec X_{\cdot,\ell}
 \end{equation}
 where $\zeroVec$ is the zero matrix of appropriate dimension. The form of the regularized solution can be expressed as \eqref{eq:TikSol Standard Form} with substitutions $\mathbf{y} = D\fVec$, $A = \kMat{D_{\kMat}^\dagger}$, and $\mathbf{b} = \gnoiseVec - \kMat\fVec_0$. 
 %This is shown by writing
@@ -162,7 +162,7 @@ B = \begin{bmatrix}
 1 & 7 & 4
 \end{bmatrix}.\]
 By definition, Toeplitz matrices need not be square. However if a Toeplitz matrix is square with dimension $n \times n$, then it is uniquely determined by $2n-1$ entries. If a Toeplitz matrix is symmetric, then it is determined by $n$ entries. \par
-Some notation for symmetric Toeplitz matrices will be introduced that will be used in Chapter \ref{ch:DCT}. Given a column vector $\mathbf{v}$ of length $n$, let $T(\mathbf{v})$ denote the $n \times n$ symmetric Toeplitz matrix with $\mathbf{v}$ as its first column. As example, the matrix $T(\mathbf{v})$ where $\mathbf{v} = [1,2,3,4]^\trans$ is
+Some notation for symmetric Toeplitz matrices will be introduced that will be used in Chapter \ref{ch:DCT}. Given a column vector $\mathbf{v}$ of length $n$, let $T(\mathbf{v})$ denote the $n \times n$ symmetric Toeplitz matrix with $\mathbf{v}$ as its first column. As example, the matrix $T(\mathbf{v})$ where $\mathbf{v} = \trans{[1,2,3,4]}$ is
 \[T(\mathbf{v}) = \begin{bmatrix}
 1 & 2 & 3 & 4 \\
 2 & 1 & 2 & 3 \\
@@ -177,7 +177,7 @@ The primary connection to be made is that discrete convolutions can be described
 0 & 3 & 2 \\
 0 & 0 & 3 
 \end{bmatrix}.\]
-Certainly $X$ is a Toeplitz matrix, and $x*y$ can be expressed as $Xy^\trans$ with $x*y$ being a (column) vector of length $n_{x*y} = 6$. The operation $Xy^\trans$ is equivalent to \texttt{conv(x,y)} in MATLAB. \par 
+Certainly $X$ is a Toeplitz matrix, and $x*y$ can be expressed as $X\trans{y}$ with $x*y$ being a (column) vector of length $n_{x*y} = 6$. The operation $X\trans{y}$ is equivalent to \texttt{conv(x,y)} in MATLAB. \par 
 A type of matrix that is closely related to Toeplitz matrices is a Hankel matrix. A Hankel matrix is a matrix that is constant along each anti-diagonal. The following are examples of Hankel matrices:
 \[A = \begin{bmatrix}
 -1 & 2 \\
@@ -197,7 +197,7 @@ A specific type of square Hankel matrix is the exchange matrix $J$, defined by o
 0 & 1 & 0 & 0 \\
 1 & 0  & 0 & 0
 \end{bmatrix}.\]
-The exchange matrix is so-named for the property that the product of $J$ with a vector $\mathbf{v}$ has the effect of ``exchanging" (or ``reversing") the entries of $\mathbf{v}$. For example, if $\mathbf{v} = [1,2,3,4]^\trans$ then $J\mathbf{v} = [4,3,2,1]^\trans$. As a result of this property, the exchange matrix is an involution, i.e. $J^2 = I$. Another result of the properties of $J$ is that the product of a Toeplitz matrix with the exchange matrix is a Hankel matrix. Lemma \ref{lem:TJ = H} outlines a specific case where the Toeplitz matrix is symmetric.
+The exchange matrix is so-named for the property that the product of $J$ with a vector $\mathbf{v}$ has the effect of ``exchanging" (or ``reversing") the entries of $\mathbf{v}$. For example, if $\mathbf{v} = \trans{[1,2,3,4]}$ then $J\mathbf{v} = \trans{[4,3,2,1]}$. As a result of this property, the exchange matrix is an involution, i.e. $J^2 = I$. Another result of the properties of $J$ is that the product of a Toeplitz matrix with the exchange matrix is a Hankel matrix. Lemma \ref{lem:TJ = H} outlines a specific case where the Toeplitz matrix is symmetric.
 \begin{lemma}
 \label{lem:TJ = H}
 Let $\mathbf{v} \in \mathbb{R}^n$ and let $J$ be the $n \times n$ exchange matrix. Then $T(J\mathbf{v})J = H(\mathbf{v})$.
@@ -238,7 +238,7 @@ These definitions are nonstandard; typically the factors $1/\sqrt{n}$ in both th
 F_{j,k} = \frac{1}{\sqrt{n}}\exp\left(\frac{-2\pi{ijk}}{n}\right), \quad 0 \leq j,k \leq n-1.
 \label{eq:DFT-Matrix}
 \end{equation}
-The matrix representing the inverse DFT is then $F^\ctrans$, where $\ctrans$ denotes conjugate transposition. A property of $F$ is that $F^\ctrans F = FF^\ctrans = (1/n)\diag(n) = I$, and so splitting the factor of $1/n$ as $(1/\sqrt{n})(1/\sqrt{n})$ for the definition of the DFT provides the benefit of $F$ being a unitary matrix. A direct consequence of the DFT being unitary is Parseval's theorem: $\|\mathbf{f}\| = \|F\mathbf{f}\|$ for any $\mathbf{f} \in \mathbb{C}^n$. Parseval's theorem follows directly from \eqref{eq:DFT} because
+The matrix representing the inverse DFT is then $\ctrans{F}$, where $\ctrans{}$ denotes conjugate transposition. A property of $F$ is that $\ctrans{F} F = F\ctrans{F} = (1/n)\diag(n) = I$, and so splitting the factor of $1/n$ as $(1/\sqrt{n})(1/\sqrt{n})$ for the definition of the DFT provides the benefit of $F$ being a unitary matrix. A direct consequence of the DFT being unitary is Parseval's theorem: $\|\mathbf{f}\| = \|F\mathbf{f}\|$ for any $\mathbf{f} \in \mathbb{C}^n$. Parseval's theorem follows directly from \eqref{eq:DFT} because
 \begin{align*}
 \|F\mathbf{f}\|^2 &= \sum_{\ell=0}^{n-1} |\mathcal{F}(\mathbf{f})_\ell |^2 \\
 &= \sum_{\ell=0}^{n-1} \left(\frac{1}{\sqrt{n}}\sum_{j=0}^{n-1} f_{j}\exp\left(\frac{-2\pi{ij\ell}}{n}\right)\right)\overline{\left(\frac{1}{\sqrt{n}}\sum_{j'=0}^{n-1} f_{j'}\exp\left(\frac{-2\pi{ij'\ell}}{n}\right)\right)} \\
@@ -256,35 +256,35 @@ Therefore
 which proves Parseval's theorem. \par
 As stated previously, a significant property of circulant matrices is that they are diagonalized by the DFT. Using the definition of the $n \times n$ unitary Fourier matrix $F$, the property can be stated as
 \begin{equation}
-C = F^\ctrans\diag(\sqrt{n}\dft{\mathbf{c}})F,
+C = \ctrans{F}\diag(\sqrt{n}\dft{\mathbf{c}})F,
 \label{eq:CircDiag}
 \end{equation}
-where $C$ is any $n \times n$ circulant matrix and $\dft{\mathbf{c}}$ is the DFT of the first row of $C$ (recall that the rows of a circulant matrix are circulant right shifts of a single row vector of length $n$). This property can be shown directly by showing that $C_{j,k} = (F^\ctrans\diag(\dft{\mathbf{c}})F)_{j,k}$ for any $0 \leq j,k \leq n-1$. Using the definition of the DFT and \eqref{eq:Circulant indexing}, the component of $F^\ctrans\diag(\sqrt{n}\dft{\mathbf{c}})F$ in $j$th row and $k$th column is given by
+where $C$ is any $n \times n$ circulant matrix and $\dft{\mathbf{c}}$ is the DFT of the first row of $C$ (recall that the rows of a circulant matrix are circulant right shifts of a single row vector of length $n$). This property can be shown directly by showing that $C_{j,k} = (\ctrans{F}\diag(\dft{\mathbf{c}})F)_{j,k}$ for any $0 \leq j,k \leq n-1$. Using the definition of the DFT and \eqref{eq:Circulant indexing}, the component of $\ctrans{F}\diag(\sqrt{n}\dft{\mathbf{c}})F$ in $j$th row and $k$th column is given by
 \begin{align*}
 \sum_{\ell=0}^{n-1} \left[\frac{1}{\sqrt{n}}  \exp\left(\frac{2\pi{i}k\ell}{n}\right)\right] \left[\sqrt{n}\dft{c}_\ell\right] \left[\frac{1}{\sqrt{n}} \exp\left(\frac{-2\pi{i}j\ell}{n}\right)\right] &= \frac{1}{\sqrt{n}} \sum_{\ell=0}^{n-1} \dft{c}_\ell \exp\left(\frac{2\pi{i}(k-j)\ell}{n}\right) \\
 &= c_{k-j \bmod n} \\
 &= C_{j,k}.
 \end{align*}
-It should be noted that by defining the DFT with the factor of $1/n$ as part of the inverse transformation (while keeping the factor split as $(1/\sqrt{n})(1/\sqrt{n})$ in the matrix form) would allow the property to be stated simply as $C = F^\ctrans\diag(\dft{\mathbf{c}})F$. \par 
+It should be noted that by defining the DFT with the factor of $1/n$ as part of the inverse transformation (while keeping the factor split as $(1/\sqrt{n})(1/\sqrt{n})$ in the matrix form) would allow the property to be stated simply as $C = \ctrans{F}\diag(\dft{\mathbf{c}})F$. \par 
 Now the properties of the DFT will be connected with the SVD of a circulant matrix, which will be the basis for the design of the numerical examples in \ref{sec:Numerical results (DFT)}. Let $\fVec$ and $\kVec$ be the $N$-point discretizations of functions $f$ and $k$ on some interval $[a,b]$. Then the cyclic convolution $\gVec = \kVec * \fVec$ can be computed as a matrix-vector product by constructing an $N \times N$ circulant matrix $\kMat$ from $\kVec$. This construction is carried out by setting the first row of $\kMat$ to be $\kVec$, and each subsequent row to be a circular right shift of the preceding row (see \ref{sec:Classes of matrices}). In MATLAB, the command \texttt{toeplitz([k(1) fliplr(k(2:end))], k)} constructs the matrix $\kMat$. Then $\gVec = \kMat\fVec$, and after the addition of noise the equation \eqref{eq:DisNoise} is obtained. Then by using the property \eqref{eq:CircDiag} with the $N \times N$ unitary Fourier matrix $F$ and assuming that $\kMat$ is invertible, 
 \begin{equation}
-\kMat^{-1}\gnoiseVec = \fVec + (F^\ctrans\diag(\dft{\kVec})F)^{-1}\noiseVec = \fVec + F^\ctrans\diag(\dft{\kVec})^{-1}F\noiseVec = \fVec + \sum_{\ell = 0}^{n-1} F^\ctrans_{\ell,\cdot}\left(\frac{\dft{\noise}_\ell}{\dft{k}_\ell}\right),
+\kMat^{-1}\gnoiseVec = \fVec + (\ctrans{F}\diag(\dft{\kVec})F)^{-1}\noiseVec = \fVec + \ctrans{F}\diag(\dft{\kVec})^{-1}F\noiseVec = \fVec + \sum_{\ell = 0}^{n-1} \ctrans{F}_{\ell,\cdot}\left(\frac{\dft{\noise}_\ell}{\dft{k}_\ell}\right),
 \label{eq:InvProdDFT}
 \end{equation}
-where $\dft{\noise}_\ell$ and $\dft{k}_\ell$ are the $\ell$th Fourier coefficients of $\noiseVec$ and $\kVec$, respectively, and $F^\ctrans_{\ell,\cdot}$ is the conjugate transpose of the $\ell$th row of $F$ (i.e. the $\ell$th column of the matrix $F^\ctrans$). Analogous to \eqref{eq:InvProd}, instabilities can arise if $\dft{k}_\ell$ is small. By introducing filter factors to reduce possible instability, an approximate solution
+where $\dft{\noise}_\ell$ and $\dft{k}_\ell$ are the $\ell$th Fourier coefficients of $\noiseVec$ and $\kVec$, respectively, and $\ctrans{F}_{\ell,\cdot}$ is the conjugate transpose of the $\ell$th row of $F$ (i.e. the $\ell$th column of the matrix $\ctrans{F}$). Analogous to \eqref{eq:InvProd}, instabilities can arise if $\dft{k}_\ell$ is small. By introducing filter factors to reduce possible instability, an approximate solution
 \begin{equation}
-\fVec_\regparam = \sum_{\ell = 0}^{n-1} F^\ctrans_{\ell,\cdot}\left(\frac{\filt(\regparam,\dft{k}_\ell)\dft{\gnoise}_\ell}{\dft{k}_\ell}\right) = F^\ctrans\Phi\dft{\kMat}^\dagger F\gnoiseVec
+\fVec_\regparam = \sum_{\ell = 0}^{n-1} \ctrans{F}_{\ell,\cdot}\left(\frac{\filt(\regparam,\dft{k}_\ell)\dft{\gnoiseVec}_\ell}{\dft{k}_\ell}\right) = \ctrans{F}\Phi\dft{\kMat}^\dagger F\gnoiseVec
 \label{eq:ApproxSolDFT}
 \end{equation}
 can be obtained analogous to \eqref{eq:ApproxSol}, where $\dft{\kMat}^\dagger = \diag(1/\dft{\kVec})$.
-Since $F^\ctrans$ is a matrix representation of the inverse DFT, the approximate solution can be rewritten as
-\[\fVec_\regparam = F^\ctrans \frac{\filt(\regparam,\dft{\kVec})\dft{\gnoiseVec}}{\dft{\kVec}}.\]
+Since $\ctrans{F}$ is a matrix representation of the inverse DFT, the approximate solution can be rewritten as
+\[\fVec_\regparam = \ctrans{F} \frac{\filt(\regparam,\dft{\kVec})\dft{\gnoiseVec}}{\dft{\kVec}}.\]
 Here $\filt(\regparam,\dft{\kVec})\dft{\gnoiseVec}/{\dft{\kVec}}$ is a vector where the operations of multiplication and division are performed component-wise. This representation is useful for making a connection with the MATLAB implementation. \par
-As mentioned in Chapter \ref{ch:Introduction}, a Picard plot is often useful in analyzing the numerical instabilities of solutions obtained from either or \eqref{eq:InvProd} or \eqref{eq:InvProdDFT}. Figure \ref{PicardPlot} shows an example of a Picard plot. The terms $|\dft{k}_\ell|$ decrease down to machine precision, though the $|\dft{\gnoise}_\ell|$ decrease but then level off just above the variance in the noise. As a result, the terms $|\dft{\gnoise}_\ell|/|\dft{k}_\ell|$ only decrease so far and then begin increasing. The steady increase can produce a blow up of the approximate solution. While illustrating these relationships, a Picard plot is also useful in determining how to truncate the sum in \eqref{eq:ApproxSolDFT} to avoid blow up in the solution. For the plot in Figure \ref{PicardPlot}, the sum in \eqref{eq:ApproxSolDFT} should be truncated around index 8 to obtain a meaningful solution. \par 
+As mentioned in Chapter \ref{ch:Introduction}, a Picard plot is often useful in analyzing the numerical instabilities of solutions obtained from either or \eqref{eq:InvProd} or \eqref{eq:InvProdDFT}. Figure \ref{PicardPlot} shows an example of a Picard plot. The terms $|\dft{k}_\ell|$ decrease down to machine precision, though the $|\dft{\gnoiseVec}_\ell|$ decrease but then level off just above the variance in the noise. As a result, the terms $|\dft{\gnoiseVec}_\ell|/|\dft{k}_\ell|$ only decrease so far and then begin increasing. The steady increase can produce a blow up of the approximate solution. While illustrating these relationships, a Picard plot is also useful in determining how to truncate the sum in \eqref{eq:ApproxSolDFT} to avoid blow up in the solution. For the plot in Figure \ref{PicardPlot}, the sum in \eqref{eq:ApproxSolDFT} should be truncated around index 8 to obtain a meaningful solution. \par 
 
 \begin{figure}[htb]
 	\centerline{\includegraphics[scale = 0.45]{Figures/PicardPlot1D_F2_S15_W200.eps}}
-\caption{(Left) A Picard plot generated from the second test function, a Gaussian blur with a width of 200, and an SNR of 15. The terms $|\dft{\gnoise}_\ell|/|\dft{k}_\ell|$ decrease until index 8, at which case the terms increase in magnitude. This is due to the fact that the $|\dft{k}_\ell|$ steadily decrease, while the $|\dft{\gnoise}_\ell|$ level off just below the variance in the noise. (Right) A zoom-in of the Picard plot is provided, showing that elements of the DFT of $\gnoiseVec$ decay only slightly below the variance of the noise in $\gnoiseVec$.}
+\caption{(Left) A Picard plot generated from the second test function, a Gaussian blur with a width of 200, and an SNR of 15. The terms $|\dft{\gnoiseVec}_\ell|/|\dft{k}_\ell|$ decrease until index 8, at which case the terms increase in magnitude. This is due to the fact that the $|\dft{k}_\ell|$ steadily decrease, while the $|\dft{\gnoiseVec}_\ell|$ level off just below the variance in the noise. (Right) A zoom-in of the Picard plot is provided, showing that elements of the DFT of $\gnoiseVec$ decay only slightly below the variance of the noise in $\gnoiseVec$.}
 \label{PicardPlot}
 \end{figure}
 
@@ -313,7 +313,7 @@ C_{j,k} = \sqrt{\frac{2 - \delta_{j,0}}{N}} \cos\left(\frac{\pi{j}(2k + 1)}{2N}\
 \end{equation}
 By switching $j$ and $k$, it is clear that $C$ is not symmetric. However, $C$ is orthogonal which is analogous to the DFT matrix being unitary. Fortunately, many of the statistical results in Section \ref{ch:DCT of white noise} demonstrate that the statistics of the DCT of white noise are simpler that those of the DFT. Another benefit of the DCT is that the implied even boundary conditions ensure continuity at the endpoints in the continuous setting. \par
 To fully describe the set of matrices diagonalized by the DCT, let the shift operator $\shift: \mathbb{R}^n \rightarrow \mathbb{R}^n$ be defined as
-\[\shift(\mathbf{v}) = [v_1,v_2,\ldots,v_{n-1},0]^\trans, \quad \mathbf{v} = [v_0,v_1,\ldots,v_{n-1}]^\trans \in \mathbb{R}^n.\] 
+\[\shift(\mathbf{v}) = \trans{[v_1,v_2,\ldots,v_{n-1},0]}, \quad \mathbf{v} = \trans{[v_0,v_1,\ldots,v_{n-1}]} \in \mathbb{R}^n.\] 
 The class of matrices diagonalization by the DCT can now be described.
 \begin{theorem}[{{\cite{ChanChanWong,KailathOlshevsky1996,Martucci1994,Sanchez_et_al}}}]
 \label{thm:DCT Diagonalization}
@@ -325,7 +325,7 @@ The diagonalization properties of the DCT in relation to Neumann boundary condit
 \label{thm:Neumann Diagonalization}
 Let the kernel sequence \eqref{eq:Kernel seq.} satisfy $k_j = k_{-j}$ for all $j \in \mathbb{Z}$. Then the matrix $K$ in \eqref{eq:Neumann Kf = g} can be expressed as
 \[K = T(\mathbf{u}) + H\left(\shift(\mathbf{u})\right),\]
-where $\mathbf{u} = [k_0,k_1,\ldots,k_{m-1},0,\ldots,0]^\trans$. In other words, $K$ can be diagonalized by the DCT.
+where $\mathbf{u} = \trans{[k_0,k_1,\ldots,k_{m-1},0,\ldots,0]}$. In other words, $K$ can be diagonalized by the DCT.
 \end{theorem}
 \begin{proof}
 Equation \eqref{eq:Neumann Kf = g} gives $K = [(0~|~T_{l})J + T + (T_{r}~|~0)J]$. Then $T = T(\mathbf{u})$ by the definition of $T$, and so it remains to show that $[(0~|~T_{l}) + (T_{r}~|~0)]J = H\left(\shift(\mathbf{u})\right)$. From the definitions of $T_{l}$ and $T_{r}$, the sum $(0~|~T_{l}) + (T_{r}~|~0)$ is equal to $T\left(J\shift(\mathbf{u})\right)$. Thus by Lemma \ref{lem:TJ = H},
@@ -349,19 +349,19 @@ While analysis has been conducted regarding the convergence of predictive and es
 To formalize the concept of downsampling, consider $\mathbf{z} = [z_0,z_2,\ldots,z_{n-1}]$. Then a vector $\mathbf{y}$ is called a downsampling of $\mathbf{z}$ if $\mathbf{y} = [z_{n_0},z_{n_1},\ldots,z_{n_{m-1}}]$, where $m \leq n$ and $n_j:\{0,1,\ldots,{m-1}\}\rightarrow\{0,1,\ldots,{n-1}\}$ is a strictly increasing function. This definition is analogous to the definition of a subsequence except with a finite number of terms. \par
 Theoretically, the variance of the noise vector does not change when a vector is downsampled because of the properties of variance. For any $m\times n$ matrix $M$ and $n$-vector $\noiseVec \sim \mathcal{N}(\zeroVec,\noiseSD^2I)$
 \begin{equation}
-\Var(M\noiseVec) = M\Var(\noiseVec)M^{\trans} = \noiseSD^2MIM^{\trans} = \noiseSD^2MM^{\trans}
+\Var(M\noiseVec) = M\Var(\noiseVec)\trans{M} = \noiseSD^2MI\trans{M} = \noiseSD^2M\trans{M}
 \label{eq:VarProp}
 \end{equation}
-where $MM^\trans$ is an $m \times m$ matrix. Certainly for arbitrary $M$, $MM^\trans$ can differ from an $m \times m$ identity matrix, which would mean that the new noise vector $M\noiseVec$ no longer represents white noise. However, given an $n$-vector $\noiseVec \sim \mathcal{N}(\zeroVec,\noiseSD^2I)$ and the goal of obtaining a downsampled version of $\noiseVec$, a matrix $E$ can be found such that $E\noiseVec$ is the downsampled vector. Since the DFT and DCT are utilized in the regularization process, a downsampled vector whose components are still equidistant from adjacent components is desirable. If the finest sampling $\tVec$ of the interval $[0,1]$ has $N = 2^L$ points, a natural downsampling with this property would be to select every other component of $\tVec$. The resulting downsampled vector would then have length $N/2 = 2^{L-1}$. A matrix $E$ that accomplishes this downsampling is the $N/2 \times N$ matrix defined as
+where $M\trans{M}$ is an $m \times m$ matrix. Certainly for arbitrary $M$, $M\trans{M}$ can differ from an $m \times m$ identity matrix, which would mean that the new noise vector $M\noiseVec$ no longer represents white noise. However, given an $n$-vector $\noiseVec \sim \mathcal{N}(\zeroVec,\noiseSD^2I)$ and the goal of obtaining a downsampled version of $\noiseVec$, a matrix $E$ can be found such that $E\noiseVec$ is the downsampled vector. Since the DFT and DCT are utilized in the regularization process, a downsampled vector whose components are still equidistant from adjacent components is desirable. If the finest sampling $\tVec$ of the interval $[0,1]$ has $N = 2^L$ points, a natural downsampling with this property would be to select every other component of $\tVec$. The resulting downsampled vector would then have length $N/2 = 2^{L-1}$. A matrix $E$ that accomplishes this downsampling is the $N/2 \times N$ matrix defined as
 \begin{equation}
 E = [\mathbf{e}_0 \: \mathbf{0} \: \mathbf{e}_1 \: \mathbf{0} \: \mathbf{e}_2 \: \mathbf{0} \ldots \mathbf{e}_{N-2} \: \mathbf{0}]
 \label{eq:Downsampling matrix}
 \end{equation}
 where $\mathbf{0}$ is the $N/2$-vector of all zeros and $\mathbf{e}_j$ is the $N/2$-vector of all zeros except for 1 as the $j\text{th}$ component, $0 \leq j \leq (N/2)-1$. Another explanation of how to construct $E$ is to concatenate every other row of an $N \times N$ identity matrix. In an effort to clarify this downsampling process, let $\tVec^{n}$ denote the $n$-point downsampling of $\tVec$. Then with this new notation, $\tVec^{N/2} = E\tVec$. \par
 As an example, consider the vector
-\[\tVec = \begin{bmatrix}
+\[\tVec = \trans{\begin{bmatrix}
 0 & \dfrac{1}{8} & \dfrac{1}{4} & \dfrac{3}{8} & \dfrac{1}{2} & \dfrac{5}{8} & \dfrac{3}{4} & \dfrac{7}{8}
-\end{bmatrix}^{\trans},\]
+\end{bmatrix}},\]
 which is an equispaced 8-point discretization of $[0,1]$. The $4 \times 8$ matrix $E$ used to obtain downsampling $\tVec^{4}$ is
 \[E = \begin{bmatrix}
 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
@@ -370,11 +370,11 @@ which is an equispaced 8-point discretization of $[0,1]$. The $4 \times 8$ matri
 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 \\
 \end{bmatrix}.\]
 Then $\tVec^4$ obtained by the product $E\tVec$ has equispaced components as desired:
-\[\tVec^4 = E\tVec = \begin{bmatrix}
+\[\tVec^4 = E\tVec = \trans{\begin{bmatrix}
 0 & \dfrac{1}{4} & \dfrac{1}{2} & \dfrac{3}{4}
-\end{bmatrix}^{\trans}.\]
-\indent Another property of the $N/2 \times N$ matrix $E$ defined in \eqref{eq:Downsampling matrix} is that $EE^{\trans} = I$, where $I$ is the $N/2 \times N/2$ identity matrix.  This is a direct consequence of $\mathbf{e}_j\mathbf{e}_j^\trans = 1$ for all $j$ with $0 \leq j \leq (N/2)-1$. Using the property in \eqref{eq:VarProp}, the variance of the  noise vector $\noiseVec^{N/2}$ downsampled from $\noiseVec$ is then
-\[\Var(\noiseVec^{N/2}) = \Var(E\noiseVec) = E\Var(\noiseVec)E^{\trans} = \noiseSD^2EE^{\trans} = \noiseSD^2I\]
+\end{bmatrix}}.\]
+\indent Another property of the $N/2 \times N$ matrix $E$ defined in \eqref{eq:Downsampling matrix} is that $E\trans{E} = I$, where $I$ is the $N/2 \times N/2$ identity matrix.  This is a direct consequence of $\mathbf{e}_j\trans{\mathbf{e}}_j = 1$ for all $j$ with $0 \leq j \leq (N/2)-1$. Using the property in \eqref{eq:VarProp}, the variance of the  noise vector $\noiseVec^{N/2}$ downsampled from $\noiseVec$ is then
+\[\Var(\noiseVec^{N/2}) = \Var(E\noiseVec) = E\Var(\noiseVec)\trans{E} = \noiseSD^2E\trans{E} = \noiseSD^2I\]
 where $I$ is the $N/2 \times N/2$ identity matrix. Therefore, downsampling white noise vectors in this way produces white noise vectors of half length, theoretically preserving variance across downsamples. As a final remark, the process of downsampling described here can be used to obtain downsampled vectors of length $N/(2^2), N/(2^3), \ldots, N/N$, though the final resolution has been chosen as $N/(2^8) = 16$. \par
 While the variance of the noise is preserved across downsampling resolution in theory, numerically there is some fluctuation. As the downsampling resolutions decrease, i.e. the length of the downsampled vectors decreases, the sample variances more spread out. Figure \ref{VarPlot1D} demonstrates this phenomenon by showing boxplots of sample variance versus downsampling resolutions. %\newpage
 
