@@ -306,3 +306,19 @@ From these equations, the domain of definition of $f(s,t)$ needed for the existe
 %\label{eq:Test Function 2 FT}
 %\end{equation}
 %Certainly there does not exist an $\Omega > 0$ such that the expression in \eqref{eq:Test Function 2 FT} is zero for all $|\omega| > \Omega$.
+
+%Depending upon the structure of $A$ in \eqref{eq:Ax = b}, the process of constructing regularized solutions can be conducted in a frequency domain rather than a spatial domain. The frequency domain we consider in this paper is the one produced from the discrete Fourier transform (DFT). The DFT is a mapping $\mathcal{F}:\mathbb{C}^n \rightarrow \mathbb{C}^n$ defined by
+%\begin{equation}
+%\mathcal{F}(\mathbf{f})_j = \frac{1}{\sqrt{n}}\sum_{\ell=0}^{n-1} f_{\ell}\exp\left(\frac{-2\pi{ij\ell}}{n}\right), \quad \mathbf{f}\in\mathbb{C}^n, \quad 0 \leq k \leq n-1.
+%\label{eq:DFT}
+%\end{equation}
+%The DFT of a vector $\mathbf{f}$ will be denoted by $\widehat{\mathbf{f}}$. The inverse DFT of a vector $\widehat{\mathbf{f}}$ is given by
+%\begin{equation}
+%\mathcal{F}^{-1}(\widehat{\mathbf{f}})_j = \frac{1}{\sqrt{n}}\sum_{\ell=0}^{n-1} \widehat{f}_\ell\exp\left(\frac{2\pi{ij\ell}}{n}\right) = f_j.
+%\end{equation}
+%These definitions are nonstandard; typically the factors $1/\sqrt{n}$ in both the forward and inverse DFT definitions are combined as a single factor of $1/n$ in the definition of the forward DFT. The DFT can also be stated in terms of matrix-vector multiplication. Given an $\mathbf{f} \in \mathbb{C}^n$, $\widehat{\mathbf{f}}$ can be expressed as $F\mathbf{f}$ where the matrix $F\in\mathbb{C}^{n\times{n}}$ has components
+%\begin{equation}
+%F_{j,k} = \frac{1}{\sqrt{n}}\exp\left(\frac{-2\pi{ijk}}{n}\right), \quad 0 \leq j,k \leq n-1.
+%\label{eq:DFT-Matrix}
+%\end{equation}
+%The matrix representing the inverse DFT is then $\trans{F}$, where $\trans{}$ denotes conjugate transposition. A property of $F$ is that $\trans{F}F = F\trans{F} = (1/n)\diag(n) = I$, and so splitting the factor of $1/n$ as $(1/\sqrt{n})(1/\sqrt{n})$ for the definition of the DFT provides the benefit of $F$ being a unitary matrix. A direct consequence of the DFT being unitary is Parseval's theorem: $\|\mathbf{f}\| = \|F\mathbf{f}\|$ for any $\mathbf{f} \in \mathbb{C}^n$. Another useful property of $F$ is that if $C$ is a circulant matrix, then $C = \trans{F}\Delta{F}$ where $\Delta = \diag(\sqrt{n}\dft{\mathbf{c}})$ and $\mathbf{c}$ is the first column of $C$.
