@@ -39,6 +39,28 @@ The term $\E(\|f\|_{\mathcal{H}}^2)$ reduces to $\|f\|_{\mathcal{H}}^2$ because 
 Since $\noiseVec \sim \mathcal{N}(0,\noiseSD^2)$, the expected values of $\noise_j$ and ${\noise_j}{\noise_k}$ are zero and $\noiseSD^2\delta_{jk}$, respectively. Therefore the second term above is zero and the third term is a summation expression for $\noiseSD^2\trace({B^*}B)$.
 \end{proof}
 
+% Complex version
+%\begin{proof}
+%By the linearity of inner products and the expected value operator,
+%\begin{align*}
+%\E(\|f + B\dft{\noiseVec}\|_{\mathcal{H}}^2) &= \E(\langle f + B\noiseVec, f + B\noiseVec\rangle_{\mathcal{H}}) \\
+%&= \E(\|f\|_{\mathcal{H}}^2) + \E\left(\langle f, B\noiseVec\rangle_{\mathcal{H}} + \overline{\langle f, B\noiseVec\rangle_{\mathcal{H}}}\right) + \E(\langle B\noiseVec, B\noiseVec\rangle_{\mathcal{H}}) \\
+%&= \E(\|f\|_{\mathcal{H}}^2) + 2\E\left(\Re(\langle f, B\noiseVec\rangle_{\mathcal{H}})\right) + \E(\langle B\noiseVec, B\noiseVec\rangle_{\mathcal{H}}) \\
+%&= \E(\|f\|_{\mathcal{H}}^2) + 2\Re\left(\E(\langle f, B\noiseVec\rangle_{\mathcal{H}})\right) + \E(\langle B\noiseVec, B\noiseVec\rangle_{\mathcal{H}}).
+%\end{align*}
+%The term $\E(\|f\|_{\mathcal{H}}^2)$ reduces to $\|f\|_{\mathcal{H}}^2$ because $f$ is an element of a deterministic Hilbert space. The inner products can be rewritten using the adjoint of $B$:
+%\begin{align*}
+%\E(\|f + B\noiseVec\|_{\mathcal{H}}^2) &= \|f\|_{\mathcal{H}}^2 + 2\Re\left(\E(\langle f, B\noiseVec\rangle_{\mathcal{H}})\right) + \E(\langle B\noiseVec, B\noiseVec\rangle_{\mathcal{H}}) \\
+%&= \|f\|_{\mathcal{H}}^2 + 2\Re\left(\E(\langle \trans{B}f, \noiseVec\rangle)\right) + \E(\langle \trans{B}B\noiseVec,\noiseVec\rangle) \\
+%&= \|f\|_{\mathcal{H}}^2 + 2\Re\left(\E(\trans{\noiseVec}\trans{B}f)\right) + \E(\trans{\noiseVec}{\trans{B}}B\noiseVec) \\
+%&= \|f\|_{\mathcal{H}}^2 + 2\sum_{j=1}^{N} \E(\noise_j)\Re((\trans{B}f)_j) + \sum_{j=1}^{N}\sum_{k=0}^{N-1} \E(\noise_j\noise_k)(\trans{B}B)_{j,k}.
+%\end{align*}
+%Since $\noiseVec \sim \mathcal{N}(\bm{\mu},\Sigma)$, $\E(\noise_j) = \mu_j$ and $\E(\noise_j\noise_k) = \Sigma_{j,k}$. Thus
+%\[\E(\|f + B\noiseVec\|_{\mathcal{H}}^2) = \|f\|_{\mathcal{H}}^2 + 2\sum_{j=1}^{N} \mu_j\Re((\trans{B}f)_j) + \sum_{j=1}^{N}\sum_{k=1}^{N} \Sigma_{j,k}(\trans{B}B)_{j,k}.\]
+%The double summation can be written using the Frobenius inner product as $\langle \Sigma, \trans{B}B\rangle_F := \trace(\trans{\Sigma}\trans{B}B) = \trace(\trans{\Sigma}\trans{B}B)$. The symmetry of $\Sigma$ and the cyclic property of the trace operator yield the final result:
+%\[\E(\|f + B\noiseVec\|_{\mathcal{H}}^2) = \|f\|_{\mathcal{H}}^2 + 2\sum_{j=1}^{N} \mu_j\Re((\trans{B}f)_j) + \trace(B\Sigma\trans{B}).\]
+%\end{proof}
+
 \noindent Applying the Trace Lemma to the expression for predictive risk yields
 \[\E\left(\frac{1}{n}\|\PE\|^2\right) = \frac{1}{n}\E\left(\|(\A-I)\kMat\fVec + \A\noiseVec\|^2\right) = \frac{1}{n}\|(\A-I)\kMat\fVec\|^2 + \frac{\noiseSD^2}{n}\trace({\A^\trans}\A).\]
 If Tikhonov regularization is used, then the influence matrix $\A$ is $\kMat(\kMat^\ctrans\kMat + \regparam{D^\ctrans}D)^{-1}\kMat^\ctrans$. The matrix $(\kMat^\ctrans\kMat + \regparam{D^\ctrans}D)^{-1}$ is symmetric as a result of $\kMat^\ctrans\kMat$ and $\regparam{D^\ctrans}D$ being individually symmetric, and thus the corresponding influence matrix $\A$ is symmetric.  With a symmetric matrix $\A$, the expected value of predictive risk is simplified to
@@ -307,3 +329,287 @@ As previously stated, the discrepancy function \eqref{eq:SpectralDP} is monotone
 %Let the family of functions $f_1,\ldots,f_R$ be as required. Relabel the functions so that their respective roots are such that $x_1 \leq \ldots \leq x_R$. Then $x_m = \min\{x_1,\ldots,x_R\} = x_1$ and $x_M = \max\{x_1,\ldots,x_R\} = x_R$. Thus it must be shown that $\overline{f} = (1/R)\sum_{j=1}^R f_i$ has a root in $[x_1,x_R]$. Since each $f_i$ is monotone increasing on $[a,b] \supseteq [x_1,x_R]$ and $x_1 \leq \ldots \leq x_R$, $f_\ell(x_1) \leq 0$ for $i = 1,\ldots,R$. Similarly, $f_\ell(x_R) \geq 0$ for $\ell = 1,\ldots,R$. Thus $\overline{f}(x_1) \leq 0$ and $\overline{f}(x_R) \geq 0$, with equality only when $x_1 = \ldots = x_R$. However if this were the case, $\overline{f}(x_1) = \overline{f}(x_R) = 0$ and so certainly $\overline{f}$ has a root in $[x_1,x_R] = \{x_1\} = \ldots = \{x_R\}$. \par 
 %If roots are not equal, then $\overline{f}(x_1) < 0$ and $\overline{f}(x_R) > 0$ since there would exist some $\ell = 1,\ldots,k$ such that $f_\ell(x_1) < 0$ or $f_\ell(x_R) > 0$, again following from the monotoncity of each function in the family. Since $\overline{f}$ is a linear combination of continuous functions, $\overline{f}$ itself is continuous. Thus having $\overline{f}(x_1) < 0$ and $\overline{f}(x_R) > 0$ implies that $\overline{f}$ has a root in $[x_1,x_R]$ by Bolzano's theorem (a corollary to the intermediate value theorem).
 %\end{proof}
+
+%\subsection{Numerical implementation} \label{sec:Implementation}
+%In an effort to streamline a discussion on the implementation of the parameter selection methods, we will use the version of the GSVD outlined in Section \ref{sec:Introduction} (which uses the assumption that the system matrix in \eqref{eq:TikSol3} has full column rank). Specifically, we assume that
+%\begin{equation}
+%\label{eq:Fourier diagonalization}
+%A^{(\ell)} = U{\Delta^{(\ell)}}\trans{X}, \quad L^{(\ell)} = V{\Lambda^{(\ell)}}\trans{X}, \qquad \ell = 1,\ldots,R
+%\end{equation}
+%While this is an extremely strong and unrealistic assumption (the belief that such a factorization does not exist in general is expressed in \cite{Brezinski2003}), it certainly becomes realistic if $A^{(\ell)} = A$ and $L^{(\ell)} = L$ for all $\ell = 1,\ldots,R$. We use \eqref{eq:Fourier diagonalization} to simply present the following derivation in the most general setting. An analogous approach could be taken if the matrices $A^{(\ell)}$ and $L^{(\ell)}$ can be simultaneously diagonalized with respect to a orthogonal/unitary transformation, such as the discrete cosine transform (DCT) or discrete Fourier transform (DFT); test problems using the DCT and DFT are considered in Section \ref{sec:Validation}. \par
+%As motivation for the following derivation, observe that the UPRE, MDP, and GCV methods all involve terms $\frac{1}{n}\|\rVec^{(\ell)}(\regparam)\|_2^2$. In addition, the UPRE and GCV methods involve $\trace(\A^{(\ell)})$. Thus for the implementation of these methods, we consider different representations of $\frac{1}{n}\|\rVec^{(\ell)}(\regparam)\|_2^2$ and $\trace(\A^{(\ell)})$. Using \eqref{eq:Fourier diagonalization}, the matrix $\A^{(\ell)}$ given by \eqref{eq:Influence matrix} can be expressed as
+%\begin{equation}
+%\label{eq:Fourier diagonalization 2}
+%\A^{(\ell)} = U\Delta^{(\ell)}\left[\trans{(\Delta^{(\ell)})}\Delta^{(\ell)} + \regparam^2\trans{(\Lambda^{(\ell)})}\Lambda^{(\ell)}\right]^{-1}\trans{(\Delta^{(\ell)})}\trans{U}, \qquad \ell = 1,\ldots,R.
+%\end{equation}
+%If $\Sigma^{(\ell)} = \noiseSD_\ell^2I$ for all $\ell = 1,\ldots,R,$ then the similarity invariance of the trace operator gives
+%\begin{align}
+%\trace\left(\Sigma^{(\ell)}\A^{\ell}\right) &= \noiseSD_\ell^2 \trace\left(\Delta^{(\ell)}\left[\trans{(\Delta^{(\ell)})}\Delta^{(\ell)} + \regparam^2\trans{(\Lambda^{(\ell)})}\Lambda^{(\ell)}\right]^{-1}\trans{(\Delta^{(\ell)})}\right) \nonumber \\
+%&= \noiseSD_\ell^2 \sum_{j=1}^{n} \frac{\bm{\delta}_j^{(\ell)}}{\bm{\delta}_j^{(\ell)} + \regparam^2 \bm{\lambda}_j^{(\ell)}}
+%\label{eq:Trace}
+%\end{align}
+%where $\bm{\delta}^{(\ell)} = \diag(\trans{(\Delta^{(\ell)})}\Delta^{(\ell)})$ and $\bm{\lambda}^{(\ell)} = \diag(\trans{(\Lambda^{(\ell)})}\Lambda^{(\ell)})$. Another benefit of using \eqref{eq:Fourier diagonalization 2} is that we can write
+%\begin{align}
+%\frac{1}{n}\|\rVec^{(\ell)}(\regparam)\|_2^2 &= \frac{1}{n}\left\|U\left(\Delta^{(\ell)}\left[\trans{(\Delta^{(\ell)})}\Delta^{(\ell)} + \regparam^2\trans{(\Lambda^{(\ell)})}\Lambda^{(\ell)}\right]^{-1}\trans{(\Delta^{(\ell)})} - I\right)\trans{U}\dVec^{(\ell)}\right\|_2^2 \nonumber \\
+%&= \frac{1}{n}\left\|\left(\Delta^{(\ell)}\left[\trans{(\Delta^{(\ell)})}\Delta^{(\ell)} + \regparam^2\trans{(\Lambda^{(\ell)})}\Lambda^{(\ell)}\right]^{-1}\trans{(\Delta^{(\ell)})} - I\right)\dft{\dVec}^{(\ell)}\right\|_2^2 \nonumber \\
+%&= \frac{1}{n}\sum_{j=1}^{n} \left(\frac{-\regparam^2\bm{\lambda}_j^{(\ell)}}{\bm{\delta}_j^{(\ell)} + \regparam^2\bm{\lambda}_j^{(\ell)}}\dft{\dVec}_j^{(\ell)}\right)^2,
+%\label{eq:Fourier regularized residual}
+%\end{align}
+%where $\dft{\dVec} = \trans{U}\dVec$. \par 
+%Using \eqref{eq:Filter functions}, the trace term \eqref{eq:Trace} can be written as
+%\begin{equation}
+%\label{eq:Trace filter}
+%\trace\left(\Sigma^{(\ell)}\A^{\ell}\right) = \noiseSD_\ell^2 \sum_{j=1}^{n} \filt_j^{(\ell)}
+%\end{equation}
+%and the regularized residual term \eqref{eq:Fourier regularized residual} can be written as
+%\begin{equation}
+%\label{eq:Fourier regularized residual filter}
+%\frac{1}{n}\|\rVec^{(\ell)}(\regparam)\|_2^2 = \frac{1}{n}\sum_{j=1}^{n} \left(-\mfilt_j^{(\ell)}\dft{\dVec}_j^{(\ell)}\right)^2 = \frac{1}{n}\sum_{j=1}^{n} \left(\mfilt_j^{(\ell)}\right)^2\left(\dft{\dVec}_j^{(\ell)}\right)^2.
+%\end{equation}
+%The representations \eqref{eq:Trace filter} and \eqref{eq:Fourier regularized residual filter}, or equivalently \eqref{eq:Trace} and \eqref{eq:Fourier regularized residual}, provide a means to explicitly describe the UPRE, MDP, and GCV functions in terms of the spectra of the system and penalty matrices as well as the components of $\dft{\dVec}$. \par 
+%One application of these representation is the differentiation of the UPRE and GCV functions, which is useful for turning the UPRE and GCV methods from minimization problems to root-finding problems. The derivative of \eqref{eq:Averaged UPRE} with respect to $\regparam$ is
+%\[\widetilde{U}'(\regparam) = \frac{1}{R}\sum_{\ell=1}^R \frac{d}{d\regparam}U^{(\ell)}(\regparam)\]
+%where
+%\begin{align}
+%\frac{d}{d\regparam}U^{(\ell)}(\regparam) &= \frac{d}{d\regparam}\left\{\frac{1}{n}\|\rVec^{(\ell)}(\regparam)\|_2^2 + \frac{2}{n} \trace\left(\Sigma^{(\ell)} A_\regparam^{(\ell)}\right) - \frac{1}{n} \trace\left(\Sigma^{(\ell)}\right)\right\} \nonumber \\
+%&= \frac{1}{n} \frac{d}{d\regparam}\left\{\sum_{j=1}^{n} \left(\mfilt_j^{(\ell)}\right)^2\left(\dft{\dVec}_j^{(\ell)}\right)^2 + 2 \trace\left(\Sigma^{(\ell)} A_\regparam^{(\ell)}\right) \right\} \nonumber \\
+%&= \frac{4\regparam}{n} \left[\sum_{j=1}^{n} \frac{\regparam^2\bm{\delta}_j^{(\ell)}\left(\bm{\lambda}_j^{(\ell)}\right)^2}{\left(\bm{\delta}_j^{(\ell)} + \regparam^2 \bm{\lambda}_j^{(\ell)}\right)^3} \left(\dft{\dVec}_j^{(\ell)}\right)^2 - \noiseSD_\ell^2 \sum_{j=1}^{n} \frac{\bm{\delta}_j^{(\ell)}\bm{\lambda}_j^{(\ell)}}{\left(\bm{\delta}_j^{(\ell)} + \regparam^2 \bm{\lambda}_j^{(\ell)}\right)^2}\right].
+%\end{align}
+%Since the regularization parameter is chosen as a zero of $\widetilde{U}'(\regparam)$, the leading constants can be dropped during numerical implementation. \par 
+%Differentiation of the adapted GCV function \eqref{eq:GCV Big 2} is more complicated without the assumption that $A^{(\ell)} = A$ and $L^{(\ell)} = L$ for all $\ell = 1,\ldots,R$. Writing $\widetilde{G}(\regparam)$ in terms of filter functions \eqref{eq:Filter functions} first yields
+%\[\widetilde{G}(\regparam) = \frac{\frac{1}{N}\sum_{\ell=1}^R \left(\sum_{j=1}^n \left(\mfilt_j^{(\ell)}\right)^2\left(\dft{\dVec}_j^{(\ell)}\right)^2\right)}{\left[1 - \frac{1}{N}\sum_{\ell=1}^R \left(\sum_{j=1}^n \filt_j^{(\ell)}\right)\right]^2}.\]
+%Since finding a zero of $\widetilde{G}'(\regparam)$ is equivalent to finding a zero of the numerator of $\widetilde{G}'(\regparam)$, focus is dedicated to just the numerator of $\widetilde{G}'(\regparam)$:
+%\begin{align*}
+%\frac{2}{N}\left[1 - \frac{1}{N}\sum_{\ell=1}^R \left(\sum_{j=1}^n \filt_j^{(\ell)}\right)\right]^2\left[\sum_{\ell=1}^R \left(\sum_{j=1}^n \mfilt_j^{(\ell)}\left(\frac{d}{d\regparam}\mfilt_j^{(\ell)}\right)\left(\dft{\dVec}_j^{(\ell)}\right)^2\right)\right] \\
+%+ \frac{2}{N^2}\left[\sum_{\ell=1}^R \left(\sum_{j=1}^n \left(\mfilt_j^{(\ell)}\right)^2\left(\dft{\dVec}_j^{(\ell)}\right)^2\right)\right]\left[1 - \frac{1}{N}\sum_{\ell=1}^R \left(\sum_{j=1}^n \filt_j^{(\ell)}\right)\right]\left[\sum_{\ell=1}^R \left(\sum_{j=1}^n \frac{d}{d\regparam}\filt_j^{(\ell)}\right)\right].
+%\end{align*}
+%Factoring terms, the process of finding zeros of $\widetilde{G}'(\regparam)$ is reduced to finding solutions of 
+%\begin{align*}
+%0 = \left[1 - \frac{1}{N}\sum_{\ell=1}^R \left(\sum_{j=1}^n \filt_j^{(\ell)}\right)\right]\left[\sum_{\ell=1}^R \left(\sum_{j=1}^n \mfilt_j^{(\ell)}\left(\frac{d}{d\regparam}\mfilt_j^{(\ell)}\right)\left(\dft{\dVec}_j^{(\ell)}\right)^2\right)\right] \\
+%+ \frac{1}{N}\left[\sum_{\ell=1}^R \left(\sum_{j=1}^n \left(\mfilt_j^{(\ell)}\right)^2\left(\dft{\dVec}_j^{(\ell)}\right)^2\right)\right]\left[\sum_{\ell=1}^R \left(\sum_{j=1}^n \frac{d}{d\regparam}\filt_j^{(\ell)}\right)\right].
+%\end{align*}
+%\indent We conclude Section \ref{sec:Methods} by showing a relationship between the adapted methods and the methods as simply applied to averaged data; the relationship is shown by first making some additional assumptions. The assumptions we make in addition to $\Sigma^{(\ell)} = \noiseSD_\ell^2 I$ are that $A^{(\ell)} = A$ and $L^{(\ell)} = L$ as well for all $\ell = 1,\ldots,R$. The consequence of these assumptions is that $\filt_j^{(\ell)} = \filt_j$ (and $\mfilt_j^{(\ell)} = \mfilt_j$) for all $\ell = 1,\ldots,R$. As a remark, recall from Section \ref{sec:Methods} that these assumptions are not necessary for obtaining the results \eqref{eq:Averaged UPRE} and \eqref{eq:Averaged MDP} for the UPRE and MDP methods, respectively. However, these assumptions are necessary in obtaining the corresponding result \eqref{eq:Averaged GCV} for the GCV method. We are now in a situation where all three results hold. \par 
+%Though the following manipulations are done to the adapted UPRE function, they can also be done for the adapted MDP and GCV functions. Using representations \eqref{eq:Trace filter} and \eqref{eq:Fourier regularized residual filter}, we can write \eqref{eq:Averaged UPRE} as
+%\begin{align}
+%\label{eq:Non-average UPRE}
+%\frac{1}{R} \sum_{\ell=1}^R \U^{(\ell)}(\regparam) &= \frac{1}{R} \sum_{\ell=1}^R \left[\frac{1}{n}\sum_{j=1}^{n} \left(\mfilt_j\right)^2|\dft{\dVec}_j^{(\ell)}|^2 + \frac{2\noiseSD_\ell^2}{n} \sum_{j=1}^{n} \filt_j - \noiseSD_\ell^2\right] \nonumber \\
+%&= \frac{1}{R} \sum_{\ell=1}^R \left(\frac{1}{n}\sum_{j=1}^{n} \left(\mfilt_j\right)^2|\dft{\dVec}_j^{(\ell)}|^2\right) + \frac{1}{R} \sum_{\ell=1}^R \left(\frac{2\noiseSD_\ell^2}{n} \sum_{j=1}^{n} \filt_j\right) - \frac{1}{R} \sum_{\ell=1}^R\noiseSD_\ell^2 \nonumber \\
+%&= \frac{1}{n}\sum_{j=1}^{n} \left(\mfilt_j\right)^2\left(\frac{1}{R} \sum_{\ell=1}^R |\dft{\dVec}_j^{(\ell)}|^2\right) + \frac{2}{n} \left(\frac{1}{R} \sum_{\ell=1}^R \noiseSD_\ell^2\right) \left(\sum_{j=1}^{n} \filt_j\right) - \frac{1}{R} \sum_{\ell=1}^R\noiseSD_\ell^2 \nonumber \\
+%&= R\left[\frac{1}{n}\sum_{j=1}^{n} \left(\mfilt_j\right)^2\left(\frac{1}{R^2} \sum_{\ell=1}^R |\dft{\dVec}_j^{(\ell)}|^2\right) + \frac{2}{n} \left(\frac{1}{R^2} \sum_{\ell=1}^R \noiseSD_\ell^2\right) \left(\sum_{j=1}^{n} \filt_j\right) - \frac{1}{R^2} \sum_{\ell=1}^R\noiseSD_\ell^2\right]
+%\end{align}
+%where the last equality is obtained through multiplication by $\frac{R}{R}$. Note that the term $\frac{1}{R^2} \sum_{\ell=1}^R\noiseSD_\ell^2$ is the variance of $\frac{1}{R} \sum_{\ell=1}^R \noiseVec^{(\ell)}$ since the random vectors $\{\noiseVec^{(\ell)}\}_{\ell=1}^R$ are mutually independent. However, \eqref{eq:Non-average UPRE} is not equal to $R$ times the UPRE function as applied to the average of the data
+%\[\aVec \coloneqq \frac{1}{R}\sum_{\ell=1}^R \dVec^{(\ell)} = \frac{1}{R} \sum_{\ell=1}^R \bVec^{(\ell)} + \frac{1}{R} \sum_{\ell=1}^R \noiseVec^{(\ell)}\] 
+%because of the term $\frac{1}{R^2} \sum_{\ell=1}^R |\dft{\dVec}_j^{(\ell)}|^2$. If the UPRE method was used with the average $\aVec$, then
+%\begin{equation}
+%\label{eq:Coefficients of Average}
+%|\dft{\aVec}_j|^2 = \frac{1}{R^2}\left|\sum_{\ell=1}^R \dft{\dVec}_j^{(\ell)}\right|^2 \leq \frac{1}{R^2} \sum_{\ell=1}^R |\dft{\dVec}_j^{(\ell)}|^2, \qquad j = 1,\ldots,n.
+%\end{equation}
+%Thus the result \eqref{eq:Non-average UPRE} shows that for
+%\begin{equation}
+%\label{eq:UPRE of Average}
+%\overline{U}(\regparam) \coloneqq \frac{1}{n}\sum_{j=1}^{n} \left(\mfilt_j\right)^2|\dft{\aVec}_j|^2 + \frac{2}{n} \left(\frac{1}{R^2} \sum_{\ell=1}^R \noiseSD_\ell^2\right) \left(\sum_{j=1}^{n} \filt_j\right) - \frac{1}{R^2} \sum_{\ell=1}^R\noiseSD_\ell^2,
+%\end{equation}
+%i.e. $\overline{U}(\regparam)$ is the UPRE function as applied to the average $\aVec$ of the data $\{\dVec^{(\ell)}\}_{\ell=1}^R$, we have that
+%\begin{equation}
+%\label{eq:UPRE Bound}
+%\widetilde{U}(\regparam) = \frac{1}{R} \sum_{\ell=1}^R \U^{(\ell)}(\regparam) \leq R \overline{U}(\regparam), \qquad \regparam \geq 0.
+%\end{equation}
+%Therefore the adapted UPRE function is truly distinct from simply applying the UPRE method to the average of the data, and the bound \eqref{eq:UPRE Bound} demonstrates a relationship between the two modalities. \par 
+%Analogous bounds can be obtained for the MDP and GCV functions as well. For the GCV method,
+%\[\widetilde{\G}(\regparam) = \frac{1}{R} \sum_{\ell=1}^R \G^{(\ell)}(\regparam) = \frac{1}{R}\sum_{\ell=1}^R \left[\frac{\frac{1}{n}\|\regres^{(\ell)}\|_2^2}{\left[1 - \frac{1}{n}\trace\left(\A\right)\right]^2}\right]  = R\frac{\frac{1}{n}\sum_{j=1}^{n} \left(\mfilt_j\right)^2\left(\frac{1}{R^2} \sum_{\ell=1}^R |\dft{\dVec}_j^{(\ell)}|^2\right)}{\left[1 - \frac{1}{n}\trace\left(\A\right)\right]^2},\]
+%again where the last equality is obtained through multiplication by $\frac{R}{R}$. Using \eqref{eq:Coefficients of Average} and letting
+%\[\overline{\G}(\regparam) = \frac{\frac{1}{n}\sum_{j=1}^{n} \left(\mfilt_j\right)^2|\dft{\aVec}_j|^2}{\left[1 - \frac{1}{n}\trace\left(\A\right)\right]^2},\]
+%we have
+%\begin{equation}
+%\label{eq:GCV Bound}
+%\widetilde{\G}(\regparam) = \frac{1}{R} \sum_{\ell=1}^R \G^{(\ell)}(\regparam) \leq R \overline{\G}(\regparam), \qquad \regparam \geq 0.
+%\end{equation}
+%Lastly, for the MDP method we have $\widetilde{\D}(\regparam)$ is equal to
+%\[\frac{1}{R} \sum_{\ell=1}^R \D^{(\ell)}(\regparam) = \frac{1}{R}\sum_{\ell=1}^R \left[\frac{1}{n}\|\rVec^{(\ell)}(\regparam)\|_2^2 - \noiseSD_{\ell}^2\right] = R\left[\frac{1}{n}\sum_{j=1}^{n} \left(\mfilt_j\right)^2\left(\frac{1}{R^2} \sum_{\ell=1}^R |\dft{\dVec}_j^{(\ell)}|^2\right) - \frac{1}{R^2}\sum_{\ell=1}^R \noiseSD_{\ell}^2\right]\]
+%so that letting
+%\[\overline{\D}(\regparam) = \frac{1}{n}\sum_{j=1}^{n} \left(\mfilt_j\right)^2 |\dft{\aVec}_j|^2 - \frac{1}{R^2}\sum_{\ell=1}^R \noiseSD_{\ell}^2\]
+%results in
+%\begin{equation}
+%\label{eq:MDP Bound}
+%\widetilde{\D}(\regparam) = \frac{1}{R} \sum_{\ell=1}^R \D^{(\ell)}(\regparam) \leq R \overline{\D}(\regparam), \qquad \regparam \geq 0.
+%\end{equation}
+
+%% Fourier version
+%\subsection{Numeric implementation} \label{sec:Implementation}
+%In an effort to streamline a discussion on the implementation of the parameter selection methods, we assume that
+%\begin{equation}
+%\label{eq:Fourier diagonalization}
+%A^{(\ell)} = \trans{F}{\Delta^{(\ell)}}F, \quad L^{(\ell)} = \trans{F}{\Lambda^{(\ell)}}F, \qquad \ell = 1,\ldots,R
+%\end{equation}
+%where $F$ is the unitary discrete Fourier transform (DFT) matrix and $\Delta^{(\ell)}$ and $\Lambda^{(\ell)}$ are diagonal matrices. This assumption is made for the sake of convenience; if the matrices $A^{(\ell)}$ and $L^{(\ell)}$ cannot be simultaneously diagonalized with respect to the DFT or any other unitary transformation, such as the discrete sine or cosine transform, then the GSVD could be utilized instead. \par
+%As motivation for the following derivation, observe that the UPRE, MDP, and GCV methods all involve terms $\frac{1}{n}\|\rVec^{(\ell)}(\regparam)\|_2^2$. In addition, the UPRE and GCV methods involve $\trace(\A^{(\ell)})$. Thus for the implementation of these methods, we consider different representations of $\frac{1}{n}\|\rVec^{(\ell)}(\regparam)\|_2^2$ and $\trace(\A^{(\ell)})$. Using \eqref{eq:Fourier diagonalization}, the matrix $\A^{(\ell)}$ given by \eqref{eq:Influence matrix} can be expressed as
+%\begin{equation}
+%\label{eq:Fourier diagonalization 2}
+%\A^{(\ell)} = \trans{F}\Delta^{(\ell)}\left[\trans{(\Delta^{(\ell)})}\Delta^{(\ell)} + \regparam^2\trans{(\Lambda^{(\ell)})}\Lambda^{(\ell)}\right]^{-1}\trans{(\Delta^{(\ell)})}F, \qquad \ell = 1,\ldots,R.
+%\end{equation}
+%If $\Sigma^{(\ell)} = \noiseSD_\ell^2I$ for all $\ell = 1,\ldots,R,$ then the similarity invariance of the trace operator gives
+%\begin{align}
+%\trace\left(\Sigma^{(\ell)}\A^{\ell}\right) &= \noiseSD_\ell^2 \trace\left(\Delta^{(\ell)}\left[\trans{(\Delta^{(\ell)})}\Delta^{(\ell)} + \regparam^2\trans{(\Lambda^{(\ell)})}\Lambda^{(\ell)}\right]^{-1}\trans{(\Delta^{(\ell)})}\right) \nonumber \\
+%&= \noiseSD_\ell^2 \sum_{j=1}^{n} \frac{|\bm{\delta}_j^{(\ell)}|^2}{|\bm{\delta}_j^{(\ell)}|^2 + \regparam^2 |\bm{\lambda}_j^{(\ell)}|^2}
+%\label{eq:Trace}
+%\end{align}
+%where $\bm{\delta}^{(\ell)} = \diag(\Delta^{(\ell)})$ and $\bm{\lambda}^{(\ell)} = \diag(\Lambda^{(\ell)})$. Another benefit of using \eqref{eq:Fourier diagonalization 2} is that we can write
+%\begin{align}
+%\frac{1}{n}\|\rVec^{(\ell)}(\regparam)\|_2^2 &= \frac{1}{n}\left\|\trans{F}\left(\Delta^{(\ell)}\left[\trans{(\Delta^{(\ell)})}\Delta^{(\ell)} + \regparam^2\trans{(\Lambda^{(\ell)})}\Lambda^{(\ell)}\right]^{-1}\trans{(\Delta^{(\ell)})} - I\right)F\dVec^{(\ell)}\right\|_2^2 \nonumber \\
+%&= \frac{1}{n}\left\|\left(\Delta^{(\ell)}\left[\trans{(\Delta^{(\ell)})}\Delta^{(\ell)} + \regparam^2\trans{(\Lambda^{(\ell)})}\Lambda^{(\ell)}\right]^{-1}\trans{(\Delta^{(\ell)})} - I\right)\left(\sqrt{n}\right)\dft{\dVec}^{(\ell)}\right\|_2^2 \nonumber \\
+%&= \sum_{j=1}^{n} \left(\frac{-\regparam^2|\bm{\lambda}_j^{(\ell)}|^2}{|\bm{\delta}_j^{(\ell)}|^2 + \regparam^2|\bm{\lambda}_j^{(\ell)}|^2}|\dft{\dVec}_j^{(\ell)}|\right)^2,
+%\label{eq:Fourier regularized residual}
+%\end{align}
+%which uses $F\dVec = (\sqrt{n})\dft{\dVec}$ with $\dft{\dVec}$ being the standard DFT of $\dVec$ \cite{Vogel:2002}. Filter functions similar to \eqref{eq:TikFilt} can be introduced to further simplify notation; letting
+%\begin{equation}
+%\label{eq:Filter functions}
+%\filt_j^{(\ell)} = \frac{|\bm{\delta}_j^{(\ell)}|^2}{|\bm{\delta}_j^{(\ell)}|^2 + \regparam^2 |\bm{\lambda}_j^{(\ell)}|^2}, \quad \mfilt_j^{(\ell)} = 1 - \filt_j^{(\ell)} = \frac{\regparam^2|\bm{\lambda}_j^{(\ell)}|^2}{|\bm{\delta}_j^{(\ell)}|^2 + \regparam^2 |\bm{\lambda}_j^{(\ell)}|^2},
+%\end{equation}
+%the trace term \eqref{eq:Trace} can be written as
+%\begin{equation}
+%\label{eq:Trace filter}
+%\trace\left(\Sigma^{(\ell)}\A^{\ell}\right) = \noiseSD_\ell^2 \sum_{j=1}^{n} \filt_j^{(\ell)}
+%\end{equation}
+%and the regularized residual term \eqref{eq:Fourier regularized residual} can be written as
+%\begin{equation}
+%\label{eq:Fourier regularized residual filter}
+%\frac{1}{n}\|\rVec^{(\ell)}(\regparam)\|_2^2 = \sum_{j=1}^{n} \left(-\mfilt_j^{(\ell)}|\dft{\dVec}_j^{(\ell)}|\right)^2 = \sum_{j=1}^{n} \left(\mfilt_j^{(\ell)}\right)^2|\dft{\dVec}_j^{(\ell)}|^2.
+%\end{equation}
+%The representations \eqref{eq:Trace filter} and \eqref{eq:Fourier regularized residual filter}, or equivalently \eqref{eq:Trace} and \eqref{eq:Fourier regularized residual}, provide a means to explicitly describe the UPRE, MDP, and GCV functions in terms of the spectra of the system and penalty matrices as well as the components of $\dft{\dVec}$. We conclude Section \ref{sec:Methods} by showing a relationship between the adapted methods and the methods as simply applied to averaged data; the relationship is shown by first making some additional assumptions. \par 
+%The assumptions we make in addition to $\Sigma^{(\ell)} = \noiseSD_\ell^2 I$ are that $A^{(\ell)} = A$ and $L^{(\ell)} = L$ as well for all $\ell = 1,\ldots,R$. The consequence of these assumptions is that $\filt_j^{(\ell)} = \filt_j$ (and $\mfilt_j^{(\ell)} = \mfilt_j$) for all $\ell = 1,\ldots,R$. As a remark, recall from Section \ref{sec:Methods} that these assumptions are not necessary for obtaining the results \eqref{eq:Averaged UPRE} and \eqref{eq:Averaged MDP} for the UPRE and MDP methods, respectively. However, these assumptions are necessary in obtaining the corresponding result \eqref{eq:Averaged GCV} for the GCV method. We are now in a situation where all three results hold. \par 
+%Though the following manipulations are done to the adapted UPRE function, they can also be done for the adapted MDP and GCV functions. Using representations \eqref{eq:Trace filter} and \eqref{eq:Fourier regularized residual filter}, we can write \eqref{eq:Averaged UPRE} as
+%\begin{align}
+%\label{eq:Non-average UPRE}
+%\frac{1}{R} \sum_{\ell=1}^R \U^{(\ell)}(\regparam) &= \frac{1}{R} \sum_{\ell=1}^R \left[\sum_{j=1}^{n} \left(\mfilt_j\right)^2|\dft{\dVec}_j^{(\ell)}|^2 + \frac{2\noiseSD_\ell^2}{n} \sum_{j=1}^{n} \filt_j - \noiseSD_\ell^2\right] \nonumber \\
+%&= \frac{1}{R} \sum_{\ell=1}^R \left(\sum_{j=1}^{n} \left(\mfilt_j\right)^2|\dft{\dVec}_j^{(\ell)}|^2\right) + \frac{1}{R} \sum_{\ell=1}^R \left(\frac{2\noiseSD_\ell^2}{n} \sum_{j=1}^{n} \filt_j\right) - \frac{1}{R} \sum_{\ell=1}^R\noiseSD_\ell^2 \nonumber \\
+%&= \sum_{j=1}^{n} \left(\mfilt_j\right)^2\left(\frac{1}{R} \sum_{\ell=1}^R |\dft{\dVec}_j^{(\ell)}|^2\right) + \frac{2}{n} \left(\frac{1}{R} \sum_{\ell=1}^R \noiseSD_\ell^2\right) \left(\sum_{j=1}^{n} \filt_j\right) - \frac{1}{R} \sum_{\ell=1}^R\noiseSD_\ell^2 \nonumber \\
+%&= R\left[\sum_{j=1}^{n} \left(\mfilt_j\right)^2\left(\frac{1}{R^2} \sum_{\ell=1}^R |\dft{\dVec}_j^{(\ell)}|^2\right) + \frac{2}{n} \left(\frac{1}{R^2} \sum_{\ell=1}^R \noiseSD_\ell^2\right) \left(\sum_{j=1}^{n} \filt_j\right) - \frac{1}{R^2} \sum_{\ell=1}^R\noiseSD_\ell^2\right]
+%\end{align}
+%where the last equality is obtained through multiplication by $\frac{R}{R}$. Note that the term $\frac{1}{R^2} \sum_{\ell=1}^R\noiseSD_\ell^2$ is the variance of $\frac{1}{R} \sum_{\ell=1}^R \noiseVec^{(\ell)}$ since the random vectors $\{\noiseVec^{(\ell)}\}_{\ell=1}^R$ are mutually independent. However, \eqref{eq:Non-average UPRE} is not equal to $R$ times the UPRE function as applied to the average of the data
+%\[\aVec \coloneqq \frac{1}{R}\sum_{\ell=1}^R \dVec^{(\ell)} = \frac{1}{R} \sum_{\ell=1}^R \bVec^{(\ell)} + \frac{1}{R} \sum_{\ell=1}^R \noiseVec^{(\ell)}\] 
+%because of the term $\frac{1}{R^2} \sum_{\ell=1}^R |\dft{\dVec}_j^{(\ell)}|^2$. If the UPRE method was used with the average $\aVec$, then
+%\begin{equation}
+%\label{eq:Coefficients of Average}
+%|\dft{\aVec}_j|^2 = \frac{1}{R^2}\left|\sum_{\ell=1}^R \dft{\dVec}_j^{(\ell)}\right|^2 \leq \frac{1}{R^2} \sum_{\ell=1}^R |\dft{\dVec}_j^{(\ell)}|^2, \qquad j = 1,\ldots,n.
+%\end{equation}
+%Thus the result \eqref{eq:Non-average UPRE} shows that for
+%\begin{equation}
+%\label{eq:UPRE of Average}
+%\overline{U}(\regparam) \coloneqq \sum_{j=1}^{n} \left(\mfilt_j\right)^2|\dft{\aVec}_j|^2 + \frac{2}{n} \left(\frac{1}{R^2} \sum_{\ell=1}^R \noiseSD_\ell^2\right) \left(\sum_{j=1}^{n} \filt_j\right) - \frac{1}{R^2} \sum_{\ell=1}^R\noiseSD_\ell^2,
+%\end{equation}
+%i.e. $\overline{U}(\regparam)$ is the UPRE function as applied to the average $\aVec$ of the data $\{\dVec^{(\ell)}\}_{\ell=1}^R$, we have that
+%\begin{equation}
+%\label{eq:UPRE Bound}
+%\widetilde{U}(\regparam) = \frac{1}{R} \sum_{\ell=1}^R \U^{(\ell)}(\regparam) \leq R \overline{U}(\regparam), \qquad \regparam \geq 0.
+%\end{equation}
+%Therefore the adapted UPRE function is truly distinct from simply applying the UPRE method to the average of the data, and the bound \eqref{eq:UPRE Bound} demonstrates a relationship between the two modalities. Analogous bounds can be obtained for the MDP and GCV functions as well.
+%
+%In an effort to streamline a discussion on the implementation of the parameter selection methods, we assume that
+%\begin{equation}
+%\label{eq:Fourier diagonalization}
+%A^{(\ell)} = \trans{F}{\Delta^{(\ell)}}F, \quad L^{(\ell)} = \trans{F}{\Lambda^{(\ell)}}F, \qquad \ell = 1,\ldots,R
+%\end{equation}
+%where $F$ is the unitary discrete Fourier transform (DFT) matrix and $\Delta^{(\ell)}$ and $\Lambda^{(\ell)}$ are diagonal matrices. This assumption is made for the sake of convenience; if the matrices $A^{(\ell)}$ and $L^{(\ell)}$ cannot be simultaneously diagonalized with respect to the DFT or any other unitary transformation, such as the discrete sine or cosine transform, then the GSVD could be utilized instead. \par
+%As motivation for the following derivation, observe that the UPRE, MDP, and GCV methods all involve terms $\frac{1}{n}\|\rVec^{(\ell)}(\regparam)\|_2^2$. In addition, the UPRE and GCV methods involve $\trace(\A^{(\ell)})$. Thus for the implementation of these methods, we consider different representations of $\frac{1}{n}\|\rVec^{(\ell)}(\regparam)\|_2^2$ and $\trace(\A^{(\ell)})$. Using \eqref{eq:Fourier diagonalization}, the matrix $\A^{(\ell)}$ given by \eqref{eq:Influence matrix} can be expressed as
+%\begin{equation}
+%\label{eq:Fourier diagonalization 2}
+%\A^{(\ell)} = \trans{F}\Delta^{(\ell)}\left[\trans{(\Delta^{(\ell)})}\Delta^{(\ell)} + \regparam^2\trans{(\Lambda^{(\ell)})}\Lambda^{(\ell)}\right]^{-1}\trans{(\Delta^{(\ell)})}F, \qquad \ell = 1,\ldots,R.
+%\end{equation}
+%If $\Sigma^{(\ell)} = \noiseSD_\ell^2I$ for all $\ell = 1,\ldots,R,$ then the similarity invariance of the trace operator gives
+%\begin{align}
+%\trace\left(\Sigma^{(\ell)}\A^{\ell}\right) &= \noiseSD_\ell^2 \trace\left(\Delta^{(\ell)}\left[\trans{(\Delta^{(\ell)})}\Delta^{(\ell)} + \regparam^2\trans{(\Lambda^{(\ell)})}\Lambda^{(\ell)}\right]^{-1}\trans{(\Delta^{(\ell)})}\right) \nonumber \\
+%&= \noiseSD_\ell^2 \sum_{j=1}^{n} \frac{|\bm{\delta}_j^{(\ell)}|^2}{|\bm{\delta}_j^{(\ell)}|^2 + \regparam^2 |\bm{\lambda}_j^{(\ell)}|^2}
+%\label{eq:Trace}
+%\end{align}
+%where $\bm{\delta}^{(\ell)} = \diag(\Delta^{(\ell)})$ and $\bm{\lambda}^{(\ell)} = \diag(\Lambda^{(\ell)})$. Another benefit of using \eqref{eq:Fourier diagonalization 2} is that we can write
+%\begin{align}
+%\frac{1}{n}\|\rVec^{(\ell)}(\regparam)\|_2^2 &= \frac{1}{n}\left\|\trans{F}\left(\Delta^{(\ell)}\left[\trans{(\Delta^{(\ell)})}\Delta^{(\ell)} + \regparam^2\trans{(\Lambda^{(\ell)})}\Lambda^{(\ell)}\right]^{-1}\trans{(\Delta^{(\ell)})} - I\right)F\dVec^{(\ell)}\right\|_2^2 \nonumber \\
+%&= \frac{1}{n}\left\|\left(\Delta^{(\ell)}\left[\trans{(\Delta^{(\ell)})}\Delta^{(\ell)} + \regparam^2\trans{(\Lambda^{(\ell)})}\Lambda^{(\ell)}\right]^{-1}\trans{(\Delta^{(\ell)})} - I\right)\left(\sqrt{n}\right)\dft{\dVec}^{(\ell)}\right\|_2^2 \nonumber \\
+%&= \sum_{j=1}^{n} \left(\frac{-\regparam^2|\bm{\lambda}_j^{(\ell)}|^2}{|\bm{\delta}_j^{(\ell)}|^2 + \regparam^2|\bm{\lambda}_j^{(\ell)}|^2}|\dft{\dVec}_j^{(\ell)}|\right)^2,
+%\label{eq:Fourier regularized residual}
+%\end{align}
+%which uses $F\dVec = (\sqrt{n})\dft{\dVec}$ with $\dft{\dVec}$ being the standard DFT of $\dVec$ \cite{Vogel:2002}. Filter functions similar to \eqref{eq:TikFilt} can be introduced to further simplify notation; letting
+%\begin{equation}
+%\label{eq:Filter functions}
+%\filt_j^{(\ell)} = \frac{|\bm{\delta}_j^{(\ell)}|^2}{|\bm{\delta}_j^{(\ell)}|^2 + \regparam^2 |\bm{\lambda}_j^{(\ell)}|^2}, \quad \mfilt_j^{(\ell)} = 1 - \filt_j^{(\ell)} = \frac{\regparam^2|\bm{\lambda}_j^{(\ell)}|^2}{|\bm{\delta}_j^{(\ell)}|^2 + \regparam^2 |\bm{\lambda}_j^{(\ell)}|^2},
+%\end{equation}
+%the trace term \eqref{eq:Trace} can be written as
+%\begin{equation}
+%\label{eq:Trace filter}
+%\trace\left(\Sigma^{(\ell)}\A^{\ell}\right) = \noiseSD_\ell^2 \sum_{j=1}^{n} \filt_j^{(\ell)}
+%\end{equation}
+%and the regularized residual term \eqref{eq:Fourier regularized residual} can be written as
+%\begin{equation}
+%\label{eq:Fourier regularized residual filter}
+%\frac{1}{n}\|\rVec^{(\ell)}(\regparam)\|_2^2 = \sum_{j=1}^{n} \left(-\mfilt_j^{(\ell)}|\dft{\dVec}_j^{(\ell)}|\right)^2 = \sum_{j=1}^{n} \left(\mfilt_j^{(\ell)}\right)^2|\dft{\dVec}_j^{(\ell)}|^2.
+%\end{equation}
+%The representations \eqref{eq:Trace filter} and \eqref{eq:Fourier regularized residual filter}, or equivalently \eqref{eq:Trace} and \eqref{eq:Fourier regularized residual}, provide a means to explicitly describe the UPRE, MDP, and GCV functions in terms of the spectra of the system and penalty matrices as well as the components of $\dft{\dVec}$. We conclude Section \ref{sec:Methods} by showing a relationship between the adapted methods and the methods as simply applied to averaged data; the relationship is shown by first making some additional assumptions. \par 
+%The assumptions we make in addition to $\Sigma^{(\ell)} = \noiseSD_\ell^2 I$ are that $A^{(\ell)} = A$ and $L^{(\ell)} = L$ as well for all $\ell = 1,\ldots,R$. The consequence of these assumptions is that $\filt_j^{(\ell)} = \filt_j$ (and $\mfilt_j^{(\ell)} = \mfilt_j$) for all $\ell = 1,\ldots,R$. As a remark, recall from Section \ref{sec:Methods} that these assumptions are not necessary for obtaining the results \eqref{eq:Averaged UPRE} and \eqref{eq:Averaged MDP} for the UPRE and MDP methods, respectively. However, these assumptions are necessary in obtaining the corresponding result \eqref{eq:Averaged GCV} for the GCV method. We are now in a situation where all three results hold. \par 
+%Though the following manipulations are done to the adapted UPRE function, they can also be done for the adapted MDP and GCV functions. Using representations \eqref{eq:Trace filter} and \eqref{eq:Fourier regularized residual filter}, we can write \eqref{eq:Averaged UPRE} as
+%\begin{align}
+%\label{eq:Non-average UPRE}
+%\frac{1}{R} \sum_{\ell=1}^R \U^{(\ell)}(\regparam) &= \frac{1}{R} \sum_{\ell=1}^R \left[\sum_{j=1}^{n} \left(\mfilt_j\right)^2|\dft{\dVec}_j^{(\ell)}|^2 + \frac{2\noiseSD_\ell^2}{n} \sum_{j=1}^{n} \filt_j - \noiseSD_\ell^2\right] \nonumber \\
+%&= \frac{1}{R} \sum_{\ell=1}^R \left(\sum_{j=1}^{n} \left(\mfilt_j\right)^2|\dft{\dVec}_j^{(\ell)}|^2\right) + \frac{1}{R} \sum_{\ell=1}^R \left(\frac{2\noiseSD_\ell^2}{n} \sum_{j=1}^{n} \filt_j\right) - \frac{1}{R} \sum_{\ell=1}^R\noiseSD_\ell^2 \nonumber \\
+%&= \sum_{j=1}^{n} \left(\mfilt_j\right)^2\left(\frac{1}{R} \sum_{\ell=1}^R |\dft{\dVec}_j^{(\ell)}|^2\right) + \frac{2}{n} \left(\frac{1}{R} \sum_{\ell=1}^R \noiseSD_\ell^2\right) \left(\sum_{j=1}^{n} \filt_j\right) - \frac{1}{R} \sum_{\ell=1}^R\noiseSD_\ell^2 \nonumber \\
+%&= R\left[\sum_{j=1}^{n} \left(\mfilt_j\right)^2\left(\frac{1}{R^2} \sum_{\ell=1}^R |\dft{\dVec}_j^{(\ell)}|^2\right) + \frac{2}{n} \left(\frac{1}{R^2} \sum_{\ell=1}^R \noiseSD_\ell^2\right) \left(\sum_{j=1}^{n} \filt_j\right) - \frac{1}{R^2} \sum_{\ell=1}^R\noiseSD_\ell^2\right]
+%\end{align}
+%where the last equality is obtained through multiplication by $\frac{R}{R}$. Note that the term $\frac{1}{R^2} \sum_{\ell=1}^R\noiseSD_\ell^2$ is the variance of $\frac{1}{R} \sum_{\ell=1}^R \noiseVec^{(\ell)}$ since the random vectors $\{\noiseVec^{(\ell)}\}_{\ell=1}^R$ are mutually independent. However, \eqref{eq:Non-average UPRE} is not equal to $R$ times the UPRE function as applied to the average of the data
+%\[\aVec \coloneqq \frac{1}{R}\sum_{\ell=1}^R \dVec^{(\ell)} = \frac{1}{R} \sum_{\ell=1}^R \bVec^{(\ell)} + \frac{1}{R} \sum_{\ell=1}^R \noiseVec^{(\ell)}\] 
+%because of the term $\frac{1}{R^2} \sum_{\ell=1}^R |\dft{\dVec}_j^{(\ell)}|^2$. If the UPRE method was used with the average $\aVec$, then
+%\begin{equation}
+%\label{eq:Coefficients of Average}
+%|\dft{\aVec}_j|^2 = \frac{1}{R^2}\left|\sum_{\ell=1}^R \dft{\dVec}_j^{(\ell)}\right|^2 \leq \frac{1}{R^2} \sum_{\ell=1}^R |\dft{\dVec}_j^{(\ell)}|^2, \qquad j = 1,\ldots,n.
+%\end{equation}
+%Thus the result \eqref{eq:Non-average UPRE} shows that for
+%\begin{equation}
+%\label{eq:UPRE of Average}
+%\overline{U}(\regparam) \coloneqq \sum_{j=1}^{n} \left(\mfilt_j\right)^2|\dft{\aVec}_j|^2 + \frac{2}{n} \left(\frac{1}{R^2} \sum_{\ell=1}^R \noiseSD_\ell^2\right) \left(\sum_{j=1}^{n} \filt_j\right) - \frac{1}{R^2} \sum_{\ell=1}^R\noiseSD_\ell^2,
+%\end{equation}
+%i.e. $\overline{U}(\regparam)$ is the UPRE function as applied to the average $\aVec$ of the data $\{\dVec^{(\ell)}\}_{\ell=1}^R$, we have that
+%\begin{equation}
+%\label{eq:UPRE Bound}
+%\widetilde{U}(\regparam) = \frac{1}{R} \sum_{\ell=1}^R \U^{(\ell)}(\regparam) \leq R \overline{U}(\regparam), \qquad \regparam \geq 0.
+%\end{equation}
+%Therefore the adapted UPRE function is truly distinct from simply applying the UPRE method to the average of the data, and the bound \eqref{eq:UPRE Bound} demonstrates a relationship between the two modalities. Analogous bounds can be obtained for the MDP and GCV functions as well.
+
+%It is from \eqref{eq:Coefficients of Average} and \eqref{eq:UPRE Bound} that we base a heuristic advocating the use of $\widetilde{U}(\regparam)$ for the selection of a regularization parameter for multiple data sets. If the data are similar, in that
+%\begin{equation}
+%\label{eq:Heuristic Assumption}
+%\frac{1}{R^2}\left|\sum_{\ell=1}^R \dft{\dVec}_j^{(\ell)}\right|^2 \approx \frac{1}{R^2} \sum_{\ell=1}^R |\dft{\dVec}_j^{(\ell)}|^2, \qquad j = 1,\ldots,n,
+%\end{equation}
+%then $\widetilde{U}(\regparam) \approx R \overline{U}(\regparam)$ which would suggest that the minimizers of these functions could be close in value.
+
+%is that we can express terms in the UPRE, GCV, and MDP functions in a way that is more tractable for differentiation with respect to $\regparam$. \par
+%Since the MDP method relies on finding a root, the UPRE and GCV functions will be cast as in a similar way. Starting with the UPRE method from Section \ref{sec:UPRE}, we now write \eqref{eq:Individual UPRE} as
+%\begin{equation}
+%\label{eq:Individual UPRE 2}
+%\U^{(\ell)}(\regparam) = \sum_{j=1}^{n} \left(\mfilt_j^{(\ell)}(\regparam)\right)^2|\dft{\dVec}_j^{(\ell)}|^2 + \frac{2\noiseSD_\ell^2}{n}\sum_{j=1}^{n} \filt_j^{(\ell)}(\regparam) - \noiseSD_{\ell}^2
+%\end{equation}
+%for $\ell = 1,\ldots,R$. The first and second derivatives of \eqref{eq:Individual UPRE 2} with respect to $\regparam$ are, respectively,
+%\begin{align}
+%\frac{d}{d\regparam}\U^{(\ell)}(\regparam) &= 2\sum_{j=1}^{n} \mfilt_j^{(\ell)}(\regparam)\left(\frac{d}{d\regparam}\mfilt_j^{(\ell)}(\regparam)\right)|\dft{\dVec}_j^{(\ell)}|^2 + \frac{2\noiseSD_\ell^2}{n} \sum_{j=1}^{n} \frac{d}{d\regparam}\left(\filt_j^{(\ell)}(\regparam)\right), \\
+%\frac{d^2}{d\regparam^2}\U^{(\ell)}(\regparam) &= 2\sum_{j=1}^{n} \left[\left(\frac{d}{d\regparam}\mfilt_j^{(\ell)}(\regparam)\right)^2 + \mfilt_j^{(\ell)}(\regparam)\left(\frac{d^2}{d\regparam^2}\mfilt_j^{(\ell)}(\regparam)\right)\right]|\dft{\dVec}_j^{(\ell)}|^2 + \frac{2\noiseSD_\ell^2}{n} \sum_{j=1}^{n} \frac{d^2}{d\regparam^2}\left(\filt_j^{(\ell)}(\regparam)\right).
+%\end{align}
+%Second derivatives will be used later for an argument regarding convexity of the parameter selection functions. \par 
+%For the GCV method, we can write \eqref{eq:Individual GCV} as 
+%\begin{equation}
+%\label{eq:Individual GCV 2}
+%\G^{(\ell)}(\regparam) = \frac{\sum_{j=1}^{n} \left(\mfilt_j^{(\ell)}(\regparam)\right)^2|\dft{\dVec}_j^{(\ell)}|^2}{\left[1 - \frac{1}{n}\sum_{j=1}^{n} \filt_j^{(\ell)}(\regparam)\right]^2} = n^2 \frac{\sum_{j=1}^{n} \left(\mfilt_j^{(\ell)}(\regparam)\right)^2|\dft{\dVec}_j^{(\ell)}|^2}{\left[\sum_{j=1}^{n} \mfilt_j^{(\ell)}(\regparam)\right]^2}, \quad \ell = 1,\ldots,R.
+%\end{equation}
+%Recall from Section \ref{sec:GCV} that \eqref{eq:GCV Big 3} only holds if $\A^{(\ell)} = \A$, or equivalently $\mfilt_j^{(\ell)}(\regparam) = \mfilt_j(\regparam)$, for all $\ell = 1,\ldots,R$. Assuming this is the case, the first derivative of \eqref{eq:Individual GCV 2} is
+%\begin{align}
+%\frac{d}{d\regparam}\G^{(\ell)}(\regparam) &= \frac{n^2}{\left[\sum_{j=1}^{n} \mfilt_j^{(\ell)}(\regparam)\right]^4}  \Bigg(2\left[\sum_{j=1}^{n} \mfilt_j^{(\ell)}(\regparam)\left(\frac{d}{d\regparam}\mfilt_j^{(\ell)}(\regparam)\right)|\dft{\dVec}_j^{(\ell)}|^2\right]\left[\sum_{j=1}^{n} \mfilt_j^{(\ell)}(\regparam)\right]^2 \\
+%&- \left[\sum_{j=1}^{n} \left(\mfilt_j^{(\ell)}(\regparam)\right)^2|\dft{\dVec}_j^{(\ell)}|^2\right]\Bigg[2\sum_{j=1}^{n}\mfilt_j^{(\ell)}(\regparam)\left(\frac{d}{d\regparam}\mfilt_j^{(\ell)}(\regparam)\right) \\
+%&+ \sum_{j \neq k} \left(\frac{d}{d\regparam}\mfilt_j(\regparam)\right)\mfilt_k(\regparam) + \mfilt_j(\regparam)\left(\frac{d}{d\regparam}\mfilt_k(\regparam)\right)\Bigg]\Bigg).
+%\end{align}
+%
+%The MDP function can be written as
+%\begin{equation}
+%\label{eq:Individual MDP 2}
+%\D^{(\ell)}(\regparam) = \sum_{j=1}^{n} \left(\mfilt_j^{(\ell)}(\regparam)\right)^2|\dft{\dVec}_j^{(\ell)}|^2 - \noiseSD_\ell^2, \quad \ell = 1,\ldots,R.
+%\end{equation}
+%The first derivative of \eqref{eq:Individual MDP 2} with respect to $\regparam$ is 
+%\begin{equation}
+%\label{eq:Individual MDP Derivative}
+%\frac{d}{d\regparam}\D^{(\ell)}(\regparam) = 2\sum_{j=1}^{n} \mfilt_j^{(\ell)}(\regparam)\left(\frac{d}{d\regparam}\mfilt_j^{(\ell)}(\regparam)\right)|\dft{\dVec}_j^{(\ell)}|^2.
+%\end{equation}

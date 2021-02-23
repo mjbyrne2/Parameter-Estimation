@@ -441,3 +441,78 @@ This equation is used for the numerical construction of the noise vectors. SNR v
 \end{figure}
 
 For an accurate evaluation of the numerical examples and their results, multiple realizations of noise are used. A primary advantage of multiple noise realizations is that the sample variance of noise vectors approaches the desired variance as the number of realizations increases. More rigorously, the mean of the sample variances of the noise vectors converges almost surely to the expected value of the sample variance, which is the desired variance $\noiseSD^2$; this is a direct consequence of the (strong) law of large numbers and the fact that the noise vectors are independent and identically distributed with standard normal distribution.
+
+% Part of the discussion about the GSVD:
+%
+%Certainly $\trans{\Lambda}\Lambda$ is diagonal, but the structure of $\trans{\Delta}\Delta$ may not be obvious if $m < n$. The structure of $\trans{\Delta}\Delta$ in such a case can be shown from the following lemma.
+%
+%\begin{lemma}
+%\label{lem:k-diagonal}
+%For any matrices $B \in \mathbb{C}^{m \times m}$ and $C \in \mathbb{C}^{n \times n}$ and any $k$-diagonal matrix $D \in \mathbb{C}^{m \times n}$ with $m < n$ and $k = n-m$, partition $D$ as $D = [\zeroVec_{m \times k} ~ E]$, where $\zeroVec_{m \times k}$ is an $m \times k$ zero matrix and $E$ is a $m \times m$ diagonal matrix. Similarly, partition $C$ as
+%\[C = \begin{bmatrix}
+%C_{k \times k} & C_{k \times m} \\
+%C_{m \times k} & F
+%\end{bmatrix}.\]
+%where $F$ is an $m \times m$ matrix. Then the structure of the matrix conjugations $\trans{D}BD \in \mathbb{C}^{n \times n}$ and $DC\trans{D} \in \mathbb{C}^{m \times m}$ are described by the following.
+%\begin{itemize}
+%\item[(a)] The matrix $\trans{D}BD$ is block diagonal with
+%\[\trans{D}BD = \begin{bmatrix}
+%\zeroVec_{k \times k} & \zeroVec_{k \times m} \\
+%\zeroVec_{m \times k} & \trans{E}BE
+%\end{bmatrix}.\]
+%\item[(b)] $DC\trans{D} = EF\trans{E}$.
+%\end{itemize}
+%\end{lemma}
+%\begin{proof}
+%For part (a), the partitioning of $D$ yields
+%\[\trans{D}BD = \begin{bmatrix}
+%\zeroVec_{k \times m} \\
+%\trans{E}
+%\end{bmatrix}B\begin{bmatrix}
+%\zeroVec_{m \times k} & E
+%\end{bmatrix} = \begin{bmatrix}
+%\zeroVec_{k \times m} \\
+%\trans{E}
+%\end{bmatrix}\begin{bmatrix}
+%\zeroVec_{m \times k} & BE
+%\end{bmatrix} = 
+%\begin{bmatrix}
+%\zeroVec_{k \times k} & \zeroVec_{k \times m} \\
+%\zeroVec_{m \times k} & \trans{E}BE
+%\end{bmatrix}.\]
+%Similarly, the proof of part (b) uses the partitioning of both $D$ and $C$:
+%\[DC\trans{D} = 
+%\begin{bmatrix}
+%\zeroVec_{m \times k} & E
+%\end{bmatrix}
+%\begin{bmatrix}
+%C_{k \times k} & C_{k \times m} \\
+%C_{m \times k} & F
+%\end{bmatrix}
+%\begin{bmatrix}
+%\zeroVec_{k \times m} \\
+%\trans{E}
+%\end{bmatrix} = \begin{bmatrix}
+%\zeroVec_{m \times k} & E
+%\end{bmatrix}
+%\begin{bmatrix}
+%C_{k \times m}\trans{E} \\
+%F\trans{E}
+%\end{bmatrix} = EF\trans{E}.\]
+%\end{proof}
+%\noindent Then it follows from part (a) of Lemma \ref{lem:k-diagonal} that $\trans{\Delta}\Delta$ is diagonal, which is stated as the following corollary.
+%
+%\begin{corollary}
+%\label{cor:Diagonal}
+%The $n \times n$ matrix $\trans{\Delta}\Delta$ in \eqref{eq:Normal equation 2} is diagonal.
+%\end{corollary}
+%\begin{proof}
+%The $m \times n$ matrix $\Delta$ is diagonal if $m \geq n$, in which case it is immediate that $\trans{\Delta}\Delta$ is diagonal. If $m < n$, then $\Delta$ is a $k$-diagonal matrix with $k = n - m$. Part (a) of Lemma \ref{lem:k-diagonal} can be applied with $D = \Delta$ and $B = I$, which implies that the structure of $\trans{\Delta}\Delta$ is
+%\[\trans{\Delta}\Delta = \begin{bmatrix}
+%\zeroVec_{k \times k} & \zeroVec_{k \times m} \\
+%\zeroVec_{m \times k} & \trans{E}E
+%\end{bmatrix}\]
+%with partition $\Delta = [\zeroVec_{m \times k} ~ E]$ and diagonal matrix $E$. The matrix $\trans{E}E$ is thus diagonal, and therefore $\trans{\Delta}\Delta$ is diagonal.
+%\end{proof}
+%
+%A consequence of Corollary \ref{cor:Diagonal} is that the matrix $\trans{\Delta}\Delta + \regparam^2 \trans{\Lambda}\Lambda$ in \eqref{eq:Normal equation 2} is diagonal.
