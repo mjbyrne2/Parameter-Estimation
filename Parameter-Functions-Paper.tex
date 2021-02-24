@@ -998,22 +998,8 @@ In the discrete setting, the average power $P$ of a vector $\xVec$ of length $n$
 \subsection{One-dimensional problem} \label{sec:1D}
 The one-dimensional test problem uses the MRI data built into MATLAB, which can be accessed by the command \texttt{load mri.mat}. Five horizontal slices were selected and reformatted as a single image (Figure \ref{fig:MRI 1D True}) of dimensions $256 \times 536$. 
 \begin{figure}[ht]
-\begin{subfigure}{\textwidth}
-\includegraphics[scale=0.36]{Figures/Full_MRI.eps}
-\subcaption{}
-\label{fig:MRI 1D True}
-\end{subfigure} \\
-\begin{subfigure}{\textwidth}
-\includegraphics[scale=0.36]{Figures/Blurred_MRI.eps}
-\subcaption{}
-\label{fig:MRI 1D Blurred}
-\end{subfigure} \\
-\begin{subfigure}{\textwidth}
-\includegraphics[scale=0.36]{Figures/Noisy_MRI}
-\subcaption{}
-\label{fig:MRI 1D Noisy}
-\end{subfigure}
-\caption{MRI data formed by reformatting the MATLAB built-in MRI data. Figure \ref{fig:MRI 1D True} shows the true data from which the training and validation vectors were selected. Each vector was blurred using a Gaussian kernel and normal noise was added; the resulting vectors are shown in Figure \ref{fig:MRI 1D Noisy}. The dimension of both images is $256 \times 536$.}
+\includegraphics[scale=0.36]{Figures/Full MRI Data.eps}
+\caption{MRI data formed by reformatting the MATLAB built-in MRI data. Figure \ref{fig:MRI 1D True} shows the true data from which the training and validation vectors were selected. Each vector was blurred using a Gaussian kernel and normal noise was added; the resulting vectors are shown in Figure \ref{fig:MRI 1D Noisy}. The dimension of all three images is $256 \times 536$.}
 \label{fig:MRI 1D}
 \end{figure}
 The default dimension of each horizontal MRI slice accessible using \texttt{load mri.mat} is $128 \times 128$. Linear interpolation was used to double the number of rows; the number of columns of the concatenated MRI slices was trimmed to to eliminate leading and trailing zero columns. The columns of the image were then multiplied by a symmetric Toeplitz matrix, approximating a Fredholm integral equation of the first kind with a Gaussian kernel of mean 0 and variance 1 (each pixel representing a unit square in the continuous problem). The resulting MRI image is vertically blurred; see Figure \ref{fig:MRI 1D Noisy}. SNR values were selected randomly between 6 and 7 for each blurred column, and realizations of normal noise with the corresponding variances were added to blurred columns. The first $536/2 = 268$ columns of Figure \ref{fig:MRI 1D True} served as the training set, while the remaining 268 columns serve as a validation set.  The following $255 \times 256$ penalty matrix $L_1$ was used, which represents an approximation of a first derivative operator:
