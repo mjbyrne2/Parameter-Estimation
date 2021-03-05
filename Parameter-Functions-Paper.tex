@@ -74,7 +74,7 @@
 \newcommand{\svd}[1]{\widehat{#1}}	% Notation for (U^T)d
 
 % UPRE derivation notation:
-\newcommand{\regres}{\mathbf{r}_{\regparam}}	% Regularized residual
+\newcommand{\rReg}{\rVec(\regparam)}	% Regularized residual
 \newcommand{\A}{A_{\regparam}}	% Influence matrix
 \newcommand{\U}{U}	% UPRE function
 \newcommand{\avgU}{\overline{U}}	% UPRE function
@@ -565,8 +565,12 @@ Given $\noiseVec^{(\ell)} \sim \mathcal{N}(\zeroVec^{(\ell)},\Sigma^{(\ell)})$ f
 \noindent In particular, Assumptions \ref{Assumption_System} and \ref{Assumption_Matrices} imply that $n_\ell = n$ for $\ell = 1,\ldots,R$.
 
 \section{Parameter selection methods} \label{sec:Methods}
-
-The development of the adapted UPRE, MDP, and GCV methods will rely on Assumption \ref{Assumption_System} and the constructions contained in Table \ref{tab:System assumptions}. By Lemma \ref{lem:Concatenation of Normal Noise}, this assumption implies that $\widetilde{\noiseVec} \sim \mathcal{N}\left(\widetilde{\zeroVec},\widetilde{\Sigma}\right)$ with $\widetilde{\zeroVec} \in \mathbb{R}^N$ and $N = \sum_{\ell=1}^{R} n_\ell$. 
+As stated in Section \ref{sec:Introduction}, there is a variety of methods for selecting regularization parameters. The UPRE and MDP methods are popular choices for situations in which the variance of the noise in the data is known. In contrast, the GCV and L-curve methods are common choices when the variance is unknown. However, all four methods involve the norm of a term $\rReg$ called the regularized residual; this term is defined as
+\begin{equation}
+\label{eq:Regularized Residual}
+\rReg = A\xReg - \dVec.
+\end{equation}
+As a final remark, the development of the adapted UPRE, MDP, and GCV methods also rely on Assumption \ref{Assumption_System} and the constructions contained in Table \ref{tab:System assumptions}. By Lemma \ref{lem:Concatenation of Normal Noise}, this assumption implies that $\widetilde{\noiseVec} \sim \mathcal{N}\left(\widetilde{\zeroVec},\widetilde{\Sigma}\right)$ with $\widetilde{\zeroVec} \in \mathbb{R}^N$ and $N = \sum_{\ell=1}^{R} n_\ell$. 
 
 \subsection{Unbiased Predictive Risk Estimator} \label{sec:UPRE}
 The UPRE method was developed in 1973 by Mallows and considers the statistical relationship between predictive error $\pVec(\regparam)$ and the regularized residual $\rVec(\regparam)$; these quantities are defined respectively as
@@ -912,7 +916,7 @@ where $\rVec_\text{win}(\regparamVec)$ is defined by \eqref{eq:Windowed Regulari
 Unlike the UPRE and MDP methods, the GCV method does not depend upon knowledge of the noise variance. For a single data set $\dVec = A\xVec + \noiseVec$, the GCV function is defined as
 \begin{equation}
 \label{eq:GCV}
-\G(\regparam) = \frac{\frac{1}{n}\|\regres\|_2^2}{\left[\frac{1}{n}\trace(I-\A)\right]^2} = \frac{\frac{1}{n}\|\regres\|_2^2}{\left[1 - \frac{1}{n}\trace(\A)\right]^2}.
+\G(\regparam) = \frac{\frac{1}{n}\|\rReg\|_2^2}{\left[\frac{1}{n}\trace(I-\A)\right]^2} = \frac{\frac{1}{n}\|\rReg\|_2^2}{\left[1 - \frac{1}{n}\trace(\A)\right]^2}.
 \end{equation}
 The GCV method determines $\regparam$ such that $\regparam_\GCV = \argmin_{\regparam > 0} \G(\regparam)$.
 
@@ -920,7 +924,7 @@ The GCV method determines $\regparam$ such that $\regparam_\GCV = \argmin_{\regp
 Using the constructions in Table \ref{tab:System assumptions} under Assumption \ref{Assumption_System} with $n_\ell = n$ for all $\ell = 1,\ldots,R$, the GCV function $\widetilde{\D}(\regparam)$ for the data sets $\{\dVec^{(\ell)}\}_{\ell=1}^R$ is
 \begin{equation}
 \label{eq:GCV Big 2}
-\widetilde{\G}(\regparam) = \frac{\frac{1}{N}\sum_{\ell=1}^R \|\regres^{(\ell)}\|_2^2}{\left[1 - \frac{1}{N}\sum_{\ell=1}^R \trace\left(\A^{(\ell)}\right)\right]^2}.
+\widetilde{\G}(\regparam) = \frac{\frac{1}{N}\sum_{\ell=1}^R \|\rReg^{(\ell)}\|_2^2}{\left[1 - \frac{1}{N}\sum_{\ell=1}^R \trace\left(\A^{(\ell)}\right)\right]^2}.
 \end{equation}
 \end{proposition}
 \begin{proof}
@@ -935,12 +939,12 @@ From the definition of $\widetilde{\mathbf{r}}_\regparam$ and the block structur
 In contrast to the UPRE and MDP methods, the GCV function \eqref{eq:GCV Big 2} for multiple data sets is not equal to the mean of individual GCV functions
 \begin{equation}
 \label{eq:Individual GCV}
-\G^{(\ell)}(\regparam) = \frac{\frac{1}{n}\|\regres^{(\ell)}\|_2^2}{\left[1 - \frac{1}{n}\trace\left(\A^{(\ell)}\right)\right]^2}, \quad \ell = 1,\ldots,R.
+\G^{(\ell)}(\regparam) = \frac{\frac{1}{n}\|\rReg^{(\ell)}\|_2^2}{\left[1 - \frac{1}{n}\trace\left(\A^{(\ell)}\right)\right]^2}, \quad \ell = 1,\ldots,R.
 \end{equation}
 However, if we assume that $A^{(\ell)} = A$ and $L^{(\ell)} = L$ for each $\ell = 1,\ldots,R$, then $\A^{(\ell)} = \A$ for each $\ell = 1,\ldots,R$ as well. In such case, \eqref{eq:GCV Big 2} can be expressed as
 \begin{equation}
 \label{eq:Averaged GCV}
-\widetilde{\G}(\regparam) = \frac{\frac{1}{N}\sum_{\ell=1}^R \|\regres^{(\ell)}\|_2^2}{\left[1 - \frac{1}{N}\sum_{\ell=1}^R \trace\left(\A\right)\right]^2} = \frac{1}{R}\frac{\sum_{\ell=1}^R \frac{1}{n} \|\regres^{(\ell)}\|_2^2}{\left[1 - \frac{1}{n} \trace\left(\A\right)\right]^2} = \frac{1}{R}\sum_{\ell=1}^R \G^{(\ell)}(\regparam).
+\widetilde{\G}(\regparam) = \frac{\frac{1}{N}\sum_{\ell=1}^R \|\rReg^{(\ell)}\|_2^2}{\left[1 - \frac{1}{N}\sum_{\ell=1}^R \trace\left(\A\right)\right]^2} = \frac{1}{R}\frac{\sum_{\ell=1}^R \frac{1}{n} \|\rReg^{(\ell)}\|_2^2}{\left[1 - \frac{1}{n} \trace\left(\A\right)\right]^2} = \frac{1}{R}\sum_{\ell=1}^R \G^{(\ell)}(\regparam).
 \end{equation}
 Note that \eqref{eq:Individual GCV} is equivalent to \eqref{eq:GCV} without Assumption \ref{Assumption_Noise}, which is to be expected since the GCV method does not rely on knowledge of the noise variance. \par 
 A bound analogous to \eqref{eq:UPRE Bound} and \eqref{eq:MDP Bound} can be obtained for the adapted GCV function.
@@ -960,7 +964,7 @@ Then
 
 \begin{proof}
 With these assumptions,
-\[\widetilde{\G}(\regparam) = \frac{1}{R} \sum_{\ell=1}^R \G^{(\ell)}(\regparam) = \frac{1}{R}\sum_{\ell=1}^R \left[\frac{\frac{1}{n}\|\regres^{(\ell)}\|_2^2}{\left[1 - \frac{1}{n}\trace\left(\A\right)\right]^2}\right]  = R\frac{\frac{1}{n}\sum_{j=1}^{n} \left(\mfilt_j\right)^2\left(\frac{1}{R^2} \sum_{\ell=1}^R |\dft{\dVec}_j^{(\ell)}|^2\right)}{\left[1 - \frac{1}{n}\trace\left(\A\right)\right]^2},\]
+\[\widetilde{\G}(\regparam) = \frac{1}{R} \sum_{\ell=1}^R \G^{(\ell)}(\regparam) = \frac{1}{R}\sum_{\ell=1}^R \left[\frac{\frac{1}{n}\|\rReg^{(\ell)}\|_2^2}{\left[1 - \frac{1}{n}\trace\left(\A\right)\right]^2}\right]  = R\frac{\frac{1}{n}\sum_{j=1}^{n} \left(\mfilt_j\right)^2\left(\frac{1}{R^2} \sum_{\ell=1}^R |\dft{\dVec}_j^{(\ell)}|^2\right)}{\left[1 - \frac{1}{n}\trace\left(\A\right)\right]^2},\]
 again where the last equality is obtained through multiplication by $\frac{R}{R}$. The definition of $\overline{\G}(\regparam)$ and \eqref{eq:Coefficients of Average} then results in the bound \eqref{eq:GCV Bound}.
 \end{proof}
 
