@@ -48,7 +48,7 @@
 \newcommand{\R}{R_{\regparam}}	% Regularization matrix
 \newcommand{\regf}{\fVec_{\regparam}}	% Regularized solution
 \newcommand{\xReg}{\xVec(\regparam)}	% Regularized solution
-\newcommand{\xWin}{\xVec_{\text{win}}(\regparam)}	% Windowed regularized solution
+\newcommand{\xWin}{\xVec_{\text{win}}}	% Windowed regularized solution
 \newcommand{\xSol}{\xVec}	% True solution
 \DeclareMathOperator*{\argmax}{arg\,max}
 \DeclareMathOperator*{\argmin}{arg\,min}
@@ -75,6 +75,7 @@
 
 % UPRE derivation notation:
 \newcommand{\rReg}{\rVec(\regparam)}	% Regularized residual
+\newcommand{\rWin}{\rVec_{\text{win}}}	% Windowed regularized residual
 \newcommand{\A}{A_{\regparam}}	% Influence matrix
 \newcommand{\U}{U}	% UPRE function
 \newcommand{\avgU}{\overline{U}}	% UPRE function
@@ -565,11 +566,17 @@ Given $\noiseVec^{(\ell)} \sim \mathcal{N}(\zeroVec^{(\ell)},\Sigma^{(\ell)})$ f
 \noindent In particular, Assumptions \ref{Assumption_System} and \ref{Assumption_Matrices} imply that $n_\ell = n$ for $\ell = 1,\ldots,R$.
 
 \section{Parameter selection methods} \label{sec:Methods}
-As stated in Section \ref{sec:Introduction}, there is a variety of methods for selecting regularization parameters. The UPRE and MDP methods are popular choices for situations in which the variance of the noise in the data is known. In contrast, the GCV and L-curve methods are common choices when the variance is unknown. However, all four methods involve the norm of a term $\rReg$ called the regularized residual; this term is defined as
+As stated in Section \ref{sec:Introduction}, there is a variety of methods for selecting regularization parameters. The UPRE and MDP methods are popular choices for situations in which the variance of the noise in the data is known. In contrast, the GCV and L-curve methods are common choices when the variance is unknown. However, all four methods involve the norm of a term $\rReg$ called the regularized residual. In the uniparameter case involving a single data point $\dVec$, the regularized residual is defined as
 \begin{equation}
 \label{eq:Regularized Residual}
 \rReg = A\xReg - \dVec.
 \end{equation}
+
+
+
+
+
+
 As a final remark, the development of the adapted UPRE, MDP, and GCV methods also rely on Assumption \ref{Assumption_System} and the constructions contained in Table \ref{tab:System assumptions}. By Lemma \ref{lem:Concatenation of Normal Noise}, this assumption implies that $\widetilde{\noiseVec} \sim \mathcal{N}\left(\widetilde{\zeroVec},\widetilde{\Sigma}\right)$ with $\widetilde{\zeroVec} \in \mathbb{R}^N$ and $N = \sum_{\ell=1}^{R} n_\ell$. 
 
 \subsection{Unbiased Predictive Risk Estimator} \label{sec:UPRE}
