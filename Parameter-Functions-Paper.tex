@@ -45,11 +45,21 @@
 % Regularization notation:
 \newcommand{\regparam}{\alpha}  % Regularization parameter
 \newcommand{\regparamVec}{\bm{\regparam}}   % Vector of regularization parameters
+\newcommand{\regparamBig}{\widetilde{\regparam}}   % Big regularization parameter
+\newcommand{\regparamVecBig}{\widetilde{\regparamVec}}   % Big regularization parameter
 \newcommand{\R}{R_{\regparam}}	% Regularization matrix
 \newcommand{\regf}{\fVec_{\regparam}}	% Regularized solution
 \newcommand{\xReg}{\xVec(\regparam)}	% Regularized solution
 \newcommand{\xWin}{\xVec_{\text{win}}}	% Windowed regularized solution
 \newcommand{\xSol}{\xVec}	% True solution
+\newcommand{\xBig}{\widetilde{\xVec}}	% Big regularized solution
+\newcommand{\xWinBig}{\xBig_{\text{win}}}	% Big windowed regularized solution
+\newcommand{\rBig}{\widetilde{\rVec}}	% Big regularized residual
+\newcommand{\rWinBig}{\rBig_{\text{win}}}	% Big windowed regularized residual
+\newcommand{\bBig}{\widetilde{\bVec}}	% Big blurred vector
+\newcommand{\dBig}{\widetilde{\dVec}}	% Big data vector
+\newcommand{\ABig}{\widetilde{A}}	% Big system matrix
+\newcommand{\LBig}{\widetilde{L}}	% Big penalty matrix
 \DeclareMathOperator*{\argmax}{arg\,max}
 \DeclareMathOperator*{\argmin}{arg\,min}
 
@@ -384,17 +394,25 @@ The only elements of the $m \times n$ matrix $\Delta$ that are possibly non-zero
 \end{equation}
 The structure of $\Delta$ depends upon the dimension of $A$. If $m \geq n$, then $\Delta$ is a diagonal matrix. Let a $k$-diagonal matrix be defined as an $m \times n$ matrix with nonzero entries given by \eqref{eq:k-diagonal} when $m < n$ (which implies $k \neq 0$). In other words, a $k$-diagonal matrix is a rectangular matrix where the only entries that are possibly nonzero are located on the $k$th upper diagonal. With this definition, $\Delta$ is a $k$-diagonal matrix if $m < n$. \par 
 An application of the decompositions \eqref{eq:GSVD} is that the normal equations 
-\[(\trans{A}A + \regparam^2 \trans{L}L)\xVec = \trans{A}\dVec\] corresponding to \eqref{eq:TikSol3} can be simplified as 
-\[(X\trans{\Delta}\Delta\trans{X} + \regparam^2 X\trans{\Lambda}\Lambda\trans{X})\xVec = X\trans{\Delta}\trans{U}\dVec,\]
+\[(\trans{A}A + \regparam^2 \trans{L}L)\xVec(\regparam) = \trans{A}\dVec\] corresponding to \eqref{eq:TikSol3} can be simplified as 
+\[(X\trans{\Delta}\Delta\trans{X} + \regparam^2 X\trans{\Lambda}\Lambda\trans{X})\xVec(\regparam) = X\trans{\Delta}\trans{U}\dVec,\]
 which gives 
-\[(\trans{\Delta}\Delta + \regparam^2 \trans{\Lambda}\Lambda)\trans{X}\xVec = \trans{\Delta}\svd{\dVec}\] 
+\begin{equation}
+    \label{eq:GSVD Normal Eq}
+    (\trans{\Delta}\Delta + \regparam^2 \trans{\Lambda}\Lambda)\trans{X}\xVec(\regparam) = \trans{\Delta}\svd{\dVec}
+\end{equation}
 due to the invertibility of $X$. \par
-Additionally, the assumption that the block system matrix in \eqref{eq:TikSol3} has full column rank means that $\trans{\Delta}\Delta + \regparam^2 \trans{\Lambda}\Lambda$ is non-singular for $\regparam > 0$. In such a case, a representation of the regularized solution similar to \eqref{eq:TikSol} is obtained:
+Additionally, the assumption that the block system matrix in \eqref{eq:TikSol3} has full column rank means that $\trans{\Delta}\Delta + \regparam^2 \trans{\Lambda}\Lambda$ is non-singular for $\regparam > 0$. In such a case, equation \eqref{eq:GSVD Normal Eq} can be solved as
+\begin{equation}
+    \label{eq:GSVD Normal Eq Sol}
+    \xVec(\regparam) = Y\inv{\left(\trans{\Delta}\Delta + \regparam^2 \trans{\Lambda}\Lambda\right)}\trans{\Delta}\svd{\dVec},
+\end{equation}
+where $Y$ is the inverse of $\trans{X}$. A representation of the regularized solution similar to \eqref{eq:TikSol} can also be obtained:
 \begin{equation}
 \label{eq:GSVD Solution 1}
-\xVec(\regparam) = \sum_{k = 1}^{n} \frac{\delta_k \svd{\dVec}_k}{\delta^2_k + \regparam^2 \lambda^2_k}Y_{\cdot,k},
+\xVec(\regparam) = \sum_{k = 1}^{n} \frac{\delta_k \svd{\dVec}_k}{\delta^2_k + \regparam^2 \lambda^2_k}Y_{\cdot,k}
 \end{equation}
-where $Y$ is the inverse of $\trans{X}$, $\bm{\delta} = \sqrt{\diag(\trans{\Delta}\Delta)}$, and $\bm{\lambda} = \sqrt{\diag(\trans{\Lambda}\Lambda)}$ (the square roots being applied element-wise).  A filter function $\filt_j$ and complement $\mfilt_j$ similar to \eqref{eq:TikFilt} can be introduced to further simplify notation:
+with $\bm{\delta} = \sqrt{\diag(\trans{\Delta}\Delta)}$ and $\bm{\lambda} = \sqrt{\diag(\trans{\Lambda}\Lambda)}$ (the square roots being applied element-wise).  A filter function $\filt_j$ and complement $\mfilt_j$ similar to \eqref{eq:TikFilt} can be introduced to further simplify notation:
 \begin{equation}
 \label{eq:Filter functions}
 \filt_j\left(\regparam,\frac{\delta_j}{\lambda_j}\right) = \frac{\delta^2_j}{\delta^2_j + \regparam^2 \lambda^2_j}, \quad \mfilt_j\left(\regparam,\frac{\delta_j}{\lambda_j}\right) = 1 - \filt_j\left(\regparam,\frac{\delta_j}{\lambda_j}\right) = \frac{\regparam^2 \lambda^2_j}{\delta^2_j + \regparam^2 \lambda^2_j}.
@@ -421,7 +439,7 @@ For $\ell = 1,\ldots,p$, let $\wVec^{(\ell)} \in \mathbb{R}^n$ be vectors contai
 Defining windows $W^{(\ell)} = \diag\left(\wVec^{(\ell)}\right)$ for $\ell = 1,\ldots,p$, property \eqref{eq:Weights} implies that $\sum_{\ell=1}^p W^{(\ell)} = I$.  A regularization parameter $\regparam^{(\ell)}$ can be selected for each window $W^{(\ell)}$ so that a windowed regularized solution can be constructed as
 \begin{equation}
 \label{eq:TikSolWindow}
-\xWin = \sum_{\ell=1}^p V\inv{\left[\trans{S}S + (\regparam^{(\ell)})^2\right]}W^{(\ell)}\trans{S}\dft{\dVec}.
+\xWin(\regparamVec) = \sum_{\ell=1}^p V\inv{\left[\trans{S}S + (\regparam^{(\ell)})^2\right]}W^{(\ell)}\trans{S}\dft{\dVec}.
 \end{equation}
 The windows must be selected before choosing corresponding regularization parameters; as such, some types of windows will be discussed. \par
 A specific class of windows are windows that do not overlap. Windows $W^{(\ell)}$ are defined to be non-overlapping if the components of their corresponding weight vectors $\wVec^{(\ell)}$ satisfy
@@ -494,12 +512,12 @@ Therefore,
 Given a penalty matrix $L \neq I$, a windowed regularized solution similar to \eqref{eq:TikSolWindow} can be obtained using the GSVD. Given the decompositions $A = $ and $L = $ described in Section \ref{sec:GSVD} and windows $W^{(\ell)}$ for $\ell = 1,\ldots,p$, a corresponding windowed regularized solution is
 \begin{equation}
 \label{eq:Windowed GSVD Solution}
-    \xWin = \sum_{\ell=1}^p Y\inv{\left[\trans{\Delta}\Delta + \left(\regparam^{(\ell)}\right)^2 \trans{\Lambda}\Lambda\right]}W^{(\ell)}\trans{\Delta}\dft{\dVec}
+    \xWin(\regparamVec) = \sum_{\ell=1}^p Y\inv{\left[\trans{\Delta}\Delta + \left(\regparam^{(\ell)}\right)^2 \trans{\Lambda}\Lambda\right]}W^{(\ell)}\trans{\Delta}\dft{\dVec}
 \end{equation}
 with $Y$ again being the inverse of $\trans{X}$. In terms of the generalized singular values $\gamma_k$, \eqref{eq:Windowed GSVD Solution} can be written as
 \begin{equation}
 \label{eq:Windowed GSVD Solution Sum}
-    \xWin = \sum_{k=1}^n \left(\sum_{\ell=1}^p \filt_k\left(\regparam^{(\ell)},\gamma_k\right)\wVec^{(\ell)}_{k}\right)  \frac{\dft{\dVec}_{k}}{\delta_k} Y_{\cdot,k}.
+    \xWin(\regparamVec) = \sum_{k=1}^n \left(\sum_{\ell=1}^p \filt_k\left(\regparam^{(\ell)},\gamma_k\right)\wVec^{(\ell)}_{k}\right)  \frac{\dft{\dVec}_{k}}{\delta_k} Y_{\cdot,k}.
 \end{equation}
 However, care must be taken when selecting the weight vectors $\wVec^{\ell}$ in light of the fact that the generalized singular values are arranged in ascending order.
 
@@ -513,15 +531,15 @@ For given regularization parameters $\regparam^{(\ell)}$ and penalty matrices $L
 \begin{equation}
 T^{(\ell)}(\xVec;\regparam^{(\ell)}) := \|A^{(\ell)}\xVec - \dVec^{(\ell)}\|_2^2 + \left(\regparam^{(\ell)}\right)^2\|L^{(\ell)}\xVec\|_2^2.
 \end{equation}
-A parameter selection method is generally utilized to select the regularization parameter for each system. Instead, let $\widetilde{\dVec}$ be the vector formed by vertically concatenating the data sets $\{\dVec^{(\ell)}\}_{\ell=1}^R$ and define the functional
+A parameter selection method is generally utilized to select the regularization parameter for each system. Instead, let $\dBig$ be the vector formed by vertically concatenating the data sets $\{\dVec^{(\ell)}\}_{\ell=1}^R$ and define the functional
 \begin{equation}
 \label{eq:Big functional}
 \widetilde{T}\left(\widetilde{\xVec};\widetilde{\regparam}\right) = \|\widetilde{A}\widetilde{\xVec} - \widetilde{\dVec}\|_2^2 + \widetilde{\regparam}^2\|\widetilde{L}\widetilde{\xVec}\|_2^2,
 \end{equation}
-where $\widetilde{\regparam}$ is a single regularization parameter. This construction implies that $\widetilde{\xVec}$, $\widetilde{\bVec}$, $\widetilde{\noiseVec}$ are vertical concatenations of vectors in $\{\bVec^{(\ell)}\}_{\ell=1}^R$ and $\{\noiseVec^{(\ell)}\}_{\ell=1}^R$, respectively. The matrices $\widetilde{A}$ and $\widetilde{L}$ are block diagonal matrices with diagonal blocks $\{A^{(\ell)}\}_{\ell=1}^R$ and $\{L^{(\ell)}\}_{\ell=1}^R$, respectively. By the definition of the 2-norm and the construction of \eqref{eq:Big functional}, we can also write
+where $\widetilde{\regparam}$ is a single regularization parameter. This construction implies that $\xBig$, $\bBig$, $\widetilde{\noiseVec}$ are vertical concatenations of vectors in $\{\bVec^{(\ell)}\}_{\ell=1}^R$ and $\{\noiseVec^{(\ell)}\}_{\ell=1}^R$, respectively. The matrices $\ABig$ and $\LBig$ are block diagonal matrices with diagonal blocks $\{A^{(\ell)}\}_{\ell=1}^R$ and $\{L^{(\ell)}\}_{\ell=1}^R$, respectively. By the definition of the 2-norm and the construction of \eqref{eq:Big functional}, we can also write
 \begin{equation}
 \label{eq:Big functional 2}
-\widetilde{T}\left(\widetilde{\xVec};\widetilde{\regparam}\right) = \sum_{\ell = 1}^R \left(\|A^{(\ell)}\xVec^{(\ell)} - \dVec^{(\ell)}\|_2^2 + \widetilde{\regparam}^2\|L^{(\ell)} \xVec^{(\ell)}\|_2^2\right) = \sum_{\ell=1}^R T^{(\ell)}\left(\xVec^{(\ell)};\widetilde{\regparam}\right).
+\widetilde{T}\left(\xBig;\widetilde{\regparam}\right) = \sum_{\ell = 1}^R \left(\|A^{(\ell)}\xVec^{(\ell)} - \dVec^{(\ell)}\|_2^2 + \widetilde{\regparam}^2\|L^{(\ell)} \xVec^{(\ell)}\|_2^2\right) = \sum_{\ell=1}^R T^{(\ell)}\left(\xVec^{(\ell)};\widetilde{\regparam}\right).
 \end{equation}
 In regards to selecting regularization parameters, the advantage of regularizing via \eqref{eq:Big functional} is that we only have to select one parameter instead of $R$ parameters (one for each data set). Table \ref{tab:System assumptions} contains the assumptions used here for the development of parameter selections methods for multiple data sets. The notation $\vcat$ is used for brevity and denotes vertical concatenation of column vectors. The built-in MATLAB command $\mathtt{vertcat}$ can be used for vertical concatenation of vectors or matrices of appropriate dimension. Assumption \ref{Assumption_System} summarizes the set-up established in \eqref{eq:Big vectors}.
 
@@ -531,11 +549,11 @@ In regards to selecting regularization parameters, the advantage of regularizing
     \label{tab:System assumptions}
     \begin{tabular}{|c|c|}
     \hline
-    $\widetilde{\xVec} = \vcat\left(\xVec^{(1)},\ldots,\xVec^{(R)}\right)$ & $\widetilde{\Sigma} = \diag\left(\Sigma^{(1)},\ldots,\Sigma^{(R)}\right)$ \\
+    $\xBig = \vcat\left(\xVec^{(1)},\ldots,\xVec^{(R)}\right)$ & $\widetilde{\Sigma} = \diag\left(\Sigma^{(1)},\ldots,\Sigma^{(R)}\right)$ \\
     \hline
-    $\widetilde{\dVec} = \vcat\left(\dVec^{(1)},\ldots,\dVec^{(R)}\right)$ & $\widetilde{A} = \diag\left(A^{(1)},\ldots,A^{(R)}\right)$ \\
+    $\dBig = \vcat\left(\dVec^{(1)},\ldots,\dVec^{(R)}\right)$ & $\ABig = \diag\left(A^{(1)},\ldots,A^{(R)}\right)$ \\
     \hline
-    $\widetilde{\noiseVec} = \vcat\left(\noiseVec^{(1)},\ldots,\noiseVec^{(R)}\right)$ & $\widetilde{L} = \diag\left(L^{(1)},\ldots,L^{(R)}\right)$ \\
+    $\widetilde{\noiseVec} = \vcat\left(\noiseVec^{(1)},\ldots,\noiseVec^{(R)}\right)$ & $\LBig = \diag\left(L^{(1)},\ldots,L^{(R)}\right)$ \\
     \hline
     \end{tabular}
   \end{center}
@@ -546,6 +564,37 @@ In regards to selecting regularization parameters, the advantage of regularizing
 For $\ell = 1,\ldots,R$, assume that $\bVec^{(\ell)} = {A^{(\ell)}}\xVec^{(\ell)}$, $\dVec^{(\ell)} = \bVec^{(\ell)} + \noiseVec^{(\ell)}$, and $\noiseVec^{(\ell)} \sim \mathcal{N}(\zeroVec^{(\ell)},\Sigma^{(\ell)})$. The vectors $\bVec^{(\ell)}$, $\dVec^{(\ell)}$, and $\noiseVec^{(\ell)}$ are of length $n_\ell$.
 \end{assumption}
 
+To obtain an explicit representation of $\xBig(\regparamBig)$, the GSVD can be utilized. A GSVD of each pair $(A^{(\ell)},L^{(\ell)})$ can obtained for $\ell = 1,\ldots,R$ so that
+\begin{equation}
+    A^{(\ell)} = U^{(\ell)}\Delta^{(\ell)}\trans{\left(X^{(\ell)}\right)}, \quad L^{(\ell)} = V^{(\ell)}\Lambda^{(\ell)}\trans{\left(X^{(\ell)}\right)}.
+\end{equation}
+These decompositions then allow for the definition of block decomposition matrices described in Table \ref{tab:Block GSVD Matrices}.
+\begin{table}[ht!]
+  \begin{center}
+    \caption{Matrices constructed from the GSVD's of $(A^{(\ell)},L^{(\ell)})$ can obtained for $\ell = 1,\ldots,R$.}
+    \label{tab:Block GSVD Matrices}
+    \begin{tabular}{|c|c|}
+    \hline
+    $\widetilde{U} = \diag\left(U^{(1)},\ldots,U^{(R)}\right)$ & $\widetilde{V} = \diag\left(V^{(1)},\ldots,V^{(R)}\right)$ \\
+    \hline
+    $\widetilde{\Delta} = \diag\left(\Delta^{(1)},\ldots,\Delta^{(R)}\right)$ & $\widetilde{\Lambda} = \diag\left(\Lambda^{(1)},\ldots,\Lambda^{(R)}\right)$ \\
+    \hline
+    \multicolumn{2}{|c|}{$\trans{\widetilde{X}} = \diag\left(\trans{\left(X^{(1)}\right)},\ldots,\trans{\left(X^{(R)}\right)}\right)$} \\
+    \hline
+    \end{tabular}
+  \end{center}
+\end{table}
+We are now able to express $\ABig$ and $\LBig$ as
+\begin{equation}
+    \label{eq:Adapted A and L GSVD}
+    \ABig = \widetilde{U}\widetilde{\Delta}\trans{\widetilde{X}}, \quad \LBig = \widetilde{V}\widetilde{\Lambda}\trans{\widetilde{X}}.
+\end{equation}
+Analogous to representation \eqref{eq:GSVD Normal Eq Sol} for a single system, the solution $\xBig(\regparamBig)$ can be written as 
+\begin{equation}
+    \label{eq:GSVD Big Normal Eq Sol}
+    \xBig(\regparamBig) = \widetilde{Y}\inv{\left(\trans{\widetilde{\Delta}}\widetilde{\Delta} + \widetilde{\regparam}^2 \trans{\widetilde{\Lambda}}\widetilde{\Lambda}\right)}\trans{\widetilde{\Delta}}\svd{\dBig}
+\end{equation}
+where $\widetilde{Y}$ is the inverse of $\widetilde{X}$. \par
 Some of the parameter estimation methods considered in this paper rely upon the statistical properties of the noise in the data, so the statistics of $\widetilde{\noiseVec}$ will be addressed. Though \eqref{eq:Big vectors} indicates that the random vectors $\{\noiseVec^{(\ell)}\}_{\ell=1}^R$ are assumed to have zero mean, we can relax this assumption so that $\noiseVec^{(\ell)} \sim \mathcal{N}(\bm{\mu}^{(\ell)},\Sigma^{(\ell)})$ for all $\ell = 1,\ldots,R$. The distribution of $\widetilde{\noiseVec}$ is then given by Lemma \ref{lem:Concatenation of Normal Noise}, which follows from the properties of the multivariate normal distribution. 
 \begin{lemma}
 \label{lem:Concatenation of Normal Noise}
@@ -565,6 +614,16 @@ Given $\noiseVec^{(\ell)} \sim \mathcal{N}(\zeroVec^{(\ell)},\Sigma^{(\ell)})$ f
 \end{assumption}
 \noindent In particular, Assumptions \ref{Assumption_System} and \ref{Assumption_Matrices} imply that $n_\ell = n$ for $\ell = 1,\ldots,R$.
 
+\subsection{Multiparameter regularization for multiple data sets} \label{sec:Adapted regularization}
+
+The ultimate situation we consider is the case where multiparameter regularization is applied to multiple data sets. Letting $\regparamVec^{(q)}$ be the regularization parameters used for multiparameter regularization applied to the $q$th system described by \eqref{eq:Big vectors}, we can independently construct regularized solutions
+\[\xWin^{(q)}\left(\regparamVec^{(q)}\right) = \sum_{\ell=1}^p Y^{(\ell)}\inv{\left[\trans{\Delta}\Delta^{(q)} + \left(\regparam^{(\ell)}\right)^2 \trans{\Lambda}\Lambda^{(q)}\right]}W^{(\ell)}\trans{\Delta}\dft{\dVec}^{(q)}\]
+
+
+
+The primary assumption we make moving forward is that the windows $W^{(\ell)}$ for each system are the same, i.e $W^{(\ell)}_q = W^{(\ell)}$ for all $q = 1,\ldots,R$. This implies that $\regparamVec^{(\ell)}$ are all vectors of length $p$.
+
+
 \section{Parameter selection methods} \label{sec:Methods}
 As stated in Section \ref{sec:Introduction}, there is a variety of methods for selecting regularization parameters. The UPRE and MDP methods are popular choices for situations in which the variance of the noise in the data is known. In contrast, the GCV and L-curve methods are common choices when the variance is unknown. However, all four methods involve the norm of a term $\rReg$ called the regularized residual. In the uniparameter case involving a single data point $\dVec$, the regularized residual is defined as
 \begin{equation}
@@ -572,7 +631,22 @@ As stated in Section \ref{sec:Introduction}, there is a variety of methods for s
 \rReg = A\xReg - \dVec.
 \end{equation}
 
-
+We extend the notation introduced in Section \ref{sec:Multiparameter} for multiparameter regularization involving a single data point to define a windowed regularized residual
+\begin{equation}
+\label{eq:Windowed regularized residual}
+\rWin(\regparamVec) = A\xWin(\regparamVec) - \dVec
+\end{equation}
+where the windowed regularized $\xWin(\regparamVec)$ is given by \eqref{eq:Windowed GSVD Solution} assuming the use of the GSVD. If instead we have multiple data points but each is used with uniparameter regularization, we can extend the notation from Section \ref{sec:Multiple data sets} (see Table \ref{tab:System assumptions}) so as to define a regularization solution
+\begin{equation}
+\label{eq:Windowed regularized residual}
+\rBig(\widetilde{\regparam}) = \ABig\xBig(\widetilde{\regparam}) - \dBig. 
+\end{equation}
+where \eqref{eq:GSVD Big Normal Eq Sol} is a representation of $\xBig(\widetilde{\regparam})$. \par 
+The ultimate situation is multiparameter regularization as applied to multiple data. For this, we combine the notations of Sections \ref{sec:Multiparameter} and \ref{sec:Multiple data sets} to construct a regularized residual $\rWinBig(\regparamVecBig)$ defined as
+\begin{equation}
+\label{eq:Windowed Big regularized residual}
+\rWinBig(\regparamVecBig) = \ABig\xWinBig(\regparamVecBig) - \dBig. 
+\end{equation}
 
 
 
