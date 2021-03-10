@@ -86,7 +86,7 @@
 % UPRE derivation notation:
 \newcommand{\rReg}{\rVec(\regparam)}	% Regularized residual
 \newcommand{\rWin}{\rVec_{\text{win}}}	% Windowed regularized residual
-\newcommand{\A}{A_{\regparam}}	% Influence matrix
+\newcommand{\A}{A(\regparam)}	% Influence matrix
 \newcommand{\U}{U}	% UPRE function
 \newcommand{\avgU}{\overline{U}}	% UPRE function
 \newcommand{\UPRE}{\text{UPRE}}	% Text of UPRE for use in math mode
@@ -427,51 +427,55 @@ In terms of the generalized singular values $\gamma_k = \delta_k/\lambda_k$ for 
 \label{eq:GSVD Solution 3}
 \xVec(\regparam) = \sum_{k = 1}^{n} \filt_k\left(\regparam,\gamma_k\right) \frac{\svd{\dVec}_k}{\delta_k} Y_{\cdot,k},
 \end{equation}
-which generalizes \eqref{eq:TikSol}. \par 
+which generalizes \eqref{eq:TikSol}. As a final representation and a return to matrix form, we can let $\Phi(\regparam) \in \mathbb{R}^{n \times n}$ diagonal matrix with
+\[\left[\Phi(\regparam)\right]_{k,k} = \filt(\regparam,\gamma_k), \quad k = 1,\ldots,n.\]
+Using $\Phi(\regparam)$, we can express representation \eqref{eq:GSVD Solution 3} more compactly as
+\[\xVec(\regparam) = Y\Phi(\regparam)\pinv{\Delta}\svd{\dVec}.\]
+
 As noted in \cite{ABT}, there are situations in which some generalized singular values $\gamma_k$ are arbitrarily large or infinite. In such cases, the corresponding filter factors $\filt_k$ are set to 1. Similarly, if $\gamma_k = 0$ or is arbitrarily small, then the corresponding summands in \eqref{eq:GSVD Solution 3} are counted as zero. Lastly, the generalized singular values are ordered such that $\gamma_1 \leq \ldots \leq \gamma_n$, which is due to the order of the diagonal elements of $\diag(\trans{\Delta}\Delta)$ and $\diag(\trans{\Lambda}\Lambda)$. In contrast, the singular values associated with the standard SVD are arranged in descending order.
 
 \subsection{Multiparameter Tikhonov regularization} \label{sec:Multiparameter}
-For $\ell = 1,\ldots,p$, let $\wVec^{(\ell)} \in \mathbb{R}^n$ be vectors containing the non-negative weights that satisfies
+For $p = 1,\ldots,P$, let $\wVec^{(p)} \in \mathbb{R}^n$ be vectors containing the non-negative weights that satisfies
 \begin{equation}
 \label{eq:Weights}
-\sum_{\ell=1}^{p} \wVec_j^{(\ell)} = 1, \quad j = 1,\ldots,n.
+\sum_{p=1}^{P} \wVec_j^{(p)} = 1, \quad j = 1,\ldots,n.
 \end{equation}
-Defining windows $W^{(\ell)} = \diag\left(\wVec^{(\ell)}\right)$ for $\ell = 1,\ldots,p$, property \eqref{eq:Weights} implies that $\sum_{\ell=1}^p W^{(\ell)} = I$.  A regularization parameter $\regparam^{(\ell)}$ can be selected for each window $W^{(\ell)}$ so that a windowed regularized solution can be constructed as
+Defining windows $W^{(p)} = \diag\left(\wVec^{(p)}\right)$ for $p = 1,\ldots,P$, property \eqref{eq:Weights} implies that $\sum_{p=1}^P W^{(p)} = I$.  A regularization parameter $\regparam^{(p)}$ can be selected for each window $W^{(p)}$ so that a windowed regularized solution can be constructed as
 \begin{equation}
 \label{eq:TikSolWindow}
-\xWin(\regparamVec) = \sum_{\ell=1}^p V\inv{\left[\trans{S}S + (\regparam^{(\ell)})^2\right]}W^{(\ell)}\trans{S}\dft{\dVec}.
+\xWin(\regparamVec) = \sum_{p=1}^P V\inv{\left[\trans{S}S + (\regparam^{(p)})^2\right]}W^{(p)}\trans{S}\dft{\dVec}.
 \end{equation}
 The windows must be selected before choosing corresponding regularization parameters; as such, some types of windows will be discussed. \par
-A specific class of windows are windows that do not overlap. Windows $W^{(\ell)}$ are defined to be non-overlapping if the components of their corresponding weight vectors $\wVec^{(\ell)}$ satisfy
+A specific class of windows are windows that do not overlap. Windows $W^{(p)}$ are defined to be non-overlapping if the components of their corresponding weight vectors $\wVec^{(p)}$ satisfy
 \begin{equation}
 \label{eq:Non-overlapping window condition}
-    \wVec_j^{(\ell)} \in \{0,1\}, \qquad j = 1,\ldots,n, \quad \ell = 1,\ldots,p.
+    \wVec_j^{(p)} \in \{0,1\}, \qquad j = 1,\ldots,n, \quad p = 1,\ldots,P.
 \end{equation}
-In words, condition \eqref{eq:Non-overlapping window condition} means that for each $j = 1,\ldots,n$, there is exactly one $\ell \in \{1,\ldots,p\}$ such that $\wVec_j^{(\ell)} = 1$. When working with non-overlapping windows, the pigeonhole principle \cite{DummitFoote3} can be used to show that there will exist indices $\ell$ such that $\wVec^{(\ell)} = \zeroVec$ if $p > n$. \par
-Perhaps the simplest way of choosing the components of $\wVec^{(\ell)}$ is to first choose $p+1$ values $\omega^{(0)} \geq \ldots \geq \omega^{(p)}$ such that $\omega^{(0)} \geq \singular_1$ and $\singular_n > \omega^{(p)}$. For $\ell = 1,\ldots,p$, we could then set
+In words, condition \eqref{eq:Non-overlapping window condition} means that for each $j = 1,\ldots,n$, there is exactly one $p \in \{1,\ldots,P\}$ such that $\wVec_j^{(p)} = 1$. When working with non-overlapping windows, the pigeonhole principle \cite{DummitFoote3} can be used to show that there will exist indices $p$ such that $\wVec^{(p)} = \zeroVec$ if $P > n$. \par
+Perhaps the simplest way of choosing the components of $\wVec^{(p)}$ is to first choose $P+1$ values $\omega^{(0)} \geq \ldots \geq \omega^{(P)}$ such that $\omega^{(0)} \geq \singular_1$ and $\singular_n > \omega^{(P)}$. For $p = 1,\ldots,P$, we could then set
 \begin{equation}
 \label{eq:Non-overlapping windows}
-\wVec_j^{(\ell)} = \begin{cases}
-1, & \omega^{(\ell-1)} \geq \singular_j > \omega^{(\ell)} \\
+\wVec_j^{(p)} = \begin{cases}
+1, & \omega^{(p-1)} \geq \singular_j > \omega^{(p)} \\
 0, & \text{otherwise.}
 \end{cases}
 \end{equation}
-There are some advantages of using \eqref{eq:Non-overlapping windows}. One advantage is that singular values of similar magnitude are grouped together. Another advantage is that the windows do not overlap. Non-overlapping windows allows for the multiparameter estimation functions discussed in Section \ref{sec:Methods} to decoupled into linear combinations of single parameter functions. Choosing $\partition^{(1)},\ldots,\partition^{(p-1)}$ to be the $p-1$ linearly-spaced or logarithmically-spaced points between $\singular_1$ and $\singular_n$ and then setting $\partition^{(0)} = \singular_1$ and $\partition^{(p)} < \singular_n$ is an example of how to use \eqref{eq:Non-overlapping windows}. \par 
-Partition values $\partition^{(0)} \geq \ldots \geq \partition^{(p)}$ can also be used to generate overlapping windows. For example, cosine windows are defined in \cite{ChungEasleyOLeary} by using midpoints
+There are some advantages of using \eqref{eq:Non-overlapping windows}. One advantage is that singular values of similar magnitude are grouped together. Another advantage is that the windows do not overlap. Non-overlapping windows allows for the multiparameter estimation functions discussed in Section \ref{sec:Methods} to decoupled into linear combinations of single parameter functions. Choosing $\partition^{(1)},\ldots,\partition^{(P-1)}$ to be the $P-1$ linearly-spaced or logarithmically-spaced points between $\singular_1$ and $\singular_n$ and then setting $\partition^{(0)} = \singular_1$ and $\partition^{(P)} < \singular_n$ is an example of how to use \eqref{eq:Non-overlapping windows}. \par 
+Partition values $\partition^{(0)} \geq \ldots \geq \partition^{(P)}$ can also be used to generate overlapping windows. For example, cosine windows are defined in \cite{ChungEasleyOLeary} by using midpoints
 \begin{equation}
 \label{eq:Midpoints}
-    \midpoint^{(\ell)} = \frac{\partition^{(\ell-1)} + \partition^{(\ell)}}{2}, \quad \ell = 1,\ldots,p,
+    \midpoint^{(p)} = \frac{\partition^{(p-1)} + \partition^{(p)}}{2}, \quad p = 1,\ldots,P,
 \end{equation}
 so that
 \begin{equation}
 \label{eq:Middle cosine windows}
-    \wVec_j^{(\ell)} = \begin{dcases}
-    \cos^2\left(\frac{\frac{\pi}{2}\left(\singular_j - \midpoint^{(\ell)}\right)}{\midpoint^{(\ell-1)} - \midpoint^{(\ell)}}\right) & \midpoint^{(\ell-1)} \geq \singular_j > \midpoint^{(\ell)}, \\
-    \cos^2\left(\frac{\frac{\pi}{2}\left(\midpoint^{(\ell)} - \singular_j\right)}{\midpoint^{(\ell)} - \midpoint^{(\ell+1)}}\right) & \midpoint^{(\ell)} \geq \singular_j > \midpoint^{(\ell+1)}, \\
+    \wVec_j^{(p)} = \begin{dcases}
+    \cos^2\left(\frac{\frac{\pi}{2}\left(\singular_j - \midpoint^{(p)}\right)}{\midpoint^{(p-1)} - \midpoint^{(p)}}\right) & \midpoint^{(p-1)} \geq \singular_j > \midpoint^{(p)}, \\
+    \cos^2\left(\frac{\frac{\pi}{2}\left(\midpoint^{(p)} - \singular_j\right)}{\midpoint^{(p)} - \midpoint^{(p+1)}}\right) & \midpoint^{(p)} \geq \singular_j > \midpoint^{(p+1)}, \\
     0 & \text{otherwise,}
-    \end{dcases} \qquad \ell = 2,\ldots,p-1.
+    \end{dcases} \qquad p = 2,\ldots,P-1.
 \end{equation}
-The first and $p$th weight vectors can be defined by 
+The first and $P$th weight vectors can be defined by 
 \begin{equation}
 \label{eq:First cosine window}
      \wVec_j^{(1)} = \begin{dcases}
@@ -483,9 +487,9 @@ The first and $p$th weight vectors can be defined by
 and
 \begin{equation}
 \label{eq:Last cosine window}
-    \wVec_j^{(p)} = \begin{dcases}
-    \cos^2\left(\frac{\frac{\pi}{2}\left(\singular_j - \midpoint^{(p)}\right)}{\midpoint^{(p-1)} - \midpoint^{(p)}}\right) & \midpoint^{(p-1)} \geq \singular_j > \midpoint^{(p)}, \\
-    1 & \midpoint^{(p)} \geq \singular_j > \omega^{(p)}, \\
+    \wVec_j^{(P)} = \begin{dcases}
+    \cos^2\left(\frac{\frac{\pi}{2}\left(\singular_j - \midpoint^{(P)}\right)}{\midpoint^{(P-1)} - \midpoint^{(P)}}\right) & \midpoint^{(P-1)} \geq \singular_j > \midpoint^{(P)}, \\
+    1 & \midpoint^{(P)} \geq \singular_j > \omega^{(P)}, \\
     0 & \text{otherwise,}
     \end{dcases}
 \end{equation}
@@ -493,59 +497,59 @@ respectively.
 \begin{proposition}
 \label{prop:Cosine windows}
 The cosine windows defined by \eqref{eq:Midpoints} through \eqref{eq:Last cosine window} satisfy
-\[\sum_{\ell=1}^{p} \wVec_j^{(\ell)} = 1, \quad j = 1,\ldots,n.\]
+\[\sum_{p=1}^{P} \wVec_j^{(p)} = 1, \quad j = 1,\ldots,n.\]
 \end{proposition}
 \begin{proof}
-Let $j \in \{1,\ldots,n\}$ be fixed. If either $\omega^{(0)} \geq \singular_j > \midpoint^{(1)}$ or $\midpoint^{(p)} \geq \singular_j > \omega^{(p)}$, the result follows immediately from \eqref{eq:First cosine window} or \eqref{eq:Last cosine window}, respectively. Now suppose that $\midpoint^{(1)} \geq \singular_j > \midpoint^{(p)}$. Then there exists exactly one value $\ell \in \{1,\ldots,p-1\}$ such that $\midpoint^{(\ell)} \geq \singular_j > \midpoint^{(\ell+1)}$. By definition of the cosine windows, $\wVec^{(\ell)}$ and $\wVec^{(\ell+1)}$ are the only weight vectors such that their $j$th components are nonzero. It must be shown that $\wVec^{(\ell)}_j + \wVec^{(\ell+1)}_j = 1$. From \eqref{eq:Middle cosine windows}, the $j$th component of $\wVec^{(\ell)}$ is
-\[\wVec^{(\ell)}_j = \cos^2\left(\frac{\frac{\pi}{2}\left(\midpoint^{(\ell)} - \singular_j\right)}{\midpoint^{(\ell)} - \midpoint^{(\ell+1)}}\right)\]
-and the $j$th component of $\wVec^{(\ell+1)}$ is
-\[\wVec^{(\ell+1)}_j =  \cos^2\left(\frac{\frac{\pi}{2}\left(\singular_j - \midpoint^{(\ell+1)}\right)}{\midpoint^{(\ell)} - \midpoint^{(\ell+1)}}\right).\]
+Let $j \in \{1,\ldots,n\}$ be fixed. If either $\omega^{(0)} \geq \singular_j > \midpoint^{(1)}$ or $\midpoint^{(P)} \geq \singular_j > \omega^{(P)}$, the result follows immediately from \eqref{eq:First cosine window} or \eqref{eq:Last cosine window}, respectively. Now suppose that $\midpoint^{(1)} \geq \singular_j > \midpoint^{(P)}$. Then there exists exactly one value $p \in \{1,\ldots,P-1\}$ such that $\midpoint^{(p)} \geq \singular_j > \midpoint^{(p+1)}$. By definition of the cosine windows, $\wVec^{(p)}$ and $\wVec^{(p+1)}$ are the only weight vectors such that their $j$th components are nonzero. It must be shown that $\wVec^{(p)}_j + \wVec^{(p+1)}_j = 1$. From \eqref{eq:Middle cosine windows}, the $j$th component of $\wVec^{(p)}$ is
+\[\wVec^{(p)}_j = \cos^2\left(\frac{\frac{\pi}{2}\left(\midpoint^{(p)} - \singular_j\right)}{\midpoint^{(p)} - \midpoint^{(p+1)}}\right)\]
+and the $j$th component of $\wVec^{(p+1)}$ is
+\[\wVec^{(p+1)}_j =  \cos^2\left(\frac{\frac{\pi}{2}\left(\singular_j - \midpoint^{(p+1)}\right)}{\midpoint^{(p)} - \midpoint^{(p+1)}}\right).\]
 Using the identity $\cos(\theta) = \sin\left(\frac{\pi}{2} - \theta\right)$, we have that
 \begin{align*}
-\wVec^{(\ell+1)}_j &= \sin^2\left(\frac{\pi}{2} - \frac{\frac{\pi}{2}\left(\singular_j - \midpoint^{(\ell+1)}\right)}{\midpoint^{(\ell)} - \midpoint^{(\ell+1)}}\right) \\
-&= \sin^2\left(\frac{\frac{\pi}{2}\left(\midpoint^{(\ell)} - \midpoint^{(\ell+1)}\right) - \frac{\pi}{2}\left(\singular_j - \midpoint^{(\ell+1)}\right)}{\midpoint^{(\ell)} - \midpoint^{(\ell+1)}}\right) \\
-&= \sin^2\left(\frac{\frac{\pi}{2}\left(\midpoint^{(\ell)} - \singular_j\right)}{\midpoint^{(\ell)} - \midpoint^{(\ell+1)}}\right).
+\wVec^{(p+1)}_j &= \sin^2\left(\frac{\pi}{2} - \frac{\frac{\pi}{2}\left(\singular_j - \midpoint^{(p+1)}\right)}{\midpoint^{(p)} - \midpoint^{(p+1)}}\right) \\
+&= \sin^2\left(\frac{\frac{\pi}{2}\left(\midpoint^{(p)} - \midpoint^{(p+1)}\right) - \frac{\pi}{2}\left(\singular_j - \midpoint^{(p+1)}\right)}{\midpoint^{(p)} - \midpoint^{(p+1)}}\right) \\
+&= \sin^2\left(\frac{\frac{\pi}{2}\left(\midpoint^{(p)} - \singular_j\right)}{\midpoint^{(p)} - \midpoint^{(p+1)}}\right).
 \end{align*}
 Therefore,
-\[\wVec^{(\ell)}_j + \wVec^{(\ell+1)}_j = \cos^2\left(\frac{\frac{\pi}{2}\left(\midpoint^{(\ell)} - \singular_j\right)}{\midpoint^{(\ell)} - \midpoint^{(\ell+1)}}\right) +  \sin^2\left(\frac{\frac{\pi}{2}\left(\midpoint^{(\ell)} - \singular_j\right)}{\midpoint^{(\ell)} - \midpoint^{(\ell+1)}}\right) = 1.\]
+\[\wVec^{(p)}_j + \wVec^{(p+1)}_j = \cos^2\left(\frac{\frac{\pi}{2}\left(\midpoint^{(p)} - \singular_j\right)}{\midpoint^{(p)} - \midpoint^{(p+1)}}\right) +  \sin^2\left(\frac{\frac{\pi}{2}\left(\midpoint^{(p)} - \singular_j\right)}{\midpoint^{(p)} - \midpoint^{(p+1)}}\right) = 1.\]
 \end{proof}
-Given a penalty matrix $L \neq I$, a windowed regularized solution similar to \eqref{eq:TikSolWindow} can be obtained using the GSVD. Given the decompositions $A = $ and $L = $ described in Section \ref{sec:GSVD} and windows $W^{(\ell)}$ for $\ell = 1,\ldots,p$, a corresponding windowed regularized solution is
+Given a penalty matrix $L \neq I$, a windowed regularized solution similar to \eqref{eq:TikSolWindow} can be obtained using the GSVD. Given the decompositions $A = U\Delta\trans{X}$ and $L = V\Lambda\trans{X}$ described in Section \ref{sec:GSVD} and windows $W^{(p)}$ for $p = 1,\ldots,P$, a corresponding windowed regularized solution is
 \begin{equation}
 \label{eq:Windowed GSVD Solution}
-    \xWin(\regparamVec) = \sum_{\ell=1}^p Y\inv{\left[\trans{\Delta}\Delta + \left(\regparam^{(\ell)}\right)^2 \trans{\Lambda}\Lambda\right]}W^{(\ell)}\trans{\Delta}\dft{\dVec}
+    \xWin(\regparamVec) = \sum_{p=1}^P Y\inv{\left[\trans{\Delta}\Delta + \left(\regparam^{(p)}\right)^2 \trans{\Lambda}\Lambda\right]}W^{(p)}\trans{\Delta}\dft{\dVec}
 \end{equation}
 with $Y$ again being the inverse of $\trans{X}$. In terms of the generalized singular values $\gamma_k$, \eqref{eq:Windowed GSVD Solution} can be written as
 \begin{equation}
 \label{eq:Windowed GSVD Solution Sum}
-    \xWin(\regparamVec) = \sum_{k=1}^n \left(\sum_{\ell=1}^p \filt_k\left(\regparam^{(\ell)},\gamma_k\right)\wVec^{(\ell)}_{k}\right)  \frac{\dft{\dVec}_{k}}{\delta_k} Y_{\cdot,k}.
+    \xWin(\regparamVec) = \sum_{k=1}^n \left(\sum_{p=1}^P \filt_k\left(\regparam^{(p)},\gamma_k\right)\wVec^{(p)}_{k}\right)  \frac{\dft{\dVec}_{k}}{\delta_k} Y_{\cdot,k}.
 \end{equation}
-However, care must be taken when selecting the weight vectors $\wVec^{\ell}$ in light of the fact that the generalized singular values are arranged in ascending order.
+However, care must be taken when selecting the weight vectors $\wVec^{p}$ in light of the fact that the generalized singular values are arranged in ascending order.
 
 \subsection{Multiple data sets} \label{sec:Multiple data sets}
-We now consider the situation where we have a collection of data sets $\{\dVec^{(\ell)}\}_{\ell=1}^R$ where 
+We now consider the situation where we have a collection of data sets $\{\dVec^{(r)}\}_{r=1}^R$ where 
 \begin{equation}
 \label{eq:Big vectors}
-\dVec^{(\ell)} = \bVec^{(\ell)} + \noiseVec^{(\ell)} = {A^{(\ell)}}\xVec^{(\ell)} + \noiseVec^{(\ell)}, \quad \noiseVec^{(\ell)} \sim \mathcal{N}(\bm{0},\Sigma^{(\ell)}), \qquad \ell = 1,\ldots,R.
+\dVec^{(r)} = \bVec^{(r)} + \noiseVec^{(r)} = {A^{(r)}}\xVec^{(r)} + \noiseVec^{(r)}, \quad \noiseVec^{(r)} \sim \mathcal{N}(\bm{0},\Sigma^{(r)}), \qquad r = 1,\ldots,R.
 \end{equation}
-For given regularization parameters $\regparam^{(\ell)}$ and penalty matrices $L^{(\ell)}$, Tikhonov regularization can be performed to produce regularized solutions $\xVec(\regparam^{(\ell)})$ that minimize the functionals
+For given regularization parameters $\regparam^{(r)}$ and penalty matrices $L^{(r)}$, Tikhonov regularization can be performed to produce regularized solutions $\xVec(\regparam^{(r)})$ that minimize the functionals
 \begin{equation}
-T^{(\ell)}(\xVec;\regparam^{(\ell)}) := \|A^{(\ell)}\xVec - \dVec^{(\ell)}\|_2^2 + \left(\regparam^{(\ell)}\right)^2\|L^{(\ell)}\xVec\|_2^2.
+T^{(r)}(\xVec;\regparam^{(r)}) := \|A^{(r)}\xVec - \dVec^{(r)}\|_2^2 + \left(\regparam^{(r)}\right)^2\|L^{(r)}\xVec\|_2^2.
 \end{equation}
-A parameter selection method is generally utilized to select the regularization parameter for each system. Instead, let $\dBig$ be the vector formed by vertically concatenating the data sets $\{\dVec^{(\ell)}\}_{\ell=1}^R$ and define the functional
+A parameter selection method is generally utilized to select the regularization parameter for each system. Instead, let $\dBig$ be the vector formed by vertically concatenating the data sets $\{\dVec^{(r)}\}_{r=1}^R$ and define the functional
 \begin{equation}
 \label{eq:Big functional}
-\widetilde{T}\left(\widetilde{\xVec};\widetilde{\regparam}\right) = \|\widetilde{A}\widetilde{\xVec} - \widetilde{\dVec}\|_2^2 + \widetilde{\regparam}^2\|\widetilde{L}\widetilde{\xVec}\|_2^2,
+\widetilde{T}\left(\widetilde{\xVec};\widetilde{\regparam}\right) = \|\ABig\widetilde{\xVec} - \widetilde{\dVec}\|_2^2 + \widetilde{\regparam}^2\|\widetilde{L}\widetilde{\xVec}\|_2^2,
 \end{equation}
-where $\widetilde{\regparam}$ is a single regularization parameter. This construction implies that $\xBig$, $\bBig$, $\widetilde{\noiseVec}$ are vertical concatenations of vectors in $\{\bVec^{(\ell)}\}_{\ell=1}^R$ and $\{\noiseVec^{(\ell)}\}_{\ell=1}^R$, respectively. The matrices $\ABig$ and $\LBig$ are block diagonal matrices with diagonal blocks $\{A^{(\ell)}\}_{\ell=1}^R$ and $\{L^{(\ell)}\}_{\ell=1}^R$, respectively. By the definition of the 2-norm and the construction of \eqref{eq:Big functional}, we can also write
+where $\widetilde{\regparam}$ is a single regularization parameter. This construction implies that $\xBig$, $\bBig$, $\widetilde{\noiseVec}$ are vertical concatenations of vectors in $\{\bVec^{(r)}\}_{r=1}^R$ and $\{\noiseVec^{(r)}\}_{r=1}^R$, respectively. The matrices $\ABig$ and $\LBig$ are block diagonal matrices with diagonal blocks $\{A^{(r)}\}_{r=1}^R$ and $\{L^{(r)}\}_{r=1}^R$, respectively. By the definition of the 2-norm and the construction of \eqref{eq:Big functional}, we can also write
 \begin{equation}
 \label{eq:Big functional 2}
-\widetilde{T}\left(\xBig;\widetilde{\regparam}\right) = \sum_{\ell = 1}^R \left(\|A^{(\ell)}\xVec^{(\ell)} - \dVec^{(\ell)}\|_2^2 + \widetilde{\regparam}^2\|L^{(\ell)} \xVec^{(\ell)}\|_2^2\right) = \sum_{\ell=1}^R T^{(\ell)}\left(\xVec^{(\ell)};\widetilde{\regparam}\right).
+\widetilde{T}\left(\xBig;\widetilde{\regparam}\right) = \sum_{r=1}^R \left(\|A^{(r)}\xVec^{(r)} - \dVec^{(r)}\|_2^2 + \widetilde{\regparam}^2\|L^{(r)} \xVec^{(r)}\|_2^2\right) = \sum_{r=1}^R T^{(r)}\left(\xVec^{(r)};\widetilde{\regparam}\right).
 \end{equation}
 In regards to selecting regularization parameters, the advantage of regularizing via \eqref{eq:Big functional} is that we only have to select one parameter instead of $R$ parameters (one for each data set). Table \ref{tab:System assumptions} contains the assumptions used here for the development of parameter selections methods for multiple data sets. The notation $\vcat$ is used for brevity and denotes vertical concatenation of column vectors. The built-in MATLAB command $\mathtt{vertcat}$ can be used for vertical concatenation of vectors or matrices of appropriate dimension. Assumption \ref{Assumption_System} summarizes the set-up established in \eqref{eq:Big vectors}.
 
 \begin{table}[ht!]
   \begin{center}
-    \caption{Summary of assumptions and constructions used for $\ell = 1,\ldots,R$.}
+    \caption{Summary of assumptions and constructions used for $r = 1,\ldots,R$.}
     \label{tab:System assumptions}
     \begin{tabular}{|c|c|}
     \hline
@@ -561,17 +565,17 @@ In regards to selecting regularization parameters, the advantage of regularizing
 
 \begin{assumption}
 \label{Assumption_System}
-For $\ell = 1,\ldots,R$, assume that $\bVec^{(\ell)} = {A^{(\ell)}}\xVec^{(\ell)}$, $\dVec^{(\ell)} = \bVec^{(\ell)} + \noiseVec^{(\ell)}$, and $\noiseVec^{(\ell)} \sim \mathcal{N}(\zeroVec^{(\ell)},\Sigma^{(\ell)})$. The vectors $\bVec^{(\ell)}$, $\dVec^{(\ell)}$, and $\noiseVec^{(\ell)}$ are of length $n_\ell$.
+For $r = 1,\ldots,R$, assume that $\bVec^{(r)} = {A^{(r)}}\xVec^{(r)}$, $\dVec^{(r)} = \bVec^{(r)} + \noiseVec^{(r)}$, and $\noiseVec^{(r)} \sim \mathcal{N}(\zeroVec^{(r)},\Sigma^{(r)})$. The vectors $\bVec^{(r)}$, $\dVec^{(r)}$, and $\noiseVec^{(r)}$ are of length $n_r$.
 \end{assumption}
 
-To obtain an explicit representation of $\xBig(\regparamBig)$, the GSVD can be utilized. A GSVD of each pair $(A^{(\ell)},L^{(\ell)})$ can obtained for $\ell = 1,\ldots,R$ so that
+To obtain an explicit representation of $\xBig(\regparamBig)$, the GSVD can be utilized. A GSVD of each pair $(A^{(r)},L^{(r)})$ can obtained for $r = 1,\ldots,R$ so that
 \begin{equation}
-    A^{(\ell)} = U^{(\ell)}\Delta^{(\ell)}\trans{\left(X^{(\ell)}\right)}, \quad L^{(\ell)} = V^{(\ell)}\Lambda^{(\ell)}\trans{\left(X^{(\ell)}\right)}.
+    A^{(r)} = U^{(r)}\Delta^{(r)}\trans{\left(X^{(r)}\right)}, \quad L^{(r)} = V^{(r)}\Lambda^{(r)}\trans{\left(X^{(r)}\right)}.
 \end{equation}
 These decompositions then allow for the definition of block decomposition matrices described in Table \ref{tab:Block GSVD Matrices}.
 \begin{table}[ht!]
   \begin{center}
-    \caption{Matrices constructed from the GSVD's of $(A^{(\ell)},L^{(\ell)})$ can obtained for $\ell = 1,\ldots,R$.}
+    \caption{Matrices constructed from the GSVD's of $(A^{(r)},L^{(r)})$ can obtained for $r = 1,\ldots,R$.}
     \label{tab:Block GSVD Matrices}
     \begin{tabular}{|c|c|}
     \hline
@@ -594,35 +598,34 @@ Analogous to representation \eqref{eq:GSVD Normal Eq Sol} for a single system, t
     \label{eq:GSVD Big Normal Eq Sol}
     \xBig(\regparamBig) = \widetilde{Y}\inv{\left(\trans{\widetilde{\Delta}}\widetilde{\Delta} + \widetilde{\regparam}^2 \trans{\widetilde{\Lambda}}\widetilde{\Lambda}\right)}\trans{\widetilde{\Delta}}\svd{\dBig}
 \end{equation}
-where $\widetilde{Y}$ is the inverse of $\widetilde{X}$. \par
-Some of the parameter estimation methods considered in this paper rely upon the statistical properties of the noise in the data, so the statistics of $\widetilde{\noiseVec}$ will be addressed. Though \eqref{eq:Big vectors} indicates that the random vectors $\{\noiseVec^{(\ell)}\}_{\ell=1}^R$ are assumed to have zero mean, we can relax this assumption so that $\noiseVec^{(\ell)} \sim \mathcal{N}(\bm{\mu}^{(\ell)},\Sigma^{(\ell)})$ for all $\ell = 1,\ldots,R$. The distribution of $\widetilde{\noiseVec}$ is then given by Lemma \ref{lem:Concatenation of Normal Noise}, which follows from the properties of the multivariate normal distribution. 
+where $\widetilde{Y}$ is the inverse of $\widetilde{X}$ and $\svd{\dBig} = \trans{\widetilde{U}}\dBig$. \par
+Some of the parameter estimation methods considered in this paper rely upon the statistical properties of the noise in the data, so the statistics of $\widetilde{\noiseVec}$ will be addressed. Though \eqref{eq:Big vectors} indicates that the random vectors $\{\noiseVec^{(r)}\}_{r=1}^R$ are assumed to have zero mean, we can relax this assumption so that $\noiseVec^{(r)} \sim \mathcal{N}(\bm{\mu}^{(r)},\Sigma^{(r)})$ for all $r = 1,\ldots,R$. The distribution of $\widetilde{\noiseVec}$ is then given by Lemma \ref{lem:Concatenation of Normal Noise}, which follows from the properties of the multivariate normal distribution. 
 \begin{lemma}
 \label{lem:Concatenation of Normal Noise}
-Let $\{\noiseVec^{(\ell)}\}_{\ell=1}^R$ be a collection of mutually independent random vectors with $\noiseVec^{(\ell)} \sim \mathcal{N}(\bm{\mu}^{(\ell)},\Sigma^{(\ell)})$ for each $\ell = 1,\ldots,R$, and let $\widetilde{\noiseVec} = \vcat(\noiseVec^{(1)},\ldots,\noiseVec^{(R)})$. Then $\widetilde{\noiseVec} \sim \mathcal{N}(\widetilde{\bm{\mu}},\widetilde{\Sigma})$ where $\widetilde{\bm{\mu}} = \vcat(\bm{\mu}^{(\ell)},\ldots,\bm{\mu}^{(R)})$ and $\widetilde{\Sigma} = \diag(\Sigma^{(1)},\ldots,\Sigma^{(R)})$.
+Let $\{\noiseVec^{(r)}\}_{r=1}^R$ be a collection of mutually independent random vectors with $\noiseVec^{(r)} \sim \mathcal{N}(\bm{\mu}^{(r)},\Sigma^{(r)})$ for each $r = 1,\ldots,R$, and let $\widetilde{\noiseVec} = \vcat(\noiseVec^{(1)},\ldots,\noiseVec^{(R)})$. Then $\widetilde{\noiseVec} \sim \mathcal{N}(\widetilde{\bm{\mu}},\widetilde{\Sigma})$ where $\widetilde{\bm{\mu}} = \vcat(\bm{\mu}^{(r)},\ldots,\bm{\mu}^{(R)})$ and $\widetilde{\Sigma} = \diag(\Sigma^{(1)},\ldots,\Sigma^{(R)})$.
 \end{lemma}
 \noindent Lemma \ref{lem:Concatenation of Normal Noise} is also useful in determining quantities like $\E(\|\widetilde{\noiseVec}\|_2^2)$, which is accomplished as needed in Sections \ref{sec:UPRE} and \ref{sec:MDP}. \par
 We conclude Section \ref{sec:Multiple data sets} by enumerating the additional underlying assumptions that will be utilized in Section \ref{sec:Methods}.
 
 \begin{assumption}
 \label{Assumption_Matrices}
-For $\ell = 1,\ldots,R$, assume that $A^{(\ell)} = A$ and $L^{(\ell)} = L$.
+For $r = 1,\ldots,R$, assume that $A^{(r)} = A$ and $L^{(r)} = L$.
 \end{assumption}  
 
 \begin{assumption}
 \label{Assumption_Noise}
-Given $\noiseVec^{(\ell)} \sim \mathcal{N}(\zeroVec^{(\ell)},\Sigma^{(\ell)})$ for $\ell = 1,\ldots,R$, assume that $\Sigma^{(\ell)} = \noiseSD_\ell^2I$.
+Given $\noiseVec^{(r)} \sim \mathcal{N}(\zeroVec^{(r)},\Sigma^{(r)})$ for $r = 1,\ldots,R$, assume that $\Sigma^{(r)} = \noiseSD_r^2 I$.
 \end{assumption}
-\noindent In particular, Assumptions \ref{Assumption_System} and \ref{Assumption_Matrices} imply that $n_\ell = n$ for $\ell = 1,\ldots,R$.
+\noindent In particular, Assumptions \ref{Assumption_System} and \ref{Assumption_Matrices} imply that $n_r = n$ for $r = 1,\ldots,R$.
 
 \subsection{Multiparameter regularization for multiple data sets} \label{sec:Adapted regularization}
 
-The ultimate situation we consider is the case where multiparameter regularization is applied to multiple data sets. Letting $\regparamVec^{(q)}$ be the regularization parameters used for multiparameter regularization applied to the $q$th system described by \eqref{eq:Big vectors}, we can independently construct regularized solutions
-\[\xWin^{(q)}\left(\regparamVec^{(q)}\right) = \sum_{\ell=1}^p Y^{(\ell)}\inv{\left[\trans{\Delta}\Delta^{(q)} + \left(\regparam^{(\ell)}\right)^2 \trans{\Lambda}\Lambda^{(q)}\right]}W^{(\ell)}\trans{\Delta}\dft{\dVec}^{(q)}\]
-
-
-
-The primary assumption we make moving forward is that the windows $W^{(\ell)}$ for each system are the same, i.e $W^{(\ell)}_q = W^{(\ell)}$ for all $q = 1,\ldots,R$. This implies that $\regparamVec^{(\ell)}$ are all vectors of length $p$.
-
+The ultimate situation we consider is the case where multiparameter regularization is applied to multiple data sets. Letting $\regparamVec^{(r)}$ be the regularization parameters used for multiparameter regularization applied to the $r$th system described by \eqref{eq:Big vectors}, we can independently construct regularized solutions
+\[\xWin^{(r)}\left(\regparamVec^{(r)}\right) = \sum_{p=1}^{P_r} Y^{(r)}\inv{\left[\trans{\left(\Delta^{(r)}\right)}\Delta^{(r)} + \left(\regparam^{(r)}_p\right)^2 \trans{\left(\Lambda^{(r)}\right)}\Lambda^{(r)}\right]}W^{(p)}_{(r)}\trans{\left(\Delta^{(r)}\right)}\dft{\dVec}^{(r)}\]
+where $W^{(p)}_{(r)}$ is the $p$th window for the $r$th system, $\regparam^{(r)}_p$ is the regularization parameter for the $p$th window, and $P_r$ is the number of windows. Each system can have its own set of windows, meaning that there are a total of $RP_r$ regularization parameters. However, the primary assumption we make moving forward is that the windows $W^{(p)}_{(r)}$ for each system are the same, i.e $W^{(p)}_{(r)} = W^{(p)}$ for all $r = 1,\ldots,R$ and $p = 1,\ldots,P$. This implies that $\regparamVec^{(r)}$ are all vectors of length $P$ and there are a total of $RP$ parameters. \par
+Analogous to the uniparameter case for multiple data sets, we define $\xWinBig(\regparamVecBig)$ as the vertical concatenation of the $\xWin^{(r)}\left(\regparamVecBig\right)$ for $r = 1,\ldots,R$, where $\regparamVecBig \in \mathbb{R}^P$ is a single vector of parameters. Using the constructions from Table \ref{tab:Block GSVD Matrices}, we have
+\[\xWinBig(\regparamVecBig) = \sum_{p=1}^{P} \widetilde{Y}\inv{\left[\trans{\widetilde{\Delta}}\widetilde{\Delta} + \widetilde{\regparam}_p^2 \trans{\widetilde{\Lambda}}\widetilde{\Lambda}\right]}\widetilde{W}^{(p)}\trans{\widetilde{\Delta}}\dft{\dBig}\]
+where $\widetilde{W}^{(p)} = \diag(W^{(p)},\ldots,W^{(p)})$ has $R$ diagonal blocks.
 
 \section{Parameter selection methods} \label{sec:Methods}
 As stated in Section \ref{sec:Introduction}, there is a variety of methods for selecting regularization parameters. The UPRE and MDP methods are popular choices for situations in which the variance of the noise in the data is known. In contrast, the GCV and L-curve methods are common choices when the variance is unknown. However, all four methods involve the norm of a term $\rReg$ called the regularized residual. In the uniparameter case involving a single data point $\dVec$, the regularized residual is defined as
@@ -642,16 +645,13 @@ where the windowed regularized $\xWin(\regparamVec)$ is given by \eqref{eq:Windo
 \rBig(\widetilde{\regparam}) = \ABig\xBig(\widetilde{\regparam}) - \dBig. 
 \end{equation}
 where \eqref{eq:GSVD Big Normal Eq Sol} is a representation of $\xBig(\widetilde{\regparam})$. \par 
-The ultimate situation is multiparameter regularization as applied to multiple data. For this, we combine the notations of Sections \ref{sec:Multiparameter} and \ref{sec:Multiple data sets} to construct a regularized residual $\rWinBig(\regparamVecBig)$ defined as
+The ultimate situation is multiparameter regularization as applied to multiple data. For this situation, we combine the notations of Sections \ref{sec:Multiparameter} through \ref{sec:Adapted regularization} to construct a regularized residual $\rWinBig(\regparamVecBig)$ defined as
 \begin{equation}
 \label{eq:Windowed Big regularized residual}
 \rWinBig(\regparamVecBig) = \ABig\xWinBig(\regparamVecBig) - \dBig. 
 \end{equation}
 
-
-
-
-As a final remark, the development of the adapted UPRE, MDP, and GCV methods also rely on Assumption \ref{Assumption_System} and the constructions contained in Table \ref{tab:System assumptions}. By Lemma \ref{lem:Concatenation of Normal Noise}, this assumption implies that $\widetilde{\noiseVec} \sim \mathcal{N}\left(\widetilde{\zeroVec},\widetilde{\Sigma}\right)$ with $\widetilde{\zeroVec} \in \mathbb{R}^N$ and $N = \sum_{\ell=1}^{R} n_\ell$. 
+% As a final remark, the development of the adapted UPRE, MDP, and GCV methods also rely on Assumption \ref{Assumption_System} and the constructions contained in Table \ref{tab:System assumptions}. By Lemma \ref{lem:Concatenation of Normal Noise}, this assumption implies that $\widetilde{\noiseVec} \sim \mathcal{N}\left(\widetilde{\zeroVec},\widetilde{\Sigma}\right)$ with $\widetilde{\zeroVec} \in \mathbb{R}^N$ and $N = \sum_{r=1}^{R} n_r$. 
 
 \subsection{Unbiased Predictive Risk Estimator} \label{sec:UPRE}
 The UPRE method was developed in 1973 by Mallows and considers the statistical relationship between predictive error $\pVec(\regparam)$ and the regularized residual $\rVec(\regparam)$; these quantities are defined respectively as
@@ -689,7 +689,7 @@ Since $\noiseVec \sim \mathcal{N}(\bm{\mu},\Sigma)$, $\mathbf{y} \sim \mathcal{N
 \noindent Applying Lemma \ref{lem:Generalized Trace Lemma} to the norm of $\pVec(\regparam)$ and noting that $\E(\noiseVec) = \zeroVec$ produces
 \begin{equation}
 \label{eq:New Predicitive Risk 1}
-\E\left(\frac{1}{n}\left\|\pVec(\regparam)\right\|_2^2\right) = \frac{1}{n}\left\|\left(\A - I\right)A\xVec\right\|_2^2 + \frac{1}{n}\trace\left(\A\Sigma\trans{A}_\regparam \right).
+\E\left(\frac{1}{n}\left\|\pVec(\regparam)\right\|_2^2\right) = \frac{1}{n}\left\|\left(\A - I\right)A\xVec\right\|_2^2 + \frac{1}{n}\trace\left(\A\Sigma\trans{\A}\right).
 \end{equation}
 The regularized residual $\rVec(\regparam)$ can be rewritten as
 \begin{equation}
@@ -699,9 +699,12 @@ The regularized residual $\rVec(\regparam)$ can be rewritten as
 and so applying Lemma \ref{lem:Generalized Trace Lemma} to the norm of $\rVec(\regparam)$ yields
 \[\E\left(\frac{1}{n}\left\|\rVec(\regparam)\right\|_2^2\right) = \frac{1}{n}\left\|\left(\A - I\right)A\xVec\right\|_2^2 + \frac{1}{n}\trace\left(\trans{\left(\A - I\right)}\Sigma\left(\A - I\right) \right).\]
 The trace term can be expanded as
-\[\trace\left(\trans{\left(\A - I\right)}\Sigma\left(\A - I\right) \right) = \trace\left(\trans{A_\regparam}\Sigma\A\right) - \trace\left(\trans{A}_\regparam\Sigma\right) - \trace\left(\Sigma\A\right) + \trace\left(\Sigma\right).\]
+\begin{align*}
+    &\trace\left(\trans{\left(\A - I\right)}\Sigma\left(\A - I\right) \right) \\
+    &= \trace\left(\trans{\A}\Sigma\A\right) - \trace\left(\trans{\A}\Sigma\right) - \trace\left(\Sigma\A\right) + \trace\left(\Sigma\right).
+\end{align*}
 The cyclic property of the trace operator and the fact that $\Sigma$ and $\A = A(\trans{A}A + \regparam^2\trans{L}L)^{-1}\trans{A}$ are symmetric matrices give
-\[\trace\left(\trans{\left(\A - I\right)}\Sigma\left(\A - I\right) \right) = \trace\left(\A\Sigma\trans{A}_\regparam\right) - 2\trace\left(\Sigma\A\right) + \trace\left(\Sigma\right),\]
+\[\trace\left(\trans{\left(\A - I\right)}\Sigma\left(\A - I\right) \right) = \trace\left(\A\Sigma\trans{\A}\right) - 2\trace\left(\Sigma\A\right) + \trace\left(\Sigma\right),\]
 and so \eqref{eq:New Predicitive Risk 1} can be expressed as
 \begin{equation}
 \label{eq:New Predictive Risk 2}
@@ -715,144 +718,144 @@ Analogous to the standard UPRE function, we can define $\widetilde{\U}(\regparam
 so that $\widetilde{\U}(\regparam)$ is an unbiased estimator of predictive risk. The standard UPRE function \eqref{eq:UPRE} is recovered from \eqref{eq:UPRE 2} if $\Sigma = \noiseSD^2 I$.
 
 \begin{proposition}
-Using the constructions in Table \ref{tab:System assumptions} under Assumption \ref{Assumption_System} with $n_\ell = n$ for all $\ell = 1,\ldots,R$, the UPRE function $\widetilde{U}(\regparam)$ for the data sets $\{\dVec^{(\ell)}\}_{\ell=1}^R$ is
+Using the constructions in Table \ref{tab:System assumptions} under Assumption \ref{Assumption_System} with $n_r = n$ for all $r = 1,\ldots,R$, the UPRE function $\widetilde{U}(\regparam)$ for the data sets $\{\dVec^{(r)}\}_{r=1}^R$ is
 \begin{equation}
 \label{eq:Averaged UPRE}
-\widetilde{\U}(\regparam) = \frac{1}{R} \sum_{\ell=1}^R \U^{(\ell)}(\regparam),
+\widetilde{\U}(\regparam) = \frac{1}{R} \sum_{r=1}^R \U^{(r)}(\regparam),
 \end{equation}
 where
 \begin{equation}
 \label{eq:Individual UPRE}
-\U^{(\ell)}(\regparam) = \frac{1}{n}\left\|\rVec^{(\ell)}(\regparam)\right\|_2^2 + \frac{2}{n} \trace\left(\Sigma^{(\ell)} A_\regparam^{(\ell)}\right) - \frac{1}{n} \trace\left(\Sigma^{(\ell)}\right).
+\U^{(r)}(\regparam) = \frac{1}{n}\left\|\rVec^{(r)}(\regparam)\right\|_2^2 + \frac{2}{n} \trace\left(\Sigma^{(r)} A^{(r)}(\regparam)\right) - \frac{1}{n} \trace\left(\Sigma^{(r)}\right).
 \end{equation}
 with
 \begin{equation}
 \label{eq:Single Regularized Residual}
-    \rVec^{(\ell)} = A^{(\ell)}\xVec^{(\ell)}(\regparam) - \dVec^{(\ell)}.
+    \rVec^{(r)} = A^{(r)}\xVec^{(r)}(\regparam) - \dVec^{(r)}.
 \end{equation}
 \end{proposition}
 \begin{proof}
-A block diagonal influence matrix $\widetilde{A}_\regparam$ can be defined as
-\[\widetilde{A}_\regparam = \widetilde{A}(\trans{\widetilde{A}}\widetilde{A} + \regparam^2\trans{\widetilde{L}}\widetilde{L})^{-1}\trans{\widetilde{A}}\]
+A block diagonal influence matrix $\ABig(\regparam)$ can be defined as
+\[\ABig(\regparam) = \ABig(\trans{\ABig}\ABig + \regparam^2\trans{\widetilde{L}}\widetilde{L})^{-1}\trans{\ABig}\]
 with diagonal blocks
 \begin{equation}
 \label{eq:Diagonal blocks}
-A^{(\ell)}_\regparam = A^{(\ell)}\left(\trans{\left(A^{(\ell)}\right)}A^{(\ell)} + \regparam^2\trans{\left(L^{(\ell)}\right)}L^{(\ell)}\right)^{-1}\trans{\left(A^{(\ell)}\right)}, \quad \ell = 1,\ldots,R.
+A^{(r)}_\regparam = A^{(r)}\left(\trans{\left(A^{(r)}\right)}A^{(r)} + \regparam^2\trans{\left(L^{(r)}\right)}L^{(r)}\right)^{-1}\trans{\left(A^{(r)}\right)}, \quad r = 1,\ldots,R.
 \end{equation}
-By further defining $\widetilde{\rVec}(\regparam) = \widetilde{A}\widetilde{\xVec}(\regparam) - \widetilde{\dVec}$ and noting that Lemma \ref{lem:Concatenation of Normal Noise} implies the vertical concatenation $\widetilde{\noiseVec}$ of $\{\noiseVec^{(\ell)}\}_{\ell=1}^R$ is distributed $\mathcal{N}(\zeroVec,\widetilde{\Sigma})$ with $\zeroVec \in \mathbb{R}^N$ and $\widetilde{\Sigma} = \diag(\Sigma^{(1)},\ldots,\Sigma^{(R)})$, the UPRE function \eqref{eq:UPRE 2} can be directly applied to produce
+By further defining $\rBig(\regparam) = \ABig\widetilde{\xVec}(\regparam) - \widetilde{\dVec}$ and noting that Lemma \ref{lem:Concatenation of Normal Noise} implies the vertical concatenation $\widetilde{\noiseVec}$ of $\{\noiseVec^{(r)}\}_{r=1}^R$ is distributed $\mathcal{N}(\zeroVec,\widetilde{\Sigma})$ with $\zeroVec \in \mathbb{R}^N$ and $\widetilde{\Sigma} = \diag(\Sigma^{(1)},\ldots,\Sigma^{(R)})$, the UPRE function \eqref{eq:UPRE 2} can be directly applied to produce
 \begin{equation}
 \label{eq:UPRE 3}
-\widetilde{\U}(\regparam) = \frac{1}{N}\left\|\widetilde{\rVec}(\regparam)\right\|_2^2 + \frac{2}{N}\trace\left(\widetilde{\Sigma}\widetilde{A}_\regparam\right) - \frac{1}{N}\trace\left(\widetilde{\Sigma}\right).
+\widetilde{\U}(\regparam) = \frac{1}{N}\left\|\rBig(\regparam)\right\|_2^2 + \frac{2}{N}\trace\left(\widetilde{\Sigma}\ABig(\regparam)\right) - \frac{1}{N}\trace\left(\widetilde{\Sigma}\right).
 \end{equation}
-The block diagonal structure of both $\widetilde{\Sigma}$ and $\widetilde{A}_\regparam$ allow for the trace terms in \eqref{eq:UPRE 3} to be written as sums involving the diagonal blocks:
+The block diagonal structure of both $\widetilde{\Sigma}$ and $\ABig(\regparam)$ allow for the trace terms in \eqref{eq:UPRE 3} to be written as sums involving the diagonal blocks:
 \begin{equation}
 \label{eq:UPRE 4}
-\widetilde{\U}(\regparam) = \frac{1}{N}\left\|\widetilde{\rVec}(\regparam)\right\|_2^2 + \frac{2}{N} \sum_{\ell=1}^R \trace\left(\Sigma^{(\ell)}A^{(\ell)}_\regparam\right) - \frac{1}{N} \sum_{\ell=1}^R \trace\left(\Sigma^{(\ell)}\right).
+\widetilde{\U}(\regparam) = \frac{1}{N}\left\|\rBig(\regparam)\right\|_2^2 + \frac{2}{N} \sum_{r=1}^R \trace\left(\Sigma^{(r)}A^{(r)}(\regparam)\right) - \frac{1}{N} \sum_{r=1}^R \trace\left(\Sigma^{(r)}\right).
 \end{equation}
-The squared 2-norm of $\widetilde{\rVec}(\regparam)$ can also be expressed as a sum so that
+The squared 2-norm of $\rBig(\regparam)$ can also be expressed as a sum so that
 \begin{align*}
-\widetilde{\U}(\regparam) &= \frac{1}{N} \sum_{\ell=1}^R \left\|\rVec^{(\ell)}(\regparam)\right\|_2^2 + \frac{2}{N} \sum_{\ell=1}^R \trace\left(\Sigma^{(\ell)} A_\regparam^{(\ell)}\right) - \frac{1}{N} \sum_{\ell=1}^R \trace\left(\Sigma^{(\ell)}\right) \\
-&= \frac{1}{R} \sum_{\ell=1}^R \left(\frac{1}{n}\left\|\rVec^{(\ell)}(\regparam)\right\|_2^2 + \frac{2}{n} \trace\left(\Sigma^{(\ell)} A_\regparam^{(\ell)}\right) - \frac{1}{n} \trace\left(\Sigma^{(\ell)}\right)\right) \\
-&= \frac{1}{R} \sum_{\ell=1}^R \U^{(\ell)}(\regparam),
+\widetilde{\U}(\regparam) &= \frac{1}{N} \sum_{r=1}^R \left\|\rVec^{(r)}(\regparam)\right\|_2^2 + \frac{2}{N} \sum_{r=1}^R \trace\left(\Sigma^{(r)} A^{(r)}(\regparam)\right) - \frac{1}{N} \sum_{r=1}^R \trace\left(\Sigma^{(r)}\right) \\
+&= \frac{1}{R} \sum_{r=1}^R \left(\frac{1}{n}\left\|\rVec^{(r)}(\regparam)\right\|_2^2 + \frac{2}{n} \trace\left(\Sigma^{(r)} A^{(r)}(\regparam)\right) - \frac{1}{n} \trace\left(\Sigma^{(r)}\right)\right) \\
+&= \frac{1}{R} \sum_{r=1}^R \U^{(r)}(\regparam),
 \end{align*}
 where
-\[\U^{(\ell)}(\regparam) = \frac{1}{n}\left\|\rVec^{(\ell)}(\regparam)\right\|_2^2 + \frac{2}{n} \trace\left(\Sigma^{(\ell)} A_\regparam^{(\ell)}\right) - \frac{1}{n} \trace\left(\Sigma^{(\ell)}\right), \quad \ell = 1,\ldots,R.\]
+\[\U^{(r)}(\regparam) = \frac{1}{n}\left\|\rVec^{(r)}(\regparam)\right\|_2^2 + \frac{2}{n} \trace\left(\Sigma^{(r)} A^{(r)}(\regparam)\right) - \frac{1}{n} \trace\left(\Sigma^{(r)}\right), \quad r = 1,\ldots,R.\]
 \end{proof}
-\noindent In other words, $\widetilde{\U}(\regparam)$ is the average of $\{\U^{(\ell)}(\regparam)\}_{\ell=1}^R$. The UPRE method for multiple data sets is to let $\widetilde{\regparam}_{\textrm{UPRE}} = \argmin_{\regparam > 0} \widetilde{\U}(\regparam)$. As a final remark, \eqref{eq:Individual UPRE} is equivalent to \eqref{eq:UPRE} under Assumption \ref{Assumption_Noise}. \par
+\noindent In other words, $\widetilde{\U}(\regparam)$ is the average of $\{\U^{(r)}(\regparam)\}_{r=1}^R$. The UPRE method for multiple data sets is to let $\widetilde{\regparam}_{\textrm{UPRE}} = \argmin_{\regparam > 0} \widetilde{\U}(\regparam)$. As a final remark, \eqref{eq:Individual UPRE} is equivalent to \eqref{eq:UPRE} under Assumption \ref{Assumption_Noise}. \par
 A representation of \eqref{eq:Averaged UPRE} will now be presented that involves generalizations of the filter functions \eqref{eq:Filter functions}. In an effort to streamline this presentation, we will use the version of the GSVD outlined in Section \ref{sec:GSVD} (which uses the assumption that the system matrix in \eqref{eq:TikSol3} has full column rank). Specifically, we make the following assumption.
 \begin{assumption}
 \label{Assumption_Diagonalization}
-We assume that there exist matrices $U$, $V$, and $\trans{X}$ such that $A^{(\ell)} = U{\Delta^{(\ell)}}\trans{X}$ and  $L^{(\ell)} = V{\Lambda^{(\ell)}}\trans{X}$ for all $\ell = 1,\ldots,R$. 
+We assume that there exist matrices $U$, $V$, and $\trans{X}$ such that $A^{(r)} = U{\Delta^{(r)}}\trans{X}$ and  $L^{(r)} = V{\Lambda^{(r)}}\trans{X}$ for all $r = 1,\ldots,R$. 
 \end{assumption}
-\noindent While this is an extremely strong and unrealistic assumption (the belief that such a factorization does not exist in general is expressed in \cite{Brezinski2003}), it certainly becomes realistic under Assumption \ref{Assumption_Matrices}. We use Assumption \ref{Assumption_Diagonalization} to simply present the following derivation in the most general setting. An analogous approach could be taken if the matrices $A^{(\ell)}$ and $L^{(\ell)}$ can be simultaneously diagonalized with respect to a orthogonal/unitary transformation, such as the discrete cosine transform (DCT) or discrete Fourier transform (DFT); test problems using the DCT and DFT are considered in Section \ref{sec:Validation}. \par
+\noindent While this is an extremely strong and unrealistic assumption (the belief that such a factorization does not exist in general is expressed in \cite{Brezinski2003}), it certainly becomes realistic under Assumption \ref{Assumption_Matrices}. We use Assumption \ref{Assumption_Diagonalization} to simply present the following derivation in the most general setting. An analogous approach could be taken if the matrices $A^{(r)}$ and $L^{(r)}$ can be simultaneously diagonalized with respect to a orthogonal/unitary transformation, such as the discrete cosine transform (DCT) or discrete Fourier transform (DFT); test problems using the DCT and DFT are considered in Section \ref{sec:Validation}. \par
 From Assumption \ref{Assumption_Diagonalization}, we define the generalized filter functions to be
 \begin{equation}
 \label{eq:Filter functions 2}
-\filt^{(\ell)}_j = \frac{\left(\delta^{(\ell)}_j\right)^2}{\left(\delta^{(\ell)}_j\right)^2 + \regparam^2 \left(\lambda^{(\ell)}_j\right)^2}, \quad \mfilt^{(\ell)}_j = 1 - \filt^{(\ell)}_j = \frac{\regparam^2 \left(\lambda^{(\ell)}_j\right)^2}{\left(\delta^{(\ell)}_j\right)^2 + \regparam^2 \left(\lambda^{(\ell)}_j\right)^2}
+\filt^{(r)}_j = \frac{\left(\delta^{(r)}_j\right)^2}{\left(\delta^{(r)}_j\right)^2 + \regparam^2 \left(\lambda^{(r)}_j\right)^2}, \quad \mfilt^{(r)}_j = 1 - \filt^{(r)}_j = \frac{\regparam^2 \left(\lambda^{(r)}_j\right)^2}{\left(\delta^{(r)}_j\right)^2 + \regparam^2 \left(\lambda^{(r)}_j\right)^2}
 \end{equation}
-where $\bm{\delta}^{(\ell)} = \sqrt{\diag(\trans{(\Delta^{(\ell)})}\Delta^{(\ell)})}$ and $\bm{\lambda}^{(\ell)} = \sqrt{\diag(\trans{(\Lambda^{(\ell)})}\Lambda^{(\ell)})}$ for each $\ell = 1,\ldots,R$. The matrix $\A^{(\ell)}$ given by \eqref{eq:Diagonal blocks} can be expressed as
+where $\bm{\delta}^{(r)} = \sqrt{\diag(\trans{(\Delta^{(r)})}\Delta^{(r)})}$ and $\bm{\lambda}^{(r)} = \sqrt{\diag(\trans{(\Lambda^{(r)})}\Lambda^{(r)})}$ for each $r = 1,\ldots,R$. The matrix $\A^{(r)}$ given by \eqref{eq:Diagonal blocks} can be expressed as
 \begin{equation}
 \label{eq:Fourier diagonalization 2}
-\A^{(\ell)} = U\Delta^{(\ell)}\left[\trans{(\Delta^{(\ell)})}\Delta^{(\ell)} + \regparam^2\trans{(\Lambda^{(\ell)})}\Lambda^{(\ell)}\right]^{-1}\trans{(\Delta^{(\ell)})}\trans{U}, \qquad \ell = 1,\ldots,R.
+\A^{(r)} = U\Delta^{(r)}\left[\trans{(\Delta^{(r)})}\Delta^{(r)} + \regparam^2\trans{(\Lambda^{(r)})}\Lambda^{(r)}\right]^{-1}\trans{(\Delta^{(r)})}\trans{U}, \qquad r = 1,\ldots,R.
 \end{equation}
-Under Assumption \ref{Assumption_Noise}, $\trace(\Sigma^{(\ell)}) = n\noiseSD^2_\ell$ and the similarity invariance of the trace operator gives
+Under Assumption \ref{Assumption_Noise}, $\trace(\Sigma^{(r)}) = n\noiseSD^2_r$ and the similarity invariance of the trace operator gives
 \begin{equation}
 \label{eq:Trace}
-\trace\left(\Sigma^{(\ell)}\A^{\ell}\right) = \noiseSD_\ell^2 \trace\left(\Delta^{(\ell)}\left[\trans{(\Delta^{(\ell)})}\Delta^{(\ell)} + \regparam^2\trans{(\Lambda^{(\ell)})}\Lambda^{(\ell)}\right]^{-1}\trans{(\Delta^{(\ell)})}\right) = \noiseSD_\ell^2 \sum_{j=1}^{n} \filt^{(\ell)}_j.
+\trace\left(\Sigma^{(r)}\A^{(r)}\right) = \noiseSD_r^2 \trace\left(\Delta^{(r)}\left[\trans{(\Delta^{(r)})}\Delta^{(r)} + \regparam^2\trans{(\Lambda^{(r)})}\Lambda^{(r)}\right]^{-1}\trans{(\Delta^{(r)})}\right) = \noiseSD_r^2 \sum_{j=1}^{n} \filt^{(r)}_j.
 \end{equation}
 Another benefit of using \eqref{eq:Fourier diagonalization 2} is that we can write
 \begin{align}
-\frac{1}{n}\|\rVec^{(\ell)}(\regparam)\|_2^2 &= \frac{1}{n}\left\|U\left(\Delta^{(\ell)}\left[\trans{(\Delta^{(\ell)})}\Delta^{(\ell)} + \regparam^2\trans{(\Lambda^{(\ell)})}\Lambda^{(\ell)}\right]^{-1}\trans{(\Delta^{(\ell)})} - I\right)\trans{U}\dVec^{(\ell)}\right\|_2^2 \nonumber \\
-&= \frac{1}{n}\left\|\left(\Delta^{(\ell)}\left[\trans{(\Delta^{(\ell)})}\Delta^{(\ell)} + \regparam^2\trans{(\Lambda^{(\ell)})}\Lambda^{(\ell)}\right]^{-1}\trans{(\Delta^{(\ell)})} - I\right)\dft{\dVec}^{(\ell)}\right\|_2^2 \nonumber \\
-&= \frac{1}{n}\sum_{j=1}^{n} \left(\mfilt^{(\ell)}_j\right)^2\left(\dft{\dVec}_j^{(\ell)}\right)^2,
+\frac{1}{n}\|\rVec^{(r)}(\regparam)\|_2^2 &= \frac{1}{n}\left\|U\left(\Delta^{(r)}\left[\trans{(\Delta^{(r)})}\Delta^{(r)} + \regparam^2\trans{(\Lambda^{(r)})}\Lambda^{(r)}\right]^{-1}\trans{(\Delta^{(r)})} - I\right)\trans{U}\dVec^{(r)}\right\|_2^2 \nonumber \\
+&= \frac{1}{n}\left\|\left(\Delta^{(r)}\left[\trans{(\Delta^{(r)})}\Delta^{(r)} + \regparam^2\trans{(\Lambda^{(r)})}\Lambda^{(r)}\right]^{-1}\trans{(\Delta^{(r)})} - I\right)\dft{\dVec}^{(r)}\right\|_2^2 \nonumber \\
+&= \frac{1}{n}\sum_{j=1}^{n} \left(\mfilt^{(r)}_j\right)^2\left(\dft{\dVec}_j^{(r)}\right)^2,
 \label{eq:Fourier regularized residual}
 \end{align}
-where $\dft{\dVec}^{(\ell)} = \trans{U}\dVec^{(\ell)}$ for $\ell = 1,\ldots,R$. Therefore, the UPRE function \eqref{eq:Averaged UPRE} for multiple data sets can be written in terms of the following representation for individual UPRE functions:
+where $\dft{\dVec}^{(r)} = \trans{U}\dVec^{(r)}$ for $r = 1,\ldots,R$. Therefore, the UPRE function \eqref{eq:Averaged UPRE} for multiple data sets can be written in terms of the following representation for individual UPRE functions:
 \begin{equation}
 \label{eq:Individual UPRE 2}
-\U^{(\ell)}(\regparam) = \frac{1}{n} \sum_{j=1}^{n} \left(\mfilt^{(\ell)}_j\right)^2\left(\dft{\dVec}_j^{(\ell)}\right)^2 + \frac{2\noiseSD^2_\ell}{n} \sum_{j=1}^{n} \filt^{(\ell)}_j - \noiseSD^2_\ell, \quad \ell = 1,\ldots,R.
+\U^{(r)}(\regparam) = \frac{1}{n} \sum_{j=1}^{n} \left(\mfilt^{(r)}_j\right)^2\left(\dft{\dVec}_j^{(r)}\right)^2 + \frac{2\noiseSD^2_r}{n} \sum_{j=1}^{n} \filt^{(r)}_j - \noiseSD^2_r, \quad r = 1,\ldots,R.
 \end{equation}
 
 We conclude Section \ref{sec:UPRE} by showing a relationship between the adapted UPRE method that uses \eqref{eq:Averaged UPRE} and the UPRE method as simply applied to averaged data. 
 
 \begin{proposition}
-Under Assumptions \ref{Assumption_System} through \ref{Assumption_Diagonalization} with data vectors $\{\dVec^{(\ell)}\}_{\ell=1}^R$, let 
+Under Assumptions \ref{Assumption_System} through \ref{Assumption_Diagonalization} with data vectors $\{\dVec^{(r)}\}_{r=1}^R$, let 
 \begin{equation}
 \label{eq:Averaged data}
-\aVec = \frac{1}{R}\sum_{\ell=1}^R \dVec^{(\ell)},
+\aVec = \frac{1}{R}\sum_{r=1}^R \dVec^{(r)},
 \end{equation}
 $\dft{\aVec} = \trans{U}\aVec$, and let
 \begin{equation}
 \label{eq:UPRE of Average}
-\overline{U}(\regparam) = \frac{1}{n}\sum_{j=1}^{n} \left(\mfilt_j\right)^2\left(\dft{\aVec}_j\right)^2 + \frac{2}{n} \left(\frac{1}{R^2} \sum_{\ell=1}^R \noiseSD_\ell^2\right) \left(\sum_{j=1}^{n} \filt_j\right) - \frac{1}{R^2} \sum_{\ell=1}^R\noiseSD_\ell^2.
+\overline{U}(\regparam) = \frac{1}{n}\sum_{j=1}^{n} \left(\mfilt_j\right)^2\left(\dft{\aVec}_j\right)^2 + \frac{2}{n} \left(\frac{1}{R^2} \sum_{r=1}^R \noiseSD_r^2\right) \left(\sum_{j=1}^{n} \filt_j\right) - \frac{1}{R^2} \sum_{r=1}^R\noiseSD_r^2.
 \end{equation}
 Then
 \begin{equation}
 \label{eq:UPRE Bound}
-\widetilde{U}(\regparam) = \frac{1}{R} \sum_{\ell=1}^R \U^{(\ell)}(\regparam) \leq R \overline{U}(\regparam), \qquad \regparam \geq 0.
+\widetilde{U}(\regparam) = \frac{1}{R} \sum_{r=1}^R \U^{(r)}(\regparam) \leq R \overline{U}(\regparam), \qquad \regparam \geq 0.
 \end{equation}
 \end{proposition}
 \begin{proof}
-The consequence of Assumptions \ref{Assumption_System} through \ref{Assumption_Noise} is that $\filt_j^{(\ell)} = \filt_j$ (and $\mfilt_j^{(\ell)} = \mfilt_j$) for all $\ell = 1,\ldots,R$. Using representation \eqref{eq:Individual UPRE 2}, we can write \eqref{eq:Averaged UPRE} as
+The consequence of Assumptions \ref{Assumption_System} through \ref{Assumption_Noise} is that $\filt_j^{(r)} = \filt_j$ (and $\mfilt_j^{(r)} = \mfilt_j$) for all $r = 1,\ldots,R$. Using representation \eqref{eq:Individual UPRE 2}, we can write \eqref{eq:Averaged UPRE} as
 \begin{align*}
-\frac{1}{R} \sum_{\ell=1}^R \U^{(\ell)}(\regparam) &= \frac{1}{R} \sum_{\ell=1}^R \left[\frac{1}{n}\sum_{j=1}^{n} \left(\mfilt_j\right)^2\left(\dft{\dVec}_j^{(\ell)}\right)^2 + \frac{2\noiseSD_\ell^2}{n} \sum_{j=1}^{n} \filt_j - \noiseSD_\ell^2\right] \\
-&= \frac{1}{R} \sum_{\ell=1}^R \left(\frac{1}{n}\sum_{j=1}^{n} \left(\mfilt_j\right)^2\left(\dft{\dVec}_j^{(\ell)}\right)^2\right) + \frac{1}{R} \sum_{\ell=1}^R \left(\frac{2\noiseSD_\ell^2}{n} \sum_{j=1}^{n} \filt_j\right) - \frac{1}{R} \sum_{\ell=1}^R\noiseSD_\ell^2 \\
-&= \frac{1}{n}\sum_{j=1}^{n} \left(\mfilt_j\right)^2\left(\frac{1}{R} \sum_{\ell=1}^R \left(\dft{\dVec}_j^{(\ell)}\right)^2\right) + \frac{2}{n} \left(\frac{1}{R} \sum_{\ell=1}^R \noiseSD_\ell^2\right) \left(\sum_{j=1}^{n} \filt_j\right) - \frac{1}{R} \sum_{\ell=1}^R\noiseSD_\ell^2.
+\frac{1}{R} \sum_{r=1}^R \U^{(r)}(\regparam) &= \frac{1}{R} \sum_{r=1}^R \left[\frac{1}{n}\sum_{j=1}^{n} \left(\mfilt_j\right)^2\left(\dft{\dVec}_j^{(r)}\right)^2 + \frac{2\noiseSD_r^2}{n} \sum_{j=1}^{n} \filt_j - \noiseSD_r^2\right] \\
+&= \frac{1}{R} \sum_{r=1}^R \left(\frac{1}{n}\sum_{j=1}^{n} \left(\mfilt_j\right)^2\left(\dft{\dVec}_j^{(r)}\right)^2\right) + \frac{1}{R} \sum_{r=1}^R \left(\frac{2\noiseSD_r^2}{n} \sum_{j=1}^{n} \filt_j\right) - \frac{1}{R} \sum_{r=1}^R\noiseSD_r^2 \\
+&= \frac{1}{n}\sum_{j=1}^{n} \left(\mfilt_j\right)^2\left(\frac{1}{R} \sum_{r=1}^R \left(\dft{\dVec}_j^{(r)}\right)^2\right) + \frac{2}{n} \left(\frac{1}{R} \sum_{r=1}^R \noiseSD_r^2\right) \left(\sum_{j=1}^{n} \filt_j\right) - \frac{1}{R} \sum_{r=1}^R\noiseSD_r^2.
 \end{align*}
 Multiplying through by $R/R$ then yields
 \begin{align}
 \label{eq:Non-average UPRE}
-&\frac{1}{R} \sum_{\ell=1}^R \U^{(\ell)}(\regparam) \nonumber \\
-&= R\left[\frac{1}{n}\sum_{j=1}^{n} \left(\mfilt_j\right)^2\left(\frac{1}{R^2} \sum_{\ell=1}^R \left(\dft{\dVec}_j^{(\ell)}\right)^2\right) + \frac{2}{n} \left(\frac{1}{R^2} \sum_{\ell=1}^R \noiseSD_\ell^2\right) \left(\sum_{j=1}^{n} \filt_j\right) - \frac{1}{R^2} \sum_{\ell=1}^R\noiseSD_\ell^2\right].
+&\frac{1}{R} \sum_{r=1}^R \U^{(r)}(\regparam) \nonumber \\
+&= R\left[\frac{1}{n}\sum_{j=1}^{n} \left(\mfilt_j\right)^2\left(\frac{1}{R^2} \sum_{r=1}^R \left(\dft{\dVec}_j^{(r)}\right)^2\right) + \frac{2}{n} \left(\frac{1}{R^2} \sum_{r=1}^R \noiseSD_r^2\right) \left(\sum_{j=1}^{n} \filt_j\right) - \frac{1}{R^2} \sum_{r=1}^R\noiseSD_r^2\right].
 \end{align}
-Note that the term $\frac{1}{R^2} \sum_{\ell=1}^R\noiseSD_\ell^2$ is the variance of $\frac{1}{R} \sum_{\ell=1}^R \noiseVec^{(\ell)}$ since the random vectors $\{\noiseVec^{(\ell)}\}_{\ell=1}^R$ are mutually independent. However, \eqref{eq:Non-average UPRE} is not equal to $R$ times the UPRE function as applied to the average of the data
-\[\aVec = \frac{1}{R}\sum_{\ell=1}^R \dVec^{(\ell)} = \frac{1}{R} \sum_{\ell=1}^R \bVec^{(\ell)} + \frac{1}{R} \sum_{\ell=1}^R \noiseVec^{(\ell)}\]
-because of the term $\frac{1}{R^2} \sum_{\ell=1}^R \left(\dft{\dVec}_j^{(\ell)}\right)^2$. If the UPRE method was used with the average $\aVec$, then
+Note that the term $\frac{1}{R^2} \sum_{r=1}^R\noiseSD_r^2$ is the variance of $\frac{1}{R} \sum_{r=1}^R \noiseVec^{(r)}$ since the random vectors $\{\noiseVec^{(r)}\}_{r=1}^R$ are mutually independent. However, \eqref{eq:Non-average UPRE} is not equal to $R$ times the UPRE function as applied to the average of the data
+\[\aVec = \frac{1}{R}\sum_{r=1}^R \dVec^{(r)} = \frac{1}{R} \sum_{r=1}^R \bVec^{(r)} + \frac{1}{R} \sum_{r=1}^R \noiseVec^{(r)}\]
+because of the term $\frac{1}{R^2} \sum_{r=1}^R \left(\dft{\dVec}_j^{(r)}\right)^2$. If the UPRE method was used with the average $\aVec$, then
 \begin{equation}
 \label{eq:Coefficients of Average}
-\left(\dft{\aVec}_j\right)^2 = \frac{1}{R^2}\left(\sum_{\ell=1}^R \dft{\dVec}_j^{(\ell)}\right)^2 \leq \frac{1}{R^2} \sum_{\ell=1}^R \left(\dft{\dVec}_j^{(\ell)}\right)^2, \qquad j = 1,\ldots,n.
+\left(\dft{\aVec}_j\right)^2 = \frac{1}{R^2}\left(\sum_{r=1}^R \dft{\dVec}_j^{(r)}\right)^2 \leq \frac{1}{R^2} \sum_{r=1}^R \left(\dft{\dVec}_j^{(r)}\right)^2, \qquad j = 1,\ldots,n.
 \end{equation}
 Thus the result \eqref{eq:Non-average UPRE} shows that for
-\[\overline{U}(\regparam) = \frac{1}{n}\sum_{j=1}^{n} \left(\mfilt_j\right)^2\left(\dft{\aVec}_j\right)^2 + \frac{2}{n} \left(\frac{1}{R^2} \sum_{\ell=1}^R \noiseSD_\ell^2\right) \left(\sum_{j=1}^{n} \filt_j\right) - \frac{1}{R^2} \sum_{\ell=1}^R\noiseSD_\ell^2,\]
-i.e. $\overline{U}(\regparam)$ is the UPRE function as applied to the average $\aVec$ of the data $\{\dVec^{(\ell)}\}_{\ell=1}^R$, we have that
-\[\widetilde{U}(\regparam) = \frac{1}{R} \sum_{\ell=1}^R \U^{(\ell)}(\regparam) \leq R \overline{U}(\regparam), \qquad \regparam \geq 0\]
+\[\overline{U}(\regparam) = \frac{1}{n}\sum_{j=1}^{n} \left(\mfilt_j\right)^2\left(\dft{\aVec}_j\right)^2 + \frac{2}{n} \left(\frac{1}{R^2} \sum_{r=1}^R \noiseSD_r^2\right) \left(\sum_{j=1}^{n} \filt_j\right) - \frac{1}{R^2} \sum_{r=1}^R\noiseSD_r^2,\]
+i.e. $\overline{U}(\regparam)$ is the UPRE function as applied to the average $\aVec$ of the data $\{\dVec^{(r)}\}_{r=1}^R$, we have that
+\[\widetilde{U}(\regparam) = \frac{1}{R} \sum_{r=1}^R \U^{(r)}(\regparam) \leq R \overline{U}(\regparam), \qquad \regparam \geq 0\]
 \end{proof}
 \noindent Therefore the adapted UPRE function is truly distinct from simply applying the UPRE method to the average of the data, and the bound \eqref{eq:UPRE Bound} demonstrates a relationship between the two modalities.
 
 \subsubsection{Multiparameter UPRE}
-We now derive a multiparameter version of the UPRE function for a single data set $\dVec = A\xVec + \noiseVec$ with $A \in \mathbb{R}^{m \times n}$ $\noiseVec \sim \mathcal{N}(\zeroVec,\noiseSD^2 I)$. For $\ell = 1,\ldots,p$, let $\wVec^{(\ell)}$ be weight vectors satisfying \eqref{eq:Weights} and let $W^{(\ell)} = \diag(\wVec^{(\ell)})$. For the regularized solution \eqref{eq:TikSolWindow}, the regularization matrix $R_\text{win}(\regparamVec)$ is
+We now derive a multiparameter version of the UPRE function for a single data set $\dVec = A\xVec + \noiseVec$ with $A \in \mathbb{R}^{m \times n}$ and $\noiseVec \sim \mathcal{N}(\zeroVec,\noiseSD^2 I)$. For $p = 1,\ldots,P$, let $\wVec^{(p)}$ be weight vectors satisfying \eqref{eq:Weights} and let $W^{(p)} = \diag(\wVec^{(p)})$. For the regularized solution \eqref{eq:TikSolWindow}, the regularization matrix $R_\text{win}(\regparamVec)$ is
 \begin{equation}
 \label{eq:Windowed Reg Matrix}
-    R_\text{win}(\regparamVec) = \sum_{\ell=1}^p V\inv{\left(\trans{S}S + \left(\regparam^{(\ell)}\right)^2\right)}W^{(j)}\trans{S}\trans{U}.
+    R_\text{win}(\regparamVec) = \sum_{p=1}^P V\inv{\left(\trans{S}S + \left(\regparam^{(p)}\right)^2\right)}W^{(p)}\trans{S}\trans{U}.
 \end{equation}
 The corresponding influence matrix $A_\text{win}(\regparamVec) = AR_\text{win}(\regparamVec)$ is then
 \begin{equation}
 \label{eq:Windowed Influence Matrix}
-    A_\text{win}(\regparamVec) = US\left[\sum_{\ell=1}^p V\inv{\left(\trans{S}S + \left(\regparam^{(\ell)}\right)^2\right)}W^{(j)}\right]\trans{S}\trans{U}. 
+    A_\text{win}(\regparamVec) = US\left[\sum_{p=1}^P V\inv{\left(\trans{S}S + \left(\regparam^{(p)}\right)^2\right)}W^{(p)}\right]\trans{S}\trans{U}. 
 \end{equation}
 The windowed regularized residual $\rVec_\text{win}(\regparamVec) = (A_\text{win}(\regparamVec) - I)\dVec$ can be written as
 \begin{equation}
-    \rVec_\text{win}(\regparamVec) = U\left(S\left[\sum_{\ell=1}^p V\inv{\left(\trans{S}S + \regparam_{\ell}^2\right)}W^{(j)}\right]\trans{S}-I\right)\dft{\dVec}.
+    \rVec_\text{win}(\regparamVec) = U\left(S\left[\sum_{p=1}^P V\inv{\left(\trans{S}S + \regparam_{p}^2\right)}W^{(p)}\right]\trans{S}-I\right)\dft{\dVec}.
 \end{equation}
 Thus the multiparameter UPRE function for problem $\dVec = A\xVec + \noiseVec$ is 
 \begin{equation}
@@ -862,36 +865,36 @@ Thus the multiparameter UPRE function for problem $\dVec = A\xVec + \noiseVec$ i
 Using $\mfilt(\regparam,\singular) := 1 - \filt(\regparam,\singular)$ with $\filt(\regparam,\singular)$ defined by \eqref{eq:TikFilt}, $\|\rVec_\text{win}(\regparamVec)\|_2^2$ can be expressed as
 \begin{equation}
 \label{eq:Windowed Regularized Residual}
-    \left\|\rVec_\text{win}(\regparamVec)\right\|_2^2 = \sum_{j=1}^{n} \left(\sum_{k=1}^{p} w_j^{(k)} \mfilt\left(\regparam^{(k)},\singular_j\right) \right)^2 \left(\dft{d}_j\right)^2.
+    \left\|\rVec_\text{win}(\regparamVec)\right\|_2^2 = \sum_{j=1}^{n} \left(\sum_{p=1}^{P} w_j^{(p)} \mfilt\left(\regparam^{(p)},\singular_j\right) \right)^2 \left(\dft{d}_j\right)^2.
 \end{equation}
 Similarly, the trace of the windowed influence matrix can be written as
 \begin{equation}
-    \trace\left(A_\text{win}(\regparamVec)\right) = \sum_{j=1}^{n} \left(\sum_{k=1}^{p} w_j^{(k)} \filt\left(\regparam^{(k)},\singular_j\right) \right).
+    \trace\left(A_\text{win}(\regparamVec)\right) = \sum_{j=1}^{n} \left(\sum_{p=1}^{P} w_j^{(p)} \filt\left(\regparam^{(p)},\singular_j\right) \right).
 \end{equation}
 Thus \eqref{eq:Multiparameter UPRE} becomes
 \begin{equation}
 \label{eq:Multiparameter UPRE 2}
-    U_\text{win}(\regparamVec) = \frac{1}{n}\sum_{j=1}^{n} \left(\sum_{k=1}^{p} w_j^{(k)} \mfilt\left(\regparam^{(k)},\singular_j\right) \right)^2 \left(\dft{d}_j\right)^2 + \frac{2\noiseSD^2}{n}\sum_{j=1}^{n} \left(\sum_{k=1}^{p} w_j^{(k)} \filt\left(\regparam^{(k)},\singular_j\right) \right) - \noiseSD^2.
+    U_\text{win}(\regparamVec) = \frac{1}{n}\sum_{j=1}^{n} \left(\sum_{p=1}^{P} w_j^{(p)} \mfilt\left(\regparam^{(p)},\singular_j\right) \right)^2 \left(\dft{d}_j\right)^2 + \frac{2\noiseSD^2}{n}\sum_{j=1}^{n} \left(\sum_{p=1}^{P} w_j^{(p)} \filt\left(\regparam^{(p)},\singular_j\right) \right) - \noiseSD^2.
 \end{equation}
 
-The MDP and GCV methods, described in Sections \ref{sec:MDP} and \ref{sec:GCV} respectively, involve the norm of a regularized residual. The exact form of this term depends upon the setting. In the single parameter, single data set case, the regularized residual $\rVec(\regparam)$ is given by \eqref{eq:Predictive Error and Regularized Residual}. In the single parameter, multiple data set case, the norm of the regularized residual $\widetilde{\rVec}(\regparam)$ can be written as a sum of terms $\|\rVec^{(j)}(\regparam)\|_2^2$ with $\rVec^{(j)}(\regparam)$ given by \eqref{eq:Single Regularized Residual}. For a multiparameter problem with a single data set, we use $\|\rVec_{\text{win}}(\regparamVec)\|_2^2$ given by \eqref{eq:Windowed Regularized Residual}. Proposition \ref{prop:Non-overlapping windows} describes how $\|\rVec_{\text{win}}(\regparamVec)\|_2^2$ can be decomposed when working with non-overlapping windows.
+The MDP and GCV methods, described in Sections \ref{sec:MDP} and \ref{sec:GCV} respectively, involve the norm of a regularized residual. The exact form of this term depends upon the setting. In the single parameter, single data set case, the regularized residual $\rVec(\regparam)$ is given by \eqref{eq:Predictive Error and Regularized Residual}. In the single parameter, multiple data set case, the norm of the regularized residual $\rBig(\regparam)$ can be written as a sum of terms $\|\rVec^{(p)}(\regparam)\|_2^2$ with $\rVec^{(p)}(\regparam)$ given by \eqref{eq:Single Regularized Residual}. For a multiparameter problem with a single data set, we use $\|\rVec_{\text{win}}(\regparamVec)\|_2^2$ given by \eqref{eq:Windowed Regularized Residual}. Proposition \ref{prop:Non-overlapping windows} describes how $\|\rVec_{\text{win}}(\regparamVec)\|_2^2$ can be decomposed when working with non-overlapping windows.
 
 \begin{proposition}
 \label{prop:Non-overlapping windows}
-If the weight vectors $\{\wVec^{(\ell)}\}_{\ell=1}^{p}$ satisfy \eqref{eq:Non-overlapping window condition}, then $\|\rVec_{\text{win}}(\regparamVec)\|_2^2$ can be written as
-\[\left\|\rVec_{\text{win}}(\regparamVec)\right\|_2^2 = \sum_{k=1}^{p} \left\|\rVec^{(k)}(\regparam)\right\|_2^2\]
+If the weight vectors $\{\wVec^{(p)}\}_{p=1}^{P}$ satisfy \eqref{eq:Non-overlapping window condition}, then $\|\rVec_{\text{win}}(\regparamVec)\|_2^2$ can be written as
+\[\left\|\rVec_{\text{win}}(\regparamVec)\right\|_2^2 = \sum_{p=1}^{P} \left\|\rVec^{(p)}(\regparam)\right\|_2^2\]
 where
-\[\left\|\rVec^{(k)}(\regparam)\right\|_2^2 = \sum_{j=1}^{n} \left( \wVec_j^{(k)} \mfilt\left(\regparam^{(k)},\singular_j\right)\dft{d}_j\right)^2..\]
+\[\left\|\rVec^{(p)}(\regparam)\right\|_2^2 = \sum_{j=1}^{n} \left( \wVec_j^{(p)} \mfilt\left(\regparam^{(p)},\singular_j\right)\dft{d}_j\right)^2..\]
 \end{proposition}
 \begin{proof}
 Using \eqref{eq:Windowed Regularized Residual}, we can write $\|\rVec_{\text{win}}(\regparamVec)\|_2^2$ as
-\[\left\|\rVec_{\text{win}}(\regparamVec)\right\|_2^2 = \sum_{j=1}^{n} \left(\sum_{k=1}^{p} \wVec_j^{(k)} \mfilt\left(\regparam^{(k)},\singular_j\right) \right)^2 \left(\dft{d}_j\right)^2.\]
-Since the weight vectors $\{\wVec^{(\ell)}\}_{\ell=1}^{p}$ satisfy \eqref{eq:Non-overlapping window condition}, for each index $j$ there exists exactly one index $k$ such that $\wVec^{(k)}_j \neq 0$. Thus the sum over $k$ has only one nonzero summand for each index $j$, meaning we can write
-\[\left(\sum_{k=1}^{p} \wVec_j^{(k)} \mfilt\left(\regparam^{(k)},\singular_j\right) \right)^2 = \sum_{k=1}^{p} \left( \wVec_j^{(k)} \mfilt\left(\regparam^{(k)},\singular_j\right)\right)^2.\]
+\[\left\|\rVec_{\text{win}}(\regparamVec)\right\|_2^2 = \sum_{j=1}^{n} \left(\sum_{p=1}^{P} \wVec_j^{(p)} \mfilt\left(\regparam^{(p)},\singular_j\right) \right)^2 \left(\dft{d}_j\right)^2.\]
+Since the weight vectors $\{\wVec^{(p)}\}_{p=1}^{P}$ satisfy \eqref{eq:Non-overlapping window condition}, for each index $j$ there exists exactly one index $p$ such that $\wVec^{(p)}_j \neq 0$. Thus the sum over $p$ has only one nonzero summand for each index $j$, meaning we can write
+\[\left(\sum_{p=1}^{P} \wVec_j^{(p)} \mfilt\left(\regparam^{(p)},\singular_j\right) \right)^2 = \sum_{p=1}^{P} \left( \wVec_j^{(p)} \mfilt\left(\regparam^{(p)},\singular_j\right)\right)^2.\]
 Therefore $\|\rVec_{\text{win}}(\regparam)\|_2^2$ can be rewritten through a change of summation so that
-\[\|\rVec_{\text{win}}(\regparamVec)\|_2^2 = \sum_{k=1}^{p} \left[ \sum_{j=1}^{n} \left( \wVec_j^{(k)} \mfilt\left(\regparam^{(k)},\singular_j\right) \right)^2 \left(\dft{d}_j\right)^2\right] = \sum_{k=1}^{p} \left\|\rVec^{(k)}(\regparam)\right\|_2^2\]
+\[\|\rVec_{\text{win}}(\regparamVec)\|_2^2 = \sum_{p=1}^{P} \left[ \sum_{j=1}^{n} \left( \wVec_j^{(p)} \mfilt\left(\regparam^{(p)},\singular_j\right) \right)^2 \left(\dft{d}_j\right)^2\right] = \sum_{p=1}^{P} \left\|\rVec^{(p)}(\regparam)\right\|_2^2\]
 with
-\[\left\|\rVec^{(k)}(\regparam)\right\|_2^2 = \sum_{j=1}^{n} \left( \wVec_j^{(k)} \mfilt\left(\regparam^{(k)},\singular_j\right)\dft{d}_j\right)^2.\]
+\[\left\|\rVec^{(p)}(\regparam)\right\|_2^2 = \sum_{j=1}^{n} \left( \wVec_j^{(p)} \mfilt\left(\regparam^{(p)},\singular_j\right)\dft{d}_j\right)^2.\]
 \end{proof}
 
 \subsection{Morozov's discrepancy principle} \label{sec:MDP}
@@ -931,33 +934,33 @@ The MDP function for the more general assumption that $\noiseVec \sim \mathcal{N
 \label{eq:General MDP}
 \widetilde{\D}(\regparam) = \frac{1}{n}\|\rVec(\regparam)\|_2^2 - \frac{1}{n}\trace\left(\Sigma\right).
 \end{equation}
-Function \eqref{eq:General MDP} can be applied to data $\{\dVec\}_{\ell=1}^R$ with constructions described in Table \ref{tab:System assumptions}. 
+Function \eqref{eq:General MDP} can be applied to data $\{\dVec\}_{r=1}^R$ with constructions described in Table \ref{tab:System assumptions}. 
 
 \begin{proposition}
-Using the constructions in Table \ref{tab:System assumptions} under Assumption \ref{Assumption_System} with $n_\ell = n$ for all $\ell = 1,\ldots,R$, the MDP function $\widetilde{\D}(\regparam)$ for the data sets $\{\dVec^{(\ell)}\}_{\ell=1}^R$ is
+Using the constructions in Table \ref{tab:System assumptions} under Assumption \ref{Assumption_System} with $n_\ell = n$ for all $r = 1,\ldots,R$, the MDP function $\widetilde{\D}(\regparam)$ for the data sets $\{\dVec^{(r)}\}_{r=1}^R$ is
 \begin{equation}
 \label{eq:Averaged MDP}
-\widetilde{\D}(\regparam) = \frac{1}{R} \sum_{\ell=1}^R \D^{(\ell)}(\regparam),
+\widetilde{\D}(\regparam) = \frac{1}{R} \sum_{r=1}^R \D^{(r)}(\regparam),
 \end{equation}
 where
 \begin{equation}
 \label{eq:Individual MDP}
-\D^{(\ell)}(\regparam) = \D^{(\ell)}(\regparam) = \frac{1}{n}\|\rVec^{(\ell)}(\regparam)\|_2^2 - \frac{1}{n}\trace\left(\Sigma^{(\ell)}\right), \quad \ell = 1,\ldots,R
+\D^{(r)}(\regparam) = \D^{(r)}(\regparam) = \frac{1}{n}\|\rVec^{(r)}(\regparam)\|_2^2 - \frac{1}{n}\trace\left(\Sigma^{(r)}\right), \quad r = 1,\ldots,R
 \end{equation}
-with $\rVec^{(\ell)} = A^{(\ell)}\xVec^{(\ell)}(\regparam) - \dVec^{(\ell)}$.
+with $\rVec^{(r)} = A^{(r)}\xVec^{(r)}(\regparam) - \dVec^{(r)}$.
 \end{proposition}
 
 \begin{proof}
 We first define
 \begin{equation}
 \label{eq:Big MDP}
-\widetilde{\D}(\regparam) = \frac{1}{N}\|\widetilde{\rVec}(\regparam)\|_2^2 - \frac{1}{N}\trace\left(\widetilde{\Sigma}\right).
+\widetilde{\D}(\regparam) = \frac{1}{N}\|\rBig(\regparam)\|_2^2 - \frac{1}{N}\trace\left(\widetilde{\Sigma}\right).
 \end{equation}
-By defining the individual MDP functions by \eqref{eq:Individual MDP}, the MDP function \eqref{eq:Big MDP} for the large system can be written as an average by exploiting the block structure of $\widetilde{A}_{\regparam}$ and $\widetilde{\Sigma}$:
+By defining the individual MDP functions by \eqref{eq:Individual MDP}, the MDP function \eqref{eq:Big MDP} for the large system can be written as an average by exploiting the block structure of $\ABig(\regparam)$ and $\widetilde{\Sigma}$:
 \begin{align*}
-\widetilde{\D}(\regparam) &= \frac{1}{N}\sum_{\ell=1}^R \|\rVec^{(\ell)}(\regparam)\|_2^2 - \frac{1}{N}\sum_{\ell=1}^R \trace\left(\Sigma^{(\ell)}\right) \nonumber \\
-&= \frac{1}{R}\sum_{\ell=1}^R \frac{1}{n}\|\rVec^{(\ell)}(\regparam)\|_2^2 - \frac{1}{R}\sum_{\ell=1}^R \frac{1}{n}\trace\left(\Sigma^{(\ell)}\right) \nonumber \\
-&= \frac{1}{R}\sum_{\ell=1}^R \D^{(\ell)}(\regparam).
+\widetilde{\D}(\regparam) &= \frac{1}{N}\sum_{r=1}^R \|\rVec^{(r)}(\regparam)\|_2^2 - \frac{1}{N}\sum_{r=1}^R \trace\left(\Sigma^{(r)}\right) \nonumber \\
+&= \frac{1}{R}\sum_{r=1}^R \frac{1}{n}\|\rVec^{(r)}(\regparam)\|_2^2 - \frac{1}{R}\sum_{r=1}^R \frac{1}{n}\trace\left(\Sigma^{(r)}\right) \nonumber \\
+&= \frac{1}{R}\sum_{r=1}^R \D^{(r)}(\regparam).
 \end{align*}
 \end{proof}
 
@@ -965,22 +968,22 @@ The MDP method for multiple data then defines $\widetilde{\regparam}_{\textrm{MD
 As with the adapted UPRE method, the adapted MDP method is distinct from the MDP method as applied to the averaged data \eqref{eq:Averaged data}.
 
 \begin{proposition}
-Under Assumptions \ref{Assumption_System} through \ref{Assumption_Diagonalization} with data vectors $\{\dVec^{(\ell)}\}_{\ell=1}^R$, let $\aVec$ be defined by \eqref{eq:Averaged data}, $\dft{\aVec} = \trans{U}\aVec$, and let
+Under Assumptions \ref{Assumption_System} through \ref{Assumption_Diagonalization} with data vectors $\{\dVec^{(r)}\}_{r=1}^R$, let $\aVec$ be defined by \eqref{eq:Averaged data}, $\dft{\aVec} = \trans{U}\aVec$, and let
 \begin{equation}
 \label{eq:MDP of Average}
-\overline{\D}(\regparam) = \frac{1}{n}\sum_{j=1}^{n} \left(\mfilt_j\right)^2 |\dft{\aVec}_j|^2 - \frac{1}{R^2}\sum_{\ell=1}^R \noiseSD_{\ell}^2
+\overline{\D}(\regparam) = \frac{1}{n}\sum_{j=1}^{n} \left(\mfilt_j\right)^2 |\dft{\aVec}_j|^2 - \frac{1}{R^2}\sum_{r=1}^R \noiseSD_{r}^2
 \end{equation}
 Then
 \begin{equation}
 \label{eq:MDP Bound}
-\widetilde{\D}(\regparam) = \frac{1}{R} \sum_{\ell=1}^R \D^{(\ell)}(\regparam) \leq R \overline{\D}(\regparam), \qquad \regparam \geq 0.
+\widetilde{\D}(\regparam) = \frac{1}{R} \sum_{r=1}^R \D^{(r)}(\regparam) \leq R \overline{\D}(\regparam), \qquad \regparam \geq 0.
 \end{equation}
 \end{proposition}
 \begin{proof}
 Under these assumptions, for the MDP method we have $\widetilde{\D}(\regparam)$ is equal to
 \begin{align*}
-    \frac{1}{R} \sum_{\ell=1}^R \D^{(\ell)}(\regparam) &= \frac{1}{R}\sum_{\ell=1}^R \left[\frac{1}{n}\|\rVec^{(\ell)}(\regparam)\|_2^2 - \noiseSD_{\ell}^2\right] \\
-    &= R\left[\frac{1}{n}\sum_{j=1}^{n} \left(\mfilt_j\right)^2\left(\frac{1}{R^2} \sum_{\ell=1}^R |\dft{\dVec}_j^{(\ell)}|^2\right) - \frac{1}{R^2}\sum_{\ell=1}^R \noiseSD_{\ell}^2\right]
+    \frac{1}{R} \sum_{r=1}^R \D^{(r)}(\regparam) &= \frac{1}{R}\sum_{r=1}^R \left[\frac{1}{n}\|\rVec^{(r)}(\regparam)\|_2^2 - \noiseSD_{r}^2\right] \\
+    &= R\left[\frac{1}{n}\sum_{j=1}^{n} \left(\mfilt_j\right)^2\left(\frac{1}{R^2} \sum_{r=1}^R |\dft{\dVec}_j^{(r)}|^2\right) - \frac{1}{R^2}\sum_{r=1}^R \noiseSD_{r}^2\right]
 \end{align*}
 so that using \eqref{eq:MDP of Average} results in the bound \eqref{eq:MDP Bound}.
 \end{proof}
@@ -1002,36 +1005,36 @@ Unlike the UPRE and MDP methods, the GCV method does not depend upon knowledge o
 The GCV method determines $\regparam$ such that $\regparam_\GCV = \argmin_{\regparam > 0} \G(\regparam)$.
 
 \begin{proposition}
-Using the constructions in Table \ref{tab:System assumptions} under Assumption \ref{Assumption_System} with $n_\ell = n$ for all $\ell = 1,\ldots,R$, the GCV function $\widetilde{\D}(\regparam)$ for the data sets $\{\dVec^{(\ell)}\}_{\ell=1}^R$ is
+Using the constructions in Table \ref{tab:System assumptions} under Assumption \ref{Assumption_System} with $n_r = n$ for all $r = 1,\ldots,R$, the GCV function $\widetilde{\D}(\regparam)$ for the data sets $\{\dVec^{(r)}\}_{r=1}^R$ is
 \begin{equation}
 \label{eq:GCV Big 2}
-\widetilde{\G}(\regparam) = \frac{\frac{1}{N}\sum_{\ell=1}^R \|\rReg^{(\ell)}\|_2^2}{\left[1 - \frac{1}{N}\sum_{\ell=1}^R \trace\left(\A^{(\ell)}\right)\right]^2}.
+\widetilde{\G}(\regparam) = \frac{\frac{1}{N}\sum_{r=1}^R \|\rVec^{(r)}(\regparam)\|_2^2}{\left[1 - \frac{1}{N}\sum_{r=1}^R \trace\left(A^{(r)}(\regparam)\right)\right]^2}.
 \end{equation}
 \end{proposition}
 \begin{proof}
 We define the GCV function for multiple data sets as
 \begin{equation}
 \label{eq:GCV Big}
-\widetilde{\G}(\regparam) = \frac{\frac{1}{N}\|\widetilde{\mathbf{r}}_\regparam\|_2^2}{\left[1 - \frac{1}{N}\trace(\widetilde{A}_\regparam)\right]^2}.
+\widetilde{\G}(\regparam) = \frac{\frac{1}{N}\|\rBig(\regparam)\|_2^2}{\left[1 - \frac{1}{N}\trace\left(\ABig(\regparam)\right)\right]^2}.
 \end{equation}
-From the definition of $\widetilde{\mathbf{r}}_\regparam$ and the block structure $\widetilde{A}_\regparam$, \eqref{eq:GCV Big} can be rewritten as \eqref{eq:GCV Big 2}.
+From the definition of $\widetilde{\mathbf{r}}_\regparam$ and the block structure $\ABig(\regparam)$, \eqref{eq:GCV Big} can be rewritten as \eqref{eq:GCV Big 2}.
 \end{proof} 
 \noindent The GCV method for multiple data sets defines $\widetilde{\regparam}_{\textrm{GCV}} = \argmin_{\regparam > 0} \widetilde{\G}(\regparam)$. \par 
 In contrast to the UPRE and MDP methods, the GCV function \eqref{eq:GCV Big 2} for multiple data sets is not equal to the mean of individual GCV functions
 \begin{equation}
 \label{eq:Individual GCV}
-\G^{(\ell)}(\regparam) = \frac{\frac{1}{n}\|\rReg^{(\ell)}\|_2^2}{\left[1 - \frac{1}{n}\trace\left(\A^{(\ell)}\right)\right]^2}, \quad \ell = 1,\ldots,R.
+\G^{(r)}(\regparam) = \frac{\frac{1}{n}\|\rVec^{(r)}(\regparam)\|_2^2}{\left[1 - \frac{1}{n}\trace\left(\A^{(r)}\right)\right]^2}, \quad r = 1,\ldots,R.
 \end{equation}
-However, if we assume that $A^{(\ell)} = A$ and $L^{(\ell)} = L$ for each $\ell = 1,\ldots,R$, then $\A^{(\ell)} = \A$ for each $\ell = 1,\ldots,R$ as well. In such case, \eqref{eq:GCV Big 2} can be expressed as
+However, if we assume that $A^{(r)} = A$ and $L^{(r)} = L$ for each $r = 1,\ldots,R$, then $\A^{(r)} = \A$ for each $r = 1,\ldots,R$ as well. In such case, \eqref{eq:GCV Big 2} can be expressed as
 \begin{equation}
 \label{eq:Averaged GCV}
-\widetilde{\G}(\regparam) = \frac{\frac{1}{N}\sum_{\ell=1}^R \|\rReg^{(\ell)}\|_2^2}{\left[1 - \frac{1}{N}\sum_{\ell=1}^R \trace\left(\A\right)\right]^2} = \frac{1}{R}\frac{\sum_{\ell=1}^R \frac{1}{n} \|\rReg^{(\ell)}\|_2^2}{\left[1 - \frac{1}{n} \trace\left(\A\right)\right]^2} = \frac{1}{R}\sum_{\ell=1}^R \G^{(\ell)}(\regparam).
+\widetilde{\G}(\regparam) = \frac{\frac{1}{N}\sum_{r=1}^R \|\rVec^{(r)}(\regparam)\|_2^2}{\left[1 - \frac{1}{N}\sum_{r=1}^R \trace\left(\A\right)\right]^2} = \frac{1}{R}\frac{\sum_{r=1}^R \frac{1}{n} \|\rVec^{(r)}(\regparam)\|_2^2}{\left[1 - \frac{1}{n} \trace\left(\A\right)\right]^2} = \frac{1}{R}\sum_{r=1}^R \G^{(r)}(\regparam).
 \end{equation}
 Note that \eqref{eq:Individual GCV} is equivalent to \eqref{eq:GCV} without Assumption \ref{Assumption_Noise}, which is to be expected since the GCV method does not rely on knowledge of the noise variance. \par 
 A bound analogous to \eqref{eq:UPRE Bound} and \eqref{eq:MDP Bound} can be obtained for the adapted GCV function.
 
 \begin{proposition}
-Under Assumptions \ref{Assumption_System} through \ref{Assumption_Diagonalization} with data vectors $\{\dVec^{(\ell)}\}_{\ell=1}^R$, let $\aVec$ be defined by \eqref{eq:Averaged data}, $\dft{\aVec} = \trans{U}\aVec$, and let
+Under Assumptions \ref{Assumption_System} through \ref{Assumption_Diagonalization} with data vectors $\{\dVec^{(r)}\}_{r=1}^R$, let $\aVec$ be defined by \eqref{eq:Averaged data}, $\dft{\aVec} = \trans{U}\aVec$, and let
 \begin{equation}
 \label{eq:GCV of Average}
 \overline{\G}(\regparam) = \frac{\frac{1}{n}\sum_{j=1}^{n} \left(\mfilt_j\right)^2|\dft{\aVec}_j|^2}{\left[1 - \frac{1}{n}\trace\left(\A\right)\right]^2}.
@@ -1039,17 +1042,17 @@ Under Assumptions \ref{Assumption_System} through \ref{Assumption_Diagonalizatio
 Then
 \begin{equation}
 \label{eq:GCV Bound}
-\widetilde{\G}(\regparam) = \frac{1}{R} \sum_{\ell=1}^R \G^{(\ell)}(\regparam) \leq R \overline{\G}(\regparam), \qquad \regparam \geq 0.
+\widetilde{\G}(\regparam) = \frac{1}{R} \sum_{r=1}^R \G^{(r)}(\regparam) \leq R \overline{\G}(\regparam), \qquad \regparam \geq 0.
 \end{equation}
 \end{proposition}
 
 \begin{proof}
 With these assumptions,
-\[\widetilde{\G}(\regparam) = \frac{1}{R} \sum_{\ell=1}^R \G^{(\ell)}(\regparam) = \frac{1}{R}\sum_{\ell=1}^R \left[\frac{\frac{1}{n}\|\rReg^{(\ell)}\|_2^2}{\left[1 - \frac{1}{n}\trace\left(\A\right)\right]^2}\right]  = R\frac{\frac{1}{n}\sum_{j=1}^{n} \left(\mfilt_j\right)^2\left(\frac{1}{R^2} \sum_{\ell=1}^R |\dft{\dVec}_j^{(\ell)}|^2\right)}{\left[1 - \frac{1}{n}\trace\left(\A\right)\right]^2},\]
+\[\widetilde{\G}(\regparam) = \frac{1}{R} \sum_{r=1}^R \G^{(r)}(\regparam) = \frac{1}{R}\sum_{r=1}^R \left[\frac{\frac{1}{n}\|\rVec^{(r)}(\regparam)\|_2^2}{\left[1 - \frac{1}{n}\trace\left(\A\right)\right]^2}\right]  = R\frac{\frac{1}{n}\sum_{j=1}^{n} \left(\mfilt_j\right)^2\left(\frac{1}{R^2} \sum_{r=1}^R |\dft{\dVec}_j^{(r)}|^2\right)}{\left[1 - \frac{1}{n}\trace\left(\A\right)\right]^2},\]
 again where the last equality is obtained through multiplication by $\frac{R}{R}$. The definition of $\overline{\G}(\regparam)$ and \eqref{eq:Coefficients of Average} then results in the bound \eqref{eq:GCV Bound}.
 \end{proof}
 
-As a closing remark regarding the GCV method, it is important to note that the assumption $A^{(\ell)} = A$ and $L^{(\ell)} = L$ for each $\ell = 1,\ldots,R$ was needed for result \eqref{eq:Averaged GCV}. In contrast, no such assumption is necessary for the corresponding UPRE and MDP results, which respectively are \eqref{eq:Averaged UPRE} and \eqref{eq:Averaged MDP}.
+As a closing remark regarding the GCV method, it is important to note that the assumption $A^{(r)} = A$ and $L^{(r)} = L$ for each $r = 1,\ldots,R$ was needed for result \eqref{eq:Averaged GCV}. In contrast, no such assumption is necessary for the corresponding UPRE and MDP results, which respectively are \eqref{eq:Averaged UPRE} and \eqref{eq:Averaged MDP}.
 
 \subsubsection{Multiparameter GCV} \label{sec:Multiparameter GCV}
 The multiparameter GCV function is
@@ -1063,15 +1066,15 @@ again where $\rVec_\text{win}(\regparamVec)$ is defined by \eqref{eq:Windowed Re
 For a basis of comparison, parameters were selected as minimizers of the function
 \begin{equation}
 \label{eq:Learning function}
-F(\regparam) = \frac{1}{R}\sum_{\ell=1}^R \left\|\xVec^{(\ell)}(\regparam) - \xVec^{(\ell)}\right\|_2^2,
+F(\regparam) = \frac{1}{R}\sum_{r=1}^R \left\|\xVec^{(r)}(\regparam) - \xVec^{(r)}\right\|_2^2,
 \end{equation} 
 which was considered in \cite{ChungEspanol2017}. A simpler way of selecting regularization parameters is to minimize
 \begin{equation}
 \label{eq:Best function}
-B^{(\ell)}(\regparam) = \left\|\xVec^{(\ell)}(\regparam) - \xVec^{(\ell)}\right\|_2^2, \quad \ell = 1,\ldots,R.
+B^{(r)}(\regparam) = \left\|\xVec^{(r)}(\regparam) - \xVec^{(r)}\right\|_2^2, \quad r = 1,\ldots,R.
 \end{equation}
-Both functions \eqref{eq:Learning function} and \eqref{eq:Best function} rely on knowledge of the true solutions $\{\xVec^{(\ell)}\}_{\ell=1}^R$. Parameters chosen as minimizers of \eqref{eq:Best function} are ``best" in the sense of minimizing the norm of the error of a single regularized solution. It is important to note that minimization of \eqref{eq:Learning function} results in a single parameter depending on all $R$ data vectors, while minimizing \eqref{eq:Best function} results in a single parameter for each of the $R$ data vectors. The relationship between \eqref{eq:Learning function} and \eqref{eq:Best function} can be expressed as
-\[F(\regparam) = \frac{1}{R}\sum_{\ell=1}^R B^{(\ell)}(\regparam).\]
+Both functions \eqref{eq:Learning function} and \eqref{eq:Best function} rely on knowledge of the true solutions $\{\xVec^{(r)}\}_{r=1}^R$. Parameters chosen as minimizers of \eqref{eq:Best function} are ``best" in the sense of minimizing the norm of the error of a single regularized solution. It is important to note that minimization of \eqref{eq:Learning function} results in a single parameter depending on all $R$ data vectors, while minimizing \eqref{eq:Best function} results in a single parameter for each of the $R$ data vectors. The relationship between \eqref{eq:Learning function} and \eqref{eq:Best function} can be expressed as
+\[F(\regparam) = \frac{1}{R}\sum_{r=1}^R B^{(r)}(\regparam).\]
 \indent To evaluate the effectiveness of both the adapted single-parameter and multiparameter selection methods described in Section \ref{sec:Methods}, three test problems were considered. For all three problems, data vectors were considered as a set of training data and resulting parameters were then applied to validation data set. A one-dimensional problem serves as a proof of concept and uses MRI data that is built into MATLAB, which is shown in Figure \ref{fig:MRI 1D}. The other problems are two-dimensional; one is constructed from the MATLAB MRI data, while the other utilizes images of the planet Mercury obtained by the MESSENGER space probe. The MESSENGER images are available to the public courtesy of NASA, the Johns Hopkins University Applied Physics Laboratory, and the Carnegie Institution of Washington \cite{MESSENGER}. \par
 For both problems, the following definition of signal-to-noise ratio (SNR) is used as a measurement for noise content in the images:
 \begin{equation}
