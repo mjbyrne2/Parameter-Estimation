@@ -636,7 +636,10 @@ The ultimate situation we consider is the case where multiparameter regularizati
 \[\xWin^{(r)}\left(\regparamVec^{(r)}\right) = \sum_{p=1}^{P_r} Y^{(r)}\inv{\left[\trans{\left(\Delta^{(r)}\right)}\Delta^{(r)} + \left(\regparam^{(r)}_p\right)^2 \trans{\left(\Lambda^{(r)}\right)}\Lambda^{(r)}\right]}W^{(p)}_{(r)}\trans{\left(\Delta^{(r)}\right)}\dft{\dVec}^{(r)}\]
 where $W^{(p)}_{(r)}$ is the $p$th window for the $r$th system, $\regparam^{(r)}_p$ is the regularization parameter for the $p$th window, and $P_r$ is the number of windows. Each system can have its own set of windows, meaning that there are a total of $RP_r$ regularization parameters. However, the primary assumption we make moving forward is that the windows $W^{(p)}_{(r)}$ for each system are the same, i.e $W^{(p)}_{(r)} = W^{(p)}$ for all $r = 1,\ldots,R$ and $p = 1,\ldots,P$. This implies that $\regparamVec^{(r)}$ are all vectors of length $P$ and there are a total of $RP$ parameters. \par
 Analogous to the uniparameter case for multiple data sets, we define $\xWinBig(\regparamVecBig)$ as the vertical concatenation of the $\xWin^{(r)}\left(\regparamVecBig\right)$ for $r = 1,\ldots,R$, where $\regparamVecBig \in \mathbb{R}^P$ is a single vector of parameters. Using the constructions from Table \ref{tab:Block GSVD Matrices}, we have
-\[\xWinBig(\regparamVecBig) = \sum_{p=1}^{P} \widetilde{Y}\inv{\left[\trans{\widetilde{\Delta}}\widetilde{\Delta} + \widetilde{\regparam}_p^2 \trans{\widetilde{\Lambda}}\widetilde{\Lambda}\right]}\widetilde{W}^{(p)}\trans{\widetilde{\Delta}}\dft{\dBig}\]
+\begin{equation}
+\label{eq:Big Windowed Solution}
+    \xWinBig(\regparamVecBig) = \sum_{p=1}^{P} \widetilde{Y}\inv{\left[\trans{\widetilde{\Delta}}\widetilde{\Delta} + \widetilde{\regparam}_p^2 \trans{\widetilde{\Lambda}}\widetilde{\Lambda}\right]}\widetilde{W}^{(p)}\trans{\widetilde{\Delta}}\dft{\dBig}
+\end{equation}
 where $\widetilde{W}^{(p)} = \diag(W^{(p)},\ldots,W^{(p)})$ has $R$ diagonal blocks.
 
 \section{Parameter selection methods} \label{sec:Methods}
@@ -662,6 +665,7 @@ The ultimate situation is multiparameter regularization as applied to multiple d
 \label{eq:Windowed Big regularized residual}
 \rWinBig(\regparamVecBig) = \ABig\xWinBig(\regparamVecBig) - \dBig. 
 \end{equation}
+The GSVD allows for $\xWinBig(\regparamVecBig)$ to be represented by \eqref{eq:Big Windowed Solution}.
 
 As a final remark, the development of the adapted UPRE, MDP, and GCV methods also rely on Assumption \ref{Assumption_System} and the constructions contained in Table \ref{tab:System assumptions}. By Lemma \ref{lem:Concatenation of Normal Noise}, this assumption implies that $\widetilde{\noiseVec} \sim \mathcal{N}\left(\widetilde{\zeroVec},\widetilde{\Sigma}\right)$ with $\widetilde{\zeroVec} \in \mathbb{R}^M$ and $M = \sum_{r=1}^{R} m_r$. 
 
@@ -730,7 +734,7 @@ Analogous to the standard UPRE function, we can define $\UBig(\regparam)$ as
 so that $\UBig(\regparam)$ is an unbiased estimator of predictive risk. The standard UPRE function \eqref{eq:UPRE} is recovered from \eqref{eq:UPRE 2} if $\Sigma = \noiseSD^2 I_{\mA}$.
 
 \begin{proposition}
-Using the constructions in Table \ref{tab:System assumptions} under Assumption \ref{Assumption_System} with $n_r = n$ for all $r = 1,\ldots,R$, the UPRE function $\widetilde{U}(\regparam)$ for the data sets $\{\dVec^{(r)}\}_{r=1}^R$ is
+Using the constructions in Table \ref{tab:System assumptions} under Assumption \ref{Assumption_System} with $m_r = m$ for all $r = 1,\ldots,R$, the UPRE function $\UBig(\regparam)$ for the data sets $\{\dVec^{(r)}\}_{r=1}^R$ is
 \begin{equation}
 \label{eq:Averaged UPRE}
 \UBig(\regparam) = \frac{1}{R} \sum_{r=1}^R \U^{(r)}(\regparam),
@@ -743,7 +747,7 @@ where
 with
 \begin{equation}
 \label{eq:Single Regularized Residual}
-    \rVec^{(r)} = A^{(r)}\xVec^{(r)}(\regparam) - \dVec^{(r)}.
+    \rVec^{(r)}(\regparam) = A^{(r)}\xVec^{(r)}(\regparam) - \dVec^{(r)}.
 \end{equation}
 \end{proposition}
 \begin{proof}
@@ -752,7 +756,7 @@ A block diagonal influence matrix $\ABig(\regparam)$ can be defined as
 with diagonal blocks
 \begin{equation}
 \label{eq:Diagonal blocks}
-A^{(r)}_\regparam = A^{(r)}\left(\trans{\left(A^{(r)}\right)}A^{(r)} + \regparam^2\trans{\left(L^{(r)}\right)}L^{(r)}\right)^{-1}\trans{\left(A^{(r)}\right)}, \quad r = 1,\ldots,R.
+A^{(r)}(\regparam) = A^{(r)}\left(\trans{\left(A^{(r)}\right)}A^{(r)} + \regparam^2\trans{\left(L^{(r)}\right)}L^{(r)}\right)^{-1}\trans{\left(A^{(r)}\right)}, \quad r = 1,\ldots,R.
 \end{equation}
 By further defining $\rBig(\regparam) = \ABig\widetilde{\xVec}(\regparam) - \widetilde{\dVec}$ and noting that Lemma \ref{lem:Concatenation of Normal Noise} implies the vertical concatenation $\widetilde{\noiseVec}$ of $\{\noiseVec^{(r)}\}_{r=1}^R$ is distributed $\mathcal{N}(\widetilde{\zeroVec},\widetilde{\Sigma})$ with $\widetilde{\zeroVec} \in \mathbb{R}^M$ and $\widetilde{\Sigma} = \diag(\Sigma^{(1)},\ldots,\Sigma^{(R)})$, the UPRE function \eqref{eq:UPRE 2} can be directly applied to produce
 \begin{equation}
@@ -785,15 +789,15 @@ From Assumption \ref{Assumption_Diagonalization}, we define the generalized filt
 \label{eq:Filter functions 2}
 \filt^{(r)}_j = \frac{\left(\delta^{(r)}_j\right)^2}{\left(\delta^{(r)}_j\right)^2 + \regparam^2 \left(\lambda^{(r)}_j\right)^2}, \quad \mfilt^{(r)}_j = 1 - \filt^{(r)}_j = \frac{\regparam^2 \left(\lambda^{(r)}_j\right)^2}{\left(\delta^{(r)}_j\right)^2 + \regparam^2 \left(\lambda^{(r)}_j\right)^2}
 \end{equation}
-where $\bm{\delta}^{(r)} = \sqrt{\diag(\trans{(\Delta^{(r)})}\Delta^{(r)})}$ and $\bm{\lambda}^{(r)} = \sqrt{\diag(\trans{(\Lambda^{(r)})}\Lambda^{(r)})}$ for each $r = 1,\ldots,R$. The matrix $\A^{(r)}$ given by \eqref{eq:Diagonal blocks} can be expressed as
+where $\bm{\delta}^{(r)} = \sqrt{\diag(\trans{(\Delta^{(r)})}\Delta^{(r)})}$ and $\bm{\lambda}^{(r)} = \sqrt{\diag(\trans{(\Lambda^{(r)})}\Lambda^{(r)})}$ for each $r = 1,\ldots,R$. The matrix $A^{(r)}(\regparam)$ given by \eqref{eq:Diagonal blocks} can be expressed as
 \begin{equation}
 \label{eq:Fourier diagonalization 2}
-\A^{(r)} = U\Delta^{(r)}\left[\trans{(\Delta^{(r)})}\Delta^{(r)} + \regparam^2\trans{(\Lambda^{(r)})}\Lambda^{(r)}\right]^{-1}\trans{(\Delta^{(r)})}\trans{U}, \qquad r = 1,\ldots,R.
+A^{(r)}(\regparam) = U\Delta^{(r)}\left[\trans{(\Delta^{(r)})}\Delta^{(r)} + \regparam^2\trans{(\Lambda^{(r)})}\Lambda^{(r)}\right]^{-1}\trans{(\Delta^{(r)})}\trans{U}, \qquad r = 1,\ldots,R.
 \end{equation}
 Under Assumption \ref{Assumption_Noise}, $\trace(\Sigma^{(r)}) = n\noiseSD^2_r$ and the similarity invariance of the trace operator gives
 \begin{equation}
 \label{eq:Trace}
-\trace\left(\Sigma^{(r)}\A^{(r)}\right) = \noiseSD_r^2 \trace\left(\Delta^{(r)}\left[\trans{(\Delta^{(r)})}\Delta^{(r)} + \regparam^2\trans{(\Lambda^{(r)})}\Lambda^{(r)}\right]^{-1}\trans{(\Delta^{(r)})}\right) = \noiseSD_r^2 \sum_{j=1}^{n} \filt^{(r)}_j.
+\trace\left(\Sigma^{(r)}A^{(r)}(\regparam)\right) = \noiseSD_r^2 \trace\left(\Delta^{(r)}\left[\trans{(\Delta^{(r)})}\Delta^{(r)} + \regparam^2\trans{(\Lambda^{(r)})}\Lambda^{(r)}\right]^{-1}\trans{(\Delta^{(r)})}\right) = \noiseSD_r^2 \sum_{j=1}^{n} \filt^{(r)}_j.
 \end{equation}
 Another benefit of using \eqref{eq:Fourier diagonalization 2} is that we can write
 \begin{align}
@@ -949,7 +953,7 @@ The MDP function for the more general assumption that $\noiseVec \sim \mathcal{N
 Function \eqref{eq:General MDP} can be applied to data $\{\dVec\}_{r=1}^R$ with constructions described in Table \ref{tab:System assumptions}. 
 
 \begin{proposition}
-Using the constructions in Table \ref{tab:System assumptions} under Assumption \ref{Assumption_System} with $n_\ell = n$ for all $r = 1,\ldots,R$, the MDP function $\DBig(\regparam)$ for the data sets $\{\dVec^{(r)}\}_{r=1}^R$ is
+Using the constructions in Table \ref{tab:System assumptions} under Assumption \ref{Assumption_System} with $m_r = m$ for all $r = 1,\ldots,R$, the MDP function $\DBig(\regparam)$ for the data sets $\{\dVec^{(r)}\}_{r=1}^R$ is
 \begin{equation}
 \label{eq:Averaged MDP}
 \DBig(\regparam) = \frac{1}{R} \sum_{r=1}^R \D^{(r)}(\regparam),
@@ -1017,7 +1021,7 @@ Unlike the UPRE and MDP methods, the GCV method does not depend upon knowledge o
 The GCV method determines $\regparam$ such that $\regparam_{\text{GCV}} = \argmin_{\regparam > 0} \G(\regparam)$.
 
 \begin{proposition}
-Using the constructions in Table \ref{tab:System assumptions} under Assumption \ref{Assumption_System} with $n_r = n$ for all $r = 1,\ldots,R$, the GCV function $\DBig(\regparam)$ for the data sets $\{\dVec^{(r)}\}_{r=1}^R$ is
+Using the constructions in Table \ref{tab:System assumptions} under Assumption \ref{Assumption_System} with $m_r = m$ for all $r = 1,\ldots,R$, the GCV function $\DBig(\regparam)$ for the data sets $\{\dVec^{(r)}\}_{r=1}^R$ is
 \begin{equation}
 \label{eq:GCV Big 2}
 \GBig(\regparam) = \frac{\frac{1}{M}\sum_{r=1}^R \|\rVec^{(r)}(\regparam)\|_2^2}{\left[1 - \frac{1}{M}\sum_{r=1}^R \trace\left(A^{(r)}(\regparam)\right)\right]^2}.
@@ -1035,9 +1039,9 @@ From the definition of $\widetilde{\mathbf{r}}_\regparam$ and the block structur
 In contrast to the UPRE and MDP methods, the GCV function \eqref{eq:GCV Big 2} for multiple data sets is not equal to the mean of individual GCV functions
 \begin{equation}
 \label{eq:Individual GCV}
-\G^{(r)}(\regparam) = \frac{\frac{1}{\mA}\|\rVec^{(r)}(\regparam)\|_2^2}{\left[1 - \frac{1}{\mA}\trace\left(\A^{(r)}\right)\right]^2}, \quad r = 1,\ldots,R.
+\G^{(r)}(\regparam) = \frac{\frac{1}{\mA}\|\rVec^{(r)}(\regparam)\|_2^2}{\left[1 - \frac{1}{\mA}\trace\left(A^{(r)}(\regparam)\right)\right]^2}, \quad r = 1,\ldots,R.
 \end{equation}
-However, if we assume that $A^{(r)} = A$ and $L^{(r)} = L$ for each $r = 1,\ldots,R$, then $\A^{(r)} = \A$ for each $r = 1,\ldots,R$ as well. In such case, \eqref{eq:GCV Big 2} can be expressed as
+However, if we assume that $A^{(r)} = A$ and $L^{(r)} = L$ for each $r = 1,\ldots,R$, then $A^{(r)}(\regparam) = \A$ for each $r = 1,\ldots,R$ as well. In such case, \eqref{eq:GCV Big 2} can be expressed as
 \begin{equation}
 \label{eq:Averaged GCV}
 \GBig(\regparam) = \frac{\frac{1}{M}\sum_{r=1}^R \|\rVec^{(r)}(\regparam)\|_2^2}{\left[1 - \frac{1}{M}\sum_{r=1}^R \trace\left(\A\right)\right]^2} = \frac{1}{R}\frac{\sum_{r=1}^R \frac{1}{\mA} \|\rVec^{(r)}(\regparam)\|_2^2}{\left[1 - \frac{1}{\mA} \trace\left(\A\right)\right]^2} = \frac{1}{R}\sum_{r=1}^R \G^{(r)}(\regparam).
@@ -1063,7 +1067,7 @@ With these assumptions,
 \begin{align}
     \GBig(\regparam) &= \frac{1}{R} \sum_{r=1}^R \G^{(r)}(\regparam) \\
     &= \frac{1}{R}\sum_{r=1}^R \left[\frac{\frac{1}{\mA}\|\rVec^{(r)}(\regparam)\|_2^2}{\left[1 - \frac{1}{\mA}\trace\left(\A\right)\right]^2}\right] \\
-    &= R\frac{\frac{1}{\mA}\sum_{j=1}^{n} \left(\mfilt_j\right)^2\left(\frac{1}{R^2} \sum_{r=1}^R |\dft{\dVec}_j^{(r)}|^2\right)}{\left[1 - \frac{1}{\mA}\trace\left(\A\right)\right]^2},
+    &= R\frac{\frac{1}{\mA}\sum_{j=1}^{n} \left(\mfilt_j\right)^2\left(\frac{1}{R^2} \sum_{r=1}^R \left|\dft{\dVec}_j^{(r)}\right|^2\right)}{\left[1 - \frac{1}{\mA}\trace\left(\A\right)\right]^2},
 \end{align}
 again where the last equality is obtained through multiplication by $\frac{R}{R}$. The definition of $\GAvg(\regparam)$ and \eqref{eq:Coefficients of Average} then results in the bound \eqref{eq:GCV Bound}.
 \end{proof}
@@ -1076,22 +1080,23 @@ The multiparameter GCV function is
 \label{eq:Windowed GCV}
     \GWin(\regparamVec) = \frac{\frac{1}{\mA}\|\rVec_{\text{win}}(\regparam)\|_2^2}{\left[1 - \frac{1}{\mA}\trace(\A)\right]^2}.,
 \end{equation}
-again where $\rVec_\text{win}(\regparamVec)$ is defined by \eqref{eq:Windowed Regularized Residual}. As with the single parameter GCV method, the multiparameter GCV method is to choose $\regparamVec \in \mathbb{R}_+^p$ such that $\GWin(\regparamVec) = 0$. $\trans{A}_{\text{win}}$
+again where $\rVec_\text{win}(\regparamVec)$ is defined by \eqref{eq:Windowed Regularized Residual}. As with the single parameter GCV method, the multiparameter GCV method is to choose $\regparamVec \in \mathbb{R}_+^p$ such that $\GWin(\regparamVec) = 0$.
 
 \section{Validation} \label{sec:Validation}
 For a basis of comparison, parameters were selected as minimizers of the function
 \begin{equation}
 \label{eq:Learning function}
-\widetilde{F}_{\text{best}}(\regparam) = \frac{1}{R}\sum_{r=1}^R \left\|\xVec^{(r)}(\regparam) - \xVec^{(r)}\right\|_2^2,
+\widetilde{F}_{\text{best}}(\regparam) = \frac{1}{R}\sum_{r=1}^R \left\|\xVec^{(r)}(\regparam) - \xVec^{(r)}\right\|_2^2 = \frac{1}{R}\left\|\xBig(\regparam) - \xBig\right\|_2^2,
 \end{equation} 
 which was considered in \cite{ChungEspanol2017}. A simpler way of selecting regularization parameters is to minimize
 \begin{equation}
 \label{eq:Best function}
 F_{\text{best}}^{(r)}(\regparam) = \left\|\xVec^{(r)}(\regparam) - \xVec^{(r)}\right\|_2^2, \quad r = 1,\ldots,R.
 \end{equation}
-Both functions \eqref{eq:Learning function} and \eqref{eq:Best function} rely on knowledge of the true solutions $\{\xVec^{(r)}\}_{r=1}^R$. Parameters chosen as minimizers of \eqref{eq:Best function} are ``best" in the sense of minimizing the norm of the error of a single regularized solution. It is important to note that minimization of \eqref{eq:Learning function} results in a single parameter depending on all $R$ data vectors, while minimizing \eqref{eq:Best function} results in a single parameter for each of the $R$ data vectors. The relationship between \eqref{eq:Learning function} and \eqref{eq:Best function} can be expressed as
+It is clear that the relationship between \eqref{eq:Learning function} and \eqref{eq:Best function} is
 \[\widetilde{F}_{\text{best}}(\regparam) = \frac{1}{R}\sum_{r=1}^R F_{\text{best}}^{(r)}(\regparam).\]
-\indent To evaluate the effectiveness of both the adapted single-parameter and multiparameter selection methods described in Section \ref{sec:Methods}, three test problems were considered. For all three problems, data vectors were considered as a set of training data and resulting parameters were then applied to validation data set. A one-dimensional problem serves as a proof of concept and uses MRI data that is built into MATLAB, which is shown in Figure \ref{fig:MRI 1D}. The other problems are two-dimensional; one is constructed from the MATLAB MRI data, while the other utilizes images of the planet Mercury obtained by the MESSENGER space probe. The MESSENGER images are available to the public courtesy of NASA, the Johns Hopkins University Applied Physics Laboratory, and the Carnegie Institution of Washington \cite{MESSENGER}. \par
+Both functions \eqref{eq:Learning function} and \eqref{eq:Best function} rely on knowledge of the true solutions $\{\xVec^{(r)}\}_{r=1}^R$. Parameters chosen as minimizers of \eqref{eq:Best function} are ``best" in the sense of minimizing the norm of the error of a single regularized solution. It is important to note that minimization of \eqref{eq:Learning function} results in a single parameter depending on all $R$ data vectors, while minimizing \eqref{eq:Best function} results in a single parameter for each of the $R$ data vectors. \par
+To evaluate the effectiveness of both the adapted single-parameter and multiparameter selection methods described in Section \ref{sec:Methods}, three test problems were considered. For all three problems, data vectors were considered as a set of training data and resulting parameters were then applied to validation data set. A one-dimensional problem serves as a proof of concept and uses MRI data that is built into MATLAB, which is shown in Figure \ref{fig:MRI 1D}. The other problems are two-dimensional; one is constructed from the MATLAB MRI data, while the other utilizes images of the planet Mercury obtained by the MESSENGER space probe. The MESSENGER images are available to the public courtesy of NASA, the Johns Hopkins University Applied Physics Laboratory, and the Carnegie Institution of Washington \cite{MESSENGER}. \par
 For both problems, the following definition of signal-to-noise ratio (SNR) is used as a measurement for noise content in the images:
 \begin{equation}
 \label{eq:SNR}
