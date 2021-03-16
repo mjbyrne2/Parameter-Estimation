@@ -541,9 +541,9 @@ However, care must be taken when selecting the weight vectors $\wVec^{p}$ in lig
 We now consider the situation where we have a collection of data sets $\{\dVec^{(r)}\}_{r=1}^R$ where 
 \begin{equation}
 \label{eq:Big vectors}
-\dVec^{(r)} = \bVec^{(r)} + \noiseVec^{(r)} = {A^{(r)}}\xVec^{(r)} + \noiseVec^{(r)}, \quad \noiseVec^{(r)} \sim \mathcal{N}(\bm{0},\Sigma^{(r)}), \qquad r = 1,\ldots,R.
+\dVec^{(r)} = \bVec^{(r)} + \noiseVec^{(r)} = {A^{(r)}}\xVec^{(r)} + \noiseVec^{(r)}, \quad \noiseVec^{(r)} \sim \mathcal{N}(\bm{0}^{(r)},\Sigma^{(r)}).
 \end{equation}
-For given regularization parameters $\regparam^{(r)}$ and penalty matrices $L^{(r)}$, Tikhonov regularization can be performed to produce regularized solutions $\xVec(\regparam^{(r)})$ that minimize the functionals
+The vectors $\dVec^{(r)}$, $\bVec^{(r)}$, $\noiseVec^{(r)}$, and $\zeroVec^{(r)}$ have length $m_r$, while the vector $\xVec^{(r)}$ has length $n_r$. The system matrices $A^{(r)}$ and covariance matrices $\Sigma^{(r)}$ are thus $m_r \times n_r$ and $m_r \times m_r$, respectively. For given regularization parameters $\regparam^{(r)}$ and penalty matrices $L^{(r)}$ of dimension $q_r \times n_r$, Tikhonov regularization can be performed to produce regularized solutions $\xVec(\regparam^{(r)})$ that minimize the functionals
 \begin{equation}
 T^{(r)}(\xVec;\regparam^{(r)}) := \|A^{(r)}\xVec - \dVec^{(r)}\|_2^2 + \left(\regparam^{(r)}\right)^2\|L^{(r)}\xVec\|_2^2.
 \end{equation}
@@ -552,7 +552,7 @@ A parameter selection method is generally utilized to select the regularization 
 \label{eq:Big functional}
 \widetilde{T}\left(\widetilde{\xVec};\widetilde{\regparam}\right) = \|\ABig\widetilde{\xVec} - \widetilde{\dVec}\|_2^2 + \widetilde{\regparam}^2\|\widetilde{L}\widetilde{\xVec}\|_2^2,
 \end{equation}
-where $\widetilde{\regparam}$ is a single regularization parameter. This construction implies that $\xBig$, $\bBig$, $\widetilde{\noiseVec}$ are vertical concatenations of vectors in $\{\bVec^{(r)}\}_{r=1}^R$ and $\{\noiseVec^{(r)}\}_{r=1}^R$, respectively. The matrices $\ABig$ and $\LBig$ are block diagonal matrices with diagonal blocks $\{A^{(r)}\}_{r=1}^R$ and $\{L^{(r)}\}_{r=1}^R$, respectively. By the definition of the 2-norm and the construction of \eqref{eq:Big functional}, we can also write
+where $\widetilde{\regparam}$ is a single regularization parameter. This construction implies that $\xBig$, $\bBig$, $\widetilde{\noiseVec}$ are vertical concatenations of vectors in $\{\xVec^{(r)}\}_{r=1}^R$, $\{\bVec^{(r)}\}_{r=1}^R$ and $\{\noiseVec^{(r)}\}_{r=1}^R$, respectively. The matrices $\ABig$ and $\LBig$ are block diagonal matrices with diagonal blocks $\{A^{(r)}\}_{r=1}^R$ and $\{L^{(r)}\}_{r=1}^R$, respectively. By the definition of the 2-norm and the construction of \eqref{eq:Big functional}, we can also write
 \begin{equation}
 \label{eq:Big functional 2}
 \widetilde{T}\left(\xBig;\widetilde{\regparam}\right) = \sum_{r=1}^R \left(\|A^{(r)}\xVec^{(r)} - \dVec^{(r)}\|_2^2 + \widetilde{\regparam}^2\|L^{(r)} \xVec^{(r)}\|_2^2\right) = \sum_{r=1}^R T^{(r)}\left(\xVec^{(r)};\widetilde{\regparam}\right).
@@ -621,12 +621,12 @@ We conclude Section \ref{sec:Multiple data sets} by enumerating the additional u
 
 \begin{assumption}
 \label{Assumption_Matrices}
-For $r = 1,\ldots,R$, assume that $A^{(r)} = A$ and $L^{(r)} = L$.
+For $r = 1,\ldots,R$, assume that $A^{(r)} = A \in \mathbb{R}^{\mA \times n}$ and $L^{(r)} = L \in \mathbb{R}^{\mL \times n}$.
 \end{assumption}  
 
 \begin{assumption}
 \label{Assumption_Noise}
-Given $\noiseVec^{(r)} \sim \mathcal{N}(\zeroVec^{(r)},\Sigma^{(r)})$ for $r = 1,\ldots,R$, assume that $\zeroVec^{(r)} = \zeroVec_{\mA \times 1}$ and $\Sigma^{(r)} = \noiseSD_r^2 I_{\mA}$.
+Given $\noiseVec^{(r)} \sim \mathcal{N}(\zeroVec^{(r)},\Sigma^{(r)})$ for $r = 1,\ldots,R$, assume that $\zeroVec^{(r)} = \zeroVec \in \mathbb{R}^{\mA}$ and $\Sigma^{(r)} = \noiseSD_r^2 I_{\mA}$.
 \end{assumption}
 \noindent In particular, Assumptions \ref{Assumption_System} and \ref{Assumption_Matrices} imply that $n_r = n$ for $r = 1,\ldots,R$. Assumption \ref{Assumption_Noise} can relaxed so that $\Sigma^{(r)}$ is any diagonal matrix $D^{(r)}$, in which case a whitening transformation $C^{(r)}$ could applied so that $\xi^{(r)} = C^{(r)}\noiseVec^{(r)}$ is distributed $\mathcal{N}(\zeroVec_{\mA \times 1},I_{\mA})$. For example, one could use the ZCA transformation $C^{(r)} = \left(\Sigma^{(r)}\right)^{-1/2}$ \cite{BellSejnowski}.
 
@@ -663,7 +663,7 @@ The ultimate situation is multiparameter regularization as applied to multiple d
 \rWinBig(\regparamVecBig) = \ABig\xWinBig(\regparamVecBig) - \dBig. 
 \end{equation}
 
-As a final remark, the development of the adapted UPRE, MDP, and GCV methods also rely on Assumption \ref{Assumption_System} and the constructions contained in Table \ref{tab:System assumptions}. By Lemma \ref{lem:Concatenation of Normal Noise}, this assumption implies that $\widetilde{\noiseVec} \sim \mathcal{N}\left(\widetilde{\zeroVec},\widetilde{\Sigma}\right)$ with $\widetilde{\zeroVec} \in \mathbb{R}^N$ and $N = \sum_{r=1}^{R} n_r$. 
+As a final remark, the development of the adapted UPRE, MDP, and GCV methods also rely on Assumption \ref{Assumption_System} and the constructions contained in Table \ref{tab:System assumptions}. By Lemma \ref{lem:Concatenation of Normal Noise}, this assumption implies that $\widetilde{\noiseVec} \sim \mathcal{N}\left(\widetilde{\zeroVec},\widetilde{\Sigma}\right)$ with $\widetilde{\zeroVec} \in \mathbb{R}^M$ and $M = \sum_{r=1}^{R} m_r$. 
 
 \subsection{Unbiased Predictive Risk Estimator} \label{sec:UPRE}
 The UPRE method was developed in 1973 by Mallows and considers the statistical relationship between predictive error $\pVec(\regparam)$ and the regularized residual $\rVec(\regparam)$; these quantities are defined respectively as
@@ -754,19 +754,19 @@ with diagonal blocks
 \label{eq:Diagonal blocks}
 A^{(r)}_\regparam = A^{(r)}\left(\trans{\left(A^{(r)}\right)}A^{(r)} + \regparam^2\trans{\left(L^{(r)}\right)}L^{(r)}\right)^{-1}\trans{\left(A^{(r)}\right)}, \quad r = 1,\ldots,R.
 \end{equation}
-By further defining $\rBig(\regparam) = \ABig\widetilde{\xVec}(\regparam) - \widetilde{\dVec}$ and noting that Lemma \ref{lem:Concatenation of Normal Noise} implies the vertical concatenation $\widetilde{\noiseVec}$ of $\{\noiseVec^{(r)}\}_{r=1}^R$ is distributed $\mathcal{N}(\zeroVec,\widetilde{\Sigma})$ with $\zeroVec \in \mathbb{R}^N$ and $\widetilde{\Sigma} = \diag(\Sigma^{(1)},\ldots,\Sigma^{(R)})$, the UPRE function \eqref{eq:UPRE 2} can be directly applied to produce
+By further defining $\rBig(\regparam) = \ABig\widetilde{\xVec}(\regparam) - \widetilde{\dVec}$ and noting that Lemma \ref{lem:Concatenation of Normal Noise} implies the vertical concatenation $\widetilde{\noiseVec}$ of $\{\noiseVec^{(r)}\}_{r=1}^R$ is distributed $\mathcal{N}(\widetilde{\zeroVec},\widetilde{\Sigma})$ with $\widetilde{\zeroVec} \in \mathbb{R}^M$ and $\widetilde{\Sigma} = \diag(\Sigma^{(1)},\ldots,\Sigma^{(R)})$, the UPRE function \eqref{eq:UPRE 2} can be directly applied to produce
 \begin{equation}
 \label{eq:UPRE 3}
-\UBig(\regparam) = \frac{1}{N}\left\|\rBig(\regparam)\right\|_2^2 + \frac{2}{N}\trace\left(\widetilde{\Sigma}\ABig(\regparam)\right) - \frac{1}{N}\trace\left(\widetilde{\Sigma}\right).
+\UBig(\regparam) = \frac{1}{M}\left\|\rBig(\regparam)\right\|_2^2 + \frac{2}{M}\trace\left(\widetilde{\Sigma}\ABig(\regparam)\right) - \frac{1}{M}\trace\left(\widetilde{\Sigma}\right).
 \end{equation}
 The block diagonal structure of both $\widetilde{\Sigma}$ and $\ABig(\regparam)$ allow for the trace terms in \eqref{eq:UPRE 3} to be written as sums involving the diagonal blocks:
 \begin{equation}
 \label{eq:UPRE 4}
-\UBig(\regparam) = \frac{1}{N}\left\|\rBig(\regparam)\right\|_2^2 + \frac{2}{N} \sum_{r=1}^R \trace\left(\Sigma^{(r)}A^{(r)}(\regparam)\right) - \frac{1}{N} \sum_{r=1}^R \trace\left(\Sigma^{(r)}\right).
+\UBig(\regparam) = \frac{1}{M}\left\|\rBig(\regparam)\right\|_2^2 + \frac{2}{M} \sum_{r=1}^R \trace\left(\Sigma^{(r)}A^{(r)}(\regparam)\right) - \frac{1}{M} \sum_{r=1}^R \trace\left(\Sigma^{(r)}\right).
 \end{equation}
 The squared 2-norm of $\rBig(\regparam)$ can also be expressed as a sum so that
 \begin{align*}
-\UBig(\regparam) &= \frac{1}{N} \sum_{r=1}^R \left\|\rVec^{(r)}(\regparam)\right\|_2^2 + \frac{2}{N} \sum_{r=1}^R \trace\left(\Sigma^{(r)} A^{(r)}(\regparam)\right) - \frac{1}{N} \sum_{r=1}^R \trace\left(\Sigma^{(r)}\right) \\
+\UBig(\regparam) &= \frac{1}{M} \sum_{r=1}^R \left\|\rVec^{(r)}(\regparam)\right\|_2^2 + \frac{2}{M} \sum_{r=1}^R \trace\left(\Sigma^{(r)} A^{(r)}(\regparam)\right) - \frac{1}{M} \sum_{r=1}^R \trace\left(\Sigma^{(r)}\right) \\
 &= \frac{1}{R} \sum_{r=1}^R \left(\frac{1}{\mA}\left\|\rVec^{(r)}(\regparam)\right\|_2^2 + \frac{2}{\mA} \trace\left(\Sigma^{(r)} A^{(r)}(\regparam)\right) - \frac{1}{\mA} \trace\left(\Sigma^{(r)}\right)\right) \\
 &= \frac{1}{R} \sum_{r=1}^R \U^{(r)}(\regparam),
 \end{align*}
@@ -966,11 +966,11 @@ with $\rVec^{(r)} = A^{(r)}\xVec^{(r)}(\regparam) - \dVec^{(r)}$.
 We first define
 \begin{equation}
 \label{eq:Big MDP}
-\DBig(\regparam) = \frac{1}{N}\|\rBig(\regparam)\|_2^2 - \frac{1}{N}\trace\left(\widetilde{\Sigma}\right).
+\DBig(\regparam) = \frac{1}{M}\|\rBig(\regparam)\|_2^2 - \frac{1}{M}\trace\left(\widetilde{\Sigma}\right).
 \end{equation}
 By defining the individual MDP functions by \eqref{eq:Individual MDP}, the MDP function \eqref{eq:Big MDP} for the large system can be written as an average by exploiting the block structure of $\ABig(\regparam)$ and $\widetilde{\Sigma}$:
 \begin{align*}
-\DBig(\regparam) &= \frac{1}{N}\sum_{r=1}^R \|\rVec^{(r)}(\regparam)\|_2^2 - \frac{1}{N}\sum_{r=1}^R \trace\left(\Sigma^{(r)}\right) \nonumber \\
+\DBig(\regparam) &= \frac{1}{M}\sum_{r=1}^R \|\rVec^{(r)}(\regparam)\|_2^2 - \frac{1}{M}\sum_{r=1}^R \trace\left(\Sigma^{(r)}\right) \nonumber \\
 &= \frac{1}{R}\sum_{r=1}^R \frac{1}{\mA}\|\rVec^{(r)}(\regparam)\|_2^2 - \frac{1}{R}\sum_{r=1}^R \frac{1}{\mA}\trace\left(\Sigma^{(r)}\right) \nonumber \\
 &= \frac{1}{R}\sum_{r=1}^R \D^{(r)}(\regparam).
 \end{align*}
@@ -1020,14 +1020,14 @@ The GCV method determines $\regparam$ such that $\regparam_{\text{GCV}} = \argmi
 Using the constructions in Table \ref{tab:System assumptions} under Assumption \ref{Assumption_System} with $n_r = n$ for all $r = 1,\ldots,R$, the GCV function $\DBig(\regparam)$ for the data sets $\{\dVec^{(r)}\}_{r=1}^R$ is
 \begin{equation}
 \label{eq:GCV Big 2}
-\GBig(\regparam) = \frac{\frac{1}{N}\sum_{r=1}^R \|\rVec^{(r)}(\regparam)\|_2^2}{\left[1 - \frac{1}{N}\sum_{r=1}^R \trace\left(A^{(r)}(\regparam)\right)\right]^2}.
+\GBig(\regparam) = \frac{\frac{1}{M}\sum_{r=1}^R \|\rVec^{(r)}(\regparam)\|_2^2}{\left[1 - \frac{1}{M}\sum_{r=1}^R \trace\left(A^{(r)}(\regparam)\right)\right]^2}.
 \end{equation}
 \end{proposition}
 \begin{proof}
 We define the GCV function for multiple data sets as
 \begin{equation}
 \label{eq:GCV Big}
-\GBig(\regparam) = \frac{\frac{1}{N}\|\rBig(\regparam)\|_2^2}{\left[1 - \frac{1}{N}\trace\left(\ABig(\regparam)\right)\right]^2}.
+\GBig(\regparam) = \frac{\frac{1}{M}\|\rBig(\regparam)\|_2^2}{\left[1 - \frac{1}{M}\trace\left(\ABig(\regparam)\right)\right]^2}.
 \end{equation}
 From the definition of $\widetilde{\mathbf{r}}_\regparam$ and the block structure $\ABig(\regparam)$, \eqref{eq:GCV Big} can be rewritten as \eqref{eq:GCV Big 2}.
 \end{proof} 
@@ -1040,7 +1040,7 @@ In contrast to the UPRE and MDP methods, the GCV function \eqref{eq:GCV Big 2} f
 However, if we assume that $A^{(r)} = A$ and $L^{(r)} = L$ for each $r = 1,\ldots,R$, then $\A^{(r)} = \A$ for each $r = 1,\ldots,R$ as well. In such case, \eqref{eq:GCV Big 2} can be expressed as
 \begin{equation}
 \label{eq:Averaged GCV}
-\GBig(\regparam) = \frac{\frac{1}{N}\sum_{r=1}^R \|\rVec^{(r)}(\regparam)\|_2^2}{\left[1 - \frac{1}{N}\sum_{r=1}^R \trace\left(\A\right)\right]^2} = \frac{1}{R}\frac{\sum_{r=1}^R \frac{1}{\mA} \|\rVec^{(r)}(\regparam)\|_2^2}{\left[1 - \frac{1}{\mA} \trace\left(\A\right)\right]^2} = \frac{1}{R}\sum_{r=1}^R \G^{(r)}(\regparam).
+\GBig(\regparam) = \frac{\frac{1}{M}\sum_{r=1}^R \|\rVec^{(r)}(\regparam)\|_2^2}{\left[1 - \frac{1}{M}\sum_{r=1}^R \trace\left(\A\right)\right]^2} = \frac{1}{R}\frac{\sum_{r=1}^R \frac{1}{\mA} \|\rVec^{(r)}(\regparam)\|_2^2}{\left[1 - \frac{1}{\mA} \trace\left(\A\right)\right]^2} = \frac{1}{R}\sum_{r=1}^R \G^{(r)}(\regparam).
 \end{equation}
 Note that \eqref{eq:Individual GCV} is equivalent to \eqref{eq:GCV} without Assumption \ref{Assumption_Noise}, which is to be expected since the GCV method does not rely on knowledge of the noise variance. \par 
 A bound analogous to \eqref{eq:UPRE Bound} and \eqref{eq:MDP Bound} can be obtained for the adapted GCV function.
