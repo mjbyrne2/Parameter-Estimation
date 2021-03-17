@@ -16,7 +16,118 @@ By using $\kMat^{-1} = V\Sigma^{-1}\trans{U}$ when $\kMat$ is nonsingular, the p
 \kMat^{-1}\gnoiseVec = \kMat^{-1}\left(\kMat\fVec + \noiseVec\right) = \fVec + \kMat^{-1}\noiseVec = \fVec + V\Sigma^{-1}\trans{U}\noiseVec = \fVec + \sum_{\ell = 0}^{n-1} \frac{\trans{U}_\ell\noiseVec}{\singular_\ell}V_{\cdot,\ell}. 
 \label{eq:InvProd}
 \end{equation}
-Even if $\kMat$ is singular, a solution can still be obtained by using the pseudoinverse $\kMat^\dagger = V{\Sigma^\dagger}\trans{U}$, where $\Sigma^\dagger = \diag(1/\singular_0,\ldots,1/\singular_{r-1})$, and the upper bound of summation in \eqref{eq:InvProd} becomes $r-1$. In either the nonsingular or singular case for $\kMat$, however, the summands in \eqref{eq:InvProd} are numerically unstable for small $\singular_\ell$. For a visual representation of this instability, a Picard plot can be constructed. A Picard plot is a graph showing the terms $|\trans{U}_{\cdot,\ell}\noiseVec|/\singular_\ell$ in decreasing order with respect to the singular values. If the terms $|\trans{U}_{\cdot,\ell}\noiseVec|$ decay faster than $\singular_\ell$ as $\ell$ increases, then the terms $|\trans{U}_{\cdot,\ell}\noiseVec|/\singular_\ell$ do not become excessively large; this is the discrete Picard condition \cite{ABT}. The discrete Picard condition is thus a measure of instability. If the discrete Picard condition is not met, then the terms $|\trans{U}_{\cdot,\ell}\noiseVec|/\singular_\ell$ blow up as $\ell$ increases, often resulting in worthless solutions. In this report, the discrete Fourier and cosine transforms will be used to obtain solutions analogous to those obtained by \eqref{eq:InvProd}. Figure \ref{PicardPlot} in Chapter \ref{ch:DFT} is an example of a Picard plot is provided that demonstrates the relationship between the noise, the width of the Gaussian blur, and the resulting numerical instabilities related to obtaining meaningful solutions. See \cite{Hansen1990} for more information on Picard plots and the associated discrete Picard condition. \par 
+Even if $\kMat$ is singular, a solution can still be obtained by using the pseudoinverse $\kMat^\dagger = V{\Sigma^\dagger}\trans{U}$, where $\Sigma^\dagger = \diag(1/\singular_0,\ldots,1/\singular_{r-1})$, and the upper bound of summation in \eqref{eq:InvProd} becomes $r-1$. 
+% The pseudoinverse, also called the Moore-Penrose generalized inverse \cite{Penrose1955}, is the unique matrix $\pinv{A} \in \mathbb{R}^{n \times \mA}$ that satisfies the following Moore-Penrose conditions \cite[p.~290]{GolubVanLoan2013}:
+% \begin{enumerate}[label={(\Roman*)}]
+%     \begin{minipage}{0.45\linewidth}
+%         \centering
+%         \item $A\pinv{A}A = A$, \label{MP Condition 1}
+%         \item $\pinv{A}A\pinv{A} = \pinv{A}$, \label{MP Condition 2}
+%     \end{minipage}
+%     \begin{minipage}{0.45\linewidth}
+%         \centering
+%         \item $\trans{\left(A\pinv{A}\right)} = A\pinv{A}$, \label{MP Condition 3}
+%         \item $\trans{\left(\pinv{A}A\right)} = \pinv{A}A$. \label{MP Condition 4}
+%     \end{minipage}
+% \end{enumerate}
+% Proposition \ref{prop:Special pseudoinverses} describes some special cases of the pseudoinverse.
+% \begin{proposition}
+% \label{prop:Special pseudoinverses}
+% Let $A \in \mathbb{R}^{\mA \times n}$ and let $\pinv{A} \in \mathbb{R}^{n \times \mA}$ be the pseudoinverse of $A$.
+%     \begin{enumerate}[label={(\roman*)}]
+%     \item If $\rank(A) = \mA$, then $\pinv{A} = \trans{A}\inv{\left(A\trans{A}\right)}$ and so $\pinv{A}$ is the right inverse of $A$. \label{prop:Right inverse}
+%     \item If $\rank(A) = n$, then $\pinv{A} = \inv{\left(\trans{A}A\right)}\trans{A}$ and so $\pinv{A}$ is the left inverse of $A$. \label{prop:Left inverse}
+%     \item If $A = \zeroVec_{\mA \times n}$, then $\pinv{A} = \zeroVec_{n \times \mA}$. \label{prop:Zero Pseudoinverse}
+%     \item If $\rank(A) = \mA = n$, then $\pinv{A} = \inv{A}$. \label{prop:Full inverse}
+%     \end{enumerate}
+% \end{proposition}
+% \begin{proof}
+% We prove part \ref{prop:Right inverse}. The proofs of parts \ref{prop:Left inverse} and \ref{prop:Zero Pseudoinverse} are analogous to that of part \ref{prop:Right inverse}, and part \ref{prop:Full inverse} follows from the definition of $\pinv{S}$ using $A = US\trans{V}$.
+% \begin{enumerate}
+%     \item[\ref{prop:Right inverse}] Since $A$ has full row rank, $A\trans{A}$ is invertible. Let $B = \trans{A}\inv{\left(A\trans{A}\right)}$. The Moore-Penrose conditions are satisfied as follows:
+%     \begin{enumerate}
+%         \item[\ref{MP Condition 1}] $ABA = \left(A\trans{A}\right)\inv{\left(A\trans{A}\right)}A = 
+%         A$,
+%         \item[\ref{MP Condition 2}] $BAB = \trans{A}\inv{\left(A\trans{A}\right)}\left(A\trans{A}\right)\inv{\left(A\trans{A}\right)} = \trans{A}\inv{\left(A\trans{A}\right)} = B$,
+%         \item[\ref{MP Condition 3}] $\trans{\left(AB\right)} = \trans{\left(\left(A\trans{A}\right)\inv{\left(A\trans{A}\right)}\right)} = I_{m \times m} = \left(A\trans{A}\right)\inv{\left(A\trans{A}\right)} = AB$,
+%         \item[\ref{MP Condition 4}] $\trans{\left(BA\right)} = \trans{\left(\trans{A}\inv{\left(A\trans{A}\right)}A\right)} = \trans{A}\inv{\left(A\trans{A}\right)}A = BA$.
+%     \end{enumerate}
+% \end{enumerate}
+% As a final remark regarding part \ref{prop:Zero Pseudoinverse} of Proposition \ref{prop:Special pseudoinverses}, any matrix other than $\zeroVec_{n \times \mA}$ would fail to satisfy \ref{MP Condition 2} of the Moore-Penrose conditions.
+% \end{proof}
+
+% \noindent The pseudoinverse can also be used with orthogonal projections onto fundamental subspaces; some applications are described in Proposition \ref{prop:Subspace projections}.
+
+% \begin{proposition}
+% \label{prop:Subspace projections}
+% Let $A \in \mathbb{R}^{\mA \times n}$, $P \in \mathbb{R}^{n \times n}$ be an orthogonal projection matrix, $\pinv{A} \in \mathbb{R}^{n \times m}$ be the pseudoinverse of $A$, and let $\rA = \rank(A)$.
+% \begin{enumerate}[label={(\roman*)}]
+%     \item $A\pinv{A}$ is the orthogonal projection onto $\range(A)$. \label{prop:Range projector}
+%     \item $\pinv{A}A$ is the orthogonal projection onto $\range\left(\trans{A}\right)$. \label{prop:Transpose range projector}
+%     \item $\pinv{P} = P$. \label{prop:Projection pseudoinverse}
+%     \item $P\pinv{\left(AP\right)} = \pinv{\left(AP\right)}$. \label{prop:Left projection}
+%     \item $\pinv{\left(PA\right)}P = \pinv{\left(PA\right)}$. \label{prop:Right projection}
+% \end{enumerate}
+% \end{proposition}
+% \begin{proof}
+% We prove parts \ref{prop:Range projector} and \ref{prop:Left projection}. The proof of part \ref{prop:Projection pseudoinverse} follows immediately from the Moore-Penrose conditions and the properties of orthogonal projections. The proof of parts \ref{prop:Transpose range projector} and \ref{prop:Right projection} are similar to that of parts \ref{prop:Range projector} and \ref{prop:Left projection}, respectively. 
+% \begin{enumerate}
+%     \item[\ref{prop:Range projector}] Let $B = A\pinv{A}$.  From \cite[p.~82]{GolubVanLoan2013}, we must show that $B$ is idempotent ($B^2 = B$), symmetric, and that $\range(B) = \range(A)$. We can use the SVD $A = US\trans{V}$ to demonstrate all three properties. Condition \ref{MP Condition 2} of the Moore-Penrose conditions gives the idempotence of $B$:
+%     \[B^2 = \left(A\pinv{A}\right)\left(A\pinv{A}\right) = A\left(\pinv{A}A\pinv{A}\right) = A\pinv{A} = B.\]
+%     For symmetry, we have that
+%     \[\trans{B} = \trans{\left(A\pinv{A}\right)} = \trans{\left(US\pinv{S}\trans{U}\right)} = U\trans{\left(S\pinv{S}\right)}\trans{U}.\]
+%     By the definition of $\pinv{S}$, the matrix $S\pinv{S} \in \mathbb{R}^{\mA \times \mA}$ is
+%     \[S\pinv{S} = \begin{bmatrix}
+%     I_{\rA} & \zeroVec \\
+%     \zeroVec & \zeroVec
+%     \end{bmatrix}.\]
+%     Thus $S\pinv{S}$ is symmetric and 
+%     \[\trans{B} = U\trans{\left(S\pinv{S}\right)}\trans{U} = US\pinv{S}\trans{U} = B,\]
+%     showing that $B$ is symmetric. If we carry out the multiplication $B = US\pinv{S}\trans{U}$, then
+%     \[B = U_{\rA}\trans{U}_{\rA}\]
+%     where $U_{\rA}$ consists of the first $\rA$ columns of $U$. Since the first $\rA$ columns of $U$ form an orthonormal basis for $\range(A)$ \cite[p.~340]{Leon2010}, $B$ being equal to $ U_{\rA}\trans{U}_{\rA}$ shows that $\range(B) = \range(A)$. Therefore, $B$ is the orthogonal projection onto $\range(A)$.
+%     \item[\ref{prop:Left projection}] Let $B = AP$ and $C = P\pinv{\left(AP\right)}$. It will be shown that $C$ satisfies the Moore-Penrose conditions.
+%     \begin{enumerate}
+%         \item[\ref{MP Condition 1}] Substituting $B$ and $C$ into the product $BCB$, we have 
+%         \[BCB = APP\pinv{\left(AP\right)}AP = AP\pinv{\left(AP\right)}AP.\] 
+%         By definition, $\pinv{\left(AP\right)}$ satisfies Moore-Penrose condition \ref{MP Condition 1}; thus $AP\pinv{\left(AP\right)}AP = AP = B$.
+%         \item[\ref{MP Condition 2}] Checking the product $CBC$, we have 
+%         \[CBC = P\pinv{\left(AP\right)}APP\pinv{\left(AP\right)} = P\pinv{\left(AP\right)}AP\pinv{\left(AP\right)}.\]
+%         $\pinv{\left(AP\right)}$ satisfies Moore-Penrose condition \ref{MP Condition 2}, and so
+%         \[P\left(\pinv{\left(AP\right)}AP\pinv{\left(AP\right)}\right) = P\pinv{\left(AP\right)} = C.\]
+%         \item[\ref{MP Condition 3}] First, we have that \[\trans{\left(BC\right)} = \trans{\left(APP\pinv{\left(AP\right)}\right)} = \trans{\left(AP\pinv{\left(AP\right)}\right)} = AP\pinv{\left(AP\right)},\]
+%         where the last equality results from the symmetry of $AP\pinv{\left(AP\right)}$. Writing $P = P^2$, we have
+%         \[\trans{\left(BC\right)} = AP^2\pinv{\left(AP\right)} = \left(AP\right)P\pinv{\left(AP\right)} = BC.\]
+%         \item[\ref{MP Condition 4}] We begin with
+%         \[\trans{\left(CB\right)} = \trans{\left(P\pinv{\left(AP\right)}AP\right)} = P\trans{A}\pinv{\left(P\trans{A}\right)}P.\]
+%         Writing the leading $P$ as $P = P^2$ and noting that $P\trans{A}\pinv{\left(P\trans{A}\right)}$ is symmetric, we have
+%         \[P\trans{A}\pinv{\left(P\trans{A}\right)}P = P\trans{\left(P\trans{A}\pinv{\left(P\trans{A}\right)}\right)}P = P\pinv{\left(AP\right)}AP^2 = P\pinv{\left(AP\right)}AP = CB.\]
+%     \end{enumerate}
+%     Therefore $C = P\pinv{\left(AP\right)}$ satisfies the Moore-Penrose conditions, meaning that $P\pinv{\left(AP\right)}$ is the pseudoinverse of $B = AP$.
+% \end{enumerate}
+% \end{proof}
+
+% \begin{table}[ht!]
+%   \begin{center}
+%     \caption{Characteristics for using $\pinv{\xVec} = \pinv{A}\dVec$ as a solution to $A\xVec = \dVec$.}
+%     \label{tab:Cases for A}
+%     \begin{tabular}{|c|c|c|c|}
+%     \hline 
+%       \multirow{2}{*}{$A$} & $\mA < n$ & \multirow{2}{*}{$\mA = n$} & $\mA > n$ \\ 
+%       & (Underdetermined system) & & (Overdetermined system) \\ \hline
+%       \multirow{4}{*}{Full rank} & $\dim(\nullspace(A)) = n - \rA$ & $\nullspace(A) = \{\zeroVec\}$  & $\nullspace(A) = \{\zeroVec\}$ \\ 
+%       & $\nullspace(\trans{A}) = \{\zeroVec\}$ & $\nullspace(\trans{A}) = \{\zeroVec\}$ & $\dim(\nullspace(\trans{A})) = \mA - \rA$ \\
+%       & $\pinv{\xVec}$ not unique & $\pinv{\xVec}$ unique & $\pinv{\xVec}$ unique \\
+%       & $A\pinv{\xVec} = \dVec$ & $A\pinv{\xVec} = \dVec$ & $A\pinv{\xVec} = \proj_{\range(A)}\dVec$ \\ \hline
+%       \multirow{4}{*}{Rank-deficient} &  \multicolumn{3}{c|}{$\dim(\nullspace(A)) = n - \rA$}  \\ 
+%       & \multicolumn{3}{c|}{$\dim(\nullspace(\trans{A})) = \mA - \rA$} \\
+%       & \multicolumn{3}{c|}{$\pinv{\xVec}$ not unique} \\
+%       & \multicolumn{3}{c|}{$A\pinv{\xVec} = \proj_{\range(A)}\dVec$} \\ \hline
+%     \end{tabular}
+%   \end{center}
+% \end{table}
+% Table \ref{tab:Cases for A} summarizes the situations involving $\pinv{\xVec}$ as a solution to $A\xVec = \dVec$.
+In either the nonsingular or singular case for $\kMat$, however, the summands in \eqref{eq:InvProd} are numerically unstable for small $\singular_\ell$. For a visual representation of this instability, a Picard plot can be constructed. A Picard plot is a graph showing the terms $|\trans{U}_{\cdot,\ell}\noiseVec|/\singular_\ell$ in decreasing order with respect to the singular values. If the terms $|\trans{U}_{\cdot,\ell}\noiseVec|$ decay faster than $\singular_\ell$ as $\ell$ increases, then the terms $|\trans{U}_{\cdot,\ell}\noiseVec|/\singular_\ell$ do not become excessively large; this is the discrete Picard condition \cite{ABT}. The discrete Picard condition is thus a measure of instability. If the discrete Picard condition is not met, then the terms $|\trans{U}_{\cdot,\ell}\noiseVec|/\singular_\ell$ blow up as $\ell$ increases, often resulting in worthless solutions. In this report, the discrete Fourier and cosine transforms will be used to obtain solutions analogous to those obtained by \eqref{eq:InvProd}. Figure \ref{PicardPlot} in Chapter \ref{ch:DFT} is an example of a Picard plot is provided that demonstrates the relationship between the noise, the width of the Gaussian blur, and the resulting numerical instabilities related to obtaining meaningful solutions. See \cite{Hansen1990} for more information on Picard plots and the associated discrete Picard condition. \par 
 A common approach to overcome numerical instabilities is to multiply the summands in \eqref{eq:InvProd} by \textit{filter functions} $\filt$ that depend upon $\singular_\ell$ and a non-negative \textit{regularization parameter} $\regparam$. By doing so, an approximate solution is obtained:
 \begin{equation}
 \fVec_\regparam = \sum_{\ell = 0}^{n-1} V_{\cdot,\ell}\filt(\regparam,\singular_\ell)\left(\frac{{\trans{U}_\ell}\gnoiseVec}{\singular_\ell}\right) = V\Phi\Sigma^\dagger \trans{U}\gnoiseVec,
@@ -105,7 +216,47 @@ for $\ell = 0,\ldots,{n-1}$. In contrast to the SVD, the generalized singular va
 \fVec_\regparam = \sum_{\ell=0}^{n-1} \frac{\gamma_\ell^2}{\gamma_\ell^2 + \regparam^2} \frac{\trans{U}_{\cdot,\ell+k}\gnoiseVec}{\lambda_\ell}Y_{\cdot,\ell}
 \end{equation}
 where $Y = \invTrans{X}$ (the inverse of $\trans{X}$). The terms $\gamma_\ell^2/(\gamma_\ell^2 + \regparam^2)$ are known as the GSVD filter factors, which are identical in form to the filter factors \eqref{eq:TikFilt}. \par 
-With the derivation of the GSVD established, an extension of the transformation that rendered \eqref{eq:TikSol Standard Form} is now stated \cite[p.~38]{Hansen:98}. First, a weighted version of the pseudoinverse $D^\dagger$ is defined as
+With the derivation of the GSVD established, an extension of the transformation that rendered \eqref{eq:TikSol Standard Form} is now stated \cite[p.~38]{Hansen:98}. 
+% We begin by introducing an $A$-weighted generalized inverse of $L$:
+% \begin{equation}
+% \label{eq:A-weighted inverse of L}
+%     \pinv{L}_A := \left(I - \pinv{\left(A\left(I - \pinv{L}L\right)\right)}A\right)\pinv{L}, \quad I \in \mathbb{R}^{n \times n}.
+% \end{equation}
+% The definition of $\pinv{L}_A$ is somewhat natural, as evidenced by Proposition \ref{prop:Pseudoinverse of L}.
+
+% \begin{proposition}
+% \label{prop:Pseudoinverse of L}
+% Given $A \in \mathbb{R}^{\mA \times n}$, $L \in \mathbb{R}^{\mL \times n}$, and $\pinv{L}_A$ defined by \eqref{eq:A-weighted inverse of L}, if $\mL \geq n$ and $\rank(L) = n$ then $\pinv{L}_A = \pinv{L}$.
+% \end{proposition}
+% \begin{proof}
+% Since $\rank(L) = n$, part \ref{prop:Left inverse} of Proposition \ref{prop:Special pseudoinverses} gives $\pinv{L} = \inv{\left(\trans{L}L\right)}\trans{L}$. Thus $\pinv{L}L = I_n$, and so
+% \[\pinv{L}_A = \left(I_n - \pinv{\left(A\left(I_n - I_n\right)\right)}A\right)\pinv{L} = \left(I_n - \pinv{\left(\zeroVec_{\mA \times n}\right)}A\right)\pinv{L}.\]
+% $\pinv{\left(\zeroVec_{\mA \times n}\right)} = \zeroVec_{n \times \mA}$ from part \ref{prop:Zero Pseudoinverse} of Proposition \ref{prop:Special pseudoinverses}, and therefore
+% \[\pinv{L}_A = \left(I_n - \zeroVec_{n \times \mA}A\right)\pinv{L} = \left(I_n - \zeroVec_{n \times n}\right)\pinv{L} = \pinv{L}.\]
+% \end{proof}
+% \noindent By letting $\xVec_0 = \pinv{\left(A\left(I_n - \pinv{L}L\right)\right)}\dVec$, we can define the substitutions
+% \begin{equation}
+% \label{eq:Standard Form Substitutions}
+%     \yVec = L\xVec, \quad B = A\pinv{L}_A, \quad \cVec = \dVec - A\xVec_0.
+% \end{equation}
+% These substitutions transform \eqref{eq:TikSol2} into the standard form \eqref{eq:TikSol Standard Form}, while the solution $\xVec$ can be obtained from $\xVec = \pinv{L}_A \yVec + \xVec_0$. The transformation proceeds by the simultaneous addition and subtraction of $A\xVec_0$ as follows
+% \[A\xVec - \dVec = A\xVec - A\xVec_0 - \dVec + A\xVec_0 = A\left(\xVec - \xVec_0\right) - \left(\dVec - A\xVec_0\right) = A\pinv{L}_A \yVec - \cVec = B\yVec - \cVec.\]
+% Proposition \ref{prop:Nullspace of L} shows that $\xVec_0$ indeed lies within the nullspace of $L$.
+
+% \begin{proposition}
+% \label{prop:Nullspace of L}
+% Given $A \in \mathbb{R}^{\mA \times n}$, $L \in \mathbb{R}^{\mL \times n}$, and $\dVec \in \mathbb{R}^{\mA}$, let
+% \[\xVec_0 = \pinv{\left(A\left(I - \pinv{L}L\right)\right)}\dVec.\]
+% Then $\xVec_0 \in \nullspace(L)$.
+% \end{proposition}
+% \begin{proof}
+% Let $B = I_n - \pinv{L}L$. Part \ref{prop:Transpose range projector} of Proposition \ref{prop:Subspace projections} states that $\pinv{L}L$ is the orthogonal projection onto $\range(\trans{L})$. Thus $B$ is the orthogonal projection onto $\nullspace(L)$. From part \ref{prop:Left projection} of Proposition \ref{prop:Subspace projections}, we can write $L\xVec_0$ as $L\xVec_0 = L\pinv{\left(AB\right)}\dVec = LB\pinv{\left(AB\right)}\dVec$. Substituting back $B = I_n - \pinv{L}L$ into the product $LB$, we have
+% \[LB = L\left(I_n - \pinv{L}L\right) = L - L\pinv{L}L.\]
+% $\pinv{L}$ satisfies Moore-Penrose condition \ref{MP Condition 1}, meaning $L - L\pinv{L}L = L - L = \zeroVec$ where $\zeroVec \in \mathbb{R}^{\mL \times n}$. Therefore
+% \[L\xVec_0 = LB\pinv{\left(AB\right)}\dVec = \zeroVec\pinv{\left(AB\right)}\dVec = \zeroVec \in \mathbb{R}^{\mL},\]
+% and so $\xVec_0 \in \nullspace(L)$.
+% \end{proof}
+First, a weighted version of the pseudoinverse $D^\dagger$ is defined as
 \[D_{\kMat}^\dagger = \left(I - \left(\kMat\left(I - D^\dagger D\right)\right)^\dagger \kMat\right)D^\dagger.\]
 If $p \geq n$, then $D_{\kMat}^\dagger$ is the same as $D^\dagger$. We must also consider
 \[\fVec_0 \equiv \left(\kMat\left(I - D^\dagger D\right)\right)^\dagger \gnoiseVec,\]

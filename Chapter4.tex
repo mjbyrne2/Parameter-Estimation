@@ -84,7 +84,58 @@ The UPRE is defined to be
 \label{eq:UPRE}
 \U_n(\regparam) = \frac{1}{n}\|\regres\|^2 + \frac{2\noiseSD^2}{n}\trace(\A) - \noiseSD^2
 \end{equation}
-and the UPRE method is to pick $\regparam_{\text{UPRE}} = \argmin_{\regparam \geq 0} \U(\regparam)$. The subscript of $\U_n(\regparam)$ indicates the function also depends upon $n$. \par 
+and the UPRE method is to pick $\regparam_{\text{UPRE}} = \argmin_{\regparam \geq 0} \U(\regparam)$. The subscript of $\U_n(\regparam)$ indicates the function also depends upon $n$. \par
+% We first derive the UPRE function for Tikhonov regularization under the more general condition that $\noiseVec \sim \mathcal{N}(\bm{0},\Sigma)$. To this end, we can then use the following lemma, which is a modification of the Trace Lemma stated in \cite[p.~98]{Vogel:2002}.
+% \begin{lemma}
+% \label{lem:Generalized Trace Lemma}
+% Let $\fVec \in \mathbb{R}^m$ be a constant vector, $\noiseVec$ be a real random $n$-vector with $\noiseVec \sim \mathcal{N}(\bm{\mu},\Sigma)$, $B \in \mathbb{R}^{m \times n}$, and let $\langle \cdot,\cdot \rangle$ be the standard Euclidean inner product. Then
+% \[\E(\|\fVec + B\noiseVec\|_2^2) = \|\fVec\|_2^2 + 2\sum_{j=1}^{n} (\trans{\fVec}B)_j \mu_j + \trace\left(B\Sigma\trans{B}\right).\]
+% \end{lemma}
+% \begin{proof}
+% By the linearity of the expected value operator and inner product,
+% \[\E(\|\fVec + B\noiseVec\|_2^2) = \E(\langle \fVec + B\noiseVec, \fVec + B\noiseVec\rangle) =  \E(\|\fVec\|_2^2) + 2\E(\langle \fVec, B\noiseVec\rangle) + \E(\|B\noiseVec\|_2^2).\]
+% $\E(\|\fVec\|_2^2) = \|\fVec\|_2^2$ because $\fVec$ is a constant vector. Moreover, the definition of the Euclidean inner product can be used to write $\E(\langle \fVec, B\noiseVec\rangle)$ as $\E(\sum_{j=1}^n (\trans{\fVec}B)_j \noise_j) = \sum_{j=1}^n (\trans{\fVec}B)_j \E(\noise_j)$. Thus,
+% \begin{align*}
+% \E(\|\fVec + B\noiseVec\|_2^2) &= \|\fVec\|_2^2 + 2\sum_{j=1}^{n} (\trans{\fVec}B)_j \E(\noise_j) + \E(\|B\noiseVec\|_2^2) \\
+% &= \|\fVec\|_2^2 + 2\sum_{j=1}^{n} (\trans{\fVec}B)_j \mu_j + \E(\|B\noiseVec\|_2^2).
+% \end{align*}
+% Focusing on $\E(\|B\noiseVec\|_2^2)$, we can write
+% \[\E(\|B\noiseVec\|_2^2) = \E\left(\sum_{j=1}^n (B\noiseVec)_j^2\right) = \sum_{j=1}^n \E((B\noiseVec)_j^2) = \sum_{j=1}^n \E(y_j^2)\]
+% where $\mathbf{y} = B\noiseVec$.
+% Since $\noiseVec \sim \mathcal{N}(\bm{\mu},\Sigma)$, $\mathbf{y} \sim \mathcal{N}(B\bm{\mu},B\Sigma\trans{B})$ \cite{Rao1973}. Lastly, $\E(y_j^2) = \Var(y_j) = (B\Sigma\trans{B})_{j,j}$ for each $j = 1,\ldots,n$. Therefore $\sum_{j=1}^n \E(y_j^2) = \sum_{j=1}^n \Var(y_j) = \trace(B\Sigma\trans{B})$ and
+% \[\E(\|\fVec + B\noiseVec\|_2^2) = \|\fVec\|_2^2 + 2\sum_{j=1}^{n} (\trans{\fVec}B)_j \mu_j + \trace(B\Sigma\trans{B}).\]
+% \end{proof}
+
+% \noindent Applying Lemma \ref{lem:Generalized Trace Lemma} to the norm of $\pVec(\regparam)$ and noting that $\E(\noiseVec) = \zeroVec$ produces
+% \begin{equation}
+% \label{eq:New Predicitive Risk 1}
+% \E\left(\frac{1}{\mA}\left\|\pVec(\regparam)\right\|_2^2\right) = \frac{1}{\mA}\left\|\left(\A - I_{\mA}\right)A\xVec\right\|_2^2 + \frac{1}{\mA}\trace\left(\A\Sigma\trans{A}(\regparam)\right).
+% \end{equation}
+% The regularized residual $\rVec(\regparam)$ can be rewritten as
+% \begin{equation}
+% \label{eq:New Regularized Residual}
+% \rVec(\regparam) = \left(\A - I_{\mA}\right)A\xVec + \left(\A - I_{\mA}\right)\noiseVec,
+% \end{equation}
+% and so applying Lemma \ref{lem:Generalized Trace Lemma} to the norm of $\rVec(\regparam)$ yields
+% \[\E\left(\frac{1}{\mA}\left\|\rVec(\regparam)\right\|_2^2\right) = \frac{1}{\mA}\left\|\left(\A - I_{\mA}\right)A\xVec\right\|_2^2 + \frac{1}{\mA}\trace\left(\trans{\left(\A - I_{\mA}\right)}\Sigma\left(\A - I_{\mA}\right)\right).\]
+% The trace term can be expanded as
+% \begin{align*}
+%     &\trace\left(\trans{\left(\A - I_{\mA}\right)}\Sigma\left(\A - I_{\mA}\right) \right) \\
+%     &= \trace\left(\trans{A}(\regparam)\Sigma\A\right) - \trace\left(\trans{A}(\regparam)\Sigma\right) - \trace\left(\Sigma\A\right) + \trace\left(\Sigma\right).
+% \end{align*}
+% The cyclic property of the trace operator and the fact that $\Sigma$ and $\A = A(\trans{A}A + \regparam^2\trans{L}L)^{-1}\trans{A}$ are symmetric matrices give
+% \[\trace\left(\trans{\left(\A - I_{\mA}\right)}\Sigma\left(\A - I_{\mA}\right)\right) = \trace\left(\A\Sigma\trans{A}(\regparam)\right) - 2\trace\left(\Sigma\A\right) + \trace\left(\Sigma\right),\]
+% and so \eqref{eq:New Predicitive Risk 1} can be expressed as
+% \begin{equation}
+% \label{eq:New Predictive Risk 2}
+% \E\left(\frac{1}{\mA}\left\|\pVec(\regparam)\right\|_2^2\right) = \E\left(\frac{1}{\mA}\left\|\rVec(\regparam)\right\|_2^2\right) + \frac{2}{\mA}\trace\left(\Sigma\A\right) - \frac{1}{\mA}\trace\left(\Sigma\right).
+% \end{equation}
+% Analogous to the standard UPRE function, we can define $\U(\regparam)$ as
+% \begin{equation}
+% \label{eq:UPRE 2}
+% \U(\regparam) = \frac{1}{\mA}\left\|\rVec(\regparam)\right\|_2^2 + \frac{2}{\mA}\trace\left(\Sigma\A\right) - \frac{1}{\mA}\trace\left(\Sigma\right).
+% \end{equation}
+% so that $\UBig(\regparam)$ is an unbiased estimator of predictive risk. The standard UPRE function \eqref{eq:UPRE} is recovered from \eqref{eq:UPRE 2} if $\Sigma = \noiseSD^2 I_{\mA}$ (which is Assumption \ref{Assumption_Noise} with $R = 1$).
 Since the DFT is a the primary tool in the report, a spectral form of the UPRE function (one that involves DFT's) is desirable, as are spectral forms of the GCV and discrepancy principal functions in Sections \ref{sec:Generalized Cross Validation} and \ref{sec:Discrepancy Principle}. To derive a spectral form of \eqref{eq:UPRE}, first recall that for Tikhonov regularization, $\A = \kMat(\ctrans{\kMat}\kMat + \regparam\ctrans{D}D)^{-1}\ctrans{\kMat}$. Assuming $\kMat$ is circulant, \eqref{eq:CircDiag} gives $\kMat = \ctrans{F}\Delta{F}$ where $\Delta = \diag(\sqrt{n}\dft{\kVec})$. If $D = \ctrans{F}\Lambda{F}$ as well (with $\Lambda = \diag(\sqrt{n}\dft{\dVec})$), then
 \begin{align*}
 \A &= \kMat(\ctrans{\kMat}\kMat + \regparam{\ctrans{D}}D)^{-1}\ctrans{\kMat} \\
