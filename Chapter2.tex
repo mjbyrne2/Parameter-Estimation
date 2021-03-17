@@ -667,3 +667,25 @@ For an accurate evaluation of the numerical examples and their results, multiple
 %\end{proof}
 %
 %A consequence of Corollary \ref{cor:Diagonal} is that the matrix $\trans{\Delta}\Delta + \regparam^2 \trans{\Lambda}\Lambda$ in \eqref{eq:Normal equation 2} is diagonal.
+
+\section{Windowed spectral regularization} \label{sec:Windowed}
+
+% \begin{proposition}
+% \label{prop:Cosine windows}
+% The cosine windows given by \cite{ChungEasleyOLeary}, presented in lines \eqref{eq:Midpoints} through \eqref{eq:Last cosine window}, satisfy
+% \[\sum_{p=1}^{P} \wVec_j^{(p)} = 1, \quad j = 1,\ldots,n.\]
+% \end{proposition}
+% \begin{proof}
+% Let $j \in \{1,\ldots,n\}$ be fixed. If either $\omega^{(0)} \geq \singular_j > \midpoint^{(1)}$ or $\midpoint^{(P)} \geq \singular_j > \omega^{(P)}$, the result follows immediately from \eqref{eq:First cosine window} or \eqref{eq:Last cosine window}, respectively. Now suppose that $\midpoint^{(1)} \geq \singular_j > \midpoint^{(P)}$. Then there exists exactly one value $p \in \{1,\ldots,P-1\}$ such that $\midpoint^{(p)} \geq \singular_j > \midpoint^{(p+1)}$. By definition of the cosine windows, $\wVec^{(p)}$ and $\wVec^{(p+1)}$ are the only weight vectors such that their $j$th components are nonzero. It must be shown that $\wVec^{(p)}_j + \wVec^{(p+1)}_j = 1$. From \eqref{eq:Middle cosine windows}, the $j$th component of $\wVec^{(p)}$ is
+% \[\wVec^{(p)}_j = \cos^2\left(\frac{\frac{\pi}{2}\left(\midpoint^{(p)} - \singular_j\right)}{\midpoint^{(p)} - \midpoint^{(p+1)}}\right)\]
+% and the $j$th component of $\wVec^{(p+1)}$ is
+% \[\wVec^{(p+1)}_j =  \cos^2\left(\frac{\frac{\pi}{2}\left(\singular_j - \midpoint^{(p+1)}\right)}{\midpoint^{(p)} - \midpoint^{(p+1)}}\right).\]
+% Using the identity $\cos(\theta) = \sin\left(\frac{\pi}{2} - \theta\right)$, we have that
+% \begin{align*}
+% \wVec^{(p+1)}_j &= \sin^2\left(\frac{\pi}{2} - \frac{\frac{\pi}{2}\left(\singular_j - \midpoint^{(p+1)}\right)}{\midpoint^{(p)} - \midpoint^{(p+1)}}\right) \\
+% &= \sin^2\left(\frac{\frac{\pi}{2}\left(\midpoint^{(p)} - \midpoint^{(p+1)}\right) - \frac{\pi}{2}\left(\singular_j - \midpoint^{(p+1)}\right)}{\midpoint^{(p)} - \midpoint^{(p+1)}}\right) \\
+% &= \sin^2\left(\frac{\frac{\pi}{2}\left(\midpoint^{(p)} - \singular_j\right)}{\midpoint^{(p)} - \midpoint^{(p+1)}}\right).
+% \end{align*}
+% Therefore,
+% \[\wVec^{(p)}_j + \wVec^{(p+1)}_j = \cos^2\left(\frac{\frac{\pi}{2}\left(\midpoint^{(p)} - \singular_j\right)}{\midpoint^{(p)} - \midpoint^{(p+1)}}\right) +  \sin^2\left(\frac{\frac{\pi}{2}\left(\midpoint^{(p)} - \singular_j\right)}{\midpoint^{(p)} - \midpoint^{(p+1)}}\right) = 1.\]
+% \end{proof}

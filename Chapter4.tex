@@ -664,3 +664,29 @@ As previously stated, the discrepancy function \eqref{eq:SpectralDP} is monotone
 %\label{eq:Individual MDP Derivative}
 %\frac{d}{d\regparam}\D^{(\ell)}(\regparam) = 2\sum_{j=1}^{n} \mfilt_j^{(\ell)}(\regparam)\left(\frac{d}{d\regparam}\mfilt_j^{(\ell)}(\regparam)\right)|\dft{\dVec}_j^{(\ell)}|^2.
 %\end{equation}
+
+% Before extending the MDP method to account for multiple data sets, some comments on the behavior of the MDP function \eqref{eq:MDP} are warranted. The term $\frac{1}{\mA}\|\rVec(\regparam)\|_2^2$ is a monotone increasing function of $\regparam$ for $\regparam > 0$, which can be seen by differentiating the summands of \eqref{eq:Fourier regularized residual} for $R = 1$:
+% \[\frac{d}{d\regparam}\left(\left(\mfilt_j\right)^2\left(\dft{d}_j\right)^2\right) = 2 \left(\dft{d}_j\right)^2 \mfilt_j\left(\frac{d}{d\regparam}\mfilt_j\right) = 2 \left(\dft{d}_j\right)^2 \mfilt_j \frac{2\regparam\bm{\lambda_j}\bm{\delta_j}}{\left(\bm{\delta}_j + \regparam^2 \bm{\lambda}_j\right)^2} \geq 0, \quad \regparam > 0.\]
+% The monotonicity of $\frac{1}{\mA}\|\rVec(\regparam)\|_2^2$ does not guarantee, however, the existence of a zero of $\D(\regparam)$. If the selected value of $\noiseSD^2$ is too large, then it is possible that $\D(\regparam) < 0$ for all $\regparam > 0$ and a root will not exist. This can be attributed to the limiting behavior of $\frac{1}{\mA}\|\rVec(\regparam)\|_2^2$, which is described by Lemma \ref{lem:Residual limit}.
+% \begin{lemma}
+% \label{lem:Residual limit}
+% \[\lim_{\regparam\rightarrow\infty} \frac{1}{\mA}\|\rVec(\regparam)\|_2^2 \leq \frac{1}{\mA}\|\dVec\|_2^2.\]
+% \end{lemma}
+% \begin{proof}
+% Writing $\frac{1}{\mA}\|\rVec(\regparam)\|_2^2$ in terms of filter functions \eqref{eq:Filter functions},
+% \[\lim_{\regparam\rightarrow\infty} \frac{1}{\mA}\|\rVec(\regparam)\|_2^2 = \lim_{\regparam\rightarrow\infty} \frac{1}{\mA} \sum_{j=1}^{n} \left(\mfilt_j\right)^2\left(\dft{d}_j\right)^2 = \frac{1}{\mA} \sum_{j=1}^{n} \left(\lim_{\regparam\rightarrow\infty}\left(\mfilt_j\right)^2\right)\left(\dft{d}_j\right)^2.\]
+% Expanding the denominator of $\left(\mfilt_j\right)^2$ makes the limit clear:
+% \[\lim_{\regparam\rightarrow\infty} \left(\mfilt_j\right)^2 = \lim_{\regparam\rightarrow\infty}\frac{\regparam^4\bm{\lambda}_j}{\regparam^4\bm{\lambda}_j + 2\regparam^2\bm{\lambda}_j\bm{\delta}_j + \bm{\delta}_j^2} = \begin{cases}
+% 1, & \bm{\lambda}_j \neq 0 \\
+% 0, & \bm{\lambda}_j = 0
+% \end{cases}.\]
+% Therefore
+% \[\lim_{\regparam\rightarrow\infty} \frac{1}{\mA}\|\rVec(\regparam)\|_2^2 = \frac{1}{\mA} \sum_{j=1}^{n} \left(\lim_{\regparam\rightarrow\infty}\left(\mfilt_j\right)^2\right)\left(\dft{d}_j\right)^2 \leq \frac{1}{\mA} \sum_{j=1}^{n} \left(\dft{d}_j\right)^2 = \frac{1}{\mA}\|\svd{\dVec}\|_2^2 = \frac{1}{\mA}\|\dVec\|_2^2,\]
+% with the last equality following from $\svd{\dVec} = \trans{U}\dVec$ with orthogonal $U$.
+% \end{proof}
+% \noindent Lemma \ref{lem:Residual limit} implies that if the selected value of $\noiseSD^2$ is larger than $\frac{1}{\mA}\|\dVec\|_2^2$, $\D(\regparam)$ will not have a root for $\regparam > 0$ and the MDP method fails to select a regularization parameter. Sometimes a safety parameter $\safeparam > 0$ is introduced to modify the MDP function to
+% \begin{equation}
+% \label{eq:MDP Safety}
+% \D(\regparam) = \frac{1}{\mA}\|\rVec(\regparam)\|_2^2 - \safeparam\noiseSD^2.
+% \end{equation}
+% to account for root-finding difficulties \cite{ABT,IRTools}, though selecting an appropriate value of $\safeparam$ is an ad hoc process and depends on the confidence of $\noiseSD^2$ as the true noise. The original MDP function is recovered from \eqref{eq:MDP Safety} when $\safeparam = 1$. \par
