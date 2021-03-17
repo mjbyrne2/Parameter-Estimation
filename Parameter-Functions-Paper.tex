@@ -170,7 +170,7 @@ A = US\trans{V}
 where the $\mA \times \mA$ matrix $U$ and the $n \times n$ matrix $V$ are orthogonal and $S$ is a $\mA \times n$ diagonal matrix. The diagonal elements of $S$ are the singular values of $A$, denoted $\singular_j$ and satisfying $\singular_1 \geq \singular_2 \geq \ldots \geq \singular_{\rA} \geq 0$ with $\rA \leq \min\{\mA,n\}$. The columns of $U$ and $V$ will be denoted $U_{\cdot,j}$ and $V_{\cdot,j}$, respectively, and are known as the left and right singular vectors of $A$. If $A$ is square ($\mA = n$) and invertible, then $\inv{A} = V\inv{S}\trans{U}$ and the solution $\inv{A}\dVec$ can be written as
 \begin{equation}
 \label{eq:InvProd}
-\inv{A}\dVec = VS^{-1}{\trans{U}}\dVec = \sum_{j=1}^{n} \frac{{\trans{(U_{\cdot,j})}}\dVec}{\singular_j}V_{\cdot,j} = \sum_{j=1}^{n} \frac{\svd{\dVec}_j}{\singular_j}V_{\cdot,j}
+\inv{A}\dVec = VS^{-1}{\trans{U}}\dVec = \sum_{j=1}^{n} \frac{{\trans{(U_{\cdot,j})}}\dVec}{\singular_j}V_{\cdot,j} = \sum_{j=1}^{n} \frac{\svd{d}_j}{\singular_j}V_{\cdot,j}
 \end{equation}
 where $\svd{\dVec} = \trans{U}\dVec$. \par 
 Beyond the situation where $A$ is square and invertible, the pseudoinverse $\pinv{A} = V\pinv{S}\trans{U}$, where $\pinv{S} \in \mathbb{R}^{n \times \mA}$ is formed by reciprocating the nonzero diagonal elements of $\trans{S}$. The pseudoinverse, also called the Moore-Penrose generalized inverse \cite{Penrose1955}, is the unique matrix $\pinv{A} \in \mathbb{R}^{n \times \mA}$ that satisfies the following Moore-Penrose conditions \cite[p.~290]{GolubVanLoan2013}:
@@ -296,10 +296,10 @@ Let $\pinv{\xVec} = \pinv{A}\dVec = V\pinv{S}\svd{\dVec}$ denote the solution of
   \end{center}
 \end{table}
 
-In any case for $A$, the summands in \eqref{eq:InvProd} are numerically unstable for small $\singular_j$ when the terms $\left|\svd{\dVec}_j\right|$ do not decay as fast as the $\singular_j$; this describes the discrete Picard condition \cite{Hansen:98}. For an ill-conditioned matrix $A$, forming \eqref{eq:InvProd} will often result in a meaningless solution. A common approach to overcome numerical instabilities is to multiply the summands in \eqref{eq:InvProd} by filter functions $\filt$ that depend upon $\singular_j$ and a non-negative regularization parameter $\regparam$, a process called regularization. By doing so, an approximate solution is
+In any case for $A$, the summands in \eqref{eq:InvProd} are numerically unstable for small $\singular_j$ when the terms $\left|\svd{d}_j\right|$ do not decay as fast as the $\singular_j$; this describes the discrete Picard condition \cite{Hansen:98}. For an ill-conditioned matrix $A$, forming \eqref{eq:InvProd} will often result in a meaningless solution. A common approach to overcome numerical instabilities is to multiply the summands in \eqref{eq:InvProd} by filter functions $\filt$ that depend upon $\singular_j$ and a non-negative regularization parameter $\regparam$, a process called regularization. By doing so, an approximate solution is
 \begin{equation}
 \label{eq:ApproxSol}
-\xVec(\regparam) := \sum_{j=1}^{\rA} \filt(\regparam,\singular_j) \frac{\svd{\dVec}_j}{\singular_j}V_{\cdot,j}  = V\Phi{S}^\dagger\svd{\dVec},
+\xVec(\regparam) := \sum_{j=1}^{\rA} \filt(\regparam,\singular_j) \frac{\svd{d}_j}{\singular_j}V_{\cdot,j}  = V\Phi{S}^\dagger\svd{\dVec},
 \end{equation}
 where the matrix $\Phi$ is diagonal with $\Phi_{j,j} = \filt(\regparam,\singular_j)$ for $j = 1,\ldots,{n}$. The most desired property of the filter functions is that $\filt(\singular_j)/\singular_j \approx 1$  for large values of $\singular_j$ and $\filt(\singular_j)/\singular_j \approx 0$ for small values of $\singular_j$. A specific example of a filter function is
 \begin{equation}
@@ -309,7 +309,7 @@ where the matrix $\Phi$ is diagonal with $\Phi_{j,j} = \filt(\regparam,\singular
 which is known as the standard Tikhonov filter function. The use of the Tikhonov filter function to generate an approximate solution is known as Tikhonov regularization \cite{Tikh1963}; in terms of an SVD, the obtained solution is
 \begin{equation}
 \label{eq:TikSol}
-\xVec(\regparam) = \sum_{j = 1}^{\rA} \frac{\singular_j \svd{\dVec}_j}{\singular_j^2 + \regparam^2}V_{\cdot,j} = \sum_{j = 1}^{\rA} \filt(\regparam,\singular_j)\frac{\svd{\dVec}_j}{\singular_j}V_{\cdot,j}.
+\xVec(\regparam) = \sum_{j = 1}^{\rA} \frac{\singular_j \svd{d}_j}{\singular_j^2 + \regparam^2}V_{\cdot,j} = \sum_{j = 1}^{\rA} \filt(\regparam,\singular_j)\frac{\svd{d}_j}{\singular_j}V_{\cdot,j}.
 \end{equation}
 An alternative representation of the above Tikhonov solution is
 \begin{equation}
@@ -422,7 +422,7 @@ Additionally, the assumption that the block system matrix in \eqref{eq:TikSol3} 
 where $Y$ is the inverse of $\trans{X}$. A representation of the regularized solution similar to \eqref{eq:TikSol} can also be obtained:
 \begin{equation}
 \label{eq:GSVD Solution 1}
-\xVec(\regparam) = \sum_{j = 1}^{n} \frac{\delta_j \svd{\dVec}_{j+k}}{\delta^2_j + \regparam^2 \lambda^2_j}Y_{\cdot,j}
+\xVec(\regparam) = \sum_{j = 1}^{n} \frac{\delta_j \svd{d}_{j+k}}{\delta^2_j + \regparam^2 \lambda^2_j}Y_{\cdot,j}
 \end{equation}
 with $\bm{\delta} = \sqrt{\diag(\trans{\Delta}\Delta)}$ and $\bm{\lambda} = \sqrt{\diag(\trans{\Lambda}\Lambda)}$ (the square roots being applied element-wise).  A filter function $\filt_j$ and complement $\mfilt_j$ similar to \eqref{eq:TikFilt} can be introduced to further simplify notation:
 \begin{equation}
@@ -432,12 +432,12 @@ with $\bm{\delta} = \sqrt{\diag(\trans{\Delta}\Delta)}$ and $\bm{\lambda} = \sqr
 Using $\filt_j$, the solution \eqref{eq:GSVD Solution 1} can be written as
 \begin{equation}
 \label{eq:GSVD Solution 2}
-\xVec(\regparam) = \sum_{j = 1}^{n} \frac{\delta^2_j}{\delta^2_j + \regparam^2 \lambda^2_j} \frac{\svd{\dVec}_{j+k}}{\delta_j} Y_{\cdot,j} = \sum_{j = 1}^{n} \filt_j\left(\regparam,\frac{\delta_j}{\lambda_j}\right) \frac{\svd{\dVec}_{j+k}}{\delta_j} Y_{\cdot,j}.
+\xVec(\regparam) = \sum_{j = 1}^{n} \frac{\delta^2_j}{\delta^2_j + \regparam^2 \lambda^2_j} \frac{\svd{d}_{j+k}}{\delta_j} Y_{\cdot,j} = \sum_{j = 1}^{n} \filt_j\left(\regparam,\frac{\delta_j}{\lambda_j}\right) \frac{\svd{d}_{j+k}}{\delta_j} Y_{\cdot,j}.
 \end{equation} 
 In terms of the generalized singular values $\gamma_j = \delta_j/\lambda_j$ for $j = 1,\ldots,n$, the solution \eqref{eq:GSVD Solution 1} can also be written as
 \begin{equation}
 \label{eq:GSVD Solution 3}
-\xVec(\regparam) = \sum_{j = 1}^{n} \filt_j\left(\regparam,\gamma_j\right) \frac{\svd{\dVec}_{j+k}}{\delta_j} Y_{\cdot,j},
+\xVec(\regparam) = \sum_{j = 1}^{n} \filt_j\left(\regparam,\gamma_j\right) \frac{\svd{d}_{j+k}}{\delta_j} Y_{\cdot,j},
 \end{equation}
 which generalizes \eqref{eq:TikSol}. As a final representation and a return to matrix form, we can let $\Phi(\regparam) \in \mathbb{R}^{n \times n}$ diagonal matrix with
 \[\left[\Phi(\regparam)\right]_{j,j} = \filt\left(\regparam,\gamma_j\right), \quad j = 1,\ldots,n.\]
@@ -533,7 +533,7 @@ Given a penalty matrix $L \neq I$, a windowed regularized solution similar to \e
 with $Y$ again being the inverse of $\trans{X}$. In terms of the generalized singular values $\gamma_j$, \eqref{eq:Windowed GSVD Solution} can be written as
 \begin{equation}
 \label{eq:Windowed GSVD Solution Sum}
-    \xWin(\regparamVec) = \sum_{j=1}^n \left(\sum_{p=1}^P \filt_j\left(\regparam^{(p)},\gamma_j\right)\wVec^{(p)}_{j}\right)  \frac{\dft{\dVec}_{j}}{\delta_j} Y_{\cdot,j}.
+    \xWin(\regparamVec) = \sum_{j=1}^n \left(\sum_{p=1}^P \filt_j\left(\regparam^{(p)},\gamma_j\right)\wVec^{(p)}_{j}\right)  \frac{\dft{d}_{j}}{\delta_j} Y_{\cdot,j}.
 \end{equation}
 However, care must be taken when selecting the weight vectors $\wVec^{p}$ in light of the fact that the generalized singular values are arranged in ascending order.
 
@@ -811,13 +811,13 @@ Another benefit of using \eqref{eq:Fourier diagonalization 2} is that we can wri
 \begin{align}
 \frac{1}{\mA}\|\rVec^{(r)}(\regparam)\|_2^2 &= \frac{1}{\mA}\left\|U\left(\Delta^{(r)}\left[\trans{(\Delta^{(r)})}\Delta^{(r)} + \regparam^2\trans{(\Lambda^{(r)})}\Lambda^{(r)}\right]^{-1}\trans{(\Delta^{(r)})} - I_{\mA}\right)\trans{U}\dVec^{(r)}\right\|_2^2 \nonumber \\
 &= \frac{1}{\mA}\left\|\left(\Delta^{(r)}\left[\trans{(\Delta^{(r)})}\Delta^{(r)} + \regparam^2\trans{(\Lambda^{(r)})}\Lambda^{(r)}\right]^{-1}\trans{(\Delta^{(r)})} - I_{\mA}\right)\dft{\dVec}^{(r)}\right\|_2^2 \nonumber \\
-&= \frac{1}{\mA}\sum_{j=1}^{n} \left(\mfilt^{(r)}_j\right)^2\left(\dft{\dVec}_j^{(r)}\right)^2,
+&= \frac{1}{\mA}\sum_{j=1}^{n} \left(\mfilt^{(r)}_j\right)^2\left(\dft{d}_j^{(r)}\right)^2,
 \label{eq:Fourier regularized residual}
 \end{align}
 where $\dft{\dVec}^{(r)} = \trans{U}\dVec^{(r)}$ for $r = 1,\ldots,R$. Lastly, Assumption 2 means that $\trace(\Sigma^{(r)}) = m\noiseSD^2_r$. Therefore, the UPRE function \eqref{eq:Averaged UPRE} for multiple data sets can be written in terms of the following representation for individual UPRE functions:
 \begin{equation}
 \label{eq:Individual UPRE 2}
-\U^{(r)}(\regparam) = \frac{1}{\mA} \sum_{j=1}^{n} \left(\mfilt^{(r)}_j\right)^2\left(\dft{\dVec}_j^{(r)}\right)^2 + \frac{2\noiseSD^2_r}{\mA} \sum_{j=1}^{n} \filt^{(r)}_j - \noiseSD^2_r, \quad r = 1,\ldots,R.
+\U^{(r)}(\regparam) = \frac{1}{\mA} \sum_{j=1}^{n} \left(\mfilt^{(r)}_j\right)^2\left(\dft{d}_j^{(r)}\right)^2 + \frac{2\noiseSD^2_r}{\mA} \sum_{j=1}^{n} \filt^{(r)}_j - \noiseSD^2_r, \quad r = 1,\ldots,R.
 \end{equation}
 
 We conclude Section \ref{sec:UPRE} by showing a relationship between the adapted UPRE method that uses \eqref{eq:Averaged UPRE} and the UPRE method as simply applied to averaged data. 
@@ -842,22 +842,22 @@ Then
 \begin{proof}
 The consequence of Assumption \ref{Assumption_Matrices} is that $\filt_j^{(r)} = \filt_j$ (and $\mfilt_j^{(r)} = \mfilt_j$) for all $r = 1,\ldots,R$. Using representation \eqref{eq:Individual UPRE 2}, we can write \eqref{eq:Averaged UPRE} as
 \begin{align*}
-\frac{1}{R} \sum_{r=1}^R \U^{(r)}(\regparam) &= \frac{1}{R} \sum_{r=1}^R \left[\frac{1}{\mA}\sum_{j=1}^{n} \left(\mfilt_j\right)^2\left(\dft{\dVec}_j^{(r)}\right)^2 + \frac{2\noiseSD_r^2}{\mA} \sum_{j=1}^{n} \filt_j - \noiseSD_r^2\right] \\
-&= \frac{1}{R} \sum_{r=1}^R \left(\frac{1}{\mA}\sum_{j=1}^{n} \left(\mfilt_j\right)^2\left(\dft{\dVec}_j^{(r)}\right)^2\right) + \frac{1}{R} \sum_{r=1}^R \left(\frac{2\noiseSD_r^2}{\mA} \sum_{j=1}^{n} \filt_j\right) - \frac{1}{R} \sum_{r=1}^R\noiseSD_r^2 \\
-&= \frac{1}{\mA}\sum_{j=1}^{n} \left(\mfilt_j\right)^2\left(\frac{1}{R} \sum_{r=1}^R \left(\dft{\dVec}_j^{(r)}\right)^2\right) + \frac{2}{\mA} \left(\frac{1}{R} \sum_{r=1}^R \noiseSD_r^2\right) \left(\sum_{j=1}^{n} \filt_j\right) - \frac{1}{R} \sum_{r=1}^R\noiseSD_r^2.
+\frac{1}{R} \sum_{r=1}^R \U^{(r)}(\regparam) &= \frac{1}{R} \sum_{r=1}^R \left[\frac{1}{\mA}\sum_{j=1}^{n} \left(\mfilt_j\right)^2\left(\dft{d}_j^{(r)}\right)^2 + \frac{2\noiseSD_r^2}{\mA} \sum_{j=1}^{n} \filt_j - \noiseSD_r^2\right] \\
+&= \frac{1}{R} \sum_{r=1}^R \left(\frac{1}{\mA}\sum_{j=1}^{n} \left(\mfilt_j\right)^2\left(\dft{d}_j^{(r)}\right)^2\right) + \frac{1}{R} \sum_{r=1}^R \left(\frac{2\noiseSD_r^2}{\mA} \sum_{j=1}^{n} \filt_j\right) - \frac{1}{R} \sum_{r=1}^R\noiseSD_r^2 \\
+&= \frac{1}{\mA}\sum_{j=1}^{n} \left(\mfilt_j\right)^2\left(\frac{1}{R} \sum_{r=1}^R \left(\dft{d}_j^{(r)}\right)^2\right) + \frac{2}{\mA} \left(\frac{1}{R} \sum_{r=1}^R \noiseSD_r^2\right) \left(\sum_{j=1}^{n} \filt_j\right) - \frac{1}{R} \sum_{r=1}^R\noiseSD_r^2.
 \end{align*}
 Multiplying through by $R/R$ then yields
 \begin{align}
 \label{eq:Non-average UPRE}
 &\frac{1}{R} \sum_{r=1}^R \U^{(r)}(\regparam) \nonumber \\
-&= R\left[\frac{1}{\mA}\sum_{j=1}^{n} \left(\mfilt_j\right)^2\left(\frac{1}{R^2} \sum_{r=1}^R \left(\dft{\dVec}_j^{(r)}\right)^2\right) + \frac{2}{\mA} \left(\frac{1}{R^2} \sum_{r=1}^R \noiseSD_r^2\right) \left(\sum_{j=1}^{n} \filt_j\right) - \frac{1}{R^2} \sum_{r=1}^R\noiseSD_r^2\right].
+&= R\left[\frac{1}{\mA}\sum_{j=1}^{n} \left(\mfilt_j\right)^2\left(\frac{1}{R^2} \sum_{r=1}^R \left(\dft{d}_j^{(r)}\right)^2\right) + \frac{2}{\mA} \left(\frac{1}{R^2} \sum_{r=1}^R \noiseSD_r^2\right) \left(\sum_{j=1}^{n} \filt_j\right) - \frac{1}{R^2} \sum_{r=1}^R\noiseSD_r^2\right].
 \end{align}
 Note that the term $\frac{1}{R^2} \sum_{r=1}^R\noiseSD_r^2$ is the variance of $\frac{1}{R} \sum_{r=1}^R \noiseVec^{(r)}$ since the random vectors $\{\noiseVec^{(r)}\}_{r=1}^R$ are mutually independent. However, \eqref{eq:Non-average UPRE} is not equal to $R$ times the UPRE function as applied to the average of the data
 \[\aVec = \frac{1}{R}\sum_{r=1}^R \dVec^{(r)} = \frac{1}{R} \sum_{r=1}^R \bVec^{(r)} + \frac{1}{R} \sum_{r=1}^R \noiseVec^{(r)}\]
-because of the term $\frac{1}{R^2} \sum_{r=1}^R \left(\dft{\dVec}_j^{(r)}\right)^2$. If the UPRE method was used with the average $\aVec$, then
+because of the term $\frac{1}{R^2} \sum_{r=1}^R \left(\dft{d}_j^{(r)}\right)^2$. If the UPRE method was used with the average $\aVec$, then
 \begin{equation}
 \label{eq:Coefficients of Average}
-\left(\dft{\aVec}_j\right)^2 = \frac{1}{R^2}\left(\sum_{r=1}^R \dft{\dVec}_j^{(r)}\right)^2 \leq \frac{1}{R^2} \sum_{r=1}^R \left(\dft{\dVec}_j^{(r)}\right)^2, \qquad j = 1,\ldots,n.
+\left(\dft{\aVec}_j\right)^2 = \frac{1}{R^2}\left(\sum_{r=1}^R \dft{d}_j^{(r)}\right)^2 \leq \frac{1}{R^2} \sum_{r=1}^R \left(\dft{d}_j^{(r)}\right)^2, \qquad j = 1,\ldots,n.
 \end{equation}
 Thus the result \eqref{eq:Non-average UPRE} shows that for
 \[\UAvg(\regparam) = \frac{1}{\mA}\sum_{j=1}^{n} \left(\mfilt_j\right)^2\left(\dft{\aVec}_j\right)^2 + \frac{2}{\mA} \left(\frac{1}{R^2} \sum_{r=1}^R \noiseSD_r^2\right) \left(\sum_{j=1}^{n} \filt_j\right) - \frac{1}{R^2} \sum_{r=1}^R\noiseSD_r^2,\]
@@ -870,16 +870,16 @@ i.e. $\UAvg(\regparam)$ is the UPRE function as applied to the average $\aVec$ o
 We now derive a multiparameter version of the UPRE function for a single data set $\dVec = A\xVec + \noiseVec$ with $A \in \mathbb{R}^{\mA \times n}$ and $\noiseVec \sim \mathcal{N}(\zeroVec,\noiseSD^2 I_{\mA})$. For $p = 1,\ldots,P$, let $\wVec^{(p)}$ be weight vectors satisfying \eqref{eq:Weights} and let $W^{(p)} = \diag(\wVec^{(p)})$. For the regularized solution \eqref{eq:TikSolWindow}, the regularization matrix $R_\text{win}(\regparamVec)$ is
 \begin{equation}
 \label{eq:Windowed Reg Matrix}
-    R_\text{win}(\regparamVec) = \sum_{p=1}^P V\inv{\left(\trans{S}S + \left(\regparam^{(p)}\right)^2\right)}W^{(p)}\trans{S}\trans{U}.
+    R_\text{win}(\regparamVec) = \sum_{p=1}^P V\inv{\left(\trans{S}S + \left(\regparam^{(p)}\right)^2 I_{n}\right)}W^{(p)}\trans{S}\trans{U}.
 \end{equation}
 The corresponding influence matrix $A_\text{win}(\regparamVec) = AR_\text{win}(\regparamVec)$ is then
 \begin{equation}
 \label{eq:Windowed Influence Matrix}
-    A_\text{win}(\regparamVec) = US\left[\sum_{p=1}^P V\inv{\left(\trans{S}S + \left(\regparam^{(p)}\right)^2\right)}W^{(p)}\right]\trans{S}\trans{U}. 
+    A_\text{win}(\regparamVec) = US\left[\sum_{p=1}^P V\inv{\left(\trans{S}S + \left(\regparam^{(p)}\right)^2 I_n\right)}W^{(p)}\right]\trans{S}\trans{U}. 
 \end{equation}
 The windowed regularized residual $\rVec_\text{win}(\regparamVec) = (A_\text{win}(\regparamVec) - I_{\mA})\dVec$ can be written as
 \begin{equation}
-    \rVec_\text{win}(\regparamVec) = U\left(S\left[\sum_{p=1}^P V\inv{\left(\trans{S}S + \regparam_{p}^2\right)}W^{(p)}\right]\trans{S} - I_{\mA}\right)\dft{\dVec}.
+    \rVec_\text{win}(\regparamVec) = U\left(S\left[\sum_{p=1}^P V\inv{\left(\trans{S}S + \regparam_{p}^2 I_n\right)}W^{(p)}\right]\trans{S} - I_{\mA}\right)\dft{\dVec}.
 \end{equation}
 Thus the multiparameter UPRE function for problem $\dVec = A\xVec + \noiseVec$ is 
 \begin{equation}
@@ -929,7 +929,7 @@ Similar to the UPRE method, the MDP method relies on knowledge of the variance o
 \end{equation}
 The function \eqref{eq:MDP} stems from the observation that if $\xReg = \xVec$, then $\E(\frac{1}{\mA}\|\rVec(\regparam)\|_2^2) = E(\frac{1}{\mA}\|\noiseVec\|_2^2) = \noiseSD^2$. The MDP method selects $\regparam_{\text{MDP}}$ as the zero of $\D(\regparam)$.  \par 
 Before extending the MDP method to account for multiple data sets, some comments on the behavior of the MDP function \eqref{eq:MDP} are warranted. The term $\frac{1}{\mA}\|\rVec(\regparam)\|_2^2$ is a monotone increasing function of $\regparam$ for $\regparam > 0$, which can be seen by differentiating the summands of \eqref{eq:Fourier regularized residual} for $R = 1$:
-\[\frac{d}{d\regparam}\left(\left(\mfilt_j\right)^2\left(\dft{\dVec}_j\right)^2\right) = 2 \left(\dft{\dVec}_j\right)^2 \mfilt_j\left(\frac{d}{d\regparam}\mfilt_j\right) = 2 \left(\dft{\dVec}_j\right)^2 \mfilt_j \frac{2\regparam\bm{\lambda_j}\bm{\delta_j}}{\left(\bm{\delta}_j + \regparam^2 \bm{\lambda}_j\right)^2} \geq 0, \quad \regparam > 0.\]
+\[\frac{d}{d\regparam}\left(\left(\mfilt_j\right)^2\left(\dft{d}_j\right)^2\right) = 2 \left(\dft{d}_j\right)^2 \mfilt_j\left(\frac{d}{d\regparam}\mfilt_j\right) = 2 \left(\dft{d}_j\right)^2 \mfilt_j \frac{2\regparam\bm{\lambda_j}\bm{\delta_j}}{\left(\bm{\delta}_j + \regparam^2 \bm{\lambda}_j\right)^2} \geq 0, \quad \regparam > 0.\]
 The monotonicity of $\frac{1}{\mA}\|\rVec(\regparam)\|_2^2$ does not guarantee, however, the existence of a zero of $\D(\regparam)$. If the selected value of $\noiseSD^2$ is too large, then it is possible that $\D(\regparam) < 0$ for all $\regparam > 0$ and a root will not exist. This can be attributed to the limiting behavior of $\frac{1}{\mA}\|\rVec(\regparam)\|_2^2$, which is described by Lemma \ref{lem:Residual limit}.
 \begin{lemma}
 \label{lem:Residual limit}
@@ -1007,7 +1007,7 @@ Then
 Under these assumptions, for the MDP method we have $\DBig(\regparam)$ is equal to
 \begin{align*}
     \frac{1}{R} \sum_{r=1}^R \D^{(r)}(\regparam) &= \frac{1}{R}\sum_{r=1}^R \left[\frac{1}{\mA}\|\rVec^{(r)}(\regparam)\|_2^2 - \noiseSD_{r}^2\right] \\
-    &= R\left[\frac{1}{\mA}\sum_{j=1}^{n} \left(\mfilt_j\right)^2\left(\frac{1}{R^2} \sum_{r=1}^R |\dft{\dVec}_j^{(r)}|^2\right) - \frac{1}{R^2}\sum_{r=1}^R \noiseSD_{r}^2\right]
+    &= R\left[\frac{1}{\mA}\sum_{j=1}^{n} \left(\mfilt_j\right)^2\left(\frac{1}{R^2} \sum_{r=1}^R |\dft{d}_j^{(r)}|^2\right) - \frac{1}{R^2}\sum_{r=1}^R \noiseSD_{r}^2\right]
 \end{align*}
 so that using \eqref{eq:MDP of Average} results in the bound \eqref{eq:MDP Bound}.
 \end{proof}
@@ -1075,7 +1075,7 @@ With these assumptions,
 \begin{align}
     \GBig(\regparam) &= \frac{1}{R} \sum_{r=1}^R \G^{(r)}(\regparam) \\
     &= \frac{1}{R}\sum_{r=1}^R \left[\frac{\frac{1}{\mA}\|\rVec^{(r)}(\regparam)\|_2^2}{\left[1 - \frac{1}{\mA}\trace\left(\A\right)\right]^2}\right] \\
-    &= R\frac{\frac{1}{\mA}\sum_{j=1}^{n} \left(\mfilt_j\right)^2\left(\frac{1}{R^2} \sum_{r=1}^R \left|\dft{\dVec}_j^{(r)}\right|^2\right)}{\left[1 - \frac{1}{\mA}\trace\left(\A\right)\right]^2},
+    &= R\frac{\frac{1}{\mA}\sum_{j=1}^{n} \left(\mfilt_j\right)^2\left(\frac{1}{R^2} \sum_{r=1}^R \left|\dft{d}_j^{(r)}\right|^2\right)}{\left[1 - \frac{1}{\mA}\trace\left(\A\right)\right]^2},
 \end{align}
 again where the last equality is obtained through multiplication by $\frac{R}{R}$. The definition of $\GAvg(\regparam)$ and \eqref{eq:Coefficients of Average} then results in the bound \eqref{eq:GCV Bound}.
 \end{proof}
