@@ -543,7 +543,7 @@ We now consider the situation where we have a collection of data sets $\{\dVec^{
 \label{eq:Big vectors}
 \dVec^{(r)} = \bVec^{(r)} + \noiseVec^{(r)} = {A^{(r)}}\xVec^{(r)} + \noiseVec^{(r)}, \quad \noiseVec^{(r)} \sim \mathcal{N}(\bm{0}^{(r)},\Sigma^{(r)}).
 \end{equation}
-The vectors $\dVec^{(r)}$, $\bVec^{(r)}$, $\noiseVec^{(r)}$, and $\zeroVec^{(r)}$ have length $m_r$, while the vector $\xVec^{(r)}$ has length $n_r$. The system matrices $A^{(r)}$ and covariance matrices $\Sigma^{(r)}$ are thus $m_r \times n_r$ and $m_r \times m_r$, respectively. For given regularization parameters $\regparam^{(r)}$ and penalty matrices $L^{(r)}$ of dimension $q_r \times n_r$, Tikhonov regularization can be performed to produce regularized solutions $\xVec(\regparam^{(r)})$ that minimize the functionals
+The vectors $\dVec^{(r)}$, $\bVec^{(r)}$, $\noiseVec^{(r)}$, and $\zeroVec^{(r)}$ have length $m_r$, while the vector $\xVec^{(r)}$ has length $n_r$. The system matrices $A^{(r)}$ and covariance matrices $\Sigma^{(r)}$ are thus $m_r \times n_r$ and $m_r \times m_r$, respectively. We also assume that the random vectors $\{\noiseVec^{(r)}\}_{r=1}^R$ are mutually independent. For given regularization parameters $\regparam^{(r)}$ and penalty matrices $L^{(r)}$ of dimension $q_r \times n_r$, Tikhonov regularization can be performed to produce regularized solutions $\xVec(\regparam^{(r)})$ that minimize the functionals
 \begin{equation}
 T^{(r)}(\xVec;\regparam^{(r)}) := \|A^{(r)}\xVec - \dVec^{(r)}\|_2^2 + \left(\regparam^{(r)}\right)^2\|L^{(r)}\xVec\|_2^2.
 \end{equation}
@@ -577,7 +577,7 @@ In regards to selecting regularization parameters, the advantage of regularizing
 
 \begin{assumption}
 \label{Assumption_System}
-For $r = 1,\ldots,R$, assume that $\bVec^{(r)} = {A^{(r)}}\xVec^{(r)}$, $\dVec^{(r)} = \bVec^{(r)} + \noiseVec^{(r)}$, and $\noiseVec^{(r)} \sim \mathcal{N}(\zeroVec^{(r)},\Sigma^{(r)})$. The vectors $\bVec^{(r)}$, $\dVec^{(r)}$, and $\noiseVec^{(r)}$ are of length $\mA_r$ and $\xVec^{(r)}$ is of length $n_r$.
+For $r = 1,\ldots,R$, assume that $\bVec^{(r)} = {A^{(r)}}\xVec^{(r)}$, $\dVec^{(r)} = \bVec^{(r)} + \noiseVec^{(r)}$, and $\noiseVec^{(r)} \sim \mathcal{N}(\zeroVec^{(r)},\Sigma^{(r)})$ with the $\noiseVec^{(r)}$ being mutually independent. The vectors $\bVec^{(r)}$, $\dVec^{(r)}$, and $\noiseVec^{(r)}$ are of length $\mA_r$ and $\xVec^{(r)}$ is of length $n_r$.
 \end{assumption}
 
 To obtain an explicit representation of $\xBig(\regparamBig)$, the GSVD can be utilized. A GSVD of each pair $(A^{(r)},L^{(r)})$ can obtained for $r = 1,\ldots,R$ so that
@@ -617,18 +617,25 @@ Some of the parameter estimation methods considered in this paper rely upon the 
 Let $\{\noiseVec^{(r)}\}_{r=1}^R$ be a collection of mutually independent random vectors with $\noiseVec^{(r)} \sim \mathcal{N}(\bm{\mu}^{(r)},\Sigma^{(r)})$ for each $r = 1,\ldots,R$, and let $\widetilde{\noiseVec} = \vcat(\noiseVec^{(1)},\ldots,\noiseVec^{(R)})$. Then $\widetilde{\noiseVec} \sim \mathcal{N}(\widetilde{\bm{\mu}},\widetilde{\Sigma})$ where $\widetilde{\bm{\mu}} = \vcat(\bm{\mu}^{(r)},\ldots,\bm{\mu}^{(R)})$ and $\widetilde{\Sigma} = \diag(\Sigma^{(1)},\ldots,\Sigma^{(R)})$.
 \end{lemma}
 \noindent Lemma \ref{lem:Concatenation of Normal Noise} is also useful in determining quantities like $\E(\|\widetilde{\noiseVec}\|_2^2)$, which is accomplished as needed in Sections \ref{sec:UPRE} and \ref{sec:MDP}. \par
-We conclude Section \ref{sec:Multiple data sets} by enumerating the additional underlying assumptions that will be utilized in Section \ref{sec:Methods}.
+We conclude Section \ref{sec:Multiple data sets} by enumerating and discussing the additional underlying assumptions that will be utilized in Section \ref{sec:Methods}. Going through the assumptions in order
+
+\begin{assumption}
+\label{Assumption_Noise}
+Given $\noiseVec^{(r)} \sim \mathcal{N}(\zeroVec^{(r)},\Sigma^{(r)})$ for $r = 1,\ldots,R$, assume $\Sigma^{(r)} = \noiseSD_r^2 I_{m_r}$ (a constant diagonal matrix).
+\end{assumption}
+
+\begin{assumption}
+\label{Assumption_Rows}
+For all $r = 1,\ldots,R$, assume that $m_r = m$. In other words, we assume that the size of each data vector $\dVec^{(r)}$ is the same.
+\end{assumption} 
 
 \begin{assumption}
 \label{Assumption_Matrices}
 For $r = 1,\ldots,R$, assume that $A^{(r)} = A \in \mathbb{R}^{\mA \times n}$ and $L^{(r)} = L \in \mathbb{R}^{\mL \times n}$.
 \end{assumption}  
 
-\begin{assumption}
-\label{Assumption_Noise}
-Given $\noiseVec^{(r)} \sim \mathcal{N}(\zeroVec^{(r)},\Sigma^{(r)})$ for $r = 1,\ldots,R$, assume that $\zeroVec^{(r)} = \zeroVec \in \mathbb{R}^{\mA}$ and $\Sigma^{(r)} = \noiseSD_r^2 I_{\mA}$.
-\end{assumption}
-\noindent In particular, Assumptions \ref{Assumption_System} and \ref{Assumption_Matrices} imply that $n_r = n$ for $r = 1,\ldots,R$. Assumption \ref{Assumption_Noise} can relaxed so that $\Sigma^{(r)}$ is any diagonal matrix $D^{(r)}$, in which case a whitening transformation $C^{(r)}$ could applied so that $\xi^{(r)} = C^{(r)}\noiseVec^{(r)}$ is distributed $\mathcal{N}(\zeroVec_{\mA \times 1},I_{\mA})$. For example, one could use the ZCA transformation $C^{(r)} = \left(\Sigma^{(r)}\right)^{-1/2}$ \cite{BellSejnowski}.
+\noindent It should be noted that Assumption \ref{Assumption_Noise} could be relaxed so that $\Sigma^{(r)}$ is any diagonal matrix $D^{(r)}$, in which case a whitening transformation $C^{(r)}$ could applied so that $\xi^{(r)} = C^{(r)}\noiseVec^{(r)} \sim \mathcal{N}(\zeroVec_{\mA \times 1},I_{\mA})$. For example, one could use the ZCA transformation $C^{(r)} = \left(\Sigma^{(r)}\right)^{-1/2}$ \cite{BellSejnowski}. \par
+The strength of the assumptions presented so far increase in accordance with their numbering. Assumption \ref{Assumption_System} describes the most general situation involving multiple data sets considered in this paper, where the size of each problem and the covariance of each zero-centered multivariate Gaussian noise vector are potentially distinct. Assumption \ref{Assumption_Noise} then requires that the covariance matrices be constant diagonal matrices, though the sizes of the problems remain unrestricted. In contrast, Assumption \ref{Assumption_Rows} specifies that each data set much be the same size $m$; however, the size of the solutions may still be district ($n_r$ can differ for different values of $r$). Assumption \ref{Assumption_Matrices} is the strongest, in that it not only implies Assumption \ref{Assumption_Rows} but demands the solution size be the same and the system and penalty matrices be the same for all problems.
 
 \subsection{Multiparameter regularization for multiple data sets} \label{sec:Adapted regularization}
 
@@ -734,7 +741,7 @@ Analogous to the standard UPRE function, we can define $\UBig(\regparam)$ as
 so that $\UBig(\regparam)$ is an unbiased estimator of predictive risk. The standard UPRE function \eqref{eq:UPRE} is recovered from \eqref{eq:UPRE 2} if $\Sigma = \noiseSD^2 I_{\mA}$.
 
 \begin{proposition}
-Using the constructions in Table \ref{tab:System assumptions} under Assumption \ref{Assumption_System} with $m_r = m$ for all $r = 1,\ldots,R$, the UPRE function $\UBig(\regparam)$ for the data sets $\{\dVec^{(r)}\}_{r=1}^R$ is
+Under Assumptions \ref{Assumption_System} and \ref{Assumption_Rows} with the constructions in Table \ref{tab:System assumptions}, the UPRE function $\UBig(\regparam)$ for the data sets $\{\dVec^{(r)}\}_{r=1}^R$ is
 \begin{equation}
 \label{eq:Averaged UPRE}
 \UBig(\regparam) = \frac{1}{R} \sum_{r=1}^R \U^{(r)}(\regparam),
@@ -783,7 +790,7 @@ A representation of \eqref{eq:Averaged UPRE} will now be presented that involves
 \label{Assumption_Diagonalization}
 We assume that there exist matrices $U$, $V$, and $\trans{X}$ such that $A^{(r)} = U{\Delta^{(r)}}\trans{X}$ and  $L^{(r)} = V{\Lambda^{(r)}}\trans{X}$ for all $r = 1,\ldots,R$. 
 \end{assumption}
-\noindent While this is an extremely strong and unrealistic assumption (the belief that such a factorization does not exist in general is expressed in \cite{Brezinski2003}), it certainly becomes realistic under Assumption \ref{Assumption_Matrices}. We use Assumption \ref{Assumption_Diagonalization} to simply present the following derivation in the most general setting. An analogous approach could be taken if the matrices $A^{(r)}$ and $L^{(r)}$ can be simultaneously diagonalized with respect to a orthogonal/unitary transformation, such as the discrete cosine transform (DCT) or discrete Fourier transform (DFT); test problems using the DCT and DFT are considered in Section \ref{sec:Validation}. \par
+\noindent While this is an extremely strong and unrealistic assumption (the belief that such a factorization does not exist in general is expressed in \cite{Brezinski2003}), it certainly becomes realistic under Assumption \ref{Assumption_Matrices}. In fact, Assumption \ref{Assumption_Matrices} implies Assumption \ref{Assumption_Diagonalization}. We use Assumption \ref{Assumption_Diagonalization} to simply present the following derivation in a general setting. An analogous approach could be taken if the matrices $A^{(r)}$ and $L^{(r)}$ can be simultaneously diagonalized with respect to a orthogonal/unitary transformation, such as the discrete cosine transform (DCT) or discrete Fourier transform (DFT); test problems using the DCT and DFT are considered in Section \ref{sec:Validation}. \par
 From Assumption \ref{Assumption_Diagonalization}, we define the generalized filter functions to be
 \begin{equation}
 \label{eq:Filter functions 2}
@@ -794,11 +801,12 @@ where $\bm{\delta}^{(r)} = \sqrt{\diag(\trans{(\Delta^{(r)})}\Delta^{(r)})}$ and
 \label{eq:Fourier diagonalization 2}
 A^{(r)}(\regparam) = U\Delta^{(r)}\left[\trans{(\Delta^{(r)})}\Delta^{(r)} + \regparam^2\trans{(\Lambda^{(r)})}\Lambda^{(r)}\right]^{-1}\trans{(\Delta^{(r)})}\trans{U}, \qquad r = 1,\ldots,R.
 \end{equation}
-Under Assumption \ref{Assumption_Noise}, $\trace(\Sigma^{(r)}) = n\noiseSD^2_r$ and the similarity invariance of the trace operator gives
-\begin{equation}
-\label{eq:Trace}
-\trace\left(\Sigma^{(r)}A^{(r)}(\regparam)\right) = \noiseSD_r^2 \trace\left(\Delta^{(r)}\left[\trans{(\Delta^{(r)})}\Delta^{(r)} + \regparam^2\trans{(\Lambda^{(r)})}\Lambda^{(r)}\right]^{-1}\trans{(\Delta^{(r)})}\right) = \noiseSD_r^2 \sum_{j=1}^{n} \filt^{(r)}_j.
-\end{equation}
+Assumption \ref{Assumption_Noise} and the similarity invariance of the trace operator gives
+\begin{align}
+    \trace\left(\Sigma^{(r)}A^{(r)}(\regparam)\right) &=  \trace\left(\noiseSD_r^2 I_{m} U\Delta^{(r)}\left[\trans{(\Delta^{(r)})}\Delta^{(r)} + \regparam^2\trans{(\Lambda^{(r)})}\Lambda^{(r)}\right]^{-1}\trans{(\Delta^{(r)})}\trans{U}\right) \nonumber \\ 
+    &= \noiseSD_r^2 \trace\left(\Delta^{(r)}\left[\trans{(\Delta^{(r)})}\Delta^{(r)} + \regparam^2\trans{(\Lambda^{(r)})}\Lambda^{(r)}\right]^{-1}\trans{(\Delta^{(r)})}\right) \nonumber \\
+    &= \noiseSD_r^2 \sum_{j=1}^{n} \filt^{(r)}_j. \label{eq:Trace}
+\end{align}
 Another benefit of using \eqref{eq:Fourier diagonalization 2} is that we can write
 \begin{align}
 \frac{1}{\mA}\|\rVec^{(r)}(\regparam)\|_2^2 &= \frac{1}{\mA}\left\|U\left(\Delta^{(r)}\left[\trans{(\Delta^{(r)})}\Delta^{(r)} + \regparam^2\trans{(\Lambda^{(r)})}\Lambda^{(r)}\right]^{-1}\trans{(\Delta^{(r)})} - I_{\mA}\right)\trans{U}\dVec^{(r)}\right\|_2^2 \nonumber \\
@@ -806,7 +814,7 @@ Another benefit of using \eqref{eq:Fourier diagonalization 2} is that we can wri
 &= \frac{1}{\mA}\sum_{j=1}^{n} \left(\mfilt^{(r)}_j\right)^2\left(\dft{\dVec}_j^{(r)}\right)^2,
 \label{eq:Fourier regularized residual}
 \end{align}
-where $\dft{\dVec}^{(r)} = \trans{U}\dVec^{(r)}$ for $r = 1,\ldots,R$. Therefore, the UPRE function \eqref{eq:Averaged UPRE} for multiple data sets can be written in terms of the following representation for individual UPRE functions:
+where $\dft{\dVec}^{(r)} = \trans{U}\dVec^{(r)}$ for $r = 1,\ldots,R$. Lastly, Assumption 2 means that $\trace(\Sigma^{(r)}) = m\noiseSD^2_r$. Therefore, the UPRE function \eqref{eq:Averaged UPRE} for multiple data sets can be written in terms of the following representation for individual UPRE functions:
 \begin{equation}
 \label{eq:Individual UPRE 2}
 \U^{(r)}(\regparam) = \frac{1}{\mA} \sum_{j=1}^{n} \left(\mfilt^{(r)}_j\right)^2\left(\dft{\dVec}_j^{(r)}\right)^2 + \frac{2\noiseSD^2_r}{\mA} \sum_{j=1}^{n} \filt^{(r)}_j - \noiseSD^2_r, \quad r = 1,\ldots,R.
@@ -815,7 +823,7 @@ where $\dft{\dVec}^{(r)} = \trans{U}\dVec^{(r)}$ for $r = 1,\ldots,R$. Therefore
 We conclude Section \ref{sec:UPRE} by showing a relationship between the adapted UPRE method that uses \eqref{eq:Averaged UPRE} and the UPRE method as simply applied to averaged data. 
 
 \begin{proposition}
-Under Assumptions \ref{Assumption_System} through \ref{Assumption_Diagonalization} with data vectors $\{\dVec^{(r)}\}_{r=1}^R$, let 
+Under Assumptions \ref{Assumption_System} through \ref{Assumption_Matrices} with data vectors $\{\dVec^{(r)}\}_{r=1}^R$, let 
 \begin{equation}
 \label{eq:Averaged data}
 \aVec = \frac{1}{R}\sum_{r=1}^R \dVec^{(r)},
@@ -828,11 +836,11 @@ $\dft{\aVec} = \trans{U}\aVec$, and let
 Then
 \begin{equation}
 \label{eq:UPRE Bound}
-\widetilde{U}(\regparam) = \frac{1}{R} \sum_{r=1}^R \U^{(r)}(\regparam) \leq R \UAvg(\regparam), \qquad \regparam \geq 0.
+\UBig(\regparam) = \frac{1}{R} \sum_{r=1}^R \U^{(r)}(\regparam) \leq R \UAvg(\regparam), \qquad \regparam \geq 0.
 \end{equation}
 \end{proposition}
 \begin{proof}
-The consequence of Assumptions \ref{Assumption_System} through \ref{Assumption_Noise} is that $\filt_j^{(r)} = \filt_j$ (and $\mfilt_j^{(r)} = \mfilt_j$) for all $r = 1,\ldots,R$. Using representation \eqref{eq:Individual UPRE 2}, we can write \eqref{eq:Averaged UPRE} as
+The consequence of Assumption \ref{Assumption_Matrices} is that $\filt_j^{(r)} = \filt_j$ (and $\mfilt_j^{(r)} = \mfilt_j$) for all $r = 1,\ldots,R$. Using representation \eqref{eq:Individual UPRE 2}, we can write \eqref{eq:Averaged UPRE} as
 \begin{align*}
 \frac{1}{R} \sum_{r=1}^R \U^{(r)}(\regparam) &= \frac{1}{R} \sum_{r=1}^R \left[\frac{1}{\mA}\sum_{j=1}^{n} \left(\mfilt_j\right)^2\left(\dft{\dVec}_j^{(r)}\right)^2 + \frac{2\noiseSD_r^2}{\mA} \sum_{j=1}^{n} \filt_j - \noiseSD_r^2\right] \\
 &= \frac{1}{R} \sum_{r=1}^R \left(\frac{1}{\mA}\sum_{j=1}^{n} \left(\mfilt_j\right)^2\left(\dft{\dVec}_j^{(r)}\right)^2\right) + \frac{1}{R} \sum_{r=1}^R \left(\frac{2\noiseSD_r^2}{\mA} \sum_{j=1}^{n} \filt_j\right) - \frac{1}{R} \sum_{r=1}^R\noiseSD_r^2 \\
@@ -854,7 +862,7 @@ because of the term $\frac{1}{R^2} \sum_{r=1}^R \left(\dft{\dVec}_j^{(r)}\right)
 Thus the result \eqref{eq:Non-average UPRE} shows that for
 \[\UAvg(\regparam) = \frac{1}{\mA}\sum_{j=1}^{n} \left(\mfilt_j\right)^2\left(\dft{\aVec}_j\right)^2 + \frac{2}{\mA} \left(\frac{1}{R^2} \sum_{r=1}^R \noiseSD_r^2\right) \left(\sum_{j=1}^{n} \filt_j\right) - \frac{1}{R^2} \sum_{r=1}^R\noiseSD_r^2,\]
 i.e. $\UAvg(\regparam)$ is the UPRE function as applied to the average $\aVec$ of the data $\{\dVec^{(r)}\}_{r=1}^R$, we have that
-\[\widetilde{U}(\regparam) = \frac{1}{R} \sum_{r=1}^R \U^{(r)}(\regparam) \leq R \UAvg(\regparam), \qquad \regparam \geq 0\]
+\[\UBig(\regparam) = \frac{1}{R} \sum_{r=1}^R \U^{(r)}(\regparam) \leq R \UAvg(\regparam), \qquad \regparam \geq 0\]
 \end{proof}
 \noindent Therefore the adapted UPRE function is truly distinct from simply applying the UPRE method to the average of the data, and the bound \eqref{eq:UPRE Bound} demonstrates a relationship between the two modalities.
 
@@ -953,7 +961,7 @@ The MDP function for the more general assumption that $\noiseVec \sim \mathcal{N
 Function \eqref{eq:General MDP} can be applied to data $\{\dVec\}_{r=1}^R$ with constructions described in Table \ref{tab:System assumptions}. 
 
 \begin{proposition}
-Using the constructions in Table \ref{tab:System assumptions} under Assumption \ref{Assumption_System} with $m_r = m$ for all $r = 1,\ldots,R$, the MDP function $\DBig(\regparam)$ for the data sets $\{\dVec^{(r)}\}_{r=1}^R$ is
+Under Assumptions \ref{Assumption_System} and \ref{Assumption_Rows} with the constructions in Table \ref{tab:System assumptions}, the MDP function $\DBig(\regparam)$ for the data sets $\{\dVec^{(r)}\}_{r=1}^R$ is
 \begin{equation}
 \label{eq:Averaged MDP}
 \DBig(\regparam) = \frac{1}{R} \sum_{r=1}^R \D^{(r)}(\regparam),
@@ -984,7 +992,7 @@ The MDP method for multiple data then defines $\widetilde{\regparam}_{\textrm{MD
 As with the adapted UPRE method, the adapted MDP method is distinct from the MDP method as applied to the averaged data \eqref{eq:Averaged data}.
 
 \begin{proposition}
-Under Assumptions \ref{Assumption_System} through \ref{Assumption_Diagonalization} with data vectors $\{\dVec^{(r)}\}_{r=1}^R$, let $\aVec$ be defined by \eqref{eq:Averaged data}, $\dft{\aVec} = \trans{U}\aVec$, and let
+Under Assumptions \ref{Assumption_System} through \ref{Assumption_Matrices} with data vectors $\{\dVec^{(r)}\}_{r=1}^R$, let $\aVec$ be defined by \eqref{eq:Averaged data}, $\dft{\aVec} = \trans{U}\aVec$, and let
 \begin{equation}
 \label{eq:MDP of Average}
 \DAvg(\regparam) = \frac{1}{\mA}\sum_{j=1}^{n} \left(\mfilt_j\right)^2 |\dft{\aVec}_j|^2 - \frac{1}{R^2}\sum_{r=1}^R \noiseSD_{r}^2
@@ -1021,7 +1029,7 @@ Unlike the UPRE and MDP methods, the GCV method does not depend upon knowledge o
 The GCV method determines $\regparam$ such that $\regparam_{\text{GCV}} = \argmin_{\regparam > 0} \G(\regparam)$.
 
 \begin{proposition}
-Using the constructions in Table \ref{tab:System assumptions} under Assumption \ref{Assumption_System} with $m_r = m$ for all $r = 1,\ldots,R$, the GCV function $\DBig(\regparam)$ for the data sets $\{\dVec^{(r)}\}_{r=1}^R$ is
+Under Assumptions \ref{Assumption_System} and \ref{Assumption_Rows} with the constructions in Table \ref{tab:System assumptions}, the GCV function $\DBig(\regparam)$ for the data sets $\{\dVec^{(r)}\}_{r=1}^R$ is
 \begin{equation}
 \label{eq:GCV Big 2}
 \GBig(\regparam) = \frac{\frac{1}{M}\sum_{r=1}^R \|\rVec^{(r)}(\regparam)\|_2^2}{\left[1 - \frac{1}{M}\sum_{r=1}^R \trace\left(A^{(r)}(\regparam)\right)\right]^2}.
@@ -1041,7 +1049,7 @@ In contrast to the UPRE and MDP methods, the GCV function \eqref{eq:GCV Big 2} f
 \label{eq:Individual GCV}
 \G^{(r)}(\regparam) = \frac{\frac{1}{\mA}\|\rVec^{(r)}(\regparam)\|_2^2}{\left[1 - \frac{1}{\mA}\trace\left(A^{(r)}(\regparam)\right)\right]^2}, \quad r = 1,\ldots,R.
 \end{equation}
-However, if we assume that $A^{(r)} = A$ and $L^{(r)} = L$ for each $r = 1,\ldots,R$, then $A^{(r)}(\regparam) = \A$ for each $r = 1,\ldots,R$ as well. In such case, \eqref{eq:GCV Big 2} can be expressed as
+However, if we use Assumption \ref{Assumption_Matrices}, then $A^{(r)}(\regparam) = \A$ for each $r = 1,\ldots,R$. In such case, \eqref{eq:GCV Big 2} can be expressed as
 \begin{equation}
 \label{eq:Averaged GCV}
 \GBig(\regparam) = \frac{\frac{1}{M}\sum_{r=1}^R \|\rVec^{(r)}(\regparam)\|_2^2}{\left[1 - \frac{1}{M}\sum_{r=1}^R \trace\left(\A\right)\right]^2} = \frac{1}{R}\frac{\sum_{r=1}^R \frac{1}{\mA} \|\rVec^{(r)}(\regparam)\|_2^2}{\left[1 - \frac{1}{\mA} \trace\left(\A\right)\right]^2} = \frac{1}{R}\sum_{r=1}^R \G^{(r)}(\regparam).
@@ -1050,7 +1058,7 @@ Note that \eqref{eq:Individual GCV} is equivalent to \eqref{eq:GCV} without Assu
 A bound analogous to \eqref{eq:UPRE Bound} and \eqref{eq:MDP Bound} can be obtained for the adapted GCV function.
 
 \begin{proposition}
-Under Assumptions \ref{Assumption_System} through \ref{Assumption_Diagonalization} with data vectors $\{\dVec^{(r)}\}_{r=1}^R$, let $\aVec$ be defined by \eqref{eq:Averaged data}, $\dft{\aVec} = \trans{U}\aVec$, and let
+Under Assumptions \ref{Assumption_System} through \ref{Assumption_Matrices} with data vectors $\{\dVec^{(r)}\}_{r=1}^R$, let $\aVec$ be defined by \eqref{eq:Averaged data}, $\dft{\aVec} = \trans{U}\aVec$, and let
 \begin{equation}
 \label{eq:GCV of Average}
 \GAvg(\regparam) = \frac{\frac{1}{\mA}\sum_{j=1}^{n} \left(\mfilt_j\right)^2|\dft{\aVec}_j|^2}{\left[1 - \frac{1}{\mA}\trace\left(\A\right)\right]^2}.
@@ -1071,8 +1079,7 @@ With these assumptions,
 \end{align}
 again where the last equality is obtained through multiplication by $\frac{R}{R}$. The definition of $\GAvg(\regparam)$ and \eqref{eq:Coefficients of Average} then results in the bound \eqref{eq:GCV Bound}.
 \end{proof}
-
-As a closing remark regarding the GCV method, it is important to note that the assumption $A^{(r)} = A$ and $L^{(r)} = L$ for each $r = 1,\ldots,R$ was needed for result \eqref{eq:Averaged GCV}. In contrast, no such assumption is necessary for the corresponding UPRE and MDP results, which respectively are \eqref{eq:Averaged UPRE} and \eqref{eq:Averaged MDP}.
+\noindent As a closing remark regarding the GCV method, it is important to note that Assumption \ref{Assumption_Matrices} was needed for result \eqref{eq:Averaged GCV}. In contrast, no such assumption is necessary for the corresponding UPRE and MDP results, which respectively are \eqref{eq:Averaged UPRE} and \eqref{eq:Averaged MDP}.
 
 \subsubsection{Multiparameter GCV} \label{sec:Multiparameter GCV}
 The multiparameter GCV function is
