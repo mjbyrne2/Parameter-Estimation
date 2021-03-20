@@ -161,7 +161,7 @@ In addition to developing these adapted parameter selection methods, some result
 Lastly, this paper introduces how multiple data sets can be used in conjunction with multiparameter regularization. Multiparameter versions of the GCV method are presented in \cite{ChungEasleyOLeary,ModarresiGolub2}; we extend these formulations to multiparameter versions of the UPRE and MDP methods. Results, summaries and directions for future work are considered in Section \ref{sec:Conclusion}. The same formulations presented in this paper could also be applied to other standard methods such as the L-curve method. We focus on the UPRE, MDP, and GCV methods to illustrate the general approach.
 
 \subsection{Summary of notation} \label{sec:Notation}
-Due to the consideration of multiple data sets as well as multiparameter regularization for these data sets, the notation in this paper is extensive and will therefore be briefly summarized. $R$ denotes the number of data sets being considered, which are indexed by $r$. The index $r$ may either be placed as a subcript or a superscript with parenthesis signs; for example, $A^{(r)}$ represents the system matrix associated with the $r$th data set. $P_r$ represents the number of windows/parameters being considered for the $r$th data set; the individual windows are indexed by $p$. The tilde ($\sim$) is placed above either matrices or vectors to denoted their use for multiple data sets. For matrices, the tilde indicates the formation of a block diagonal matrix. For vectors, the tilde indicates vertical concatenation. The functions used in each parameter selection method are indicated using $F$ with subscripts denoting which method is being considered. The tilde is added to indicate a function used for multiple data sets. For example, $\UBig(\regparam)$ represents the UPRE (uniparameter) function for multiple data sets. For matrices, vectors, and functions being used for multiparameter regularization, the subscript ``win" is added. Letters are bolded to indicate vectors; the term $\UWinBig(\regparamVec)$ represents the UPRE function for use in the ultimate case, where multiple data sets are being used for multiparameter regularization with the parameters contained in the vector $\regparamVec$.
+Due to the consideration of multiple data sets as well as multiparameter regularization for these data sets, the notation in this paper is extensive and will therefore be briefly summarized. $R$ denotes the number of data sets being considered, which are indexed by $r$. The index $r$ may either be placed as a subscript or a superscript with parenthesis signs; for example, $A^{(r)}$ represents the system matrix associated with the $r$th data set. $P_r$ represents the number of windows/parameters being considered for the $r$th data set; the individual windows are indexed by $p$. The tilde ($\sim$) is placed above either matrices or vectors to denoted their use for multiple data sets. For matrices, the tilde indicates the formation of a block diagonal matrix. For vectors, the tilde indicates vertical concatenation. The functions used in each parameter selection method are indicated using $F$ with subscripts denoting which method is being considered. The tilde is added to indicate a function used for multiple data sets. For example, $\UBig(\regparam)$ represents the UPRE (uniparameter) function for multiple data sets. For matrices, vectors, and functions being used for multiparameter regularization, the subscript ``win" is added. Letters are bolded to indicate vectors; the term $\UWinBig(\regparamVec)$ represents the UPRE function for use in the ultimate case, where multiple data sets are being used for multiparameter regularization with the parameters contained in the vector $\regparamVec$.
 
 \section{Background} \label{sec:Background}
 
@@ -610,7 +610,16 @@ where $\dft{\dVec}^{(r)} = \trans{U}\dVec^{(r)}$ for $r = 1,\ldots,R$. Lastly, A
 \U^{(r)}(\regparam) = \frac{1}{\mA} \sum_{j=1}^{n} \left(\mfilt^{(r)}_j\right)^2\left(\dft{d}_j^{(r)}\right)^2 + \frac{2\noiseSD^2_r}{\mA} \sum_{j=1}^{n} \filt^{(r)}_j - \noiseSD^2_r, \quad r = 1,\ldots,R.
 \end{equation}
 
-We conclude Section \ref{sec:UPRE} by showing a relationship between the adapted UPRE method that uses \eqref{eq:Averaged UPRE} and the UPRE method as simply applied to averaged data. 
+We conclude Section \ref{sec:UPRE} by showing a relationship between the adapted UPRE method that uses \eqref{eq:Averaged UPRE} and the UPRE method as simply applied to averaged data. For this result, we need the following assumption.
+
+\begin{assumption}
+\label{Assumption_Decomposition}
+We assume that there exist matrices $\Delta \in \mathbb{R}^{\mA \times n}$ and $\Lambda \in \mathbb{R}^{\mL \times n}$ such that
+\[A^{(r)} = U^{(r)}\Delta\trans{\left(X^{(r)}\right)}, \quad L^{(r)} = V^{(r)}\Lambda\trans{\left(X^{(r)}\right)}\]
+for $r = 1,\ldots,R$, where $U^{(r)}$ and $V^{(r)}$ are orthogonal and $X^{(r)}$ is invertible.
+\end{assumption}
+
+Though Assumption \ref{Assumption_Decomposition} is strong, it is implied by Assumption \ref{Assumption_Matrices}.
 
 \begin{proposition}
 Under Assumptions \ref{Assumption_System} through \ref{Assumption_Matrices} with data vectors $\{\dVec^{(r)}\}_{r=1}^R$, let 
