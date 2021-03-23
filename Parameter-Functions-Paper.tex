@@ -314,10 +314,10 @@ We follow the approach in \cite{ChungEasleyOLeary} by defining $P$ vectors $\wVe
 \label{eq:Weights}
 \sum_{p=1}^{P} \wVec_j^{(p)} = 1, \quad j = 1,\ldots,n.
 \end{equation}
-Defining windows $W^{(p)} = \diag\left(\wVec^{(p)}\right)$ for $p = 1,\ldots,P$, we have that that $\sum_{p=1}^P W^{(p)} = I_n$. A regularization parameter $\regparam^{(p)}$ can be selected for each window $W^{(p)}$ so that a windowed regularized solution can be constructed as
+Defining windows $W^{(p)} = \diag\left(\wVec^{(p)}\right)$ for $p = 1,\ldots,P$, we have that that $\sum_{p=1}^P W^{(p)} = I_n$. A regularization parameter $\regparam_{p}$ can be selected for each window $W^{(p)}$ so that a windowed regularized solution can be constructed as
 \begin{equation}
 \label{eq:TikSolWindow}
-\xWin(\regparamVec) = \sum_{p=1}^P V\inv{\left[\trans{S}S + (\regparam^{(p)})^2\right]}W^{(p)}\trans{S}\dft{\dVec}.
+\xWin(\regparamVec) = \sum_{p=1}^P V\inv{\left[\trans{S}S + (\regparam_{p})^2\right]}W^{(p)}\trans{S}\dft{\dVec}.
 \end{equation}
 Here we are using $L = I$ as the penalty matrix, so that the GSVD is reduced to the SVD. The windows must be selected before choosing corresponding regularization parameters; as such, some types of windows will be discussed. \par
 A specific class of windows are windows that do not overlap. Windows $W^{(p)}$ are defined to be non-overlapping if the components of their corresponding weight vectors $\wVec^{(p)}$ satisfy
@@ -371,26 +371,26 @@ respectively. See \cite{Byrne} for a proof that such cosine windows satisfies \e
 Given a penalty matrix $L \neq I$, a windowed regularized solution similar to \eqref{eq:TikSolWindow} can be obtained using the GSVD. Given the decompositions $A = U\Delta\trans{X}$ and $L = V\Lambda\trans{X}$ described in Section \ref{sec:GSVD} and windows $W^{(p)}$ for $p = 1,\ldots,P$, a corresponding windowed regularized solution is
 \begin{equation}
 \label{eq:Windowed GSVD Solution}
-    \xWin(\regparamVec) = \sum_{p=1}^P Y\inv{\left[\trans{\Delta}\Delta + \left(\regparam^{(p)}\right)^2 \trans{\Lambda}\Lambda\right]}W^{(p)}\trans{\Delta}\dft{\dVec}
+    \xWin(\regparamVec) = \sum_{p=1}^P Y\inv{\left[\trans{\Delta}\Delta + \left(\regparam_{p}\right)^2 \trans{\Lambda}\Lambda\right]}W^{(p)}\trans{\Delta}\dft{\dVec}
 \end{equation}
 with $Y$ again being the inverse of $\trans{X}$. In terms of the generalized singular values $\gamma_j$, \eqref{eq:Windowed GSVD Solution} can be written as
 \begin{equation}
 \label{eq:Windowed GSVD Solution Sum}
-    \xWin(\regparamVec) = \sum_{j=1}^n \left(\sum_{p=1}^P \filt_j\left(\regparam^{(p)},\gamma_j\right)\wVec^{(p)}_{j}\right)  \frac{\dft{d}_{j+k}}{\delta_j} Y_{\cdot,j}.
+    \xWin(\regparamVec) = \sum_{j=1}^n \left(\sum_{p=1}^P \filt_j\left(\regparam_{p},\gamma_j\right)\wVec^{(p)}_{j}\right)  \frac{\dft{d}_{j+k}}{\delta_j} Y_{\cdot,j}.
 \end{equation}
 However, care must be taken when selecting the weight vectors $\wVec^{p}$ in light of the fact that the generalized singular values are arranged in ascending order. If we extend the notation $\Phi(\regparam)$ and $\Psi(\regparam)$ introduced in Section \ref{sec:GSVD} to diagonal matrices $\Phi\left(\regparam^{(p)}\right)$ and $\Psi\left(\regparam^{(p)}\right)$ with entries
-\[\left[\Phi\left(\regparam^{(p)}\right)\right]_j = \begin{cases}
+\[\left[\Phi\left(\regparam_{p}\right)\right]_j = \begin{cases}
 0, & \delta_j = 0 \\
 1, & \lambda_j = 0 \\
-\filt_j\left(\regparam^{(p)},\gamma_j\right), & \text{otherwise,}
+\filt_j\left(\regparam_{p},\gamma_j\right), & \text{otherwise,}
 \end{cases} \qquad
-\left[\Psi\left(\regparam^{(p)}\right)\right]_j = \begin{cases}
+\left[\Psi\left(\regparam_{p}\right)\right]_j = \begin{cases}
 1, & \delta_j = 0 \\
 0, & \lambda_j = 0 \\
-\mfilt_j\left(\regparam^{(p)},\gamma_j\right), & \text{otherwise,}
+\mfilt_j\left(\regparam_{p},\gamma_j\right), & \text{otherwise,}
 \end{cases}\]
-then \eqref{eq:Windowed GSVD Solution} can be written as
-\[.\]
+then \eqref{eq:Windowed GSVD Solution} can also be written as
+\[\xWin(\regparamVec) = Y\sum_{p=1}^P W^{(p)} \Phi\left(\regparam_{p}\right)\pinv{\Delta}\dft{\dVec}.\]
 
 \subsection{Multiple data sets} \label{sec:Multiple data sets}
 We now consider the situation where we have a collection of data sets $\{\dVec^{(r)}\}_{r=1}^R$ where 
@@ -466,7 +466,22 @@ Analogous to representation \eqref{eq:GSVD Normal Eq Sol} for a single system, t
     \label{eq:GSVD Big Normal Eq Sol}
     \xBig(\regparamBig) = \widetilde{Y}\inv{\left(\trans{\widetilde{\Delta}}\widetilde{\Delta} + \widetilde{\regparam}^2 \trans{\widetilde{\Lambda}}\widetilde{\Lambda}\right)}\trans{\widetilde{\Delta}}\svd{\dBig}
 \end{equation}
-where $\widetilde{Y}$ is the inverse of $\widetilde{X}$ and $\svd{\dBig} = \trans{\widetilde{U}}\dBig$. \par
+where $\widetilde{Y}$ is the inverse of $\widetilde{X}$ and $\svd{\dBig} = \trans{\widetilde{U}}\dBig$. The notation from Section \ref{sec:GSVD} can be used to define
+\[\left[\Phi^{(r)}\left(\regparam\right)\right]_j = \begin{cases}
+0, & \delta_j^{(r)} = 0 \\
+1, & \lambda_j^{(r)} = 0 \\
+\filt_j\left(\regparam,\gamma_j^{(r)}\right), & \text{otherwise,}
+\end{cases} \qquad
+\left[\Psi^{(r)}\left(\regparam\right)\right]_j = \begin{cases}
+1, & \delta_j^{(r)} = 0 \\
+0, & \lambda_j^{(r)} = 0 \\
+\mfilt_j\left(\regparam,\gamma_j^{(r)}\right), & \text{otherwise}
+\end{cases}\]
+for $r = 1,\ldots,R$, so that we can let
+\[\widetilde{\Phi}(\regparam) = \diag\left(\Phi^{(1)}(\regparam),\ldots,\Phi^{(R)}(\regparam)\right), \quad \widetilde{\Psi}(\regparam) = \diag\left(\Psi^{(1)}(\regparam),\ldots,\Psi^{(R)}(\regparam)\right).\]
+With $\widetilde{\Phi}$, representation \eqref{eq:GSVD Big Normal Eq Sol} becomes
+\[\xBig(\regparamBig) = \widetilde{Y}\widetilde{\Phi}(\regparam)\pinv{\widetilde{\Delta}}\svd{\dBig}.\]
+
 Some of the parameter estimation methods considered in this paper rely upon the statistical properties of the noise in the data, so the statistics of $\widetilde{\noiseVec}$ will be addressed. Though \eqref{eq:Big vectors} indicates that the random vectors $\{\noiseVec^{(r)}\}_{r=1}^R$ are assumed to have zero mean, we can relax this assumption so that $\noiseVec^{(r)} \sim \mathcal{N}(\bm{\mu}^{(r)},\Sigma^{(r)})$ for all $r = 1,\ldots,R$. The distribution of $\widetilde{\noiseVec}$ is then given by Lemma \ref{lem:Concatenation of Normal Noise}, which follows from the properties of the multivariate normal distribution. 
 \begin{lemma}
 \label{lem:Concatenation of Normal Noise}
@@ -503,7 +518,23 @@ Analogous to the uniparameter case for multiple data sets, we define $\xWinBig(\
 \label{eq:Big Windowed Solution}
     \xWinBig(\regparamVecBig) = \sum_{p=1}^{P} \widetilde{Y}\inv{\left[\trans{\widetilde{\Delta}}\widetilde{\Delta} + \widetilde{\regparam}_p^2 \trans{\widetilde{\Lambda}}\widetilde{\Lambda}\right]}\widetilde{W}^{(p)}\trans{\widetilde{\Delta}}\dft{\dBig}
 \end{equation}
-where $\widetilde{W}^{(p)} = \diag(W^{(p)},\ldots,W^{(p)})$ has $R$ diagonal blocks.
+where $\widetilde{W}^{(p)} = \diag(W^{(p)},\ldots,W^{(p)})$ has $R$ diagonal blocks. Extending the notation from Section \ref{sec:Multiple data sets} to multiparameter regularization, we can define
+\[\widetilde{\Phi}\left(\widetilde{\regparam}_{p}\right) = \diag\left(\Phi^{(1)}\left(\widetilde{\regparam}_{p}\right),\ldots,\Phi^{(R)}\left(\widetilde{\regparam}_{p}\right)\right), \quad \widetilde{\Psi}\left(\widetilde{\regparam}_{p}\right) = \diag\left(\Psi^{(1)}\left(\widetilde{\regparam}_{p}\right),\ldots,\Psi^{(R)}\left(\widetilde{\regparam}_{p}\right)\right)\]
+where
+\begin{align*}
+    \left[\Phi^{(r)}\left(\widetilde{\regparam}_{p}\right)\right]_j &= \begin{cases}
+0, & \delta_j = 0 \\
+1, & \lambda_j = 0 \\
+\filt_j\left(\widetilde{\regparam}_{p},\gamma_j^{(r)}\right), & \text{otherwise,}
+\end{cases} \\
+\left[\widetilde{\Psi}^{(r)}\left(\widetilde{\regparam}_{p}\right)\right]_j &= \begin{cases}
+1, & \delta_j = 0 \\
+0, & \lambda_j = 0 \\
+\mfilt_j\left(\widetilde{\regparam}_{p},\gamma_j^{(r)}\right), & \text{otherwise.}
+\end{cases}
+\end{align*}
+Using $\widetilde{\Phi}\left(\widetilde{\regparam}_{p}\right)$ for the $p$th window, representation \eqref{eq:Big Windowed Solution} can be written as
+\[\xWinBig(\regparamVecBig) = \widetilde{Y}\sum_{p=1}^{P} \widetilde{W}^{(p)}\widetilde{\Phi}\left(\widetilde{\regparam}_{p}\right)\pinv{\widetilde{\Delta}}\dft{\dBig}.\]
 
 \section{Parameter selection methods} \label{sec:Methods}
 As stated in Section \ref{sec:Introduction}, there are a variety of methods for selecting regularization parameters and we illustrate some limited examples. The UPRE and MDP methods are popular choices for situations in which the variance of the noise in the data is known. In contrast, the GCV and L-curve methods are common choices when the variance is unknown. However, all four methods involve the norm of a term $\rReg$ called the regularized residual. In the uniparameter case involving a single data set $\dVec$, the regularized residual is defined as
