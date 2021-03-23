@@ -293,12 +293,20 @@ In terms of the generalized singular values $\gamma_j = \delta_j/\lambda_j$ for 
 \label{eq:GSVD Solution 3}
 \xVec(\regparam) = \sum_{j = 1}^{n} \filt_j\left(\regparam,\gamma_j\right) \frac{\svd{d}_{j+k}}{\delta_j} Y_{\cdot,j},
 \end{equation}
-which generalizes \eqref{eq:TikSol}. As a final representation and a return to matrix form, we can let $\Phi(\regparam) \in \mathbb{R}^{n \times n}$ diagonal matrix with
-\[\left[\Phi(\regparam)\right]_{j,j} = \filt\left(\regparam,\gamma_j\right), \quad j = 1,\ldots,n.\]
-Using $\Phi(\regparam)$, we can express representation \eqref{eq:GSVD Solution 3} more compactly as
+which generalizes \eqref{eq:TikSol}. The generalized singular values are ordered such that $\gamma_1 \leq \ldots \leq \gamma_n$, which is due to the order of the diagonal elements of $\diag(\trans{\Delta}\Delta)$ and $\diag(\trans{\Lambda}\Lambda)$. In contrast, the singular values associated with the standard SVD are arranged in descending order. \par
+As a final representation and a return to matrix form, we can let $\Phi(\regparam)$ and $\Psi(\regparam) = I - \Phi(\regparam)$ be $n \times n$ diagonal matrix with diagonal entries
+\[\left[\Phi(\regparam)\right]_j = \begin{cases}
+0, & \delta_j = 0 \\
+1, & \lambda_j = 0 \\
+\filt_j(\regparam,\gamma_j), & \text{otherwise,}
+\end{cases} \qquad
+[\Psi(\regparam)]_j = \begin{cases}
+1, & \delta_j = 0 \\
+0, & \lambda_j = 0 \\
+\mfilt_j(\regparam,\gamma_j), & \text{otherwise}
+\end{cases}\]
+for $j = 1,\ldots,n$. As noted in \cite[p.~107]{ABT}, there are situations in which some generalized singular values $\gamma_j$ are zero or arbitrarily small (meaning $\delta_j = 0$ or is arbitrarily small). In such cases, the corresponding filter factors $\filt_j$ are set to 1. Similarly, if $\gamma_j$ is arbitrarily small or infinite (which occurs when $\lambda_j$ is too small), then the corresponding summands in \eqref{eq:GSVD Solution 3} are counted as zero. Using $\Phi(\regparam)$, we can express representation \eqref{eq:GSVD Solution 3} more compactly as
 \[\xVec(\regparam) = Y\Phi(\regparam)\pinv{\Delta}\svd{\dVec}.\]
-
-As noted in \cite{ABT}, there are situations in which some generalized singular values $\gamma_j$ are arbitrarily large or infinite. In such cases, the corresponding filter factors $\filt_j$ are set to 1. Similarly, if $\gamma_j = 0$ or is arbitrarily small, then the corresponding summands in \eqref{eq:GSVD Solution 3} are counted as zero. Lastly, the generalized singular values are ordered such that $\gamma_1 \leq \ldots \leq \gamma_n$, which is due to the order of the diagonal elements of $\diag(\trans{\Delta}\Delta)$ and $\diag(\trans{\Lambda}\Lambda)$. In contrast, the singular values associated with the standard SVD are arranged in descending order.
 
 \subsection{Multiparameter Tikhonov regularization} \label{sec:Multiparameter}
 We follow the approach in \cite{ChungEasleyOLeary} by defining $P$ vectors $\wVec^{(p)} \in \mathbb{R}^n$ that contain non-negative weights which satisfy
@@ -311,7 +319,7 @@ Defining windows $W^{(p)} = \diag\left(\wVec^{(p)}\right)$ for $p = 1,\ldots,P$,
 \label{eq:TikSolWindow}
 \xWin(\regparamVec) = \sum_{p=1}^P V\inv{\left[\trans{S}S + (\regparam^{(p)})^2\right]}W^{(p)}\trans{S}\dft{\dVec}.
 \end{equation}
-The windows must be selected before choosing corresponding regularization parameters; as such, some types of windows will be discussed. \par
+Here we are using $L = I$ as the penalty matrix, so that the GSVD is reduced to the SVD. The windows must be selected before choosing corresponding regularization parameters; as such, some types of windows will be discussed. \par
 A specific class of windows are windows that do not overlap. Windows $W^{(p)}$ are defined to be non-overlapping if the components of their corresponding weight vectors $\wVec^{(p)}$ satisfy
 \begin{equation}
 \label{eq:Non-overlapping window condition}
@@ -368,9 +376,21 @@ Given a penalty matrix $L \neq I$, a windowed regularized solution similar to \e
 with $Y$ again being the inverse of $\trans{X}$. In terms of the generalized singular values $\gamma_j$, \eqref{eq:Windowed GSVD Solution} can be written as
 \begin{equation}
 \label{eq:Windowed GSVD Solution Sum}
-    \xWin(\regparamVec) = \sum_{j=1}^n \left(\sum_{p=1}^P \filt_j\left(\regparam^{(p)},\gamma_j\right)\wVec^{(p)}_{j}\right)  \frac{\dft{d}_{j}}{\delta_j} Y_{\cdot,j}.
+    \xWin(\regparamVec) = \sum_{j=1}^n \left(\sum_{p=1}^P \filt_j\left(\regparam^{(p)},\gamma_j\right)\wVec^{(p)}_{j}\right)  \frac{\dft{d}_{j+k}}{\delta_j} Y_{\cdot,j}.
 \end{equation}
-However, care must be taken when selecting the weight vectors $\wVec^{p}$ in light of the fact that the generalized singular values are arranged in ascending order.
+However, care must be taken when selecting the weight vectors $\wVec^{p}$ in light of the fact that the generalized singular values are arranged in ascending order. If we extend the notation $\Phi(\regparam)$ and $\Psi(\regparam)$ introduced in Section \ref{sec:GSVD} to diagonal matrices $\Phi\left(\regparam^{(p)}\right)$ and $\Psi\left(\regparam^{(p)}\right)$ with entries
+\[\left[\Phi\left(\regparam^{(p)}\right)\right]_j = \begin{cases}
+0, & \delta_j = 0 \\
+1, & \lambda_j = 0 \\
+\filt_j\left(\regparam^{(p)},\gamma_j\right), & \text{otherwise,}
+\end{cases} \qquad
+\left[\Psi\left(\regparam^{(p)}\right)\right]_j = \begin{cases}
+1, & \delta_j = 0 \\
+0, & \lambda_j = 0 \\
+\mfilt_j\left(\regparam^{(p)},\gamma_j\right), & \text{otherwise,}
+\end{cases}\]
+then \eqref{eq:Windowed GSVD Solution} can be written as
+\[.\]
 
 \subsection{Multiple data sets} \label{sec:Multiple data sets}
 We now consider the situation where we have a collection of data sets $\{\dVec^{(r)}\}_{r=1}^R$ where 
@@ -417,6 +437,7 @@ For $r = 1,\ldots,R$, assume that $\bVec^{(r)} = {A^{(r)}}\xVec^{(r)}$, $\dVec^{
 
 To obtain an explicit representation of $\xBig(\regparamBig)$, the GSVD can be utilized. A GSVD of each pair $(A^{(r)},L^{(r)})$ can obtained for $r = 1,\ldots,R$ so that
 \begin{equation}
+\label{eq:Mulitple GSVD}
     A^{(r)} = U^{(r)}\Delta^{(r)}\trans{\left(X^{(r)}\right)}, \quad L^{(r)} = V^{(r)}\Lambda^{(r)}\trans{\left(X^{(r)}\right)}.
 \end{equation}
 These decompositions then allow for the definition of block decomposition matrices described in Table \ref{tab:Block GSVD Matrices}.
@@ -485,11 +506,33 @@ Analogous to the uniparameter case for multiple data sets, we define $\xWinBig(\
 where $\widetilde{W}^{(p)} = \diag(W^{(p)},\ldots,W^{(p)})$ has $R$ diagonal blocks.
 
 \section{Parameter selection methods} \label{sec:Methods}
-As stated in Section \ref{sec:Introduction}, there are a variety of methods for selecting regularization parameters and we illustrate some limited examples. The UPRE and MDP methods are popular choices for situations in which the variance of the noise in the data is known. In contrast, the GCV and L-curve methods are common choices when the variance is unknown. However, all four methods involve the norm of a term $\rReg$ called the regularized residual. In the uniparameter case involving a single data point $\dVec$, the regularized residual is defined as
+As stated in Section \ref{sec:Introduction}, there are a variety of methods for selecting regularization parameters and we illustrate some limited examples. The UPRE and MDP methods are popular choices for situations in which the variance of the noise in the data is known. In contrast, the GCV and L-curve methods are common choices when the variance is unknown. However, all four methods involve the norm of a term $\rReg$ called the regularized residual. In the uniparameter case involving a single data set $\dVec$, the regularized residual is defined as
 \begin{equation}
 \label{eq:Regularized Residual}
 \rReg = A\xReg - \dVec.
 \end{equation}
+The UPRE and GCV methods involve the trace of an additional term called the influence matrix $\A$ \cite[p.~98]{Vogel:2002}. In uniparameter regularization for a single data set, the influence matrix is defined as
+\begin{equation}
+    \label{eq:Influence matrix}
+    \A = A\inv{\left(\trans{A}A + \regparam^2\trans{L}L\right)}\trans{A}.
+\end{equation}
+If the GSVD is used, we can express $\A$ as
+\begin{align*}
+    \A &= U\Delta\trans{X}\inv{\left(X\trans{\Delta}\trans{U}U\Delta\trans{X} + \regparam^2 X\trans{\Lambda}\trans{V}V\Lambda\trans{X}\right)}X\trans{\Delta}\trans{U} \\
+    &= U\Delta\inv{\left(\trans{\Delta}\Delta + \regparam^2 \trans{\Lambda}\Lambda\right)}\trans{\Delta}\trans{U}.
+\end{align*}
+The filter functions \eqref{eq:Filter functions} provide a convenient way of expressing $\|\rReg\|_2^2$ and $\trace(\A)$. To streamline notation, for $j = 1,\ldots,n$ we let
+\[\filt_j = \begin{cases}
+0, & \delta_j = 0 \\
+1, & \lambda_j = 0 \\
+\frac{\gamma_j^2}{\gamma_j^2 + \regparam^2}, & \text{otherwise,}
+\end{cases} \qquad \mfilt_j = 1 - \filt_j = \begin{cases}
+1, & \delta_j = 0 \\
+0, & \lambda_j = 0 \\
+\frac{\regparam^2}{\gamma_j^2 + \regparam^2}, & \text{otherwise,}
+\end{cases}\]
+which are in terms of the generalized singular values $\gamma_j = \delta_j/\lambda_j$. The condition $\delta_j = 0$ corresponds with $\gamma_j = 0$, while $\lambda_j = 0$ corresponds with $\gamma_j$ begin infinite. From a numerical standpoint, some tolerance should be set to monitor the size of $\gamma_j$ and adjust the filter factors accordingly. With this notation, we can write
+\[\left\|\rReg\right\|_2^2 = \sum_{j=1}^{n} \left(\mfilt_j\right)^2\left(\dft{d}_j\right)^2, \qquad \trace(\A) = \sum_{j=1}^{n} \filt_j. \quad \left[\Phi^{(r)}(\regparam^{(p)})\right]_j\]
 
 We extend the notation introduced in Section \ref{sec:Multiparameter} for multiparameter regularization involving a single data point to define a windowed regularized residual
 \begin{equation}
@@ -508,8 +551,32 @@ The ultimate situation is multiparameter regularization as applied to multiple d
 \rWinBig(\regparamVecBig) = \ABig\xWinBig(\regparamVecBig) - \dBig. 
 \end{equation}
 The GSVD allows for $\xWinBig(\regparamVecBig)$ to be represented by \eqref{eq:Big Windowed Solution}.
+To this end, we will use the version of the GSVD outlined in Section \ref{sec:GSVD} (which uses the assumption that the system matrix in \eqref{eq:TikSol3} has full column rank). Specifically, we use \eqref{eq:Mulitple GSVD} to define the generalized filter functions to be
+\begin{equation}
+\label{eq:Filter functions 2}
+\filt^{(r)}_j = \frac{\left(\delta^{(r)}_j\right)^2}{\left(\delta^{(r)}_j\right)^2 + \regparam^2 \left(\lambda^{(r)}_j\right)^2}, \quad \mfilt^{(r)}_j = 1 - \filt^{(r)}_j = \frac{\regparam^2 \left(\lambda^{(r)}_j\right)^2}{\left(\delta^{(r)}_j\right)^2 + \regparam^2 \left(\lambda^{(r)}_j\right)^2}
+\end{equation}
+where $\bm{\delta}^{(r)} = \sqrt{\diag(\trans{(\Delta^{(r)})}\Delta^{(r)})}$ and $\bm{\lambda}^{(r)} = \sqrt{\diag(\trans{(\Lambda^{(r)})}\Lambda^{(r)})}$ for each $r = 1,\ldots,R$. The influence matrix $A^{(r)}(\regparam)$ given by \eqref{eq:Diagonal blocks} can be expressed as
+\begin{equation}
+\label{eq:Fourier diagonalization 2}
+A^{(r)}(\regparam) = U^{(r)}\Delta^{(r)}\left[\trans{(\Delta^{(r)})}\Delta^{(r)} + \regparam^2\trans{(\Lambda^{(r)})}\Lambda^{(r)}\right]^{-1}\trans{\left(\Delta^{(r)}\right)}\trans{\left(U^{(r)}\right)}, \qquad r = 1,\ldots,R.
+\end{equation}
+Assumption \ref{Assumption_Noise} and the similarity invariance of the trace operator gives
+\begin{align}
+    \trace\left(\Sigma^{(r)}A^{(r)}(\regparam)\right) &=  \trace\left(\noiseSD_r^2 I_{m} U^{(r)}\Delta^{(r)}\left[\trans{(\Delta^{(r)})}\Delta^{(r)} + \regparam^2\trans{(\Lambda^{(r)})}\Lambda^{(r)}\right]^{-1}\trans{\left(\Delta^{(r)}\right)}\trans{\left(U^{(r)}\right)}\right) \nonumber \\ 
+    &= \noiseSD_r^2 \trace\left(\Delta^{(r)}\left[\trans{(\Delta^{(r)})}\Delta^{(r)} + \regparam^2\trans{(\Lambda^{(r)})}\Lambda^{(r)}\right]^{-1}\trans{(\Delta^{(r)})}\right) \nonumber \\
+    &= \noiseSD_r^2 \sum_{j=1}^{n} \filt^{(r)}_j. \label{eq:Trace}
+\end{align}
+Another benefit of using \eqref{eq:Fourier diagonalization 2} is that we can write
+\begin{align}
+\frac{1}{\mA}\|\rVec^{(r)}(\regparam)\|_2^2 &= \frac{1}{\mA}\left\|U^{(r)}\left(\Delta^{(r)}\left[\trans{(\Delta^{(r)})}\Delta^{(r)} + \regparam^2\trans{(\Lambda^{(r)})}\Lambda^{(r)}\right]^{-1}\trans{(\Delta^{(r)})} - I_{\mA}\right)\trans{\left(U^{(r)}\right)}\dVec^{(r)}\right\|_2^2 \nonumber \\
+&= \frac{1}{\mA}\left\|\left(\Delta^{(r)}\left[\trans{(\Delta^{(r)})}\Delta^{(r)} + \regparam^2\trans{(\Lambda^{(r)})}\Lambda^{(r)}\right]^{-1}\trans{(\Delta^{(r)})} - I_{\mA}\right)\dft{\dVec}^{(r)}\right\|_2^2 \nonumber \\
+&= \frac{1}{\mA}\sum_{j=1}^{n} \left(\mfilt^{(r)}_j\right)^2\left(\dft{d}_j^{(r)}\right)^2,
+\label{eq:Fourier regularized residual}
+\end{align}
+where $\dft{\dVec}^{(r)} = \trans{\left(U^{(r)}\right)}\dVec^{(r)}$ for $r = 1,\ldots,R$. Lastly, Assumption 2 means that $\trace(\Sigma^{(r)}) = m\noiseSD^2_r$. 
 
-As a final remark, the development of the adapted UPRE, MDP, and GCV methods also rely on Assumption \ref{Assumption_System} and the constructions contained in Table \ref{tab:System assumptions}. By Lemma \ref{lem:Concatenation of Normal Noise}, this assumption implies that $\widetilde{\noiseVec} \sim \mathcal{N}\left(\widetilde{\zeroVec},\widetilde{\Sigma}\right)$ with $\widetilde{\zeroVec} \in \mathbb{R}^M$ and $M = \sum_{r=1}^{R} m_r$. 
+As a final remark, an analogous approach could be taken if the matrices $A^{(r)}$ and $L^{(r)}$ can be simultaneously diagonalized with respect to a orthogonal/unitary transformation, such as the discrete cosine transform (DCT) or discrete Fourier transform (DFT); test problems using the DCT and DFT are considered in Section \ref{sec:Validation}. The development of the adapted UPRE, MDP, and GCV methods also rely on Assumption \ref{Assumption_System} and the constructions contained in Table \ref{tab:System assumptions}. By Lemma \ref{lem:Concatenation of Normal Noise}, this assumption implies that $\widetilde{\noiseVec} \sim \mathcal{N}\left(\widetilde{\zeroVec},\widetilde{\Sigma}\right)$ with $\widetilde{\zeroVec} \in \mathbb{R}^M$ and $M = \sum_{r=1}^{R} m_r$. 
 
 \subsection{Unbiased Predictive Risk Estimator} \label{sec:UPRE}
 The UPRE method was developed in 1973 by Mallows and considers the statistical relationship between predictive error $\pVec(\regparam)$ and the regularized residual $\rVec(\regparam)$; these quantities are defined respectively as
@@ -575,36 +642,8 @@ where
 \[\U^{(r)}(\regparam) = \frac{1}{\mA}\left\|\rVec^{(r)}(\regparam)\right\|_2^2 + \frac{2}{\mA} \trace\left(\Sigma^{(r)} A^{(r)}(\regparam)\right) - \frac{1}{\mA} \trace\left(\Sigma^{(r)}\right), \quad r = 1,\ldots,R.\]
 \end{proof}
 \noindent In other words, $\UBig(\regparam)$ is the average of $\{\U^{(r)}(\regparam)\}_{r=1}^R$. The UPRE method for multiple data sets is to let $\widetilde{\regparam}_{\textrm{UPRE}} = \argmin_{\regparam > 0} \UBig(\regparam)$. As a final remark, \eqref{eq:Individual UPRE} is equivalent to \eqref{eq:UPRE} under Assumption \ref{Assumption_Noise}. \par
-A representation of \eqref{eq:Averaged UPRE} will now be presented that involves generalizations of the filter functions \eqref{eq:Filter functions}. In an effort to streamline this presentation, we will use the version of the GSVD outlined in Section \ref{sec:GSVD} (which uses the assumption that the system matrix in \eqref{eq:TikSol3} has full column rank). Specifically, we make the following assumption.
-\begin{assumption}
-\label{Assumption_Diagonalization}
-We assume that there exist matrices $U$, $V$, and $\trans{X}$ such that $A^{(r)} = U{\Delta^{(r)}}\trans{X}$ and  $L^{(r)} = V{\Lambda^{(r)}}\trans{X}$ for all $r = 1,\ldots,R$. 
-\end{assumption}
-\noindent While this is an extremely strong and unrealistic assumption (the belief that such a factorization does not exist in general is expressed in \cite{Brezinski2003}), it certainly becomes realistic under Assumption \ref{Assumption_Matrices}. In fact, Assumption \ref{Assumption_Matrices} implies Assumption \ref{Assumption_Diagonalization}. We use Assumption \ref{Assumption_Diagonalization} to simply present the following derivation in a general setting. An analogous approach could be taken if the matrices $A^{(r)}$ and $L^{(r)}$ can be simultaneously diagonalized with respect to a orthogonal/unitary transformation, such as the discrete cosine transform (DCT) or discrete Fourier transform (DFT); test problems using the DCT and DFT are considered in Section \ref{sec:Validation}. \par
-From Assumption \ref{Assumption_Diagonalization}, we define the generalized filter functions to be
-\begin{equation}
-\label{eq:Filter functions 2}
-\filt^{(r)}_j = \frac{\left(\delta^{(r)}_j\right)^2}{\left(\delta^{(r)}_j\right)^2 + \regparam^2 \left(\lambda^{(r)}_j\right)^2}, \quad \mfilt^{(r)}_j = 1 - \filt^{(r)}_j = \frac{\regparam^2 \left(\lambda^{(r)}_j\right)^2}{\left(\delta^{(r)}_j\right)^2 + \regparam^2 \left(\lambda^{(r)}_j\right)^2}
-\end{equation}
-where $\bm{\delta}^{(r)} = \sqrt{\diag(\trans{(\Delta^{(r)})}\Delta^{(r)})}$ and $\bm{\lambda}^{(r)} = \sqrt{\diag(\trans{(\Lambda^{(r)})}\Lambda^{(r)})}$ for each $r = 1,\ldots,R$. The matrix $A^{(r)}(\regparam)$ given by \eqref{eq:Diagonal blocks} can be expressed as
-\begin{equation}
-\label{eq:Fourier diagonalization 2}
-A^{(r)}(\regparam) = U\Delta^{(r)}\left[\trans{(\Delta^{(r)})}\Delta^{(r)} + \regparam^2\trans{(\Lambda^{(r)})}\Lambda^{(r)}\right]^{-1}\trans{(\Delta^{(r)})}\trans{U}, \qquad r = 1,\ldots,R.
-\end{equation}
-Assumption \ref{Assumption_Noise} and the similarity invariance of the trace operator gives
-\begin{align}
-    \trace\left(\Sigma^{(r)}A^{(r)}(\regparam)\right) &=  \trace\left(\noiseSD_r^2 I_{m} U\Delta^{(r)}\left[\trans{(\Delta^{(r)})}\Delta^{(r)} + \regparam^2\trans{(\Lambda^{(r)})}\Lambda^{(r)}\right]^{-1}\trans{(\Delta^{(r)})}\trans{U}\right) \nonumber \\ 
-    &= \noiseSD_r^2 \trace\left(\Delta^{(r)}\left[\trans{(\Delta^{(r)})}\Delta^{(r)} + \regparam^2\trans{(\Lambda^{(r)})}\Lambda^{(r)}\right]^{-1}\trans{(\Delta^{(r)})}\right) \nonumber \\
-    &= \noiseSD_r^2 \sum_{j=1}^{n} \filt^{(r)}_j. \label{eq:Trace}
-\end{align}
-Another benefit of using \eqref{eq:Fourier diagonalization 2} is that we can write
-\begin{align}
-\frac{1}{\mA}\|\rVec^{(r)}(\regparam)\|_2^2 &= \frac{1}{\mA}\left\|U\left(\Delta^{(r)}\left[\trans{(\Delta^{(r)})}\Delta^{(r)} + \regparam^2\trans{(\Lambda^{(r)})}\Lambda^{(r)}\right]^{-1}\trans{(\Delta^{(r)})} - I_{\mA}\right)\trans{U}\dVec^{(r)}\right\|_2^2 \nonumber \\
-&= \frac{1}{\mA}\left\|\left(\Delta^{(r)}\left[\trans{(\Delta^{(r)})}\Delta^{(r)} + \regparam^2\trans{(\Lambda^{(r)})}\Lambda^{(r)}\right]^{-1}\trans{(\Delta^{(r)})} - I_{\mA}\right)\dft{\dVec}^{(r)}\right\|_2^2 \nonumber \\
-&= \frac{1}{\mA}\sum_{j=1}^{n} \left(\mfilt^{(r)}_j\right)^2\left(\dft{d}_j^{(r)}\right)^2,
-\label{eq:Fourier regularized residual}
-\end{align}
-where $\dft{\dVec}^{(r)} = \trans{U}\dVec^{(r)}$ for $r = 1,\ldots,R$. Lastly, Assumption 2 means that $\trace(\Sigma^{(r)}) = m\noiseSD^2_r$. Therefore, the UPRE function \eqref{eq:Averaged UPRE} for multiple data sets can be written in terms of the following representation for individual UPRE functions:
+A representation of \eqref{eq:Averaged UPRE} will now be presented that involves generalizations of the filter functions \eqref{eq:Filter functions}. 
+Therefore, the UPRE function \eqref{eq:Averaged UPRE} for multiple data sets can be written in terms of the following representation for individual UPRE functions:
 \begin{equation}
 \label{eq:Individual UPRE 2}
 \U^{(r)}(\regparam) = \frac{1}{\mA} \sum_{j=1}^{n} \left(\mfilt^{(r)}_j\right)^2\left(\dft{d}_j^{(r)}\right)^2 + \frac{2\noiseSD^2_r}{\mA} \sum_{j=1}^{n} \filt^{(r)}_j - \noiseSD^2_r, \quad r = 1,\ldots,R.
@@ -619,7 +658,7 @@ We assume that there exist matrices $\Delta \in \mathbb{R}^{\mA \times n}$ and $
 for $r = 1,\ldots,R$, where $U^{(r)}$ and $V^{(r)}$ are orthogonal and $X^{(r)}$ is invertible.
 \end{assumption}
 
-Though Assumption \ref{Assumption_Decomposition} is strong, it is implied by Assumption \ref{Assumption_Matrices}.
+Though Assumption \ref{Assumption_Decomposition} is strong, it is implied by Assumption \ref{Assumption_Matrices}. A consequence of Assumption \ref{Assumption_Decomposition} is that the pairs $(A^{(r)},L^{(r)})$ all have the same generalized singular values.
 
 \begin{proposition}
 Under Assumptions \ref{Assumption_System} through \ref{Assumption_Matrices} with data vectors $\{\dVec^{(r)}\}_{r=1}^R$, let 
