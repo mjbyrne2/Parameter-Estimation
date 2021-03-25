@@ -147,7 +147,7 @@ In this paper, we seek solutions of
 \label{eq:Ax = b}
 A\xVec = \dVec,
 \end{equation}
-where $A \in \mathbb{R}^{\mA \times n}$ is ill-conditioned and $\dVec$ is known. Specifically we consider the situation where the condition number of $A$ is large and the data available to us is $\dVec = \bVec + \noiseVec$, with $\noiseVec$ being a realization of a random vector and $\bVec = A\xTrue$. Even for small systems, direct matrix inversion is not recommended due to the noise in the data and the ill-conditioning of the system matrix $A$. An alternative approach is regularization, which aims to mathematically describe desired characteristics of a solution to produce a more well-posed problem. \par
+where $A \in \mathbb{R}^{\mA \times n}$ and $\dVec$ is known. Specifically we consider the situation where the data available to us is $\dVec = \bVec + \noiseVec$, with $\noiseVec$ being a realization of a random vector and $\bVec = A\xTrue$. Even for invertible matrices $A$, direct matrix inversion is not recommended due to the noise in the data and the possibility of $A$ begin ill-conditioned. An alternative approach is regularization, which aims to mathematically describe desired characteristics of a solution to produce a more well-posed problem. \par
 A common regularization technique is Tikhonov regularization \cite{Tikh1963}, in which the regularized solution $\xReg$ is defined as
 \begin{equation}
 \label{eq:TikSol2}
