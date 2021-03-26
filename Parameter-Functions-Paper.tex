@@ -176,7 +176,7 @@ where the $\mA \times \mA$ matrix $U$ and the $n \times n$ matrix $V$ are orthog
 \inv{A}\dVec = VS^{-1}{\trans{U}}\dVec = \sum_{j=1}^{n} \frac{{\trans{(U_{\cdot,j})}}\dVec}{\singular_j}V_{\cdot,j} = \sum_{j=1}^{n} \frac{\svd{d}_j}{\singular_j}V_{\cdot,j}
 \end{equation}
 where $\svd{\dVec} = \trans{U}\dVec$. \par 
-Beyond the situation where $A$ is square and invertible, the pseudoinverse \cite{Penrose1955} $\pinv{A} = V\pinv{S}\trans{U}$, where $\pinv{S} \in \mathbb{R}^{n \times \mA}$ is formed by reciprocating the nonzero diagonal elements of $\trans{S}$. When working with the pseudoinverse $\pinv{A}$, it can be convenient to write
+Beyond the situation where $A$ is square and invertible, the pseudoinverse \cite{Penrose1955} $\pinv{A} = V\pinv{S}\trans{U}$ can be used where $\pinv{S} \in \mathbb{R}^{n \times \mA}$ is formed by reciprocating the nonzero diagonal elements of $\trans{S}$. When working with the pseudoinverse $\pinv{A}$, it can be convenient to write
 \begin{equation}
 \label{eq:Compact SVD}
 A = U_{\rA}S_{\rA}\trans{V}_{\rA}
@@ -188,27 +188,28 @@ where $U_{\rA} \in \mathbb{R}^{\mA \times \rA}$ and $V_{\rA} \in \mathbb{R}^{n \
 \end{equation}
 
 Let $\pinv{\xVec} = \pinv{A}\dVec = V\pinv{S}\svd{\dVec}$ denote the solution of $A\xVec = \dVec$ obtained using the pseudoinverse $\pinv{A}$. The summation representation of $\pinv{\xVec}$ is the same as \eqref{eq:InvProd} except that $\rA$ is the upper limit of summation. In the case where $\nullspace(A) \neq \{\zeroVec\}$, infinitely many solutions to $A\xVec = \dVec$ can be constructed as $\pinv{\xVec} + \xVec_0$ where $\xVec_0 \in \nullspace(A)$ is arbitrary. \par
-Generally, the summands in \eqref{eq:InvProd} are numerically unstable for small $\singular_j$ when the terms $\left|\svd{d}_j\right|$ do not decay as fast as the $\singular_j$; this describes the discrete Picard condition \cite{Hansen:98}. For an ill-conditioned matrix $A$, forming \eqref{eq:InvProd} will often result in a meaningless solution. A common approach to overcome numerical instabilities is to multiply the summands in \eqref{eq:InvProd} by filter functions $\filt$ that depend upon $\singular_j$ and a non-negative regularization parameter $\regparam$, a process called regularization. By doing so, an approximate solution is
+Generally, the summands in \eqref{eq:InvProd} are numerically unstable for small $\singular_j$ when the terms $\left|\svd{d}_j\right|$ do not decay as fast as the $\singular_j$; this describes the discrete Picard condition \cite{Hansen:98}. For an ill-conditioned matrix $A$, forming \eqref{eq:InvProd} will often result in a meaningless solution. A common approach to overcome numerical instabilities is to multiply the summands in \eqref{eq:InvProd} by filter functions $\filt(\regparam,\singular_j)$ that depend upon $\singular_j$ and a non-negative regularization parameter $\regparam$, a process called regularization. By doing so, an approximate solution is
 \begin{equation}
 \label{eq:ApproxSol}
-\xVec(\regparam) := \sum_{j=1}^{\rA} \filt(\regparam,\singular_j) \frac{\svd{d}_j}{\singular_j}V_{\cdot,j}  = V\Phi{S}^\dagger\svd{\dVec},
+\xVec(\regparam) := \sum_{j=1}^{n} \filt(\regparam,\singular_j) \frac{\svd{d}_j}{\singular_j}V_{\cdot,j}  = V\Phi(\regparam){S}^\dagger\svd{\dVec},
 \end{equation}
-where the matrix $\Phi$ is diagonal with $\Phi_{j,j} = \filt(\regparam,\singular_j)$ for $j = 1,\ldots,{n}$. The most desired property of the filter functions is that $\filt(\singular_j)/\singular_j \approx 1$  for large values of $\singular_j$ and $\filt(\singular_j)/\singular_j \approx 0$ for small values of $\singular_j$. A specific example of a filter function is
+where the matrix $\Phi(\regparam)$ is diagonal with diagonal entries 
+\[\Phi_j(\regparam) = \begin{cases}
+0, & \singular_j = 0 \\
+\filt(\regparam,\singular_j), & \text{otherwise,}
+\end{cases} \quad j = 1,\ldots,n.\]
+The most desired property of the filter functions is that $\filt(\regparam,\singular_j)/\singular_j \approx 1$  for large values of $\singular_j$ and $\filt(\regparam,\singular_j)/\singular_j \approx 0$ for small values of $\singular_j$. A specific example of a filter function is
 \begin{equation}
 \label{eq:TikFilt}
 \filt(\regparam,\singular_j)  = \frac{\singular_j^2}{\singular_j^2 + \regparam^2}
 \end{equation}
-which is known as the standard Tikhonov filter function. The use of the Tikhonov filter function to generate an approximate solution is known as Tikhonov regularization \cite{Tikh1963}; in terms of an SVD, the obtained solution is
-\begin{equation}
-\label{eq:TikSol}
-\xVec(\regparam) = \sum_{j = 1}^{\rA} \frac{\singular_j \svd{d}_j}{\singular_j^2 + \regparam^2}V_{\cdot,j} = \sum_{j = 1}^{\rA} \filt(\regparam,\singular_j)\frac{\svd{d}_j}{\singular_j}V_{\cdot,j}.
-\end{equation}
+which is known as the standard Tikhonov filter function. The use of the Tikhonov filter function to generate an approximate solution is known as Tikhonov regularization \cite{Tikh1963}. \par
 An alternative representation of the above Tikhonov solution is
 \begin{equation}
 \label{eq:Damped LS}
 \xVec(\regparam) = \argmin_{\xVec \in \mathbb{R}^n} \left\{\|A\xVec - \dVec\|_2^2 + \regparam^2\|\xVec\|_2^2\right\},
 \end{equation}
-which is a solution to a damped least squares problem \cite{ABT}. The solutions \eqref{eq:TikSol} and \eqref{eq:Damped LS} are solutions to the ordinary least squares problem
+which is a solution to a damped least squares problem \cite{ABT}. The regularized solution \eqref{eq:Damped LS} is a solution to the ordinary least squares problem
 \begin{equation}
 \label{eq:Ordinary LS}
 \min_{\xVec \in \mathbb{R}^n} \left\{\left\|
@@ -226,8 +227,8 @@ where the system matrix has full rank for all $\regparam > 0$. Using the SVD of 
 \[(\trans{A}A + \regparam^2 I_n)\xVec = \trans{A}\dVec\]
 corresponding to \eqref{eq:Ordinary LS} simplify to
 \[(\trans{S}S + \regparam^2 I_n)\trans{V}\xVec = \trans{S}\svd{\dVec}.\]
-Representation \eqref{eq:TikSol} is then obtained by noting that $(\trans{S}S + \regparam^2 I_n)$ is a diagonal matrix that is guaranteed to be non-singular for $\regparam > 0$. If $A$ has full column rank and $\mA \geq n$, then $\trans{S}S + \regparam^2 I_n$ is non-singular even when $\regparam = 0$ but may be poorly conditioned. \par
-Representation \eqref{eq:Damped LS} follows from selecting $L$ in \eqref{eq:TikSol2} to be $I_n$. Analogous to \eqref{eq:Ordinary LS}, the solution \eqref{eq:TikSol2} can be expressed in block form as
+Representation \eqref{eq:ApproxSol} is then obtained by noting that $(\trans{S}S + \regparam^2 I_n)$ is a diagonal matrix that is guaranteed to be non-singular for $\regparam > 0$. If $A$ has full column rank and $\mA \geq n$, then $\trans{S}S + \regparam^2 I_n$ is non-singular even when $\regparam = 0$ but may be poorly conditioned. \par
+Representation \eqref{eq:ApproxSol} follows from selecting $L$ in \eqref{eq:TikSol2} to be $I_n$. Analogous to \eqref{eq:Ordinary LS}, the solution \eqref{eq:TikSol2} can be expressed in block form as
 \begin{equation}
 \xVec(\regparam) = \argmin_{\xVec \in \mathbb{R}^n} \left\{\left\| \begin{bmatrix}
 A \\
@@ -273,7 +274,7 @@ Additionally, the assumption that the block system matrix in \eqref{eq:TikSol3} 
     \label{eq:GSVD Normal Eq Sol}
     \xVec(\regparam) = Y\inv{\left(\trans{\Delta}\Delta + \regparam^2 \trans{\Lambda}\Lambda\right)}\trans{\Delta}\svd{\dVec},
 \end{equation}
-where $Y$ is the inverse of $\trans{X}$. A representation of the regularized solution similar to \eqref{eq:TikSol} can also be obtained:
+where $Y$ is the inverse of $\trans{X}$. A representation of the regularized solution similar to \eqref{eq:ApproxSol} can also be obtained:
 \begin{equation}
 \label{eq:GSVD Solution 1}
 \xVec(\regparam) = \sum_{j = 1}^{n} \frac{\delta_j \svd{d}_{j+k}}{\delta^2_j + \regparam^2 \lambda^2_j}Y_{\cdot,j}
@@ -293,7 +294,7 @@ In terms of the generalized singular values $\gamma_j = \delta_j/\lambda_j$ for 
 \label{eq:GSVD Solution 3}
 \xVec(\regparam) = \sum_{j = 1}^{n} \filt_j\left(\regparam,\gamma_j\right) \frac{\svd{d}_{j+k}}{\delta_j} Y_{\cdot,j},
 \end{equation}
-which generalizes \eqref{eq:TikSol}. The generalized singular values are ordered such that $\gamma_1 \leq \ldots \leq \gamma_n$, which is due to the order of the diagonal elements of $\diag(\trans{\Delta}\Delta)$ and $\diag(\trans{\Lambda}\Lambda)$. In contrast, the singular values associated with the standard SVD are arranged in descending order. \par
+which generalizes \eqref{eq:ApproxSol}. The generalized singular values are ordered such that $\gamma_1 \leq \ldots \leq \gamma_n$, which is due to the order of the diagonal elements of $\diag(\trans{\Delta}\Delta)$ and $\diag(\trans{\Lambda}\Lambda)$. In contrast, the singular values associated with the standard SVD are arranged in descending order. \par
 As a final representation and a return to matrix form, we can let $\Phi(\regparam)$ and $\Psi(\regparam) = I - \Phi(\regparam)$ be $n \times n$ diagonal matrix with diagonal entries
 \[\left[\Phi(\regparam)\right]_j = \begin{cases}
 0, & \delta_j = 0 \\
@@ -314,10 +315,10 @@ We follow the approach in \cite{ChungEasleyOLeary} by defining $P$ vectors $\wVe
 \label{eq:Weights}
 \sum_{p=1}^{P} \wVec_j^{(p)} = 1, \quad j = 1,\ldots,n.
 \end{equation}
-Defining windows $W^{(p)} = \diag\left(\wVec^{(p)}\right)$ for $p = 1,\ldots,P$, we have that that $\sum_{p=1}^P W^{(p)} = I_n$. A regularization parameter $\regparam_{p}$ can be selected for each window $W^{(p)}$ so that a windowed regularized solution can be constructed as
+Defining windows $W^{(p)} = \diag\left(\wVec^{(p)}\right)$ for $p = 1,\ldots,P$, we have that that $\sum_{p=1}^P W^{(p)} = I_n$. A regularization parameter $\regparam^{(p)}$ can be selected for each window $W^{(p)}$ so that a windowed regularized solution can be constructed as
 \begin{equation}
 \label{eq:TikSolWindow}
-\xWin(\regparamVec) = \sum_{p=1}^P V\inv{\left[\trans{S}S + (\regparam_{p})^2\right]}W^{(p)}\trans{S}\dft{\dVec}.
+\xWin(\regparamVec) = \sum_{p=1}^P V\inv{\left[\trans{S}S + (\regparam^{(p)})^2\right]}W^{(p)}\trans{S}\dft{\dVec}.
 \end{equation}
 Here we are using $L = I$ as the penalty matrix, so that the GSVD is reduced to the SVD. The windows must be selected before choosing corresponding regularization parameters; as such, some types of windows will be discussed. \par
 A specific class of windows are windows that do not overlap. Windows $W^{(p)}$ are defined to be non-overlapping if the components of their corresponding weight vectors $\wVec^{(p)}$ satisfy
@@ -371,26 +372,26 @@ respectively. See \cite{Byrne} for a proof that such cosine windows satisfies \e
 Given a penalty matrix $L \neq I$, a windowed regularized solution similar to \eqref{eq:TikSolWindow} can be obtained using the GSVD. Given the decompositions $A = U\Delta\trans{X}$ and $L = V\Lambda\trans{X}$ described in Section \ref{sec:GSVD} and windows $W^{(p)}$ for $p = 1,\ldots,P$, a corresponding windowed regularized solution is
 \begin{equation}
 \label{eq:Windowed GSVD Solution}
-    \xWin(\regparamVec) = \sum_{p=1}^P Y\inv{\left[\trans{\Delta}\Delta + \left(\regparam_{p}\right)^2 \trans{\Lambda}\Lambda\right]}W^{(p)}\trans{\Delta}\dft{\dVec}
+    \xWin(\regparamVec) = \sum_{p=1}^P Y\inv{\left[\trans{\Delta}\Delta + \left(\regparam^{(p)}\right)^2 \trans{\Lambda}\Lambda\right]}W^{(p)}\trans{\Delta}\dft{\dVec}
 \end{equation}
 with $Y$ again being the inverse of $\trans{X}$. In terms of the generalized singular values $\gamma_j$, \eqref{eq:Windowed GSVD Solution} can be written as
 \begin{equation}
 \label{eq:Windowed GSVD Solution Sum}
-    \xWin(\regparamVec) = \sum_{j=1}^n \left(\sum_{p=1}^P \filt_j\left(\regparam_{p},\gamma_j\right)\wVec^{(p)}_{j}\right)  \frac{\dft{d}_{j+k}}{\delta_j} Y_{\cdot,j}.
+    \xWin(\regparamVec) = \sum_{j=1}^n \left(\sum_{p=1}^P \filt_j\left(\regparam^{(p)},\gamma_j\right)\wVec^{(p)}_{j}\right)  \frac{\dft{d}_{j+k}}{\delta_j} Y_{\cdot,j}.
 \end{equation}
 However, care must be taken when selecting the weight vectors $\wVec^{p}$ in light of the fact that the generalized singular values are arranged in ascending order. If we extend the notation $\Phi(\regparam)$ and $\Psi(\regparam)$ introduced in Section \ref{sec:GSVD} to diagonal matrices $\Phi\left(\regparam^{(p)}\right)$ and $\Psi\left(\regparam^{(p)}\right)$ with entries
-\[\left[\Phi\left(\regparam_{p}\right)\right]_j = \begin{cases}
+\[\left[\Phi\left(\regparam^{(p)}\right)\right]_j = \begin{cases}
 0, & \delta_j = 0 \\
 1, & \lambda_j = 0 \\
-\filt_j\left(\regparam_{p},\gamma_j\right), & \text{otherwise,}
+\filt_j\left(\regparam^{(p)},\gamma_j\right), & \text{otherwise,}
 \end{cases} \qquad
-\left[\Psi\left(\regparam_{p}\right)\right]_j = \begin{cases}
+\left[\Psi\left(\regparam^{(p)}\right)\right]_j = \begin{cases}
 1, & \delta_j = 0 \\
 0, & \lambda_j = 0 \\
-\mfilt_j\left(\regparam_{p},\gamma_j\right), & \text{otherwise,}
+\mfilt_j\left(\regparam^{(p)},\gamma_j\right), & \text{otherwise,}
 \end{cases}\]
 then \eqref{eq:Windowed GSVD Solution} can also be written as
-\[\xWin(\regparamVec) = Y\sum_{p=1}^P W^{(p)} \Phi\left(\regparam_{p}\right)\pinv{\Delta}\dft{\dVec}.\]
+\[\xWin(\regparamVec) = Y\sum_{p=1}^P W^{(p)} \Phi\left(\regparam^{(p)}\right)\pinv{\Delta}\dft{\dVec}.\]
 
 \subsection{Multiple data sets} \label{sec:Multiple data sets}
 We now consider the situation where we have a collection of data sets $\{\dVec^{(r)}\}_{r=1}^R$ where 
@@ -519,22 +520,22 @@ Analogous to the uniparameter case for multiple data sets, we define $\xWinBig(\
     \xWinBig(\regparamVecBig) = \sum_{p=1}^{P} \widetilde{Y}\inv{\left[\trans{\widetilde{\Delta}}\widetilde{\Delta} + \widetilde{\regparam}_p^2 \trans{\widetilde{\Lambda}}\widetilde{\Lambda}\right]}\widetilde{W}^{(p)}\trans{\widetilde{\Delta}}\dft{\dBig}
 \end{equation}
 where $\widetilde{W}^{(p)} = \diag(W^{(p)},\ldots,W^{(p)})$ has $R$ diagonal blocks. Extending the notation from Section \ref{sec:Multiple data sets} to multiparameter regularization, we can define
-\[\widetilde{\Phi}\left(\widetilde{\regparam}_{p}\right) = \diag\left(\Phi^{(1)}\left(\widetilde{\regparam}_{p}\right),\ldots,\Phi^{(R)}\left(\widetilde{\regparam}_{p}\right)\right), \quad \widetilde{\Psi}\left(\widetilde{\regparam}_{p}\right) = \diag\left(\Psi^{(1)}\left(\widetilde{\regparam}_{p}\right),\ldots,\Psi^{(R)}\left(\widetilde{\regparam}_{p}\right)\right)\]
+\[\widetilde{\Phi}\left(\widetilde{\regparam}^{(p)}\right) = \diag\left(\Phi^{(1)}\left(\widetilde{\regparam}^{(p)}\right),\ldots,\Phi^{(R)}\left(\widetilde{\regparam}^{(p)}\right)\right), \quad \widetilde{\Psi}\left(\widetilde{\regparam}^{(p)}\right) = \diag\left(\Psi^{(1)}\left(\widetilde{\regparam}^{(p)}\right),\ldots,\Psi^{(R)}\left(\widetilde{\regparam}^{(p)}\right)\right)\]
 where
 \begin{align*}
-    \left[\Phi^{(r)}\left(\widetilde{\regparam}_{p}\right)\right]_j &= \begin{cases}
+    \left[\Phi^{(r)}\left(\widetilde{\regparam}^{(p)}\right)\right]_j &= \begin{cases}
 0, & \delta_j = 0 \\
 1, & \lambda_j = 0 \\
-\filt_j\left(\widetilde{\regparam}_{p},\gamma_j^{(r)}\right), & \text{otherwise,}
+\filt_j\left(\widetilde{\regparam}^{(p)},\gamma_j^{(r)}\right), & \text{otherwise,}
 \end{cases} \\
-\left[\widetilde{\Psi}^{(r)}\left(\widetilde{\regparam}_{p}\right)\right]_j &= \begin{cases}
+\left[\widetilde{\Psi}^{(r)}\left(\widetilde{\regparam}^{(p)}\right)\right]_j &= \begin{cases}
 1, & \delta_j = 0 \\
 0, & \lambda_j = 0 \\
-\mfilt_j\left(\widetilde{\regparam}_{p},\gamma_j^{(r)}\right), & \text{otherwise.}
+\mfilt_j\left(\widetilde{\regparam}^{(p)},\gamma_j^{(r)}\right), & \text{otherwise.}
 \end{cases}
 \end{align*}
-Using $\widetilde{\Phi}\left(\widetilde{\regparam}_{p}\right)$ for the $p$th window, representation \eqref{eq:Big Windowed Solution} can be written as
-\[\xWinBig(\regparamVecBig) = \widetilde{Y}\sum_{p=1}^{P} \widetilde{W}^{(p)}\widetilde{\Phi}\left(\widetilde{\regparam}_{p}\right)\pinv{\widetilde{\Delta}}\dft{\dBig}.\]
+Using $\widetilde{\Phi}\left(\widetilde{\regparam}^{(p)}\right)$ for the $p$th window, representation \eqref{eq:Big Windowed Solution} can be written as
+\[\xWinBig(\regparamVecBig) = \widetilde{Y}\sum_{p=1}^{P} \widetilde{W}^{(p)}\widetilde{\Phi}\left(\widetilde{\regparam}^{(p)}\right)\pinv{\widetilde{\Delta}}\dft{\dBig}.\]
 
 \section{Parameter selection methods} \label{sec:Methods}
 As stated in Section \ref{sec:Introduction}, there are a variety of methods for selecting regularization parameters and we illustrate some limited examples. The UPRE and MDP methods are popular choices for situations in which the variance of the noise in the data is known. In contrast, the GCV and L-curve methods are common choices when the variance is unknown. However, all four methods involve the norm of a term $\rReg$ called the regularized residual. In the uniparameter case involving a single data set $\dVec$, the regularized residual is defined as
@@ -618,7 +619,7 @@ The UPRE method was developed in 1973 by Mallows and considers the statistical r
 The standard UPRE function for Tikhonov regularization is
 \begin{equation}
 \label{eq:UPRE}
-\U(\alpha) = \frac{1}{\mA}\|\rVec(\regparam)\|_2^2 + \frac{2\noiseSD^2}{\mA}\trace(A_\regparam) - \noiseSD^2
+\U(\alpha) = \frac{1}{\mA}\|\rVec(\regparam)\|_2^2 + \frac{2\noiseSD^2}{\mA}\trace(\A) - \noiseSD^2
 \end{equation}
 where $\A = A(\trans{A}A + \regparam^2\trans{L}L)^{-1}\trans{A}$ is the influence matrix and $\noiseVec \sim \mathcal{N}(\bm{0},\noiseSD^2 I_{\mA})$. The function $\U(\regparam)$ is an unbiased estimator of the expected value of $\frac{1}{\mA}\|\pVec(\regparam)\|_2^2$, a quantity called the predictive risk. The UPRE method selects $\regparam_{\textrm{UPRE}} = \argmin_{\regparam > 0} \U(\regparam)$. \par
 We first present the UPRE function for Tikhonov regularization under the more general condition that $\noiseVec \sim \mathcal{N}(\bm{0},\Sigma)$. Analogous to the standard UPRE function, we can define $\U(\regparam)$ as
@@ -748,7 +749,7 @@ The corresponding influence matrix $A_\text{win}(\regparamVec) = AR_\text{win}(\
 \end{equation}
 The windowed regularized residual $\rVec_\text{win}(\regparamVec) = (A_\text{win}(\regparamVec) - I_{\mA})\dVec$ can be written as
 \begin{equation}
-    \rVec_\text{win}(\regparamVec) = U\left(S\left[\sum_{p=1}^P V\inv{\left(\trans{S}S + \regparam_{p}^2 I_n\right)}W^{(p)}\right]\trans{S} - I_{\mA}\right)\dft{\dVec}.
+    \rVec_\text{win}(\regparamVec) = U\left(S\left[\sum_{p=1}^P V\inv{\left(\trans{S}S + \left(\regparam^{(p)}\right)^2 I_n\right)}W^{(p)}\right]\trans{S} - I_{\mA}\right)\dft{\dVec}.
 \end{equation}
 Thus the multiparameter UPRE function for problem $\dVec = A\xVec + \noiseVec$ is 
 \begin{equation}
