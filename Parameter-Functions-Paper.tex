@@ -291,12 +291,12 @@ The standard Tikhonov filter function $\filt_j(\regparam)$ defined by \eqref{eq:
 \filt_j(\regparam) = \begin{cases}
 0, & \delta_j = 0 \\
 1, & \lambda_j = 0 \\
-\frac{\gamma^2_j}{\gamma^2_j + \regparam^2}, & \text{otherwise,}
+\dfrac{\gamma^2_j}{\gamma^2_j + \regparam^2}, & \text{otherwise,}
 \end{cases} \qquad
 \mfilt_j(\regparam) = \begin{cases}
 1, & \delta_j = 0 \\
 0, & \lambda_j = 0 \\
-\frac{\regparam^2}{\gamma^2_j + \regparam^2}, & \text{otherwise}
+\dfrac{\regparam^2}{\gamma^2_j + \regparam^2}, & \text{otherwise}
 \end{cases}
 \end{equation}
 Using $\filt_j$, the solution \eqref{eq:GSVD Solution 3} can be written as
@@ -307,21 +307,6 @@ Using $\filt_j$, the solution \eqref{eq:GSVD Solution 3} can be written as
 which generalizes \eqref{eq:ApproxSol}. As a final representation and a return to matrix form, we now let
 \[\Phi(\regparam) = \diag\left(\filt_1(\regparam),\ldots,\filt_n(\regparam)\right), \qquad \Psi(\regparam) = I - \Phi(\regparam) = \diag\left(\mfilt_1(\regparam),\ldots,\mfilt_n(\regparam)\right)\]
 where the diagonal entries are defined by \eqref{eq:Filter functions}. Using $\Phi(\regparam)$, we can express representation \eqref{eq:GSVD Solution 2} more compactly as $\xVec(\regparam) = Y\Phi(\regparam)\pinv{\Delta}\svd{\dVec}$.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 \subsection{Multiparameter Tikhonov regularization} \label{sec:Multiparameter}
 We follow the approach in \cite{ChungEasleyOLeary} by defining $P$ vectors $\wVec^{(p)} \in \mathbb{R}^n$ that contain non-negative weights which satisfy
@@ -388,22 +373,13 @@ Given a penalty matrix $L \neq I$, a windowed regularized solution similar to \e
 \label{eq:Windowed GSVD Solution}
     \xWin(\regparamVec) = \sum_{p=1}^P Y\inv{\left[\trans{\Delta}\Delta + \left(\regparam^{(p)}\right)^2 \trans{\Lambda}\Lambda\right]}W^{(p)}\trans{\Delta}\dft{\dVec}
 \end{equation}
-with $Y$ again being the inverse of $\trans{X}$. In terms of the generalized singular values $\gamma_j$, \eqref{eq:Windowed GSVD Solution} can be written as
+with $Y$ again being the inverse of $\trans{X}$. In terms of the filter functions \eqref{eq:Filter functions}, the windowed solution \eqref{eq:Windowed GSVD Solution} can be written as
 \begin{equation}
 \label{eq:Windowed GSVD Solution Sum}
-    \xWin(\regparamVec) = \sum_{j=1}^n \left(\sum_{p=1}^P \filt_j\left(\regparam^{(p)},\gamma_j\right)\wVec^{(p)}_{j}\right)  \frac{\dft{d}_{j+k}}{\delta_j} Y_{\cdot,j}.
+    \xWin(\regparamVec) = \sum_{j=1}^n \left(\sum_{p=1}^P \filt_j\left(\regparam^{(p)}\right)\wVec^{(p)}_{j}\right)  \frac{\dft{d}_{j+k}}{\delta_j} Y_{\cdot,j}.
 \end{equation}
-However, care must be taken when selecting the weight vectors $\wVec^{p}$ in light of the fact that the generalized singular values are arranged in ascending order. If we extend the notation $\Phi(\regparam)$ and $\Psi(\regparam)$ introduced in Section \ref{sec:GSVD} to diagonal matrices $\Phi\left(\regparam^{(p)}\right)$ and $\Psi\left(\regparam^{(p)}\right)$ with entries
-\[\left[\Phi\left(\regparam^{(p)}\right)\right]_j = \begin{cases}
-0, & \delta_j = 0 \\
-1, & \lambda_j = 0 \\
-\filt_j\left(\regparam^{(p)},\gamma_j\right), & \text{otherwise,}
-\end{cases} \qquad
-\left[\Psi\left(\regparam^{(p)}\right)\right]_j = \begin{cases}
-1, & \delta_j = 0 \\
-0, & \lambda_j = 0 \\
-\mfilt_j\left(\regparam^{(p)},\gamma_j\right), & \text{otherwise,}
-\end{cases}\]
+However, care must be taken when selecting the weight vectors $\wVec^{p}$ in light of the fact that the generalized singular values are arranged in ascending order. If we extend the notation $\Phi(\regparam)$ and $\Psi(\regparam)$ introduced in Section \ref{sec:GSVD} to defined the $n \times n$ diagonal matrices 
+\[\Phi\left(\regparam^{(p)}\right) = \diag\left(\filt_1\left(\regparam^{(p)}\right),\ldots,\filt_n\left(\regparam^{(p)}\right)\right), \quad  \Psi\left(\regparam^{(p)}\right) = \diag\left(\mfilt_1\left(\regparam^{(p)}\right),\ldots,\mfilt_n\left(\regparam^{(p)}\right)\right),\]
 then \eqref{eq:Windowed GSVD Solution} can also be written as
 \[\xWin(\regparamVec) = Y\sum_{p=1}^P W^{(p)} \Phi\left(\regparam^{(p)}\right)\pinv{\Delta}\dft{\dVec}.\]
 
@@ -481,21 +457,22 @@ Analogous to representation \eqref{eq:GSVD Normal Eq Sol} for a single system, t
     \label{eq:GSVD Big Normal Eq Sol}
     \xBig(\regparamBig) = \widetilde{Y}\inv{\left(\trans{\widetilde{\Delta}}\widetilde{\Delta} + \widetilde{\regparam}^2 \trans{\widetilde{\Lambda}}\widetilde{\Lambda}\right)}\trans{\widetilde{\Delta}}\svd{\dBig}
 \end{equation}
-where $\widetilde{Y}$ is the inverse of $\widetilde{X}$ and $\svd{\dBig} = \trans{\widetilde{U}}\dBig$. The notation from Section \ref{sec:GSVD} can be used to define
-\[\left[\Phi^{(r)}\left(\regparam\right)\right]_j = \begin{cases}
+where $\widetilde{Y}$ is the inverse of $\widetilde{X}$ and $\svd{\dBig} = \trans{\widetilde{U}}\dBig$. The filter function notation from Section \ref{sec:GSVD} can be used to define
+\[\filt_j^{(r)}\left(\regparam\right) = \begin{cases}
 0, & \delta_j^{(r)} = 0 \\
 1, & \lambda_j^{(r)} = 0 \\
-\filt_j\left(\regparam,\gamma_j^{(r)}\right), & \text{otherwise,}
+\dfrac{\left(\gamma_j^{(r)}\right)^2}{\left(\gamma_j^{(r)}\right)^2 + \regparam^2}, & \text{otherwise,}
 \end{cases} \qquad
-\left[\Psi^{(r)}\left(\regparam\right)\right]_j = \begin{cases}
+\mfilt_j^{(r)}\left(\regparam\right) = \begin{cases}
 1, & \delta_j^{(r)} = 0 \\
 0, & \lambda_j^{(r)} = 0 \\
-\mfilt_j\left(\regparam,\gamma_j^{(r)}\right), & \text{otherwise}
+\dfrac{\regparam^2}{\left(\gamma_j^{(r)}\right)^2 + \regparam^2}, & \text{otherwise}
 \end{cases}\]
-for $r = 1,\ldots,R$, so that we can let
+for $r = 1,\ldots,R$, as well as the $n \times n$ diagonal matrices
+\[\Phi^{(r)}(\regparam) = \diag\left(\filt_1^{(r)}(\regparam),\ldots,\filt_n^{(r)}(\regparam)\right), \quad \Psi^{(r)}(\regparam) = \diag\left(\mfilt_1^{(r)}(\regparam),\ldots,\mfilt_n^{(r)}(\regparam)\right).\]
+The diagonal matrices $\Phi^{(r)}(\regparam)$ and $\Psi^{(r)}(\regparam)$ can be diagonally concatenated to form the block diagonal matrices
 \[\widetilde{\Phi}(\regparam) = \diag\left(\Phi^{(1)}(\regparam),\ldots,\Phi^{(R)}(\regparam)\right), \quad \widetilde{\Psi}(\regparam) = \diag\left(\Psi^{(1)}(\regparam),\ldots,\Psi^{(R)}(\regparam)\right).\]
-With $\widetilde{\Phi}$, representation \eqref{eq:GSVD Big Normal Eq Sol} becomes
-\[\xBig(\regparamBig) = \widetilde{Y}\widetilde{\Phi}(\regparam)\pinv{\widetilde{\Delta}}\svd{\dBig}.\]
+With $\widetilde{\Phi}$, representation \eqref{eq:GSVD Big Normal Eq Sol} becomes $\xBig(\regparamBig) = \widetilde{Y}\widetilde{\Phi}(\regparam)\pinv{\widetilde{\Delta}}\svd{\dBig}$.
 
 Some of the parameter estimation methods considered in this paper rely upon the statistical properties of the noise in the data, so the statistics of $\widetilde{\noiseVec}$ will be addressed. Though \eqref{eq:Big vectors} indicates that the random vectors $\{\noiseVec^{(r)}\}_{r=1}^R$ are assumed to have zero mean, we can relax this assumption so that $\noiseVec^{(r)} \sim \mathcal{N}(\bm{\mu}^{(r)},\Sigma^{(r)})$ for all $r = 1,\ldots,R$. The distribution of $\widetilde{\noiseVec}$ is then given by Lemma \ref{lem:Concatenation of Normal Noise}, which follows from the properties of the multivariate normal distribution. 
 \begin{lemma}
@@ -525,30 +502,34 @@ The strength of the assumptions presented so far increase in accordance with the
 
 \subsection{Multiparameter regularization for multiple data sets} \label{sec:Adapted regularization}
 
-The ultimate situation we consider is the case where multiparameter regularization is applied to multiple data sets. Letting $\regparamVec^{(r)}$ be the regularization parameters used for multiparameter regularization applied to the $r$th system described by \eqref{eq:Big vectors}, we can independently construct regularized solutions
-\[\xWin^{(r)}\left(\regparamVec^{(r)}\right) = \sum_{p=1}^{P_r} Y^{(r)}\inv{\left[\trans{\left(\Delta^{(r)}\right)}\Delta^{(r)} + \left(\regparam^{(r)}_p\right)^2 \trans{\left(\Lambda^{(r)}\right)}\Lambda^{(r)}\right]}W^{(p)}_{(r)}\trans{\left(\Delta^{(r)}\right)}\dft{\dVec}^{(r)}\]
-where $W^{(p)}_{(r)}$ is the $p$th window for the $r$th system, $\regparam^{(r)}_p$ is the regularization parameter for the $p$th window, and $P_r$ is the number of windows. Each system can have its own set of windows, meaning that there are a total of $RP_r$ regularization parameters. However, the primary assumption we make moving forward is that the windows $W^{(p)}_{(r)}$ for each system are the same, i.e $W^{(p)}_{(r)} = W^{(p)}$ for all $r = 1,\ldots,R$ and $p = 1,\ldots,P$. This implies that $\regparamVec^{(r)}$ are all vectors of length $P$ and there are a total of $RP$ parameters. \par
+The ultimate situation we consider is the case where multiparameter regularization is applied to multiple data sets. Letting $\regparamVec^{(r)} = [\regparam^{(r,1)},\regparam^{(r,2)},\ldots,\regparam^{(r,P_r)}]$ be the $P_r$ regularization parameters used for multiparameter regularization applied to the $r$th system described by \eqref{eq:Big vectors}, we can independently construct regularized solutions
+\[\xWin^{(r)}\left(\regparamVec^{(r)}\right) = \sum_{p=1}^{P_r} Y^{(r)}\inv{\left[\trans{\left(\Delta^{(r)}\right)}\Delta^{(r)} + \left(\regparam^{(r,p)}\right)^2 \trans{\left(\Lambda^{(r)}\right)}\Lambda^{(r)}\right]}W^{(r,p)}\trans{\left(\Delta^{(r)}\right)}\dft{\dVec}^{(r)}\]
+where $W^{(r,p)}$ is the $p$th window for the $r$th system. Each system can have its own set of windows, meaning that there are a total of $\sum_{r=1}^{R} P_r$ regularization parameters. However, the primary assumption we make moving forward is that the windows $W^{(r,p)}$ for each system are the same, i.e $W^{(r,p)} = W^{(p)}$ for all $r = 1,\ldots,R$ and $p = 1,\ldots,P$. This implies that $\regparamVec^{(r)}$ are all vectors of length $P$ and there are a total of $RP$ parameters. \par
 Analogous to the uniparameter case for multiple data sets, we define $\xWinBig(\regparamVecBig)$ as the vertical concatenation of the $\xWin^{(r)}\left(\regparamVecBig\right)$ for $r = 1,\ldots,R$, where $\regparamVecBig \in \mathbb{R}^P$ is a single vector of parameters. Using the constructions from Table \ref{tab:Block GSVD Matrices}, we have
 \begin{equation}
 \label{eq:Big Windowed Solution}
-    \xWinBig(\regparamVecBig) = \sum_{p=1}^{P} \widetilde{Y}\inv{\left[\trans{\widetilde{\Delta}}\widetilde{\Delta} + \widetilde{\regparam}_p^2 \trans{\widetilde{\Lambda}}\widetilde{\Lambda}\right]}\widetilde{W}^{(p)}\trans{\widetilde{\Delta}}\dft{\dBig}
+    \xWinBig(\regparamVecBig) = \sum_{p=1}^{P} \widetilde{Y}\inv{\left[\trans{\widetilde{\Delta}}\widetilde{\Delta} + \left(\widetilde{\regparam}^{(p)}\right)^2 \trans{\widetilde{\Lambda}}\widetilde{\Lambda}\right]}\widetilde{W}^{(p)}\trans{\widetilde{\Delta}}\dft{\dBig}
 \end{equation}
-where $\widetilde{W}^{(p)} = \diag(W^{(p)},\ldots,W^{(p)})$ has $R$ diagonal blocks. Extending the notation from Section \ref{sec:Multiple data sets} to multiparameter regularization, we can define
+where $\widetilde{W}^{(p)} = \diag(W^{(p)},\ldots,W^{(p)})$ has $R$ diagonal blocks. As the final extension of notation from Section \ref{sec:Multiple data sets}, we define
 \begin{align*}
-    \widetilde{\Phi}\left(\widetilde{\regparam}^{(p)}\right) &= \diag\left(\Phi^{(1)}\left(\widetilde{\regparam}^{(p)}\right),\ldots,\Phi^{(R)}\left(\widetilde{\regparam}^{(p)}\right)\right), \\ \widetilde{\Psi}\left(\widetilde{\regparam}^{(p)}\right) &= \diag\left(\Psi^{(1)}\left(\widetilde{\regparam}^{(p)}\right),\ldots,\Psi^{(R)}\left(\widetilde{\regparam}^{(p)}\right)\right)
-\end{align*}
-where
-\begin{align*}
-    \left[\Phi^{(r)}\left(\widetilde{\regparam}^{(p)}\right)\right]_j &= \begin{cases}
-0, & \delta_j = 0 \\
-1, & \lambda_j = 0 \\
-\filt_j\left(\widetilde{\regparam}^{(p)},\gamma_j^{(r)}\right), & \text{otherwise,}
+    \filt_j^{(r)}\left(\regparam^{(p)}\right) &= \begin{cases}
+0, & \delta_j^{(r)} = 0 \\
+1, & \lambda_j^{(r)} = 0 \\
+\dfrac{\left(\gamma_j^{(r)}\right)^2}{\left(\gamma_j^{(r)}\right)^2 + \left(\regparam^{(p)}\right)^2}, & \text{otherwise,}
 \end{cases} \\
-\left[\widetilde{\Psi}^{(r)}\left(\widetilde{\regparam}^{(p)}\right)\right]_j &= \begin{cases}
-1, & \delta_j = 0 \\
-0, & \lambda_j = 0 \\
-\mfilt_j\left(\widetilde{\regparam}^{(p)},\gamma_j^{(r)}\right), & \text{otherwise.}
+\mfilt_j^{(r)}\left(\regparam^{(p)}\right) &= \begin{cases}
+1, & \delta_j^{(r)} = 0 \\
+0, & \lambda_j^{(r)} = 0 \\
+\dfrac{\left(\regparam^{(p)}\right)^2}{\left(\gamma_j^{(r)}\right)^2 + \left(\regparam^{(p)}\right)^2}, & \text{otherwise}
 \end{cases}
+\end{align*}
+for $r = 1,\ldots,R$ and $p = 1,\ldots,P$. With the diagonal matrices
+\begin{align*}
+    \Phi^{(r)}\left(\widetilde{\regparam}^{(p)}\right) &= \diag\left(\filt_1^{(r)}\left(\regparam^{(p)}\right),\ldots,\filt_n^{(r)}\left(\regparam^{(p)}\right)\right), \\ \Phi^{(1)}\left(\widetilde{\regparam}^{(p)}\right) &= \diag\left(\mfilt_1^{(r)}\left(\regparam^{(p)}\right),\ldots,\mfilt_n^{(r)}\left(\regparam^{(p)}\right)\right),
+\end{align*}
+the appropriate block matrices can be formed:
+\begin{align*}
+    \widetilde{\Phi}\left(\widetilde{\regparam}^{(p)}\right) &= \diag\left(\Phi^{(1)}\left(\widetilde{\regparam}^{(p)}\right),\ldots,\Phi^{(R)}\left(\widetilde{\regparam}^{(p)}\right)\right), \\ \widetilde{\Psi}\left(\widetilde{\regparam}^{(p)}\right) &= \diag\left(\Psi^{(1)}\left(\widetilde{\regparam}^{(p)}\right),\ldots,\Psi^{(R)}\left(\widetilde{\regparam}^{(p)}\right)\right).
 \end{align*}
 Using $\widetilde{\Phi}\left(\widetilde{\regparam}^{(p)}\right)$ for the $p$th window, representation \eqref{eq:Big Windowed Solution} can be written as
 \[\xWinBig(\regparamVecBig) = \widetilde{Y}\sum_{p=1}^{P} \widetilde{W}^{(p)}\widetilde{\Phi}\left(\widetilde{\regparam}^{(p)}\right)\pinv{\widetilde{\Delta}}\dft{\dBig}.\]
