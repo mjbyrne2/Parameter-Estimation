@@ -188,20 +188,20 @@ where $U_{\rA} \in \mathbb{R}^{\mA \times \rA}$ and $V_{\rA} \in \mathbb{R}^{n \
 \end{equation}
 
 Let $\pinv{\xVec} = \pinv{A}\dVec = V\pinv{S}\svd{\dVec}$ denote the solution of $A\xVec = \dVec$ obtained using the pseudoinverse $\pinv{A}$. The summation representation of $\pinv{\xVec}$ is the same as \eqref{eq:InvProd} except that $\rA$ is the upper limit of summation. In the case where $\nullspace(A) \neq \{\zeroVec\}$, infinitely many solutions to $A\xVec = \dVec$ can be constructed as $\pinv{\xVec} + \xVec_0$ where $\xVec_0 \in \nullspace(A)$ is arbitrary. \par
-Generally, the summands in \eqref{eq:InvProd} are numerically unstable for small $\singular_j$ when the terms $\left|\svd{d}_j\right|$ do not decay as fast as the $\singular_j$; this describes the discrete Picard condition \cite{Hansen:98}. For an ill-conditioned matrix $A$, forming \eqref{eq:InvProd} will often result in a meaningless solution. A common approach to overcome numerical instabilities is to multiply the summands in \eqref{eq:InvProd} by filter functions $\filt(\regparam,\singular_j)$ that depend upon $\singular_j$ and a non-negative regularization parameter $\regparam$, a process called regularization. By doing so, an approximate solution is
+Generally, the summands in \eqref{eq:InvProd} are numerically unstable for small $\singular_j$ when the terms $\left|\svd{d}_j\right|$ do not decay as fast as the $\singular_j$; this describes the discrete Picard condition \cite{Hansen:98}. For an ill-conditioned matrix $A$, forming \eqref{eq:InvProd} will often result in a meaningless solution. A common approach to overcome numerical instabilities is to multiply the summands in \eqref{eq:InvProd} by filter functions $\filt_j(\regparam)$ that depend upon $\singular_j$ and a non-negative regularization parameter $\regparam$, a process called regularization. By doing so, an approximate solution is
 \begin{equation}
 \label{eq:ApproxSol}
-\xVec(\regparam) := \sum_{j=1}^{n} \filt(\regparam,\singular_j) \frac{\svd{d}_j}{\singular_j}V_{\cdot,j}  = V\Phi(\regparam){S}^\dagger\svd{\dVec},
+\xVec(\regparam) := \sum_{j=1}^{n} \filt_j(\regparam) \frac{\svd{d}_j}{\singular_j}V_{\cdot,j}  = V\Phi(\regparam){S}^\dagger\svd{\dVec},
 \end{equation}
 where the matrix $\Phi(\regparam)$ is diagonal with diagonal entries 
 \[\Phi_j(\regparam) = \begin{cases}
 0, & \singular_j = 0 \\
-\filt(\regparam,\singular_j), & \text{otherwise,}
+\filt_j(\regparam), & \text{otherwise,}
 \end{cases} \quad j = 1,\ldots,n.\]
-The most desired property of the filter functions is that $\filt(\regparam,\singular_j)/\singular_j \approx 1$  for large values of $\singular_j$ and $\filt(\regparam,\singular_j)/\singular_j \approx 0$ for small values of $\singular_j$. A specific example of a filter function is
+The most desired property of the filter functions is that $\filt_j(\regparam)/\singular_j \approx 1$  for large values of $\singular_j$ and $\filt_j(\regparam)/\singular_j \approx 0$ for small values of $\singular_j$. A specific example of a filter function is
 \begin{equation}
 \label{eq:TikFilt}
-\filt(\regparam,\singular_j)  = \frac{\singular_j^2}{\singular_j^2 + \regparam^2}
+\filt_j(\regparam)  = \frac{\singular_j^2}{\singular_j^2 + \regparam^2}
 \end{equation}
 which is known as the standard Tikhonov filter function. The use of the Tikhonov filter function to generate an approximate solution is known as Tikhonov regularization \cite{Tikh1963}. \par
 An alternative representation of the above Tikhonov solution is
@@ -279,35 +279,49 @@ where $Y$ is the inverse of $\trans{X}$. A representation of the regularized sol
 \label{eq:GSVD Solution 1}
 \xVec(\regparam) = \sum_{j = 1}^{n} \frac{\delta_j \svd{d}_{j+k}}{\delta^2_j + \regparam^2 \lambda^2_j}Y_{\cdot,j}
 \end{equation}
-with $\bm{\delta} = \sqrt{\diag(\trans{\Delta}\Delta)}$ and $\bm{\lambda} = \sqrt{\diag(\trans{\Lambda}\Lambda)}$ (the square roots being applied element-wise).  A filter function $\filt_j$ and complement $\mfilt_j$ similar to \eqref{eq:TikFilt} can be introduced to further simplify notation:
-\begin{equation}
-\label{eq:Filter functions}
-\filt_j\left(\regparam,\frac{\delta_j}{\lambda_j}\right) = \frac{\delta^2_j}{\delta^2_j + \regparam^2 \lambda^2_j}, \quad \mfilt_j\left(\regparam,\frac{\delta_j}{\lambda_j}\right) = 1 - \filt_j\left(\regparam,\frac{\delta_j}{\lambda_j}\right) = \frac{\regparam^2 \lambda^2_j}{\delta^2_j + \regparam^2 \lambda^2_j}.
-\end{equation}
-Using $\filt_j$, the solution \eqref{eq:GSVD Solution 1} can be written as
-\begin{equation}
-\label{eq:GSVD Solution 2}
-\xVec(\regparam) = \sum_{j = 1}^{n} \frac{\delta^2_j}{\delta^2_j + \regparam^2 \lambda^2_j} \frac{\svd{d}_{j+k}}{\delta_j} Y_{\cdot,j} = \sum_{j = 1}^{n} \filt_j\left(\regparam,\frac{\delta_j}{\lambda_j}\right) \frac{\svd{d}_{j+k}}{\delta_j} Y_{\cdot,j}.
-\end{equation} 
-In terms of the generalized singular values $\gamma_j = \delta_j/\lambda_j$ for $j = 1,\ldots,n$, the solution \eqref{eq:GSVD Solution 1} can also be written as
+with $\bm{\delta} = \sqrt{\diag(\trans{\Delta}\Delta)}$ and $\bm{\lambda} = \sqrt{\diag(\trans{\Lambda}\Lambda)}$ (the square roots being applied element-wise).  In terms of the generalized singular values $\gamma_j = \delta_j/\lambda_j$ for $j = 1,\ldots,n$, the solution \eqref{eq:GSVD Solution 1} can also be written as
 \begin{equation}
 \label{eq:GSVD Solution 3}
-\xVec(\regparam) = \sum_{j = 1}^{n} \filt_j\left(\regparam,\gamma_j\right) \frac{\svd{d}_{j+k}}{\delta_j} Y_{\cdot,j},
+\xVec(\regparam) = \sum_{j = 1}^{n} \frac{\delta_j^2}{\delta^2_j + \regparam^2 \lambda^2_j} \frac{\svd{d}_{j+k}}{\delta_j} Y_{\cdot,j} = \sum_{j = 1}^{n} \frac{\gamma_j^2}{\gamma^2_j + \regparam^2} \frac{\svd{d}_{j+k}}{\delta_j} Y_{\cdot,j}.
 \end{equation}
-which generalizes \eqref{eq:ApproxSol}. The generalized singular values are ordered such that $\gamma_1 \leq \ldots \leq \gamma_n$, which is due to the order of the diagonal elements of $\diag(\trans{\Delta}\Delta)$ and $\diag(\trans{\Lambda}\Lambda)$. In contrast, the singular values associated with the standard SVD are arranged in descending order. \par
-As a final representation and a return to matrix form, we can let $\Phi(\regparam)$ and $\Psi(\regparam) = I - \Phi(\regparam)$ be $n \times n$ diagonal matrix with diagonal entries
-\[\left[\Phi(\regparam)\right]_j = \begin{cases}
+The generalized singular values are ordered such that $\gamma_1 \leq \ldots \leq \gamma_n$, which is due to the order of the diagonal elements of $\diag(\trans{\Delta}\Delta)$ and $\diag(\trans{\Lambda}\Lambda)$. In contrast, the singular values associated with the standard SVD are arranged in descending order. As noted in \cite[p.~107]{ABT}, there are situations in which some generalized singular values $\gamma_j$ are zero or arbitrarily small (meaning $\delta_j = 0$ or is arbitrarily small). In such cases, the ratios $\gamma_j^2/(\gamma_j^2 + \regparam^2)$ are set to 1. Similarly, if $\gamma_j$ is arbitrarily small or infinite (which occurs when $\lambda_j$ is too small), then the corresponding summands in \eqref{eq:GSVD Solution 3} are counted as zero. \par
+The standard Tikhonov filter function $\filt_j(\regparam)$ defined by \eqref{eq:TikFilt} can be generalized and a complement $\mfilt_j(\regparam)$ can be introduced to further simplify notation:
+\begin{equation}
+\label{eq:Filter functions}
+\filt_j(\regparam) = \begin{cases}
 0, & \delta_j = 0 \\
 1, & \lambda_j = 0 \\
-\filt_j(\regparam,\gamma_j), & \text{otherwise,}
+\frac{\gamma^2_j}{\gamma^2_j + \regparam^2}, & \text{otherwise,}
 \end{cases} \qquad
-[\Psi(\regparam)]_j = \begin{cases}
+\mfilt_j(\regparam) = \begin{cases}
 1, & \delta_j = 0 \\
 0, & \lambda_j = 0 \\
-\mfilt_j(\regparam,\gamma_j), & \text{otherwise}
-\end{cases}\]
-for $j = 1,\ldots,n$. As noted in \cite[p.~107]{ABT}, there are situations in which some generalized singular values $\gamma_j$ are zero or arbitrarily small (meaning $\delta_j = 0$ or is arbitrarily small). In such cases, the corresponding filter factors $\filt_j$ are set to 1. Similarly, if $\gamma_j$ is arbitrarily small or infinite (which occurs when $\lambda_j$ is too small), then the corresponding summands in \eqref{eq:GSVD Solution 3} are counted as zero. Using $\Phi(\regparam)$, we can express representation \eqref{eq:GSVD Solution 3} more compactly as
-\[\xVec(\regparam) = Y\Phi(\regparam)\pinv{\Delta}\svd{\dVec}.\]
+\frac{\regparam^2}{\gamma^2_j + \regparam^2}, & \text{otherwise}
+\end{cases}
+\end{equation}
+Using $\filt_j$, the solution \eqref{eq:GSVD Solution 3} can be written as
+\begin{equation}
+\label{eq:GSVD Solution 2}
+\xVec(\regparam) = \sum_{j = 1}^{n} \frac{\delta^2_j}{\delta^2_j + \regparam^2 \lambda^2_j} \frac{\svd{d}_{j+k}}{\delta_j} Y_{\cdot,j} = \sum_{j = 1}^{n} \filt_j\left(\regparam\right) \frac{\svd{d}_{j+k}}{\delta_j} Y_{\cdot,j}
+\end{equation} 
+which generalizes \eqref{eq:ApproxSol}. As a final representation and a return to matrix form, we now let
+\[\Phi(\regparam) = \diag\left(\filt_1(\regparam),\ldots,\filt_n(\regparam)\right), \qquad \Psi(\regparam) = I - \Phi(\regparam) = \diag\left(\mfilt_1(\regparam),\ldots,\mfilt_n(\regparam)\right)\]
+where the diagonal entries are defined by \eqref{eq:Filter functions}. Using $\Phi(\regparam)$, we can express representation \eqref{eq:GSVD Solution 2} more compactly as $\xVec(\regparam) = Y\Phi(\regparam)\pinv{\Delta}\svd{\dVec}$.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 \subsection{Multiparameter Tikhonov regularization} \label{sec:Multiparameter}
 We follow the approach in \cite{ChungEasleyOLeary} by defining $P$ vectors $\wVec^{(p)} \in \mathbb{R}^n$ that contain non-negative weights which satisfy
@@ -520,7 +534,9 @@ Analogous to the uniparameter case for multiple data sets, we define $\xWinBig(\
     \xWinBig(\regparamVecBig) = \sum_{p=1}^{P} \widetilde{Y}\inv{\left[\trans{\widetilde{\Delta}}\widetilde{\Delta} + \widetilde{\regparam}_p^2 \trans{\widetilde{\Lambda}}\widetilde{\Lambda}\right]}\widetilde{W}^{(p)}\trans{\widetilde{\Delta}}\dft{\dBig}
 \end{equation}
 where $\widetilde{W}^{(p)} = \diag(W^{(p)},\ldots,W^{(p)})$ has $R$ diagonal blocks. Extending the notation from Section \ref{sec:Multiple data sets} to multiparameter regularization, we can define
-\[\widetilde{\Phi}\left(\widetilde{\regparam}^{(p)}\right) = \diag\left(\Phi^{(1)}\left(\widetilde{\regparam}^{(p)}\right),\ldots,\Phi^{(R)}\left(\widetilde{\regparam}^{(p)}\right)\right), \quad \widetilde{\Psi}\left(\widetilde{\regparam}^{(p)}\right) = \diag\left(\Psi^{(1)}\left(\widetilde{\regparam}^{(p)}\right),\ldots,\Psi^{(R)}\left(\widetilde{\regparam}^{(p)}\right)\right)\]
+\begin{align*}
+    \widetilde{\Phi}\left(\widetilde{\regparam}^{(p)}\right) &= \diag\left(\Phi^{(1)}\left(\widetilde{\regparam}^{(p)}\right),\ldots,\Phi^{(R)}\left(\widetilde{\regparam}^{(p)}\right)\right), \\ \widetilde{\Psi}\left(\widetilde{\regparam}^{(p)}\right) &= \diag\left(\Psi^{(1)}\left(\widetilde{\regparam}^{(p)}\right),\ldots,\Psi^{(R)}\left(\widetilde{\regparam}^{(p)}\right)\right)
+\end{align*}
 where
 \begin{align*}
     \left[\Phi^{(r)}\left(\widetilde{\regparam}^{(p)}\right)\right]_j &= \begin{cases}
