@@ -63,6 +63,8 @@
 \newcommand{\bBig}{\widetilde{\bVec}}	% Big blurred vector
 \newcommand{\dBig}{\widetilde{\dVec}}	% Big data vector
 \newcommand{\ABig}{\widetilde{A}}	% Big system matrix
+\newcommand{\AWin}{A_{\text{win}}}	% Big system matrix
+\newcommand{\AWinBig}{\widetilde{A}_{\text{win}}}	% Big windowed influence matrix
 \newcommand{\LBig}{\widetilde{L}}	% Big penalty matrix
 \DeclareMathOperator*{\argmax}{arg\,max}
 \DeclareMathOperator*{\argmin}{arg\,min}
@@ -525,14 +527,17 @@ where $\widetilde{W}^{(p)} = \diag(W^{(p)},\ldots,W^{(p)})$ has $R$ diagonal blo
 \end{align*}
 for $r = 1,\ldots,R$ and $p = 1,\ldots,P$. With the diagonal matrices
 \begin{align*}
-    \Phi^{(r)}\left(\widetilde{\regparam}^{(p)}\right) &= \diag\left(\filt_1^{(r)}\left(\regparam^{(p)}\right),\ldots,\filt_n^{(r)}\left(\regparam^{(p)}\right)\right), \\ \Phi^{(1)}\left(\widetilde{\regparam}^{(p)}\right) &= \diag\left(\mfilt_1^{(r)}\left(\regparam^{(p)}\right),\ldots,\mfilt_n^{(r)}\left(\regparam^{(p)}\right)\right),
+    \Phi^{(r)}\left(\widetilde{\regparam}^{(p)}\right) &= \diag\left(\filt_1^{(r)}\left(\regparam^{(p)}\right),\ldots,\filt_n^{(r)}\left(\regparam^{(p)}\right)\right), \\ \Psi^{(r)}\left(\widetilde{\regparam}^{(p)}\right) &= \diag\left(\mfilt_1^{(r)}\left(\regparam^{(p)}\right),\ldots,\mfilt_n^{(r)}\left(\regparam^{(p)}\right)\right),
 \end{align*}
 the appropriate block matrices can be formed:
 \begin{align*}
     \widetilde{\Phi}\left(\widetilde{\regparam}^{(p)}\right) &= \diag\left(\Phi^{(1)}\left(\widetilde{\regparam}^{(p)}\right),\ldots,\Phi^{(R)}\left(\widetilde{\regparam}^{(p)}\right)\right), \\ \widetilde{\Psi}\left(\widetilde{\regparam}^{(p)}\right) &= \diag\left(\Psi^{(1)}\left(\widetilde{\regparam}^{(p)}\right),\ldots,\Psi^{(R)}\left(\widetilde{\regparam}^{(p)}\right)\right).
 \end{align*}
 Using $\widetilde{\Phi}\left(\widetilde{\regparam}^{(p)}\right)$ for the $p$th window, representation \eqref{eq:Big Windowed Solution} can be written as
-\[\xWinBig(\regparamVecBig) = \widetilde{Y}\sum_{p=1}^{P} \widetilde{W}^{(p)}\widetilde{\Phi}\left(\widetilde{\regparam}^{(p)}\right)\pinv{\widetilde{\Delta}}\dft{\dBig}.\]
+\begin{equation}
+\label{eq:Big Windowed Solution 2}
+    \xWinBig(\regparamVecBig) = \widetilde{Y}\sum_{p=1}^{P} \widetilde{W}^{(p)}\widetilde{\Phi}\left(\widetilde{\regparam}^{(p)}\right)\pinv{\widetilde{\Delta}}\dft{\dBig}.
+\end{equation}
 
 \section{Parameter selection methods} \label{sec:Methods}
 As stated in Section \ref{sec:Introduction}, there are a variety of methods for selecting regularization parameters and we illustrate some limited examples. The UPRE and MDP methods are popular choices for situations in which the variance of the noise in the data is known. In contrast, the GCV and L-curve methods are common choices when the variance is unknown. However, all four methods involve the norm of a term $\rReg$ called the regularized residual. In the uniparameter case involving a single data set $\dVec$, the regularized residual is defined as
@@ -545,41 +550,71 @@ The UPRE and GCV methods involve the trace of an additional term called the infl
     \label{eq:Influence matrix}
     \A = A\inv{\left(\trans{A}A + \regparam^2\trans{L}L\right)}\trans{A}.
 \end{equation}
-If the GSVD is used, we can express $\A$ as
+If the GSVD is used with the filter factor matrix $\Phi(\regparam)$, we can express $\A$ as
 \begin{align*}
     \A &= U\Delta\trans{X}\inv{\left(X\trans{\Delta}\trans{U}U\Delta\trans{X} + \regparam^2 X\trans{\Lambda}\trans{V}V\Lambda\trans{X}\right)}X\trans{\Delta}\trans{U} \\
-    &= U\Delta\inv{\left(\trans{\Delta}\Delta + \regparam^2 \trans{\Lambda}\Lambda\right)}\trans{\Delta}\trans{U}.
+    &= U\Delta\inv{\left(\trans{\Delta}\Delta + \regparam^2 \trans{\Lambda}\Lambda\right)}\trans{\Delta}\trans{U} \\
+    &= U\Delta\Phi(\regparam)\pinv{\Delta}\trans{U}.
 \end{align*}
-The filter functions \eqref{eq:Filter functions} provide a convenient way of expressing $\|\rReg\|_2^2$ and $\trace(\A)$. To streamline notation, for $j = 1,\ldots,n$ we let
-\[\filt_j = \begin{cases}
-0, & \delta_j = 0 \\
-1, & \lambda_j = 0 \\
-\frac{\gamma_j^2}{\gamma_j^2 + \regparam^2}, & \text{otherwise,}
-\end{cases} \qquad \mfilt_j = 1 - \filt_j = \begin{cases}
-1, & \delta_j = 0 \\
-0, & \lambda_j = 0 \\
-\frac{\regparam^2}{\gamma_j^2 + \regparam^2}, & \text{otherwise,}
-\end{cases}\]
-which are in terms of the generalized singular values $\gamma_j = \delta_j/\lambda_j$. The condition $\delta_j = 0$ corresponds with $\gamma_j = 0$, while $\lambda_j = 0$ corresponds with $\gamma_j$ begin infinite. From a numerical standpoint, some tolerance should be set to monitor the size of $\gamma_j$ and adjust the filter factors accordingly. With this notation, we can write
-\[\left\|\rReg\right\|_2^2 = \sum_{j=1}^{n} \left(\mfilt_j\right)^2\left(\dft{d}_j\right)^2, \qquad \trace(\A) = \sum_{j=1}^{n} \filt_j. \quad \left[\Phi^{(r)}(\regparam^{(p)})\right]_j\]
 
 We extend the notation introduced in Section \ref{sec:Multiparameter} for multiparameter regularization involving a single data point to define a windowed regularized residual
 \begin{equation}
 \label{eq:Windowed regularized residual}
 \rWin(\regparamVec) = A\xWin(\regparamVec) - \dVec
 \end{equation}
-where the windowed regularized $\xWin(\regparamVec)$ is given by \eqref{eq:Windowed GSVD Solution} assuming the use of the GSVD. If instead we have multiple data points but each is used with uniparameter regularization, we can extend the notation from Section \ref{sec:Multiple data sets} (see Table \ref{tab:System assumptions}) so as to define a regularization solution
+where the windowed regularized $\xWin(\regparamVec)$ is given by \eqref{eq:Windowed GSVD Solution} assuming the use of the GSVD. Similarly, we generalize the windowed regularization matrix defined in \cite{ChungEasleyOLeary} so that for windowed spectral regularization, the influence matrix $\AWin(\regparamVec)$ is
+\[\AWin(\regparamVec) = U\Delta\sum_{p=1}^{P}\inv{\left(\trans{\Delta}\Delta + \left(\regparam^{(p)}\right)^2 \trans{\Lambda}\Lambda\right)}W^{(p)}\trans{\Delta}\trans{U} = U\Delta\sum_{p=1}^{P}W^{(p)}\Phi\left(\regparam^{(p)}\right)\pinv{\Delta}\trans{U}.\]
+
+If instead we have multiple data points but each is used with uniparameter regularization, we can extend the notation from Section \ref{sec:Multiple data sets} (see Table \ref{tab:System assumptions}) so as to define a regularization solution and influence matrix
 \begin{equation}
 \label{eq:Big regularized residual}
-\rBig(\widetilde{\regparam}) = \ABig\xBig(\widetilde{\regparam}) - \dBig. 
+\rBig(\widetilde{\regparam}) = \ABig\xBig(\widetilde{\regparam}) - \dBig, \quad \ABig(\regparamBig) = \widetilde{U}\widetilde{\Delta}\inv{\left(\trans{\widetilde{\Delta}}\widetilde{\Delta} + \left(\regparamBig\right)^2 \trans{\widetilde{\Lambda}}\widetilde{\Lambda}\right)}\trans{\widetilde{\Delta}}\trans{\widetilde{U}} = \widetilde{U}\widetilde{\Delta}\widetilde{\Phi}\left(\regparamBig\right)\pinv{\widetilde{\Delta}}\trans{\widetilde{U}}.
 \end{equation}
-where \eqref{eq:GSVD Big Normal Eq Sol} is a representation of $\xBig(\widetilde{\regparam})$. \par 
-The ultimate situation is multiparameter regularization as applied to multiple data. For this situation, we combine the notations of Sections \ref{sec:Multiparameter} through \ref{sec:Adapted regularization} to construct a regularized residual $\rWinBig(\regparamVecBig)$ defined as
+A GSVD representation of $\xBig(\widetilde{\regparam})$ is provided by \eqref{eq:GSVD Big Normal Eq Sol} and the diagonal blocks of $\ABig(\regparamBig)$ are
+\begin{align}
+    A^{(r)}(\regparamBig) &= U^{(r)}\Delta^{(r)}\inv{\left(\trans{\left(\Delta^{(r)}\right)}\Delta^{(r)} + \left(\regparamBig\right)^2 \trans{\left(\Lambda^{(r)}\right)}\Lambda^{(r)}\right)}\trans{\left(\Delta^{(r)}\right)}\trans{\left(U^{(r)}\right)} \nonumber \\ 
+    &= U^{(r)}\Delta^{(r)}\Phi^{(r)}\left(\regparamBig\right)\pinv{\left(\Delta^{(r)}\right)}\trans{\left(U^{(r)}\right)} \label{eq:Diagonal blocks}
+\end{align}
+for $r = 1,\ldots,R$. \par
+The ultimate situation is multiparameter regularization as applied to multiple data. For this situation, we combine the notations of Sections \ref{sec:Multiparameter} through \ref{sec:Adapted regularization} to construct a regularized residual
 \begin{equation}
 \label{eq:Windowed Big regularized residual}
-\rWinBig(\regparamVecBig) = \ABig\xWinBig(\regparamVecBig) - \dBig. 
+\rWinBig(\regparamVecBig) = \ABig\xWinBig(\regparamVecBig) - \dBig
 \end{equation}
-The GSVD allows for $\xWinBig(\regparamVecBig)$ to be represented by \eqref{eq:Big Windowed Solution}.
+and influence matrix defined by
+\begin{equation}
+    \label{eq:Windowed Big Influence Matrix}
+    \AWinBig(\regparamVecBig) = \widetilde{U}\widetilde{\Delta}\sum_{p=1}^{P}\inv{\left(\trans{\widetilde{\Delta}}\widetilde{\Delta} + \left(\regparamBig^{(p)}\right)^2 \trans{\widetilde{\Lambda}}\widetilde{\Lambda}\right)}\widetilde{W}^{(p)}\trans{\widetilde{\Delta}}\trans{\widetilde{U}} = \widetilde{U}\widetilde{\Delta}\sum_{p=1}^{P}\widetilde{W}^{(p)}\widetilde{\Phi}\left(\regparamBig^{(p)}\right)\pinv{\widetilde{\Delta}}\trans{\widetilde{U}}.
+\end{equation}
+$\xWinBig(\regparamVecBig)$ can be represented by \eqref{eq:Big Windowed Solution}, while the diagonal blocks of $\AWinBig(\regparamVecBig)$ are
+\begin{align}
+    \AWin^{(r)}(\regparamVecBig) &= U^{(r)}\Delta^{(r)}\sum_{p=1}^{P}\inv{\left(\trans{\left(\Delta^{(r)}\right)}\Delta^{(r)} + \left(\regparamBig^{(p)}\right)^2 \trans{\left(\Lambda^{(r)}\right)}\Lambda^{(r)}\right)}W^{(p)}\trans{\left(\Delta^{(r)}\right)}\trans{\left(U^{(r)}\right)} \nonumber \\ 
+    &= U^{(r)}\Delta^{(r)}\sum_{p=1}^{P}W^{(p)}\Phi^{(r)}\left(\regparamBig^{(p)}\right)\pinv{\left(\Delta^{(r)}\right)}\trans{\left(U^{(r)}\right)}. \label{eq:Windowed Big Influence Diagonals}
+\end{align}
+
+We will now present representations of the necessary norm and trace terms that are used in discussions of the adapted UPRE, MDP, and GCV methods. These representations are presented for multiparameter regularization of multiple data sets since this is the most general situation. The first representation is given in Theorem \ref{thm:Regularized residual}, which concerns the norm of the regularized residual.
+
+\begin{theorem}
+\label{thm:Regularized residual}
+Under Assumptions \ref{Assumption_System} and \ref{Assumption_Rows}, the norm of $\rWinBig(\regparamVecBig)$ is
+\[\left\|\rWinBig(\regparamVecBig)\right\|_2^2 = .\]
+\end{theorem}
+\begin{proof}
+From Assumption \ref{Assumption_Rows}, the length of each data set $\dVec^{(r)}$ is $m$. Thus we let $t = mR$, which is the length of $\rWinBig(\regparamVecBig)$. Substituting \eqref{eq:Big Windowed Solution 2} into the definition of $\rWinBig(\regparamVecBig)$, we have
+\begin{align*}
+    \rWinBig(\regparamVecBig) &= \widetilde{U}\widetilde{\Delta}\sum_{p=1}^{P} \widetilde{W}^{(p)}\widetilde{\Phi}\left(\widetilde{\regparam}^{(p)}\right)\pinv{\widetilde{\Delta}}\dft{\dBig} - \dBig \\
+    &= \left[\widetilde{U}\widetilde{\Delta}\sum_{p=1}^{P} \widetilde{W}^{(p)}\widetilde{\Phi}\left(\widetilde{\regparam}^{(p)}\right)\pinv{\widetilde{\Delta}}\trans{\widetilde{U}} - I_t\right]\dBig \\
+    &= \left[\widetilde{U}\widetilde{\Delta}\sum_{p=1}^{P} \widetilde{W}^{(p)}\widetilde{\Phi}\left(\widetilde{\regparam}^{(p)}\right)\pinv{\widetilde{\Delta}}\trans{\widetilde{U}} - \widetilde{U}\trans{\widetilde{U}}\right]\dBig \\
+    &= \widetilde{U}\left[\widetilde{\Delta}\sum_{p=1}^{P} \widetilde{W}^{(p)}\widetilde{\Phi}\left(\widetilde{\regparam}^{(p)}\right)\pinv{\widetilde{\Delta}}\trans{\widetilde{U}} - I_t\right]\svd{\dBig}.
+\end{align*}
+Using the 2-norm and the block structure of the matrices, we can then write
+\begin{align*}
+    \left\|\rWinBig(\regparamVecBig)\right\|_2^2 &= \sum_{r=1}^{R}\left\|\rWin^{(r)}(\regparamVecBig)\right\|_2^2 \\
+    &= \sum_{r=1}^{R} \left\|U^{(r)}\left[\Delta^{(r)}\sum_{p=1}^{P} W^{(p)}\Phi^{(r)}\left(\widetilde{\regparam}^{(p)}\right)\pinv{\left(\Delta^{(r)}\right)}\trans{\left(U^{(r)}\right)} - I_m\right]\svd{\dVec}^{(r)}\right\|_2^2 \\
+    &= \sum_{r=1}^{R} \left\|\left[\Delta^{(r)}\sum_{p=1}^{P} W^{(p)}\Phi^{(r)}\left(\widetilde{\regparam}^{(p)}\right)\pinv{\left(\Delta^{(r)}\right)}\trans{\left(U^{(r)}\right)} - I_m\right]\svd{\dVec}^{(r)}\right\|_2^2
+\end{align*}
+\end{proof}
+
 To this end, we will use the version of the GSVD outlined in Section \ref{sec:GSVD} (which uses the assumption that the system matrix in \eqref{eq:TikSol3} has full column rank). Specifically, we use \eqref{eq:Mulitple GSVD} to define the generalized filter functions to be
 \begin{equation}
 \label{eq:Filter functions 2}
@@ -606,6 +641,21 @@ Another benefit of using \eqref{eq:Fourier diagonalization 2} is that we can wri
 where $\dft{\dVec}^{(r)} = \trans{\left(U^{(r)}\right)}\dVec^{(r)}$ for $r = 1,\ldots,R$. Lastly, Assumption 2 means that $\trace(\Sigma^{(r)}) = m\noiseSD^2_r$. 
 
 As a final remark, an analogous approach could be taken if the matrices $A^{(r)}$ and $L^{(r)}$ can be simultaneously diagonalized with respect to a orthogonal/unitary transformation, such as the discrete cosine transform (DCT) or discrete Fourier transform (DFT); test problems using the DCT and DFT are considered in Section \ref{sec:Validation}. The development of the adapted UPRE, MDP, and GCV methods also rely on Assumption \ref{Assumption_System} and the constructions contained in Table \ref{tab:System assumptions}. By Lemma \ref{lem:Concatenation of Normal Noise}, this assumption implies that $\widetilde{\noiseVec} \sim \mathcal{N}\left(\widetilde{\zeroVec},\widetilde{\Sigma}\right)$ with $\widetilde{\zeroVec} \in \mathbb{R}^M$ and $M = \sum_{r=1}^{R} m_r$. 
+
+The filter functions \eqref{eq:Filter functions} provide a convenient way of expressing $\|\rReg\|_2^2$ and $\trace(\A)$. To streamline notation, for $j = 1,\ldots,n$ we let
+\[\filt_j = \begin{cases}
+0, & \delta_j = 0 \\
+1, & \lambda_j = 0 \\
+\frac{\gamma_j^2}{\gamma_j^2 + \regparam^2}, & \text{otherwise,}
+\end{cases} \qquad \mfilt_j = 1 - \filt_j = \begin{cases}
+1, & \delta_j = 0 \\
+0, & \lambda_j = 0 \\
+\frac{\regparam^2}{\gamma_j^2 + \regparam^2}, & \text{otherwise,}
+\end{cases}\]
+which are in terms of the generalized singular values $\gamma_j = \delta_j/\lambda_j$. The condition $\delta_j = 0$ corresponds with $\gamma_j = 0$, while $\lambda_j = 0$ corresponds with $\gamma_j$ begin infinite. From a numerical standpoint, some tolerance should be set to monitor the size of $\gamma_j$ and adjust the filter factors accordingly. With this notation, we can write
+\[\left\|\rReg\right\|_2^2 = \sum_{j=1}^{n} \left(\mfilt_j\right)^2\left(\dft{d}_j\right)^2, \qquad \trace(\A) = \sum_{j=1}^{n} \filt_j.\]
+
+
 
 \subsection{Unbiased Predictive Risk Estimator} \label{sec:UPRE}
 The UPRE method was developed in 1973 by Mallows and considers the statistical relationship between predictive error $\pVec(\regparam)$ and the regularized residual $\rVec(\regparam)$; these quantities are defined respectively as
@@ -646,11 +696,7 @@ with
 \begin{proof}
 A block diagonal influence matrix $\ABig(\regparam)$ can be defined as
 \[\ABig(\regparam) = \ABig(\trans{\ABig}\ABig + \regparam^2\trans{\widetilde{L}}\widetilde{L})^{-1}\trans{\ABig}\]
-with diagonal blocks
-\begin{equation}
-\label{eq:Diagonal blocks}
-A^{(r)}(\regparam) = A^{(r)}\left(\trans{\left(A^{(r)}\right)}A^{(r)} + \regparam^2\trans{\left(L^{(r)}\right)}L^{(r)}\right)^{-1}\trans{\left(A^{(r)}\right)}, \quad r = 1,\ldots,R.
-\end{equation}
+with diagonal blocks \eqref{eq:Diagonal blocks}
 By further defining $\rBig(\regparam) = \ABig\widetilde{\xVec}(\regparam) - \widetilde{\dVec}$ and noting that Lemma \ref{lem:Concatenation of Normal Noise} implies the vertical concatenation $\widetilde{\noiseVec}$ of $\{\noiseVec^{(r)}\}_{r=1}^R$ is distributed $\mathcal{N}(\widetilde{\zeroVec},\widetilde{\Sigma})$ with $\widetilde{\zeroVec} \in \mathbb{R}^M$ and $\widetilde{\Sigma} = \diag(\Sigma^{(1)},\ldots,\Sigma^{(R)})$, the UPRE function \eqref{eq:UPRE 2} can be directly applied to produce
 \begin{equation}
 \label{eq:UPRE 3}
