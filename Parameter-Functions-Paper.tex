@@ -554,9 +554,9 @@ If the GSVD is used with the filter factor matrix $\Phi(\regparam)$, we can expr
 \begin{align*}
     \A &= U\Delta\trans{X}\inv{\left(X\trans{\Delta}\trans{U}U\Delta\trans{X} + \regparam^2 X\trans{\Lambda}\trans{V}V\Lambda\trans{X}\right)}X\trans{\Delta}\trans{U} \\
     &= U\Delta\inv{\left(\trans{\Delta}\Delta + \regparam^2 \trans{\Lambda}\Lambda\right)}\trans{\Delta}\trans{U} \\
-    &= U\Delta\Phi(\regparam)\pinv{\Delta}\trans{U}.
+    &= U\Delta\Phi(\regparam)\pinv{\Delta}\trans{U},
 \end{align*}
-
+where the last equality follows from the identity $\trans{\Delta} = \trans{\Delta}\Delta\pinv{\Delta}$ \cite{Byrne}. \par
 We extend the notation introduced in Section \ref{sec:Multiparameter} for multiparameter regularization involving a single data point to define a windowed regularized residual
 \begin{equation}
 \label{eq:Windowed regularized residual}
@@ -587,75 +587,94 @@ and influence matrix defined by
     \AWinBig(\regparamVecBig) = \widetilde{U}\widetilde{\Delta}\sum_{p=1}^{P}\inv{\left(\trans{\widetilde{\Delta}}\widetilde{\Delta} + \left(\regparamBig^{(p)}\right)^2 \trans{\widetilde{\Lambda}}\widetilde{\Lambda}\right)}\widetilde{W}^{(p)}\trans{\widetilde{\Delta}}\trans{\widetilde{U}} = \widetilde{U}\widetilde{\Delta}\sum_{p=1}^{P}\widetilde{W}^{(p)}\widetilde{\Phi}\left(\regparamBig^{(p)}\right)\pinv{\widetilde{\Delta}}\trans{\widetilde{U}}.
 \end{equation}
 $\xWinBig(\regparamVecBig)$ can be represented by \eqref{eq:Big Windowed Solution}, while the diagonal blocks of $\AWinBig(\regparamVecBig)$ are
-\begin{align}
-    \AWin^{(r)}(\regparamVecBig) &= U^{(r)}\Delta^{(r)}\sum_{p=1}^{P}\inv{\left(\trans{\left(\Delta^{(r)}\right)}\Delta^{(r)} + \left(\regparamBig^{(p)}\right)^2 \trans{\left(\Lambda^{(r)}\right)}\Lambda^{(r)}\right)}W^{(p)}\trans{\left(\Delta^{(r)}\right)}\trans{\left(U^{(r)}\right)} \nonumber \\ 
-    &= U^{(r)}\Delta^{(r)}\sum_{p=1}^{P}W^{(p)}\Phi^{(r)}\left(\regparamBig^{(p)}\right)\pinv{\left(\Delta^{(r)}\right)}\trans{\left(U^{(r)}\right)}. \label{eq:Windowed Big Influence Diagonals}
-\end{align}
+\begin{equation}
+    \AWin^{(r)}(\regparamVecBig)
+    = U^{(r)}\Delta^{(r)}\sum_{p=1}^{P}W^{(p)}\Phi^{(r)}\left(\regparamBig^{(p)}\right)\pinv{\left(\Delta^{(r)}\right)}\trans{\left(U^{(r)}\right)}. \label{eq:Windowed Big Influence Diagonals}
+\end{equation}
 
 We will now present representations of the necessary norm and trace terms that are used in discussions of the adapted UPRE, MDP, and GCV methods. These representations are presented for multiparameter regularization of multiple data sets since this is the most general situation. The first representation is given in Theorem \ref{thm:Regularized residual}, which concerns the norm of the regularized residual.
 
 \begin{theorem}
 \label{thm:Regularized residual}
 Under Assumptions \ref{Assumption_System} and \ref{Assumption_Rows}, the norm of $\rWinBig(\regparamVecBig)$ is
-\[\left\|\rWinBig(\regparamVecBig)\right\|_2^2 = .\]
+\[\left\|\rWinBig(\regparamVecBig)\right\|_2^2 = \begin{cases}
+\sum_{r=1}^{R} \left(\sum_{j=1}^{m} \left(\left[\sum_{p=1}^{P} w_{j+k}^{(p)}\Psi_{j+k}^{(p)}\left(\regparamBig^{(p)}\right)\right] \hat{d}_j^{(r)}\right)^2\right), & m \leq n, \\
+\sum_{r=1}^{R} \left(\sum_{j=1}^{n} \left(\left[\sum_{p=1}^{P} w_{j}^{(p)}\Psi_{j}^{(p)}\left(\regparamBig^{(p)}\right)\right] \hat{d}_j^{(r)}\right)^2 + \sum_{j=n+1}^{m} \left(\hat{d}_j^{(r)}\right)^2\right), & m > n.
+\end{cases}.\]
 \end{theorem}
 \begin{proof}
-From Assumption \ref{Assumption_Rows}, the length of each data set $\dVec^{(r)}$ is $m$. Thus we let $t = mR$, which is the length of $\rWinBig(\regparamVecBig)$. Substituting \eqref{eq:Big Windowed Solution 2} into the definition of $\rWinBig(\regparamVecBig)$, we have
+From Assumption \ref{Assumption_Rows}, the length of each data set $\dVec^{(r)}$ is $m$. Thus we let $M = mR$, which is the length of $\rWinBig(\regparamVecBig)$. Substituting \eqref{eq:Big Windowed Solution 2} into the definition of $\rWinBig(\regparamVecBig)$, we have
 \begin{align*}
     \rWinBig(\regparamVecBig) &= \widetilde{U}\widetilde{\Delta}\sum_{p=1}^{P} \widetilde{W}^{(p)}\widetilde{\Phi}\left(\widetilde{\regparam}^{(p)}\right)\pinv{\widetilde{\Delta}}\dft{\dBig} - \dBig \\
-    &= \left[\widetilde{U}\widetilde{\Delta}\sum_{p=1}^{P} \widetilde{W}^{(p)}\widetilde{\Phi}\left(\widetilde{\regparam}^{(p)}\right)\pinv{\widetilde{\Delta}}\trans{\widetilde{U}} - I_t\right]\dBig \\
+    &= \left[\widetilde{U}\widetilde{\Delta}\sum_{p=1}^{P} \widetilde{W}^{(p)}\widetilde{\Phi}\left(\widetilde{\regparam}^{(p)}\right)\pinv{\widetilde{\Delta}}\trans{\widetilde{U}} - I_M\right]\dBig \\
     &= \left[\widetilde{U}\widetilde{\Delta}\sum_{p=1}^{P} \widetilde{W}^{(p)}\widetilde{\Phi}\left(\widetilde{\regparam}^{(p)}\right)\pinv{\widetilde{\Delta}}\trans{\widetilde{U}} - \widetilde{U}\trans{\widetilde{U}}\right]\dBig \\
-    &= \widetilde{U}\left[\widetilde{\Delta}\sum_{p=1}^{P} \widetilde{W}^{(p)}\widetilde{\Phi}\left(\widetilde{\regparam}^{(p)}\right)\pinv{\widetilde{\Delta}}\trans{\widetilde{U}} - I_t\right]\svd{\dBig}.
+    &= \widetilde{U}\left[\widetilde{\Delta}\sum_{p=1}^{P} \widetilde{W}^{(p)}\widetilde{\Phi}\left(\widetilde{\regparam}^{(p)}\right)\pinv{\widetilde{\Delta}} - I_M\right]\svd{\dBig}.
 \end{align*}
 Using the 2-norm and the block structure of the matrices, we can then write
 \begin{align*}
     \left\|\rWinBig(\regparamVecBig)\right\|_2^2 &= \sum_{r=1}^{R}\left\|\rWin^{(r)}(\regparamVecBig)\right\|_2^2 \\
-    &= \sum_{r=1}^{R} \left\|U^{(r)}\left[\Delta^{(r)}\sum_{p=1}^{P} W^{(p)}\Phi^{(r)}\left(\widetilde{\regparam}^{(p)}\right)\pinv{\left(\Delta^{(r)}\right)}\trans{\left(U^{(r)}\right)} - I_m\right]\svd{\dVec}^{(r)}\right\|_2^2 \\
-    &= \sum_{r=1}^{R} \left\|\left[\Delta^{(r)}\sum_{p=1}^{P} W^{(p)}\Phi^{(r)}\left(\widetilde{\regparam}^{(p)}\right)\pinv{\left(\Delta^{(r)}\right)}\trans{\left(U^{(r)}\right)} - I_m\right]\svd{\dVec}^{(r)}\right\|_2^2
+    &= \sum_{r=1}^{R} \left\|U^{(r)}\left[\Delta^{(r)}\sum_{p=1}^{P} W^{(p)}\Phi^{(r)}\left(\widetilde{\regparam}^{(p)}\right)\pinv{\left(\Delta^{(r)}\right)} - I_m\right]\svd{\dVec}^{(r)}\right\|_2^2 \\
+    &= \sum_{r=1}^{R} \left\|\left[\Delta^{(r)}\sum_{p=1}^{P} W^{(p)}\Phi^{(r)}\left(\widetilde{\regparam}^{(p)}\right)\pinv{\left(\Delta^{(r)}\right)} - I_m\right]\svd{\dVec}^{(r)}\right\|_2^2.
 \end{align*}
+We must now consider the two cases. If $m \leq n$, then $k = n - m \geq 0$ and 
+\[\left\|\left[\Delta^{(r)}\sum_{p=1}^{P} W^{(p)}\Phi^{(r)}\left(\widetilde{\regparam}^{(p)}\right)\pinv{\left(\Delta^{(r)}\right)} - I_m\right]\svd{\dVec}^{(r)}\right\|_2^2 = \sum_{j=1}^{m} \left(\left[\sum_{p=1}^{P} w_{j+k}^{(p)}\Psi_{j+k}^{(p)}\left(\regparamBig^{(p)}\right)\right] \hat{d}_j^{(r)}\right)^2.\]
+If $m > n$ instead, then let $k = m - n > 0$. The matrix within the norm has the block form
+\[\Delta^{(r)}\sum_{p=1}^{P} W^{(p)}\Phi^{(r)}\left(\widetilde{\regparam}^{(p)}\right)\pinv{\left(\Delta^{(r)}\right)} - I_m = \begin{bmatrix}
+-\sum_{p=1}^{P} W^{(p)} \Psi^{(r)}\left(\widetilde{\regparam}^{(p)}\right) & \zeroVec_{n \times k} \\
+\zeroVec_{k \times n} & -I_k
+\end{bmatrix}.\]
+Thus the norm becomes
+\[\left\|\begin{bmatrix}
+-\sum_{p=1}^{P} W^{(p)} \Psi^{(r)}\left(\widetilde{\regparam}^{(p)}\right) & \zeroVec_{n \times k} \\
+\zeroVec_{k \times n} & -I_k
+\end{bmatrix}\svd{\dVec}^{(r)}\right\|_2^2 = \sum_{j=1}^{n} \left(\left[\sum_{p=1}^{P} w_{j}^{(p)}\Psi_{j}^{(p)}\left(\regparamBig^{(p)}\right)\right] \hat{d}_j^{(r)}\right)^2 + \sum_{j=n+1}^{m} \left(\hat{d}_j^{(r)}\right)^2.\]
 \end{proof}
 
-To this end, we will use the version of the GSVD outlined in Section \ref{sec:GSVD} (which uses the assumption that the system matrix in \eqref{eq:TikSol3} has full column rank). Specifically, we use \eqref{eq:Mulitple GSVD} to define the generalized filter functions to be
-\begin{equation}
-\label{eq:Filter functions 2}
-\filt^{(r)}_j = \frac{\left(\delta^{(r)}_j\right)^2}{\left(\delta^{(r)}_j\right)^2 + \regparam^2 \left(\lambda^{(r)}_j\right)^2}, \quad \mfilt^{(r)}_j = 1 - \filt^{(r)}_j = \frac{\regparam^2 \left(\lambda^{(r)}_j\right)^2}{\left(\delta^{(r)}_j\right)^2 + \regparam^2 \left(\lambda^{(r)}_j\right)^2}
-\end{equation}
-where $\bm{\delta}^{(r)} = \sqrt{\diag(\trans{(\Delta^{(r)})}\Delta^{(r)})}$ and $\bm{\lambda}^{(r)} = \sqrt{\diag(\trans{(\Lambda^{(r)})}\Lambda^{(r)})}$ for each $r = 1,\ldots,R$. The influence matrix $A^{(r)}(\regparam)$ given by \eqref{eq:Diagonal blocks} can be expressed as
-\begin{equation}
-\label{eq:Fourier diagonalization 2}
-A^{(r)}(\regparam) = U^{(r)}\Delta^{(r)}\left[\trans{(\Delta^{(r)})}\Delta^{(r)} + \regparam^2\trans{(\Lambda^{(r)})}\Lambda^{(r)}\right]^{-1}\trans{\left(\Delta^{(r)}\right)}\trans{\left(U^{(r)}\right)}, \qquad r = 1,\ldots,R.
-\end{equation}
-Assumption \ref{Assumption_Noise} and the similarity invariance of the trace operator gives
-\begin{align}
-    \trace\left(\Sigma^{(r)}A^{(r)}(\regparam)\right) &=  \trace\left(\noiseSD_r^2 I_{m} U^{(r)}\Delta^{(r)}\left[\trans{(\Delta^{(r)})}\Delta^{(r)} + \regparam^2\trans{(\Lambda^{(r)})}\Lambda^{(r)}\right]^{-1}\trans{\left(\Delta^{(r)}\right)}\trans{\left(U^{(r)}\right)}\right) \nonumber \\ 
-    &= \noiseSD_r^2 \trace\left(\Delta^{(r)}\left[\trans{(\Delta^{(r)})}\Delta^{(r)} + \regparam^2\trans{(\Lambda^{(r)})}\Lambda^{(r)}\right]^{-1}\trans{(\Delta^{(r)})}\right) \nonumber \\
-    &= \noiseSD_r^2 \sum_{j=1}^{n} \filt^{(r)}_j. \label{eq:Trace}
-\end{align}
-Another benefit of using \eqref{eq:Fourier diagonalization 2} is that we can write
-\begin{align}
-\frac{1}{\mA}\|\rVec^{(r)}(\regparam)\|_2^2 &= \frac{1}{\mA}\left\|U^{(r)}\left(\Delta^{(r)}\left[\trans{(\Delta^{(r)})}\Delta^{(r)} + \regparam^2\trans{(\Lambda^{(r)})}\Lambda^{(r)}\right]^{-1}\trans{(\Delta^{(r)})} - I_{\mA}\right)\trans{\left(U^{(r)}\right)}\dVec^{(r)}\right\|_2^2 \nonumber \\
-&= \frac{1}{\mA}\left\|\left(\Delta^{(r)}\left[\trans{(\Delta^{(r)})}\Delta^{(r)} + \regparam^2\trans{(\Lambda^{(r)})}\Lambda^{(r)}\right]^{-1}\trans{(\Delta^{(r)})} - I_{\mA}\right)\dft{\dVec}^{(r)}\right\|_2^2 \nonumber \\
-&= \frac{1}{\mA}\sum_{j=1}^{n} \left(\mfilt^{(r)}_j\right)^2\left(\dft{d}_j^{(r)}\right)^2,
-\label{eq:Fourier regularized residual}
-\end{align}
-where $\dft{\dVec}^{(r)} = \trans{\left(U^{(r)}\right)}\dVec^{(r)}$ for $r = 1,\ldots,R$. Lastly, Assumption 2 means that $\trace(\Sigma^{(r)}) = m\noiseSD^2_r$. 
+Theorem \ref{thm:Trace} provides of representation of the trace term needed for the remainder of Section \ref{sec:Methods}.
 
-As a final remark, an analogous approach could be taken if the matrices $A^{(r)}$ and $L^{(r)}$ can be simultaneously diagonalized with respect to a orthogonal/unitary transformation, such as the discrete cosine transform (DCT) or discrete Fourier transform (DFT); test problems using the DCT and DFT are considered in Section \ref{sec:Validation}. The development of the adapted UPRE, MDP, and GCV methods also rely on Assumption \ref{Assumption_System} and the constructions contained in Table \ref{tab:System assumptions}. By Lemma \ref{lem:Concatenation of Normal Noise}, this assumption implies that $\widetilde{\noiseVec} \sim \mathcal{N}\left(\widetilde{\zeroVec},\widetilde{\Sigma}\right)$ with $\widetilde{\zeroVec} \in \mathbb{R}^M$ and $M = \sum_{r=1}^{R} m_r$. 
+\begin{theorem}
+\label{thm:Trace}
+Under Assumptions \ref{Assumption_System} through \ref{Assumption_Rows}, the trace of $\AWinBig(\regparamVecBig)$ is
+\[\trace\left(\widetilde{\Sigma}\AWinBig(\regparamVecBig)\right) = \sum_{r=1}^{R} \left( \noiseSD_r^2 \sum_{j = k+1}^{n} \left[\sum_{p=1}^{P} w_j^{(p)} \Phi_j^{(r)}\left(\regparamBig^{(p)}\right)\right] \right)\]
+where $k = \min\{0,n-m\}$.
+\end{theorem}
+\begin{proof}
+The diagonal block structure of both $\widetilde{\Sigma} = \diag\left(\Sigma^{(1)},\ldots,\Sigma^{(R)}\right)$ and $\AWinBig(\regparamVecBig)$ allow the trace to be written as a sum of traces:
+\[\trace\left(\widetilde{\Sigma}\AWinBig(\regparamVecBig)\right) = \sum_{r=1}^{R} \trace\left(\Sigma^{(r)}\AWin^{(r)}\left(\regparamVecBig\right)\right).\]
+From Assumption \ref{Assumption_Noise}, we have that $\Sigma^{(r)} = \noiseSD_r^2 I_m$ for all $r = 1,\ldots,R$. Furthermore, representation \eqref{eq:Windowed Big Influence Diagonals} of the diagonal blocks of $\AWinBig(\regparamVecBig)$ and the similarity invariance of the trace operation allow us to write
+\[\trace\left(\Sigma^{(r)}\AWin^{(r)}\left(\regparamVecBig\right)\right) = \noiseSD_r^2 \trace\left(\Delta^{(r)}\sum_{p=1}^{P}W^{(p)}\Phi^{(r)}\left(\regparamBig^{(p)}\right)\pinv{\left(\Delta^{(r)}\right)}\right).\]
+Using $k = \min\{0,n-m\}$, we have
+\[\noiseSD_r^2 \trace\left(\Delta^{(r)}\sum_{p=1}^{P}W^{(p)}\Phi^{(r)}\left(\regparamBig^{(p)}\right)\pinv{\left(\Delta^{(r)}\right)}\right) = \noiseSD_r^2 \sum_{j = k+1}^{n} \left[\sum_{p=1}^{P} w_j^{(p)} \Phi_j^{(r)}\left(\regparamBig^{(p)}\right)\right].\]
+Therefore,
+\[\trace\left(\widetilde{\Sigma}\AWinBig(\regparamVecBig)\right) = \sum_{r=1}^{R} \left( \noiseSD_r^2 \sum_{j = k+1}^{n} \left[\sum_{p=1}^{P} w_j^{(p)} \Phi_j^{(r)}\left(\regparamBig^{(p)}\right)\right] \right).\]
+\end{proof}
 
-The filter functions \eqref{eq:Filter functions} provide a convenient way of expressing $\|\rReg\|_2^2$ and $\trace(\A)$. To streamline notation, for $j = 1,\ldots,n$ we let
-\[\filt_j = \begin{cases}
-0, & \delta_j = 0 \\
-1, & \lambda_j = 0 \\
-\frac{\gamma_j^2}{\gamma_j^2 + \regparam^2}, & \text{otherwise,}
-\end{cases} \qquad \mfilt_j = 1 - \filt_j = \begin{cases}
-1, & \delta_j = 0 \\
-0, & \lambda_j = 0 \\
-\frac{\regparam^2}{\gamma_j^2 + \regparam^2}, & \text{otherwise,}
-\end{cases}\]
-which are in terms of the generalized singular values $\gamma_j = \delta_j/\lambda_j$. The condition $\delta_j = 0$ corresponds with $\gamma_j = 0$, while $\lambda_j = 0$ corresponds with $\gamma_j$ begin infinite. From a numerical standpoint, some tolerance should be set to monitor the size of $\gamma_j$ and adjust the filter factors accordingly. With this notation, we can write
-\[\left\|\rReg\right\|_2^2 = \sum_{j=1}^{n} \left(\mfilt_j\right)^2\left(\dft{d}_j\right)^2, \qquad \trace(\A) = \sum_{j=1}^{n} \filt_j.\]
+% To this end, we will use the version of the GSVD outlined in Section \ref{sec:GSVD} (which uses the assumption that the system matrix in \eqref{eq:TikSol3} has full column rank). Specifically, we use \eqref{eq:Mulitple GSVD} to define the generalized filter functions to be
+% \begin{equation}
+% \label{eq:Filter functions 2}
+% \filt^{(r)}_j = \frac{\left(\delta^{(r)}_j\right)^2}{\left(\delta^{(r)}_j\right)^2 + \regparam^2 \left(\lambda^{(r)}_j\right)^2}, \quad \mfilt^{(r)}_j = 1 - \filt^{(r)}_j = \frac{\regparam^2 \left(\lambda^{(r)}_j\right)^2}{\left(\delta^{(r)}_j\right)^2 + \regparam^2 \left(\lambda^{(r)}_j\right)^2}
+% \end{equation}
+% where $\bm{\delta}^{(r)} = \sqrt{\diag(\trans{(\Delta^{(r)})}\Delta^{(r)})}$ and $\bm{\lambda}^{(r)} = \sqrt{\diag(\trans{(\Lambda^{(r)})}\Lambda^{(r)})}$ for each $r = 1,\ldots,R$. The influence matrix $A^{(r)}(\regparam)$ given by \eqref{eq:Diagonal blocks} can be expressed as
+% \begin{equation}
+% \label{eq:Fourier diagonalization 2}
+% A^{(r)}(\regparam) = U^{(r)}\Delta^{(r)}\left[\trans{(\Delta^{(r)})}\Delta^{(r)} + \regparam^2\trans{(\Lambda^{(r)})}\Lambda^{(r)}\right]^{-1}\trans{\left(\Delta^{(r)}\right)}\trans{\left(U^{(r)}\right)}, \qquad r = 1,\ldots,R.
+% \end{equation}
+% Assumption \ref{Assumption_Noise} and the similarity invariance of the trace operator gives
+% \begin{align}
+%     \trace\left(\Sigma^{(r)}A^{(r)}(\regparam)\right) &=  \trace\left(\noiseSD_r^2 I_{m} U^{(r)}\Delta^{(r)}\left[\trans{(\Delta^{(r)})}\Delta^{(r)} + \regparam^2\trans{(\Lambda^{(r)})}\Lambda^{(r)}\right]^{-1}\trans{\left(\Delta^{(r)}\right)}\trans{\left(U^{(r)}\right)}\right) \nonumber \\ 
+%     &= \noiseSD_r^2 \trace\left(\Delta^{(r)}\left[\trans{(\Delta^{(r)})}\Delta^{(r)} + \regparam^2\trans{(\Lambda^{(r)})}\Lambda^{(r)}\right]^{-1}\trans{(\Delta^{(r)})}\right) \nonumber \\
+%     &= \noiseSD_r^2 \sum_{j=1}^{n} \filt^{(r)}_j. \label{eq:Trace}
+% \end{align}
+% Another benefit of using \eqref{eq:Fourier diagonalization 2} is that we can write
+% \begin{align}
+% \frac{1}{\mA}\|\rVec^{(r)}(\regparam)\|_2^2 &= \frac{1}{\mA}\left\|U^{(r)}\left(\Delta^{(r)}\left[\trans{(\Delta^{(r)})}\Delta^{(r)} + \regparam^2\trans{(\Lambda^{(r)})}\Lambda^{(r)}\right]^{-1}\trans{(\Delta^{(r)})} - I_{\mA}\right)\trans{\left(U^{(r)}\right)}\dVec^{(r)}\right\|_2^2 \nonumber \\
+% &= \frac{1}{\mA}\left\|\left(\Delta^{(r)}\left[\trans{(\Delta^{(r)})}\Delta^{(r)} + \regparam^2\trans{(\Lambda^{(r)})}\Lambda^{(r)}\right]^{-1}\trans{(\Delta^{(r)})} - I_{\mA}\right)\dft{\dVec}^{(r)}\right\|_2^2 \nonumber \\
+% &= \frac{1}{\mA}\sum_{j=1}^{n} \left(\mfilt^{(r)}_j\right)^2\left(\dft{d}_j^{(r)}\right)^2,
+% \label{eq:Fourier regularized residual}
+% \end{align}
+% where $\dft{\dVec}^{(r)} = \trans{\left(U^{(r)}\right)}\dVec^{(r)}$ for $r = 1,\ldots,R$. Lastly, Assumption 2 means that $\trace(\Sigma^{(r)}) = m\noiseSD^2_r$. 
 
-
+% As a final remark, an analogous approach could be taken if the matrices $A^{(r)}$ and $L^{(r)}$ can be simultaneously diagonalized with respect to a orthogonal/unitary transformation, such as the discrete cosine transform (DCT) or discrete Fourier transform (DFT); test problems using the DCT and DFT are considered in Section \ref{sec:Validation}. The development of the adapted UPRE, MDP, and GCV methods also rely on Assumption \ref{Assumption_System} and the constructions contained in Table \ref{tab:System assumptions}. By Lemma \ref{lem:Concatenation of Normal Noise}, this assumption implies that $\widetilde{\noiseVec} \sim \mathcal{N}\left(\widetilde{\zeroVec},\widetilde{\Sigma}\right)$ with $\widetilde{\zeroVec} \in \mathbb{R}^M$ and $M = \sum_{r=1}^{R} m_r$. 
 
 \subsection{Unbiased Predictive Risk Estimator} \label{sec:UPRE}
 The UPRE method was developed in 1973 by Mallows and considers the statistical relationship between predictive error $\pVec(\regparam)$ and the regularized residual $\rVec(\regparam)$; these quantities are defined respectively as
