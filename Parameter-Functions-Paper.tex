@@ -640,20 +640,20 @@ Proposition \ref{prop:Non-overlapping windows} describes how $\|\rWinBig(\regpar
 
 \begin{proposition}
 \label{prop:Non-overlapping windows}
-If the weight vectors $\{\wVec^{(p)}\}_{p=1}^{P}$ satisfy \eqref{eq:Non-overlapping window condition}, then $\|\rWinBig(\regparamVecBig)\|_2^2$ can be written as
-\[\left\|\rWinBig(\regparamVecBig)\right\|_2^2 = \sum_{p=1}^{P} \left\|\rVec^{(p)}(\regparam)\right\|_2^2\]
+For a given $r = 1,\ldots,R$, if the weight vectors $\{\wVec^{(r,p)}\}_{p=1}^{P}$ satisfy \eqref{eq:Non-overlapping window condition}, then $\|\rWin^{(r)}(\regparamVecBig)\|_2^2$ can be written as
+\[\left\|\rWin^{(r)}(\regparamVecBig)\right\|_2^2 = \sum_{p=1}^{P} \left\|\rWin^{(r,p)}(\regparamBig^{(p)})\right\|_2^2\]
 where
-\[\left\|\rVec^{(p)}(\regparam)\right\|_2^2 = \sum_{j=1}^{n} \left( \wVec_j^{(p)} \mfilt\left(\regparam^{(p)},\singular_j\right)\dft{d}_j\right)^2..\]
+\[\left\|\rWin^{(r,p)}(\regparamBig^{(p)})\right\|_2^2 = \sum_{j=1}^{n} \left(w_j^{(r,p)} \Psi_j^{(p)}\left(\regparamBig^{(p)}\right)\hat{d}_j^{(r)}\right)^2.\]
 \end{proposition}
 \begin{proof}
-Using \eqref{eq:Windowed Regularized Residual}, we can write $\|\rVec_{\text{win}}(\regparamVec)\|_2^2$ as
-\[\left\|\rVec_{\text{win}}(\regparamVec)\right\|_2^2 = \sum_{j=1}^{n} \left(\sum_{p=1}^{P} \wVec_j^{(p)} \mfilt\left(\regparam^{(p)},\singular_j\right) \right)^2 \left(\dft{d}_j\right)^2.\]
-Since the weight vectors $\{\wVec^{(p)}\}_{p=1}^{P}$ satisfy \eqref{eq:Non-overlapping window condition}, for each index $j$ there exists exactly one index $p$ such that $\wVec^{(p)}_j \neq 0$. Thus the sum over $p$ has only one nonzero summand for each index $j$, meaning we can write
-\[\left(\sum_{p=1}^{P} \wVec_j^{(p)} \mfilt\left(\regparam^{(p)},\singular_j\right) \right)^2 = \sum_{p=1}^{P} \left( \wVec_j^{(p)} \mfilt\left(\regparam^{(p)},\singular_j\right)\right)^2.\]
-Therefore $\|\rVec_{\text{win}}(\regparam)\|_2^2$ can be rewritten through a change of summation so that
-\[\|\rVec_{\text{win}}(\regparamVec)\|_2^2 = \sum_{p=1}^{P} \left[ \sum_{j=1}^{n} \left( \wVec_j^{(p)} \mfilt\left(\regparam^{(p)},\singular_j\right) \right)^2 \left(\dft{d}_j\right)^2\right] = \sum_{p=1}^{P} \left\|\rVec^{(p)}(\regparam)\right\|_2^2\]
+Using \eqref{eq:Windowed Regularized Residual}, we can write $\|\rWin^{(r)}(\regparamVecBig)\|_2^2$ as
+\[\left\|\rWin^{(r)}(\regparamVecBig)\right\|_2^2 = \sum_{j=1}^{n} \left(\sum_{p=1}^{P} w_j^{(r,p)} \Psi_j^{(r)}\left(\regparamBig^{(p)}\right) \right)^2 \left(\dft{d}_j\right)^2.\]
+Since the weight vectors $\{\wVec^{(r,p)}\}_{p=1}^{P}$ satisfy \eqref{eq:Non-overlapping window condition}, for each index $j$ there exists exactly one index $p$ such that $w^{(r,p)}_j \neq 0$. Thus the sum over $p$ has only one nonzero summand for each index $j$, meaning we can write
+\[\left(\sum_{p=1}^{P} w_j^{(r,p)} \Psi_j^{(r,p)}\left(\regparamBig^{(p)}\right) \right)^2 = \sum_{p=1}^{P} \left(w_j^{(r,p)} \Psi_j^{(r,p)}\left(\regparamBig^{(p)}\right)\right)^2.\]
+Therefore $\|\rWin^{(r)}(\regparamVecBig)\|_2^2$ can be rewritten through a change of summation so that
+\[\left\|\rWin^{(r)}(\regparamVecBig)\right\|_2^2 = \sum_{p=1}^{P} \left[ \sum_{j=1}^{n} \left( w_j^{(r,p)} \Psi_j^{(r,p)}\left(\regparamBig^{(p)}\right)\right)^2 \left(\hat{d}_j^{(r)}\right)^2\right] = \sum_{p=1}^{P} \left\|\rWin^{(r,p)}(\regparamBig^{(p)})\right\|_2^2\]
 with
-\[\left\|\rVec^{(p)}(\regparam)\right\|_2^2 = \sum_{j=1}^{n} \left( \wVec_j^{(p)} \mfilt\left(\regparam^{(p)},\singular_j\right)\dft{d}_j\right)^2.\]
+\[\left\|\rWin^{(r,p)}(\regparamBig^{(p)})\right\|_2^2 = \sum_{j=1}^{n} \left(w_j^{(r,p)} \Psi_j^{(r,p)}\left(\regparamBig^{(p)}\right)\hat{d}_j^{(r)}\right)^2.\]
 \end{proof}
 
 Theorem \ref{thm:Trace} provides of representation of the trace term needed for the remainder of Section \ref{sec:Methods}.
