@@ -470,7 +470,7 @@ where $\widetilde{Y}$ is the inverse of $\widetilde{X}$ and $\svd{\dBig} = \tran
 0, & \lambda_j^{(r)} = 0 \\
 \dfrac{\regparam^2}{\left(\gamma_j^{(r)}\right)^2 + \regparam^2}, & \text{otherwise}
 \end{cases}\]
-for $r = 1,\ldots,R$, as well as the $n \times n$ diagonal matrices
+for $r = 1,\ldots,R$, as well as the $n_r \times n_r$ diagonal matrices
 \[\Phi^{(r)}(\regparam) = \diag\left(\filt_1^{(r)}(\regparam),\ldots,\filt_n^{(r)}(\regparam)\right), \quad \Psi^{(r)}(\regparam) = \diag\left(\mfilt_1^{(r)}(\regparam),\ldots,\mfilt_n^{(r)}(\regparam)\right).\]
 The diagonal matrices $\Phi^{(r)}(\regparam)$ and $\Psi^{(r)}(\regparam)$ can be diagonally concatenated to form the block diagonal matrices
 \[\widetilde{\Phi}(\regparam) = \diag\left(\Phi^{(1)}(\regparam),\ldots,\Phi^{(R)}(\regparam)\right), \quad \widetilde{\Psi}(\regparam) = \diag\left(\Psi^{(1)}(\regparam),\ldots,\Psi^{(R)}(\regparam)\right).\]
@@ -506,13 +506,13 @@ The strength of the assumptions presented so far increase in accordance with the
 
 The ultimate situation we consider is the case where multiparameter regularization is applied to multiple data sets. Letting $\regparamVec^{(r)} = [\regparam^{(r,1)},\regparam^{(r,2)},\ldots,\regparam^{(r,P_r)}]$ be the $P_r$ regularization parameters used for multiparameter regularization applied to the $r$th system described by \eqref{eq:Big vectors}, we can independently construct regularized solutions
 \[\xWin^{(r)}\left(\regparamVec^{(r)}\right) = \sum_{p=1}^{P_r} Y^{(r)}\inv{\left[\trans{\left(\Delta^{(r)}\right)}\Delta^{(r)} + \left(\regparam^{(r,p)}\right)^2 \trans{\left(\Lambda^{(r)}\right)}\Lambda^{(r)}\right]}W^{(r,p)}\trans{\left(\Delta^{(r)}\right)}\dft{\dVec}^{(r)}\]
-where $W^{(r,p)}$ is the $p$th window for the $r$th system. Each system can have its own set of windows, meaning that there are a total of $\sum_{r=1}^{R} P_r$ regularization parameters. However, the primary assumption we make moving forward is that the windows $W^{(r,p)}$ for each system are the same, i.e $W^{(r,p)} = W^{(p)}$ for all $r = 1,\ldots,R$ and $p = 1,\ldots,P$. This implies that $\regparamVec^{(r)}$ are all vectors of length $P$ and there are a total of $RP$ parameters. \par
+where $W^{(r,p)}$ is the $p$th window for the $r$th system. Each system can have its own set of windows, meaning that there are a total of $\sum_{r=1}^{R} P_r$ regularization parameters. However, the primary assumption we make moving forward is that the number of windows $W^{(r,p)}$ for each system is the same, i.e $P_r = P$ for all $r = 1,\ldots,R$. This implies that $\regparamVec^{(r)}$ are all vectors of length $P$ and there are a total of $RP$ parameters. \par
 Analogous to the uniparameter case for multiple data sets, we define $\xWinBig(\regparamVecBig)$ as the vertical concatenation of the $\xWin^{(r)}\left(\regparamVecBig\right)$ for $r = 1,\ldots,R$, where $\regparamVecBig \in \mathbb{R}^P$ is a single vector of parameters. Using the constructions from Table \ref{tab:Block GSVD Matrices}, we have
 \begin{equation}
 \label{eq:Big Windowed Solution}
     \xWinBig(\regparamVecBig) = \sum_{p=1}^{P} \widetilde{Y}\inv{\left[\trans{\widetilde{\Delta}}\widetilde{\Delta} + \left(\widetilde{\regparam}^{(p)}\right)^2 \trans{\widetilde{\Lambda}}\widetilde{\Lambda}\right]}\widetilde{W}^{(p)}\trans{\widetilde{\Delta}}\dft{\dBig}
 \end{equation}
-where $\widetilde{W}^{(p)} = \diag(W^{(p)},\ldots,W^{(p)})$ has $R$ diagonal blocks. As the final extension of notation from Section \ref{sec:Multiple data sets}, we define
+where $\widetilde{W}^{(p)} = \diag(W^{(1,p)},\ldots,W^{(R,p)})$ has $R$ diagonal blocks. As the final extension of notation from Section \ref{sec:Multiple data sets}, we define
 \begin{align*}
     \filt_j^{(r)}\left(\regparam^{(p)}\right) &= \begin{cases}
 0, & \delta_j^{(r)} = 0 \\
@@ -589,21 +589,24 @@ and influence matrix defined by
 $\xWinBig(\regparamVecBig)$ can be represented by \eqref{eq:Big Windowed Solution}, while the diagonal blocks of $\AWinBig(\regparamVecBig)$ are
 \begin{equation}
     \AWin^{(r)}(\regparamVecBig)
-    = U^{(r)}\Delta^{(r)}\sum_{p=1}^{P}W^{(p)}\Phi^{(r)}\left(\regparamBig^{(p)}\right)\pinv{\left(\Delta^{(r)}\right)}\trans{\left(U^{(r)}\right)}. \label{eq:Windowed Big Influence Diagonals}
+    = U^{(r)}\Delta^{(r)}\sum_{p=1}^{P}W^{(r,p)}\Phi^{(r)}\left(\regparamBig^{(p)}\right)\pinv{\left(\Delta^{(r)}\right)}\trans{\left(U^{(r)}\right)}. \label{eq:Windowed Big Influence Diagonals}
 \end{equation}
-
+Both $W^{(r,p)}$ and $\Phi^{(r)}(\regparamBig^{(p)})$ are $n_r \times n_r$ matrices. \par
 We will now present representations of the necessary norm and trace terms that are used in discussions of the adapted UPRE, MDP, and GCV methods. These representations are presented for multiparameter regularization of multiple data sets since this is the most general situation. The first representation is given in Theorem \ref{thm:Regularized residual}, which concerns the norm of the regularized residual.
 
 \begin{theorem}
 \label{thm:Regularized residual}
-Under Assumptions \ref{Assumption_System} and \ref{Assumption_Rows}, the norm of $\rWinBig(\regparamVecBig)$ is
-\[\left\|\rWinBig(\regparamVecBig)\right\|_2^2 = \begin{cases}
-\sum_{r=1}^{R} \left(\sum_{j=1}^{m} \left(\left[\sum_{p=1}^{P} w_{j+k}^{(p)}\Psi_{j+k}^{(p)}\left(\regparamBig^{(p)}\right)\right] \hat{d}_j^{(r)}\right)^2\right), & m \leq n, \\
-\sum_{r=1}^{R} \left(\sum_{j=1}^{n} \left(\left[\sum_{p=1}^{P} w_{j}^{(p)}\Psi_{j}^{(p)}\left(\regparamBig^{(p)}\right)\right] \hat{d}_j^{(r)}\right)^2 + \sum_{j=n+1}^{m} \left(\hat{d}_j^{(r)}\right)^2\right), & m > n.
-\end{cases}.\]
+Under Assumptions \ref{Assumption_System} and using the construction in Table \ref{tab:Block GSVD Matrices}, the norm of $\rWinBig(\regparamVecBig)$ is
+\[\left\|\rWinBig(\regparamVecBig)\right\|_2^2 = \sum_{r=1}^{R}\left\|\rWin^{(r)}(\regparamVecBig)\right\|_2^2\]
+where for each $r = 1,\ldots,R$ we have
+\[\left\|\rWin^{(r)}(\regparamVecBig)\right\|_2^2 = \begin{cases}
+\sum_{j=1}^{m_r} \left(\left[\sum_{p=1}^{P} w_{j+k_r}^{(r,p)}\Psi_{j+k_r}^{(r)}\left(\regparamBig^{(p)}\right)\right] \hat{d}_j^{(r)}\right)^2, & m_r \leq n_r, \\
+\sum_{j=1}^{n_r} \left(\left[\sum_{p=1}^{P} w_{j}^{(r,p)}\Psi_{j}^{(r)}\left(\regparamBig^{(p)}\right)\right] \hat{d}_j^{(r)}\right)^2 + \sum_{j=n+1}^{m_r} \left(\hat{d}_j^{(r)}\right)^2, & m_r > n_r.
+\end{cases}\]
+with $k_r = n_r - m_r$.
 \end{theorem}
 \begin{proof}
-From Assumption \ref{Assumption_Rows}, the length of each data set $\dVec^{(r)}$ is $m$. Thus we let $M = mR$, which is the length of $\rWinBig(\regparamVecBig)$. Substituting \eqref{eq:Big Windowed Solution 2} into the definition of $\rWinBig(\regparamVecBig)$, we have
+We first let $M = \sum_{r=1}^{R} m_r$, which is the length of $\rWinBig(\regparamVecBig)$. Substituting \eqref{eq:Big Windowed Solution 2} into the definition of $\rWinBig(\regparamVecBig)$, we have
 \begin{align*}
     \rWinBig(\regparamVecBig) &= \widetilde{U}\widetilde{\Delta}\sum_{p=1}^{P} \widetilde{W}^{(p)}\widetilde{\Phi}\left(\widetilde{\regparam}^{(p)}\right)\pinv{\widetilde{\Delta}}\dft{\dBig} - \dBig \\
     &= \left[\widetilde{U}\widetilde{\Delta}\sum_{p=1}^{P} \widetilde{W}^{(p)}\widetilde{\Phi}\left(\widetilde{\regparam}^{(p)}\right)\pinv{\widetilde{\Delta}}\trans{\widetilde{U}} - I_M\right]\dBig \\
@@ -613,29 +616,32 @@ From Assumption \ref{Assumption_Rows}, the length of each data set $\dVec^{(r)}$
 Using the 2-norm and the block structure of the matrices, we can then write
 \begin{align*}
     \left\|\rWinBig(\regparamVecBig)\right\|_2^2 &= \sum_{r=1}^{R}\left\|\rWin^{(r)}(\regparamVecBig)\right\|_2^2 \\
-    &= \sum_{r=1}^{R} \left\|U^{(r)}\left[\Delta^{(r)}\sum_{p=1}^{P} W^{(p)}\Phi^{(r)}\left(\widetilde{\regparam}^{(p)}\right)\pinv{\left(\Delta^{(r)}\right)} - I_m\right]\svd{\dVec}^{(r)}\right\|_2^2 \\
-    &= \sum_{r=1}^{R} \left\|\left[\Delta^{(r)}\sum_{p=1}^{P} W^{(p)}\Phi^{(r)}\left(\widetilde{\regparam}^{(p)}\right)\pinv{\left(\Delta^{(r)}\right)} - I_m\right]\svd{\dVec}^{(r)}\right\|_2^2.
+    &= \sum_{r=1}^{R} \left\|U^{(r)}\left[\Delta^{(r)}\sum_{p=1}^{P} W^{(r,p)}\Phi^{(r)}\left(\widetilde{\regparam}^{(p)}\right)\pinv{\left(\Delta^{(r)}\right)} - I_{m_r}\right]\svd{\dVec}^{(r)}\right\|_2^2 \\
+    &= \sum_{r=1}^{R} \left\|\left[\Delta^{(r)}\sum_{p=1}^{P} W^{(r,p)}\Phi^{(r)}\left(\widetilde{\regparam}^{(p)}\right)\pinv{\left(\Delta^{(r)}\right)} - I_{m_r}\right]\svd{\dVec}^{(r)}\right\|_2^2.
 \end{align*}
-We must now consider the two cases. If $m \leq n$, then $k = n - m \geq 0$ and 
-\[\left\|\left[\Delta^{(r)}\sum_{p=1}^{P} W^{(p)}\Phi^{(r)}\left(\widetilde{\regparam}^{(p)}\right)\pinv{\left(\Delta^{(r)}\right)} - I_m\right]\svd{\dVec}^{(r)}\right\|_2^2 = \sum_{j=1}^{m} \left(\left[\sum_{p=1}^{P} w_{j+k}^{(p)}\Psi_{j+k}^{(p)}\left(\regparamBig^{(p)}\right)\right] \hat{d}_j^{(r)}\right)^2.\]
-If $m > n$ instead, then let $k = m - n > 0$. The matrix within the norm has the block form
-\[\Delta^{(r)}\sum_{p=1}^{P} W^{(p)}\Phi^{(r)}\left(\widetilde{\regparam}^{(p)}\right)\pinv{\left(\Delta^{(r)}\right)} - I_m = \begin{bmatrix}
--\sum_{p=1}^{P} W^{(p)} \Psi^{(r)}\left(\widetilde{\regparam}^{(p)}\right) & \zeroVec_{n \times k} \\
-\zeroVec_{k \times n} & -I_k
+We must now consider the two cases for each $r = 1,\ldots,R$. If $m_r \leq n_r$, then let $k_r = n_r - m_r$ and so that 
+\[\left\|\left[\Delta^{(r)}\sum_{p=1}^{P} W^{(r,p)}\Phi^{(r)}\left(\widetilde{\regparam}^{(p)}\right)\pinv{\left(\Delta^{(r)}\right)} - I_{m_r}\right]\svd{\dVec}^{(r)}\right\|_2^2 = \sum_{j=1}^{m_r} \left(\left[\sum_{p=1}^{P} w_{j+{k_r}}^{(r,p)}\Psi_{j+{k_r}}^{(r)}\left(\regparamBig^{(p)}\right)\right] \hat{d}_j^{(r)}\right)^2.\]
+If $m_r > n_r$ instead, then let $k_r = m_r - n_r$. The matrix within the norm has the block form
+\[\Delta^{(r)}\sum_{p=1}^{P} W^{(r,p)}\Phi^{(r)}\left(\widetilde{\regparam}^{(p)}\right)\pinv{\left(\Delta^{(r)}\right)} - I_{m_r} = \begin{bmatrix}
+-\sum_{p=1}^{P} W^{(r,p)} \Psi^{(r)}\left(\widetilde{\regparam}^{(p)}\right) & \zeroVec_{n_r \times k_r} \\
+\zeroVec_{k_r \times n_r} & -I_{k_r}
 \end{bmatrix}.\]
 Thus the norm becomes
-\[\left\|\begin{bmatrix}
--\sum_{p=1}^{P} W^{(p)} \Psi^{(r)}\left(\widetilde{\regparam}^{(p)}\right) & \zeroVec_{n \times k} \\
-\zeroVec_{k \times n} & -I_k
-\end{bmatrix}\svd{\dVec}^{(r)}\right\|_2^2 = \sum_{j=1}^{n} \left(\left[\sum_{p=1}^{P} w_{j}^{(p)}\Psi_{j}^{(p)}\left(\regparamBig^{(p)}\right)\right] \hat{d}_j^{(r)}\right)^2 + \sum_{j=n+1}^{m} \left(\hat{d}_j^{(r)}\right)^2.\]
+\begin{align*}
+    &\left\|\begin{bmatrix}
+-\sum_{p=1}^{P} W^{(r,p)} \Psi^{(r)}\left(\widetilde{\regparam}^{(p)}\right) & \zeroVec_{n_r \times k_r} \\
+\zeroVec_{k_r \times n_r} & -I_{k_r}
+\end{bmatrix}\svd{\dVec}^{(r)}\right\|_2^2 \\
+&= \sum_{j=1}^{n_r} \left(\left[\sum_{p=1}^{P} w_{j}^{(r,p)}\Psi_{j}^{(r)}\left(\regparamBig^{(p)}\right)\right] \hat{d}_j^{(r)}\right)^2 + \sum_{j ={n_r}+1}^{m_r} \left(\hat{d}_j^{(r)}\right)^2.
+\end{align*}
 \end{proof}
 
 Proposition \ref{prop:Non-overlapping windows} describes how $\|\rWinBig(\regparamVecBig)\|_2^2$ can be decomposed when working with non-overlapping windows.
 
 \begin{proposition}
 \label{prop:Non-overlapping windows}
-If the weight vectors $\{\wVec^{(p)}\}_{p=1}^{P}$ satisfy \eqref{eq:Non-overlapping window condition}, then $\|\rVec_{\text{win}}(\regparamVec)\|_2^2$ can be written as
-\[\left\|\rVec_{\text{win}}(\regparamVec)\right\|_2^2 = \sum_{p=1}^{P} \left\|\rVec^{(p)}(\regparam)\right\|_2^2\]
+If the weight vectors $\{\wVec^{(p)}\}_{p=1}^{P}$ satisfy \eqref{eq:Non-overlapping window condition}, then $\|\rWinBig(\regparamVecBig)\|_2^2$ can be written as
+\[\left\|\rWinBig(\regparamVecBig)\right\|_2^2 = \sum_{p=1}^{P} \left\|\rVec^{(p)}(\regparam)\right\|_2^2\]
 where
 \[\left\|\rVec^{(p)}(\regparam)\right\|_2^2 = \sum_{j=1}^{n} \left( \wVec_j^{(p)} \mfilt\left(\regparam^{(p)},\singular_j\right)\dft{d}_j\right)^2..\]
 \end{proposition}
