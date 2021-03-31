@@ -630,6 +630,26 @@ Thus the norm becomes
 \end{bmatrix}\svd{\dVec}^{(r)}\right\|_2^2 = \sum_{j=1}^{n} \left(\left[\sum_{p=1}^{P} w_{j}^{(p)}\Psi_{j}^{(p)}\left(\regparamBig^{(p)}\right)\right] \hat{d}_j^{(r)}\right)^2 + \sum_{j=n+1}^{m} \left(\hat{d}_j^{(r)}\right)^2.\]
 \end{proof}
 
+Proposition \ref{prop:Non-overlapping windows} describes how $\|\rWinBig(\regparamVecBig)\|_2^2$ can be decomposed when working with non-overlapping windows.
+
+\begin{proposition}
+\label{prop:Non-overlapping windows}
+If the weight vectors $\{\wVec^{(p)}\}_{p=1}^{P}$ satisfy \eqref{eq:Non-overlapping window condition}, then $\|\rVec_{\text{win}}(\regparamVec)\|_2^2$ can be written as
+\[\left\|\rVec_{\text{win}}(\regparamVec)\right\|_2^2 = \sum_{p=1}^{P} \left\|\rVec^{(p)}(\regparam)\right\|_2^2\]
+where
+\[\left\|\rVec^{(p)}(\regparam)\right\|_2^2 = \sum_{j=1}^{n} \left( \wVec_j^{(p)} \mfilt\left(\regparam^{(p)},\singular_j\right)\dft{d}_j\right)^2..\]
+\end{proposition}
+\begin{proof}
+Using \eqref{eq:Windowed Regularized Residual}, we can write $\|\rVec_{\text{win}}(\regparamVec)\|_2^2$ as
+\[\left\|\rVec_{\text{win}}(\regparamVec)\right\|_2^2 = \sum_{j=1}^{n} \left(\sum_{p=1}^{P} \wVec_j^{(p)} \mfilt\left(\regparam^{(p)},\singular_j\right) \right)^2 \left(\dft{d}_j\right)^2.\]
+Since the weight vectors $\{\wVec^{(p)}\}_{p=1}^{P}$ satisfy \eqref{eq:Non-overlapping window condition}, for each index $j$ there exists exactly one index $p$ such that $\wVec^{(p)}_j \neq 0$. Thus the sum over $p$ has only one nonzero summand for each index $j$, meaning we can write
+\[\left(\sum_{p=1}^{P} \wVec_j^{(p)} \mfilt\left(\regparam^{(p)},\singular_j\right) \right)^2 = \sum_{p=1}^{P} \left( \wVec_j^{(p)} \mfilt\left(\regparam^{(p)},\singular_j\right)\right)^2.\]
+Therefore $\|\rVec_{\text{win}}(\regparam)\|_2^2$ can be rewritten through a change of summation so that
+\[\|\rVec_{\text{win}}(\regparamVec)\|_2^2 = \sum_{p=1}^{P} \left[ \sum_{j=1}^{n} \left( \wVec_j^{(p)} \mfilt\left(\regparam^{(p)},\singular_j\right) \right)^2 \left(\dft{d}_j\right)^2\right] = \sum_{p=1}^{P} \left\|\rVec^{(p)}(\regparam)\right\|_2^2\]
+with
+\[\left\|\rVec^{(p)}(\regparam)\right\|_2^2 = \sum_{j=1}^{n} \left( \wVec_j^{(p)} \mfilt\left(\regparam^{(p)},\singular_j\right)\dft{d}_j\right)^2.\]
+\end{proof}
+
 Theorem \ref{thm:Trace} provides of representation of the trace term needed for the remainder of Section \ref{sec:Methods}.
 
 \begin{theorem}
@@ -677,17 +697,12 @@ Therefore,
 % As a final remark, an analogous approach could be taken if the matrices $A^{(r)}$ and $L^{(r)}$ can be simultaneously diagonalized with respect to a orthogonal/unitary transformation, such as the discrete cosine transform (DCT) or discrete Fourier transform (DFT); test problems using the DCT and DFT are considered in Section \ref{sec:Validation}. The development of the adapted UPRE, MDP, and GCV methods also rely on Assumption \ref{Assumption_System} and the constructions contained in Table \ref{tab:System assumptions}. By Lemma \ref{lem:Concatenation of Normal Noise}, this assumption implies that $\widetilde{\noiseVec} \sim \mathcal{N}\left(\widetilde{\zeroVec},\widetilde{\Sigma}\right)$ with $\widetilde{\zeroVec} \in \mathbb{R}^M$ and $M = \sum_{r=1}^{R} m_r$. 
 
 \subsection{Unbiased Predictive Risk Estimator} \label{sec:UPRE}
-The UPRE method was developed in 1973 by Mallows and considers the statistical relationship between predictive error $\pVec(\regparam)$ and the regularized residual $\rVec(\regparam)$; these quantities are defined respectively as
-\begin{equation}
-\label{eq:Predictive Error and Regularized Residual}
-\pVec(\regparam) = A(\xReg - \xSol), \quad \rVec(\regparam) = A\xReg - \dVec.
-\end{equation}
-The standard UPRE function for Tikhonov regularization is
+The UPRE method was developed in 1973 by Mallows and considers the statistical relationship between the regularized residual \eqref{eq:Regularized Residual} and the predictive error $\pVec(\regparam) = A(\xReg - \xSol)$. The standard UPRE function for Tikhonov regularization is
 \begin{equation}
 \label{eq:UPRE}
 \U(\alpha) = \frac{1}{\mA}\|\rVec(\regparam)\|_2^2 + \frac{2\noiseSD^2}{\mA}\trace(\A) - \noiseSD^2
 \end{equation}
-where $\A = A(\trans{A}A + \regparam^2\trans{L}L)^{-1}\trans{A}$ is the influence matrix and $\noiseVec \sim \mathcal{N}(\bm{0},\noiseSD^2 I_{\mA})$. The function $\U(\regparam)$ is an unbiased estimator of the expected value of $\frac{1}{\mA}\|\pVec(\regparam)\|_2^2$, a quantity called the predictive risk. The UPRE method selects $\regparam_{\textrm{UPRE}} = \argmin_{\regparam > 0} \U(\regparam)$. \par
+where \eqref{eq:Influence matrix} is the influence matrix and $\noiseVec \sim \mathcal{N}(\bm{0},\noiseSD^2 I_{\mA})$. The function $\U(\regparam)$ is an unbiased estimator of the expected value of $\frac{1}{\mA}\|\pVec(\regparam)\|_2^2$, a quantity called the predictive risk. The UPRE method selects $\regparam_{\textrm{UPRE}} = \argmin_{\regparam > 0} \U(\regparam)$. \par
 We first present the UPRE function for Tikhonov regularization under the more general condition that $\noiseVec \sim \mathcal{N}(\bm{0},\Sigma)$. Analogous to the standard UPRE function, we can define $\U(\regparam)$ as
 \begin{equation}
 \label{eq:UPRE 2}
@@ -833,25 +848,7 @@ Thus \eqref{eq:Multiparameter UPRE} becomes
     \UWin(\regparamVec) = \frac{1}{\mA}\sum_{j=1}^{n} \left(\sum_{p=1}^{P} w_j^{(p)} \mfilt\left(\regparam^{(p)},\singular_j\right) \right)^2 \left(\dft{d}_j\right)^2 + \frac{2\noiseSD^2}{\mA}\sum_{j=1}^{n} \left(\sum_{p=1}^{P} w_j^{(p)} \filt\left(\regparam^{(p)},\singular_j\right) \right) - \noiseSD^2.
 \end{equation}
 
-The MDP and GCV methods, described in Sections \ref{sec:MDP} and \ref{sec:GCV} respectively, involve the norm of a regularized residual. The exact form of this term depends upon the setting. In the single parameter, single data set case, the regularized residual $\rVec(\regparam)$ is given by \eqref{eq:Predictive Error and Regularized Residual}. In the single parameter, multiple data set case, the norm of the regularized residual $\rBig(\regparam)$ can be written as a sum of terms $\|\rVec^{(p)}(\regparam)\|_2^2$ with $\rVec^{(p)}(\regparam)$ given by \eqref{eq:Single Regularized Residual}. For a multiparameter problem with a single data set, we use $\|\rVec_{\text{win}}(\regparamVec)\|_2^2$ given by \eqref{eq:Windowed Regularized Residual}. Proposition \ref{prop:Non-overlapping windows} describes how $\|\rVec_{\text{win}}(\regparamVec)\|_2^2$ can be decomposed when working with non-overlapping windows.
-
-\begin{proposition}
-\label{prop:Non-overlapping windows}
-If the weight vectors $\{\wVec^{(p)}\}_{p=1}^{P}$ satisfy \eqref{eq:Non-overlapping window condition}, then $\|\rVec_{\text{win}}(\regparamVec)\|_2^2$ can be written as
-\[\left\|\rVec_{\text{win}}(\regparamVec)\right\|_2^2 = \sum_{p=1}^{P} \left\|\rVec^{(p)}(\regparam)\right\|_2^2\]
-where
-\[\left\|\rVec^{(p)}(\regparam)\right\|_2^2 = \sum_{j=1}^{n} \left( \wVec_j^{(p)} \mfilt\left(\regparam^{(p)},\singular_j\right)\dft{d}_j\right)^2..\]
-\end{proposition}
-\begin{proof}
-Using \eqref{eq:Windowed Regularized Residual}, we can write $\|\rVec_{\text{win}}(\regparamVec)\|_2^2$ as
-\[\left\|\rVec_{\text{win}}(\regparamVec)\right\|_2^2 = \sum_{j=1}^{n} \left(\sum_{p=1}^{P} \wVec_j^{(p)} \mfilt\left(\regparam^{(p)},\singular_j\right) \right)^2 \left(\dft{d}_j\right)^2.\]
-Since the weight vectors $\{\wVec^{(p)}\}_{p=1}^{P}$ satisfy \eqref{eq:Non-overlapping window condition}, for each index $j$ there exists exactly one index $p$ such that $\wVec^{(p)}_j \neq 0$. Thus the sum over $p$ has only one nonzero summand for each index $j$, meaning we can write
-\[\left(\sum_{p=1}^{P} \wVec_j^{(p)} \mfilt\left(\regparam^{(p)},\singular_j\right) \right)^2 = \sum_{p=1}^{P} \left( \wVec_j^{(p)} \mfilt\left(\regparam^{(p)},\singular_j\right)\right)^2.\]
-Therefore $\|\rVec_{\text{win}}(\regparam)\|_2^2$ can be rewritten through a change of summation so that
-\[\|\rVec_{\text{win}}(\regparamVec)\|_2^2 = \sum_{p=1}^{P} \left[ \sum_{j=1}^{n} \left( \wVec_j^{(p)} \mfilt\left(\regparam^{(p)},\singular_j\right) \right)^2 \left(\dft{d}_j\right)^2\right] = \sum_{p=1}^{P} \left\|\rVec^{(p)}(\regparam)\right\|_2^2\]
-with
-\[\left\|\rVec^{(p)}(\regparam)\right\|_2^2 = \sum_{j=1}^{n} \left( \wVec_j^{(p)} \mfilt\left(\regparam^{(p)},\singular_j\right)\dft{d}_j\right)^2.\]
-\end{proof}
+The MDP and GCV methods, described in Sections \ref{sec:MDP} and \ref{sec:GCV} respectively, involve the norm of a regularized residual. The exact form of this term depends upon the setting. In the single parameter, single data set case, the regularized residual $\rVec(\regparam)$ is given by \eqref{eq:Regularized Residual}. In the single parameter, multiple data set case, the norm of the regularized residual $\rBig(\regparam)$ can be written as a sum of terms $\|\rVec^{(p)}(\regparam)\|_2^2$ with $\rVec^{(p)}(\regparam)$ given by \eqref{eq:Single Regularized Residual}. For a multiparameter problem with a single data set, we use $\|\rVec_{\text{win}}(\regparamVec)\|_2^2$ given by \eqref{eq:Windowed Regularized Residual}. 
 
 \subsection{Morozov's discrepancy principle} \label{sec:MDP}
 Similar to the UPRE method, the MDP method relies on knowledge of the variance of $\noiseVec$. If $\noise \sim \mathcal{N}(\bm{0},\noiseSD^2 I_{\mA})$, then the MDP function is 
