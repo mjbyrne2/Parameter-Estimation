@@ -495,12 +495,19 @@ For all $r = 1,\ldots,R$, assume that $m_r = m$. In other words, we assume that 
 \end{assumption} 
 
 \begin{assumption}
+\label{Assumption_Decomposition}
+We assume that there exist matrices $\Delta \in \mathbb{R}^{\mA \times n}$ and $\Lambda \in \mathbb{R}^{\mL \times n}$ such that
+\[A^{(r)} = U^{(r)}\Delta\trans{\left(X^{(r)}\right)}, \quad L^{(r)} = V^{(r)}\Lambda\trans{\left(X^{(r)}\right)}\]
+for $r = 1,\ldots,R$, where $U^{(r)}$ and $V^{(r)}$ are orthogonal and $X^{(r)}$ is invertible.
+\end{assumption}
+
+\begin{assumption}
 \label{Assumption_Matrices}
 For $r = 1,\ldots,R$, assume that $A^{(r)} = A \in \mathbb{R}^{\mA \times n}$ and $L^{(r)} = L \in \mathbb{R}^{\mL \times n}$.
 \end{assumption}  
 
 \noindent It should be noted that Assumption \ref{Assumption_Noise} could be relaxed so that $\Sigma^{(r)}$ is any diagonal matrix $D^{(r)}$, in which case a whitening transformation $C^{(r)}$ could applied so that $\xi^{(r)} = C^{(r)}\noiseVec^{(r)} \sim \mathcal{N}(\zeroVec_{\mA \times 1},I_{\mA})$. For example, one could use the zero-phase component analysis (ZCA) transformation $C^{(r)} = \left(\Sigma^{(r)}\right)^{-1/2}$ \cite{BellSejnowski}. \par
-The strength of the assumptions presented so far increase in accordance with their numbering. Assumption \ref{Assumption_System} describes the most general situation involving multiple data sets considered in this paper, where the size of each problem and the covariance of each zero-centered multivariate Gaussian noise vector are potentially distinct. Assumption \ref{Assumption_Noise} then requires that the covariance matrices be constant diagonal matrices, though the sizes of the problems remain unrestricted. In contrast, Assumption \ref{Assumption_Rows} specifies that each data set much be the same size $m$; however, the size of the solutions may still be district ($n_r$ can differ for different values of $r$). Assumption \ref{Assumption_Matrices} is the strongest, in that it not only implies Assumption \ref{Assumption_Rows} but demands the solution size be the same and the system and penalty matrices be the same for all problems.
+The strength of the assumptions presented increase in accordance with their numbering. Assumption \ref{Assumption_System} describes the most general situation involving multiple data sets considered in this paper, where the size of each problem and the covariance of each zero-centered multivariate Gaussian noise vector are potentially distinct. Assumption \ref{Assumption_Noise} then requires that the covariance matrices be constant diagonal matrices, though the sizes of the problems remain unrestricted. In contrast, Assumption \ref{Assumption_Rows} specifies that each data set much be the same size $m$; however, the size of the solutions may still be district ($n_r$ can differ for different values of $r$). A consequence of Assumption \ref{Assumption_Decomposition} is that the pairs $(A^{(r)},L^{(r)})$ all have the same generalized singular values. Though Assumption \ref{Assumption_Decomposition} is strong, it is implied by Assumption \ref{Assumption_Matrices}. Assumption \ref{Assumption_Matrices} is the strongest, in that it not only implies Assumptions \ref{Assumption_Rows} and \ref{Assumption_Decomposition} but demands the solution size be the same and the system and penalty matrices be the same for all problems. 
 
 \subsection{Multiparameter regularization for multiple data sets} \label{sec:Adapted regularization}
 
@@ -714,7 +721,7 @@ We first present the UPRE function for Tikhonov regularization under the more ge
 \label{eq:UPRE 2}
 \U(\regparam) = \frac{1}{\mA}\left\|\rVec(\regparam)\right\|_2^2 + \frac{2}{\mA}\trace\left(\Sigma\A\right) - \frac{1}{\mA}\trace\left(\Sigma\right).
 \end{equation}
-so that $\UBig(\regparam)$ is an unbiased estimator of predictive risk; see \cite{Byrne} for a derivation of \eqref{eq:UPRE 2}. The standard UPRE function \eqref{eq:UPRE} is recovered from \eqref{eq:UPRE 2} if $\Sigma = \noiseSD^2 I_{\mA}$ (which is Assumption \ref{Assumption_Noise} with $R = 1$).
+so that $\U(\regparam)$ is an unbiased estimator of predictive risk; see \cite{Byrne} for a derivation of \eqref{eq:UPRE 2}. The standard UPRE function \eqref{eq:UPRE} is recovered from \eqref{eq:UPRE 2} if $\Sigma = \noiseSD^2 I_{\mA}$ (which is Assumption \ref{Assumption_Noise} with $R = 1$).
 
 \begin{proposition}
 Under Assumptions \ref{Assumption_System} and \ref{Assumption_Rows} with the constructions in Table \ref{tab:System assumptions}, the UPRE function $\UBig(\regparam)$ for the data sets $\{\dVec^{(r)}\}_{r=1}^R$ is
@@ -764,16 +771,7 @@ Therefore, the UPRE function \eqref{eq:Averaged UPRE} for multiple data sets can
 \U^{(r)}(\regparam) = \frac{1}{\mA} \sum_{j=1}^{n} \left(\mfilt^{(r)}_j\right)^2\left(\dft{d}_j^{(r)}\right)^2 + \frac{2\noiseSD^2_r}{\mA} \sum_{j=1}^{n} \filt^{(r)}_j - \noiseSD^2_r, \quad r = 1,\ldots,R.
 \end{equation}
 
-We conclude Section \ref{sec:UPRE} by showing a relationship between the adapted UPRE method that uses \eqref{eq:Averaged UPRE} and the UPRE method as simply applied to averaged data. For this result, we need the following assumption.
-
-\begin{assumption}
-\label{Assumption_Decomposition}
-We assume that there exist matrices $\Delta \in \mathbb{R}^{\mA \times n}$ and $\Lambda \in \mathbb{R}^{\mL \times n}$ such that
-\[A^{(r)} = U^{(r)}\Delta\trans{\left(X^{(r)}\right)}, \quad L^{(r)} = V^{(r)}\Lambda\trans{\left(X^{(r)}\right)}\]
-for $r = 1,\ldots,R$, where $U^{(r)}$ and $V^{(r)}$ are orthogonal and $X^{(r)}$ is invertible.
-\end{assumption}
-
-Though Assumption \ref{Assumption_Decomposition} is strong, it is implied by Assumption \ref{Assumption_Matrices}. A consequence of Assumption \ref{Assumption_Decomposition} is that the pairs $(A^{(r)},L^{(r)})$ all have the same generalized singular values.
+We conclude Section \ref{sec:UPRE} by showing a relationship between the adapted UPRE method that uses \eqref{eq:Averaged UPRE} and the UPRE method as simply applied to averaged data.
 
 \begin{proposition}
 Under Assumptions \ref{Assumption_System} through \ref{Assumption_Matrices} with data vectors $\{\dVec^{(r)}\}_{r=1}^R$, let 
