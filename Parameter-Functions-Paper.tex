@@ -16,6 +16,7 @@
 \newcommand{\bVec}{\mathbf{b}}	% Vector
 \newcommand{\cVec}{\mathbf{c}}	% Vector
 \newcommand{\dVec}{\mathbf{d}}	% Vector
+\newcommand{\dAvg}{\overline{\dVec}}	% Vector
 \newcommand{\kVec}{\mathbf{k}}	% Vector
 \newcommand{\pVec}{\mathbf{p}}	% Vector
 \newcommand{\rVec}{\mathbf{r}}	% Vector
@@ -57,9 +58,13 @@
 \newcommand{\xWin}{\xVec_{\text{win}}}	% Windowed regularized solution
 \newcommand{\xSol}{\xVec}	% True solution
 \newcommand{\xBig}{\widetilde{\xVec}}	% Big regularized solution
+\newcommand{\xAvg}{\overline{\xVec}}	% Regularized solution using the average data
 \newcommand{\xWinBig}{\xBig_{\text{win}}}	% Big windowed regularized solution
+\newcommand{\xWinAvg}{\xAvg_{\text{win}}}	% Windowed regularized solution using the average data
 \newcommand{\rBig}{\widetilde{\rVec}}	% Big regularized residual
+\newcommand{\rAvg}{\overline{\rVec}}	% Regularized residual using the average data
 \newcommand{\rWinBig}{\rBig_{\text{win}}}	% Big windowed regularized residual
+\newcommand{\rWinAvg}{\rAvg_{\text{win}}}	% Windowed regularized residual using the average data
 \newcommand{\bBig}{\widetilde{\bVec}}	% Big blurred vector
 \newcommand{\dBig}{\widetilde{\dVec}}	% Big data vector
 \newcommand{\ABig}{\widetilde{A}}	% Big system matrix
@@ -643,6 +648,17 @@ Thus the norm becomes
 \end{align*}
 \end{proof}
 
+We can also develop an analog of windowed regularized residual as applied to the average $\dAvg = \frac{1}{R}\sum_{r=1}^R \dVec^{(r)}$ under Assumptions \ref{Assumption_Rows} and \ref{Assumption_Matrices}. Define the windowed regularized residual applied to $\dAvg$ as
+\begin{equation}
+\label{eq:Average residual}
+\rWinAvg(\regparamVec) = A\xWinAvg(\regparamBig) - \dAvg.
+\end{equation}
+
+\begin{corollary}
+Under Assumptions \ref{Assumption_System} through \ref{Assumption_Matrices} and using the construction in Table \ref{tab:Block GSVD Matrices}, the norm of $\rWinBig(\regparamVecBig)$ is where $\aVec = \sum_{r=1}^R \dVec^{(r)}$
+\end{corollary}
+
+
 Proposition \ref{prop:Non-overlapping windows} describes how $\|\rWinBig(\regparamVecBig)\|_2^2$ can be decomposed when working with non-overlapping windows.
 
 \begin{proposition}
@@ -748,46 +764,40 @@ We first present the UPRE function for Tikhonov regularization under the more ge
 so that $\U(\regparam)$ is an unbiased estimator of predictive risk; see \cite{Byrne} for a derivation of \eqref{eq:UPRE 2}. The standard UPRE function \eqref{eq:UPRE} is recovered from \eqref{eq:UPRE 2} if $\Sigma = \noiseSD^2 I_{\mA}$ (which is Assumption \ref{Assumption_Noise} with $R = 1$).
 
 \begin{proposition}
-Under Assumptions \ref{Assumption_System} and \ref{Assumption_Rows} with the constructions in Table \ref{tab:System assumptions}, the UPRE function $\UBig(\regparam)$ for the data sets $\{\dVec^{(r)}\}_{r=1}^R$ is
+Under Assumptions \ref{Assumption_System} and \ref{Assumption_Rows} with the constructions in Table \ref{tab:System assumptions}, the UPRE function $\UWinBig(\regparam)$ for the data sets $\{\dVec^{(r)}\}_{r=1}^R$ and windows $\{\{W^{(r,p)}\}_{p=1}^P\}_{r=1}^R$ is
 \begin{equation}
 \label{eq:Averaged UPRE}
-\UBig(\regparam) = \frac{1}{R} \sum_{r=1}^R \U^{(r)}(\regparam),
+\UWinBig(\regparamVecBig) = \frac{1}{R} \sum_{r=1}^R \UWin^{(r)}(\regparamVecBig),
 \end{equation}
 where
 \begin{equation}
 \label{eq:Individual UPRE}
-\U^{(r)}(\regparam) = \frac{1}{\mA}\left\|\rVec^{(r)}(\regparam)\right\|_2^2 + \frac{2}{\mA} \trace\left(\Sigma^{(r)} A^{(r)}(\regparam)\right) - \frac{1}{\mA} \trace\left(\Sigma^{(r)}\right).
-\end{equation}
-with
-\begin{equation}
-\label{eq:Single Regularized Residual}
-    \rVec^{(r)}(\regparam) = A^{(r)}\xVec^{(r)}(\regparam) - \dVec^{(r)}.
+\UWin^{(r)}(\regparamVecBig) = \frac{1}{m}\left\|\rWin^{(r)}(\regparamVecBig)\right\|_2^2 + \frac{2}{m} \trace\left(\Sigma^{(r)} A^{(r)}(\regparamVecBig)\right) - \frac{1}{m} \trace\left(\Sigma^{(r)}\right).
 \end{equation}
 \end{proposition}
 \begin{proof}
-A block diagonal influence matrix $\ABig(\regparam)$ can be defined as
-\[\ABig(\regparam) = \ABig(\trans{\ABig}\ABig + \regparam^2\trans{\widetilde{L}}\widetilde{L})^{-1}\trans{\ABig}\]
-with diagonal blocks \eqref{eq:Diagonal blocks}
-By further defining $\rBig(\regparam) = \ABig\widetilde{\xVec}(\regparam) - \widetilde{\dVec}$ and noting that Lemma \ref{lem:Concatenation of Normal Noise} implies the vertical concatenation $\widetilde{\noiseVec}$ of $\{\noiseVec^{(r)}\}_{r=1}^R$ is distributed $\mathcal{N}(\widetilde{\zeroVec},\widetilde{\Sigma})$ with $\widetilde{\zeroVec} \in \mathbb{R}^M$ and $\widetilde{\Sigma} = \diag(\Sigma^{(1)},\ldots,\Sigma^{(R)})$, the UPRE function \eqref{eq:UPRE 2} can be directly applied to produce
+We first let $M = \sum_{r=1}^R m_r$. Lemma \ref{lem:Concatenation of Normal Noise} implies the vertical concatenation $\widetilde{\noiseVec}$ of $\{\noiseVec^{(r)}\}_{r=1}^R$ is distributed $\mathcal{N}(\widetilde{\zeroVec},\widetilde{\Sigma})$ with $\widetilde{\zeroVec} \in \mathbb{R}^M$ and $\widetilde{\Sigma} = \diag(\Sigma^{(1)},\ldots,\Sigma^{(R)})$, and so the more general UPRE function \eqref{eq:UPRE 2} can be directly applied to produce
 \begin{equation}
 \label{eq:UPRE 3}
-\UBig(\regparam) = \frac{1}{M}\left\|\rBig(\regparam)\right\|_2^2 + \frac{2}{M}\trace\left(\widetilde{\Sigma}\ABig(\regparam)\right) - \frac{1}{M}\trace\left(\widetilde{\Sigma}\right).
+\UWinBig(\regparam) = \frac{1}{M}\left\|\rWinBig(\regparam)\right\|_2^2 + \frac{2}{M}\trace\left(\widetilde{\Sigma}\AWinBig(\regparamVecBig)\right) - \frac{1}{M}\trace\left(\widetilde{\Sigma}\right).
 \end{equation}
-The block diagonal structure of both $\widetilde{\Sigma}$ and $\ABig(\regparam)$ allow for the trace terms in \eqref{eq:UPRE 3} to be written as sums involving the diagonal blocks:
+As used in the proofs of Theorems \ref{thm:Regularized residual} and \ref{thm:Trace}, the structure of $\rWinBig(\regparamVecBig)$, $\widetilde{\Sigma}$, and $\AWinBig(\regparamVecBig)$ allow for \eqref{eq:UPRE 3} to be written in terms of sums over $r$:
 \begin{equation}
 \label{eq:UPRE 4}
-\UBig(\regparam) = \frac{1}{M}\left\|\rBig(\regparam)\right\|_2^2 + \frac{2}{M} \sum_{r=1}^R \trace\left(\Sigma^{(r)}A^{(r)}(\regparam)\right) - \frac{1}{M} \sum_{r=1}^R \trace\left(\Sigma^{(r)}\right).
+\UWinBig(\regparam) = \frac{1}{M}\left\|\rWin^{(r)}(\regparamVecBig)\right\|_2^2 + \frac{2}{M} \sum_{r=1}^R \trace\left(\Sigma^{(r)}\AWin^{(r)}(\regparamVecBig)\right) - \frac{1}{M} \sum_{r=1}^R \trace\left(\Sigma^{(r)}\right).
 \end{equation}
-The squared 2-norm of $\rBig(\regparam)$ can also be expressed as a sum so that
+Assumption \ref{Assumption_Rows} implies $M = Rm$, so that
 \begin{align*}
-\UBig(\regparam) &= \frac{1}{M} \sum_{r=1}^R \left\|\rVec^{(r)}(\regparam)\right\|_2^2 + \frac{2}{M} \sum_{r=1}^R \trace\left(\Sigma^{(r)} A^{(r)}(\regparam)\right) - \frac{1}{M} \sum_{r=1}^R \trace\left(\Sigma^{(r)}\right) \\
-&= \frac{1}{R} \sum_{r=1}^R \left(\frac{1}{\mA}\left\|\rVec^{(r)}(\regparam)\right\|_2^2 + \frac{2}{\mA} \trace\left(\Sigma^{(r)} A^{(r)}(\regparam)\right) - \frac{1}{\mA} \trace\left(\Sigma^{(r)}\right)\right) \\
-&= \frac{1}{R} \sum_{r=1}^R \U^{(r)}(\regparam),
+\UWinBig(\regparam) &= \frac{1}{M}\left\|\rWin^{(r)}(\regparamVecBig)\right\|_2^2 + \frac{2}{M} \sum_{r=1}^R \trace\left(\Sigma^{(r)}\AWin^{(r)}(\regparamVecBig)\right) - \frac{1}{M} \sum_{r=1}^R \trace\left(\Sigma^{(r)}\right) \\
+&= \frac{1}{R} \sum_{r=1}^R \left(\frac{1}{m}\left\|\rWin^{(r)}(\regparamVecBig)\right\|_2^2 + \frac{2}{m} \trace\left(\Sigma^{(r)} \AWin^{(r)}(\regparamVecBig)\right) - \frac{1}{m} \trace\left(\Sigma^{(r)}\right)\right) \\
+&= \frac{1}{R} \sum_{r=1}^R \UWin^{(r)}(\regparamVecBig),
 \end{align*}
 where
-\[\U^{(r)}(\regparam) = \frac{1}{\mA}\left\|\rVec^{(r)}(\regparam)\right\|_2^2 + \frac{2}{\mA} \trace\left(\Sigma^{(r)} A^{(r)}(\regparam)\right) - \frac{1}{\mA} \trace\left(\Sigma^{(r)}\right), \quad r = 1,\ldots,R.\]
+\[\U^{(r)}(\regparam) = \frac{1}{m}\left\|\rWin^{(r)}(\regparamVecBig)\right\|_2^2 + \frac{2}{m} \trace\left(\Sigma^{(r)} \AWin^{(r)}(\regparamVecBig)\right) - \frac{1}{m} \trace\left(\Sigma^{(r)}\right), \quad r = 1,\ldots,R.\]
 \end{proof}
-\noindent In other words, $\UBig(\regparam)$ is the average of $\{\U^{(r)}(\regparam)\}_{r=1}^R$. The UPRE method for multiple data sets is to let $\widetilde{\regparam}_{\textrm{UPRE}} = \argmin_{\regparam > 0} \UBig(\regparam)$. As a final remark, \eqref{eq:Individual UPRE} is equivalent to \eqref{eq:UPRE} under Assumption \ref{Assumption_Noise}. \par
+\noindent In other words, $\UWinBig(\regparamVecBig)$ is the average of $\{\UWin^{(r)}(\regparamVecBig)\}_{r=1}^R$. The UPRE method for windowed regularization with multiple data sets is to let 
+\[\regparamVecBig_{\text{UPRE}} = \argmin_{\regparamVecBig \in \mathbb{R}_+^{P}} \UWinBig(\regparamVecBig).\]
+Theorem \ref{thm:Regularized residual} provides a filter function representation for $\|\rWin^{(r)}(\regparamVecBig)\|_2^2$. Theorem \ref{thm:Trace} provides a representation for $\trace(\Sigma^{(r)} \AWin^{(r)}(\regparamVecBig))$ under Assumption \ref{Assumption_Noise}. As a final remark, \eqref{eq:Individual UPRE} is equivalent to \eqref{eq:UPRE} under Assumption \ref{Assumption_Noise}. \par
 A representation of \eqref{eq:Averaged UPRE} will now be presented that involves generalizations of the filter functions \eqref{eq:Filter functions}. 
 Therefore, the UPRE function \eqref{eq:Averaged UPRE} for multiple data sets can be written in terms of the following representation for individual UPRE functions:
 \begin{equation}
@@ -840,43 +850,6 @@ i.e. $\UAvg(\regparam)$ is the UPRE function as applied to the average $\aVec$ o
 \[\UBig(\regparam) = \frac{1}{R} \sum_{r=1}^R \U^{(r)}(\regparam) \leq R \UAvg(\regparam), \qquad \regparam \geq 0\]
 \end{proof}
 \noindent Therefore the adapted UPRE function is truly distinct from simply applying the UPRE method to the average of the data, and the bound \eqref{eq:UPRE Bound} demonstrates a relationship between the two modalities.
-
-\subsubsection{Multiparameter UPRE}
-We now derive a multiparameter version of the UPRE function for a single data set $\dVec = A\xVec + \noiseVec$ with $A \in \mathbb{R}^{\mA \times n}$ and $\noiseVec \sim \mathcal{N}(\zeroVec,\noiseSD^2 I_{\mA})$. For $p = 1,\ldots,P$, let $\wVec^{(p)}$ be weight vectors satisfying \eqref{eq:Weights} and let $W^{(p)} = \diag(\wVec^{(p)})$. For the regularized solution \eqref{eq:TikSolWindow}, the regularization matrix $R_\text{win}(\regparamVec)$ is
-\begin{equation}
-\label{eq:Windowed Reg Matrix}
-    R_\text{win}(\regparamVec) = \sum_{p=1}^P V\inv{\left(\trans{S}S + \left(\regparam^{(p)}\right)^2 I_{n}\right)}W^{(p)}\trans{S}\trans{U}.
-\end{equation}
-The corresponding influence matrix $A_\text{win}(\regparamVec) = AR_\text{win}(\regparamVec)$ is then
-\begin{equation}
-\label{eq:Windowed Influence Matrix}
-    A_\text{win}(\regparamVec) = US\left[\sum_{p=1}^P V\inv{\left(\trans{S}S + \left(\regparam^{(p)}\right)^2 I_n\right)}W^{(p)}\right]\trans{S}\trans{U}. 
-\end{equation}
-The windowed regularized residual $\rVec_\text{win}(\regparamVec) = (A_\text{win}(\regparamVec) - I_{\mA})\dVec$ can be written as
-\begin{equation}
-    \rVec_\text{win}(\regparamVec) = U\left(S\left[\sum_{p=1}^P V\inv{\left(\trans{S}S + \left(\regparam^{(p)}\right)^2 I_n\right)}W^{(p)}\right]\trans{S} - I_{\mA}\right)\dft{\dVec}.
-\end{equation}
-Thus the multiparameter UPRE function for problem $\dVec = A\xVec + \noiseVec$ is 
-\begin{equation}
-\label{eq:Multiparameter UPRE}
-    \UWin(\regparamVec) = \frac{1}{\mA}\left\|\rVec_\text{win}(\regparamVec)\right\|_2^2 + \frac{2\noiseSD^2}{\mA}\trace\left(A_\text{win}(\regparamVec)\right) - \noiseSD^2.
-\end{equation}
-Using $\mfilt(\regparam,\singular) := 1 - \filt(\regparam,\singular)$ with $\filt(\regparam,\singular)$ defined by \eqref{eq:TikFilt}, $\|\rVec_\text{win}(\regparamVec)\|_2^2$ can be expressed as
-\begin{equation}
-\label{eq:Windowed Regularized Residual}
-    \left\|\rVec_\text{win}(\regparamVec)\right\|_2^2 = \sum_{j=1}^{n} \left(\sum_{p=1}^{P} w_j^{(p)} \mfilt\left(\regparam^{(p)},\singular_j\right) \right)^2 \left(\dft{d}_j\right)^2.
-\end{equation}
-Similarly, the trace of the windowed influence matrix can be written as
-\begin{equation}
-    \trace\left(A_\text{win}(\regparamVec)\right) = \sum_{j=1}^{n} \left(\sum_{p=1}^{P} w_j^{(p)} \filt\left(\regparam^{(p)},\singular_j\right) \right).
-\end{equation}
-Thus \eqref{eq:Multiparameter UPRE} becomes
-\begin{equation}
-\label{eq:Multiparameter UPRE 2}
-    \UWin(\regparamVec) = \frac{1}{\mA}\sum_{j=1}^{n} \left(\sum_{p=1}^{P} w_j^{(p)} \mfilt\left(\regparam^{(p)},\singular_j\right) \right)^2 \left(\dft{d}_j\right)^2 + \frac{2\noiseSD^2}{\mA}\sum_{j=1}^{n} \left(\sum_{p=1}^{P} w_j^{(p)} \filt\left(\regparam^{(p)},\singular_j\right) \right) - \noiseSD^2.
-\end{equation}
-
-The MDP and GCV methods, described in Sections \ref{sec:MDP} and \ref{sec:GCV} respectively, involve the norm of a regularized residual. The exact form of this term depends upon the setting. In the single parameter, single data set case, the regularized residual $\rVec(\regparam)$ is given by \eqref{eq:Regularized Residual}. In the single parameter, multiple data set case, the norm of the regularized residual $\rBig(\regparam)$ can be written as a sum of terms $\|\rVec^{(p)}(\regparam)\|_2^2$ with $\rVec^{(p)}(\regparam)$ given by \eqref{eq:Single Regularized Residual}. For a multiparameter problem with a single data set, we use $\|\rVec_{\text{win}}(\regparamVec)\|_2^2$ given by \eqref{eq:Windowed Regularized Residual}. 
 
 \subsection{Morozov's discrepancy principle} \label{sec:MDP}
 Similar to the UPRE method, the MDP method relies on knowledge of the variance of $\noiseVec$. If $\noise \sim \mathcal{N}(\bm{0},\noiseSD^2 I_{\mA})$, then the MDP function is 
@@ -950,14 +923,6 @@ Under these assumptions, for the MDP method we have $\DBig(\regparam)$ is equal 
 so that using \eqref{eq:MDP of Average} results in the bound \eqref{eq:MDP Bound}.
 \end{proof}
 
-\subsubsection{Multiparameter MDP} \label{sec:Multiparameter MDP}
-The multiparameter MDP function is
-\begin{equation}
-\label{eq:Windowed MDP}
-    \DWin(\regparamVec) = \left\|\rVec_\text{win}(\regparamVec)\right\|_2^2 - \noiseSD^2
-\end{equation}
-where $\rVec_\text{win}(\regparamVec)$ is defined by \eqref{eq:Windowed Regularized Residual}. Analogous to the single parameter MDP method, the multiparameter MDP method is to choose $\regparamVec \in \mathbb{R}_+^p$ such that $\DWin(\regparamVec) = 0$.
-
 \subsection{Generalized cross validation} \label{sec:GCV}
 Unlike the UPRE and MDP methods, the GCV method does not depend upon knowledge of the noise variance. For a single data set $\dVec = A\xVec + \noiseVec$, the GCV function is defined as
 \begin{equation}
@@ -1018,14 +983,6 @@ With these assumptions,
 again where the last equality is obtained through multiplication by $\frac{R}{R}$. The definition of $\GAvg(\regparam)$ and \eqref{eq:Coefficients of Average} then results in the bound \eqref{eq:GCV Bound}.
 \end{proof}
 \noindent As a closing remark regarding the GCV method, it is important to note that Assumption \ref{Assumption_Matrices} was needed for result \eqref{eq:Averaged GCV}. In contrast, no such assumption is necessary for the corresponding UPRE and MDP results, which respectively are \eqref{eq:Averaged UPRE} and \eqref{eq:Averaged MDP}.
-
-\subsubsection{Multiparameter GCV} \label{sec:Multiparameter GCV}
-The multiparameter GCV function is
-\begin{equation}
-\label{eq:Windowed GCV}
-    \GWin(\regparamVec) = \frac{\frac{1}{\mA}\|\rVec_{\text{win}}(\regparam)\|_2^2}{\left[1 - \frac{1}{\mA}\trace(\A)\right]^2}.,
-\end{equation}
-again where $\rVec_\text{win}(\regparamVec)$ is defined by \eqref{eq:Windowed Regularized Residual}. As with the single parameter GCV method, the multiparameter GCV method is to choose $\regparamVec \in \mathbb{R}_+^p$ such that $\GWin(\regparamVec) = 0$.
 
 \section{Validation} \label{sec:Validation}
 For a basis of comparison, parameters were selected as minimizers of the function
