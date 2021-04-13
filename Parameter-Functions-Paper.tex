@@ -608,7 +608,7 @@ Under Assumptions \ref{Assumption_System} and using the construction in Table \r
 where for each $r = 1,\ldots,R$ we have
 \[\left\|\rWin^{(r)}(\regparamVecBig)\right\|_2^2 = \begin{cases}
 \sum_{j=1}^{m_r} \left(\left[\sum_{p=1}^{P} w_{j+k_r}^{(r,p)}\Psi_{j+k_r}^{(r)}\left(\regparamBig^{(p)}\right)\right] \hat{d}_j^{(r)}\right)^2, & m_r \leq n_r, \\
-\sum_{j=1}^{n_r} \left(\left[\sum_{p=1}^{P} w_{j}^{(r,p)}\Psi_{j}^{(r)}\left(\regparamBig^{(p)}\right)\right] \hat{d}_j^{(r)}\right)^2 + \sum_{j=n+1}^{m_r} \left(\hat{d}_j^{(r)}\right)^2, & m_r > n_r.
+\sum_{j=1}^{n_r} \left(\left[\sum_{p=1}^{P} w_{j}^{(r,p)}\Psi_{j}^{(r)}\left(\regparamBig^{(p)}\right)\right] \hat{d}_j^{(r)}\right)^2 + \sum_{j = n_r + 1}^{m_r} \left(\hat{d}_j^{(r)}\right)^2, & m_r > n_r.
 \end{cases}\]
 with $k_r = n_r - m_r$.
 \end{theorem}
@@ -647,20 +647,24 @@ Proposition \ref{prop:Non-overlapping windows} describes how $\|\rWinBig(\regpar
 
 \begin{proposition}
 \label{prop:Non-overlapping windows}
-For a given $r = 1,\ldots,R$, if the weight vectors $\{\wVec^{(r,p)}\}_{p=1}^{P}$ satisfy \eqref{eq:Non-overlapping window condition}, then $\|\rWin^{(r)}(\regparamVecBig)\|_2^2$ can be written as
+For a given $r \in \{1,\ldots,R\}$, if the weight vectors $\{\wVec^{(r,p)}\}_{p=1}^{P}$ satisfy \eqref{eq:Non-overlapping window condition}, then $\|\rWin^{(r)}(\regparamVecBig)\|_2^2$ can be written as
 \[\left\|\rWin^{(r)}(\regparamVecBig)\right\|_2^2 = \sum_{p=1}^{P} \left\|\rWin^{(r,p)}(\regparamBig^{(p)})\right\|_2^2\]
 where
-\[\left\|\rWin^{(r,p)}(\regparamBig^{(p)})\right\|_2^2 = \sum_{j=1}^{n} \left(w_j^{(r,p)} \Psi_j^{(p)}\left(\regparamBig^{(p)}\right)\hat{d}_j^{(r)}\right)^2.\]
+\[\left\|\rWin^{(r,p)}(\regparamBig^{(p)})\right\|_2^2 = \sum_{j=1}^{n} \left(w_j^{(r,p)} \Psi_j^{(p)}\left(\regparamBig^{(p)}\right)\hat{d}_j^{(r)}\right)^2\]
+\[\left\|\rWin^{(r,p)}(\regparamBig^{(p)})\right\|_2^2 = \begin{cases} \sum_{j=1}^{m_r} \left(w_{j+k_r}^{(r,p)}\Psi_{j+k_r}^{(r)}\left(\regparamBig^{(p)}\right) \hat{d}_j^{(r)}\right)^2, & m_r \leq n_r, \\
+\sum_{j=1}^{n_r} \left(w_{j}^{(r,p)}\Psi_{j}^{(r)}\left(\regparamBig^{(p)}\right) \hat{d}_j^{(r)}\right)^2 + \sum_{j = n_r + 1}^{m_r} \left(\hat{d}_j^{(r)}\right)^2, & m_r > n_r.
+\end{cases}\]
+with $k_r = n_r - m_r$.
 \end{proposition}
 \begin{proof}
-Using \eqref{eq:Windowed Regularized Residual}, we can write $\|\rWin^{(r)}(\regparamVecBig)\|_2^2$ as
-\[\left\|\rWin^{(r)}(\regparamVecBig)\right\|_2^2 = \sum_{j=1}^{n} \left(\sum_{p=1}^{P} w_j^{(r,p)} \Psi_j^{(r)}\left(\regparamBig^{(p)}\right) \right)^2 \left(\dft{d}_j\right)^2.\]
-Since the weight vectors $\{\wVec^{(r,p)}\}_{p=1}^{P}$ satisfy \eqref{eq:Non-overlapping window condition}, for each index $j$ there exists exactly one index $p$ such that $w^{(r,p)}_j \neq 0$. Thus the sum over $p$ has only one nonzero summand for each index $j$, meaning we can write
-\[\left(\sum_{p=1}^{P} w_j^{(r,p)} \Psi_j^{(r,p)}\left(\regparamBig^{(p)}\right) \right)^2 = \sum_{p=1}^{P} \left(w_j^{(r,p)} \Psi_j^{(r,p)}\left(\regparamBig^{(p)}\right)\right)^2.\]
+Given $r \in \{1,\ldots,R\}$, we assume that $m_r \leq n_r$ for the sake of brevity; the proof when $m_r > n_r$ is similar. Using Theorem \ref{thm:Regularized residual}, we can write $\|\rWin^{(r)}(\regparamVecBig)\|_2^2$ as
+\[\left\|\rWin^{(r)}(\regparamVecBig)\right\|_2^2 = \sum_{j=1}^{m_r} \left[\sum_{p=1}^{P} w_{j+k_r}^{(r,p)}\Psi_{j+k_r}^{(r)}\left(\regparamBig^{(p)}\right)\right]^2 \left(\hat{d}_j^{(r)}\right)^2\]
+with $k_r = n_r - m_r$. Since the weight vectors $\{\wVec^{(r,p)}\}_{p=1}^{P}$ satisfy \eqref{eq:Non-overlapping window condition}, for each index $j$ there exists exactly one index $p$ such that $w^{(r,p)}_j \neq 0$. Thus the sum over $p$ has only one nonzero summand for each index $j$, meaning we can write
+\[\left[\sum_{p=1}^{P} w_{j + k_r}^{(r,p)} \Psi_{j + k_r}^{(r)}\left(\regparamBig^{(p)}\right) \right]^2 = \sum_{p=1}^{P} \left(w_{j + k_r}^{(r,p)} \Psi_{j + k_r}^{(r)}\left(\regparamBig^{(p)}\right)\right)^2.\]
 Therefore $\|\rWin^{(r)}(\regparamVecBig)\|_2^2$ can be rewritten through a change of summation so that
-\[\left\|\rWin^{(r)}(\regparamVecBig)\right\|_2^2 = \sum_{p=1}^{P} \left[ \sum_{j=1}^{n} \left( w_j^{(r,p)} \Psi_j^{(r,p)}\left(\regparamBig^{(p)}\right)\right)^2 \left(\hat{d}_j^{(r)}\right)^2\right] = \sum_{p=1}^{P} \left\|\rWin^{(r,p)}(\regparamBig^{(p)})\right\|_2^2\]
+\[\left\|\rWin^{(r)}(\regparamVecBig)\right\|_2^2 = \sum_{p=1}^{P} \left[ \sum_{j=1}^{m_r} \left( w_{j + k_r}^{(r,p)} \Psi_{j + k_r}^{(r)}\left(\regparamBig^{(p)}\right)\right)^2 \left(\hat{d}_j^{(r)}\right)^2\right] = \sum_{p=1}^{P} \left\|\rWin^{(r,p)}(\regparamBig^{(p)})\right\|_2^2\]
 with
-\[\left\|\rWin^{(r,p)}(\regparamBig^{(p)})\right\|_2^2 = \sum_{j=1}^{n} \left(w_j^{(r,p)} \Psi_j^{(r,p)}\left(\regparamBig^{(p)}\right)\hat{d}_j^{(r)}\right)^2.\]
+\[\left\|\rWin^{(r,p)}(\regparamBig^{(p)})\right\|_2^2 = \sum_{j=1}^{m_r} \left(w_{j + k_r}^{(r,p)} \Psi_{j + k_r}^{(r)}\left(\regparamBig^{(p)}\right)\hat{d}_j^{(r)}\right)^2.\]
 \end{proof}
 
 Theorem \ref{thm:Trace} provides of representation of the trace term needed for the remainder of Section \ref{sec:Methods}.
@@ -668,18 +672,38 @@ Theorem \ref{thm:Trace} provides of representation of the trace term needed for 
 \begin{theorem}
 \label{thm:Trace}
 Under Assumptions \ref{Assumption_System} through \ref{Assumption_Rows}, the trace of $\AWinBig(\regparamVecBig)$ is
-\[\trace\left(\widetilde{\Sigma}\AWinBig(\regparamVecBig)\right) = \sum_{r=1}^{R} \left( \noiseSD_r^2 \sum_{j = k+1}^{n} \left[\sum_{p=1}^{P} w_j^{(p)} \Phi_j^{(r)}\left(\regparamBig^{(p)}\right)\right] \right)\]
-where $k = \min\{0,n-m\}$.
+\[\trace\left(\widetilde{\Sigma}\AWinBig(\regparamVecBig)\right) = \sum_{r=1}^{R} \left( \noiseSD_r^2 \sum_{j = k_r + 1}^{n_r} \left[\sum_{p=1}^{P} w_j^{(r,p)} \Phi_j^{(r)}\left(\regparamBig^{(p)}\right)\right] \right)\]
+where $k_r = \min\{0,n_r - m_r\}$.
 \end{theorem}
 \begin{proof}
 The diagonal block structure of both $\widetilde{\Sigma} = \diag\left(\Sigma^{(1)},\ldots,\Sigma^{(R)}\right)$ and $\AWinBig(\regparamVecBig)$ allow the trace to be written as a sum of traces:
 \[\trace\left(\widetilde{\Sigma}\AWinBig(\regparamVecBig)\right) = \sum_{r=1}^{R} \trace\left(\Sigma^{(r)}\AWin^{(r)}\left(\regparamVecBig\right)\right).\]
-From Assumption \ref{Assumption_Noise}, we have that $\Sigma^{(r)} = \noiseSD_r^2 I_m$ for all $r = 1,\ldots,R$. Furthermore, representation \eqref{eq:Windowed Big Influence Diagonals} of the diagonal blocks of $\AWinBig(\regparamVecBig)$ and the similarity invariance of the trace operation allow us to write
-\[\trace\left(\Sigma^{(r)}\AWin^{(r)}\left(\regparamVecBig\right)\right) = \noiseSD_r^2 \trace\left(\Delta^{(r)}\sum_{p=1}^{P}W^{(p)}\Phi^{(r)}\left(\regparamBig^{(p)}\right)\pinv{\left(\Delta^{(r)}\right)}\right).\]
-Using $k = \min\{0,n-m\}$, we have
-\[\noiseSD_r^2 \trace\left(\Delta^{(r)}\sum_{p=1}^{P}W^{(p)}\Phi^{(r)}\left(\regparamBig^{(p)}\right)\pinv{\left(\Delta^{(r)}\right)}\right) = \noiseSD_r^2 \sum_{j = k+1}^{n} \left[\sum_{p=1}^{P} w_j^{(p)} \Phi_j^{(r)}\left(\regparamBig^{(p)}\right)\right].\]
+From Assumption \ref{Assumption_Noise}, we have that $\Sigma^{(r)} = \noiseSD_r^2 I_{m_r}$ for all $r = 1,\ldots,R$. Furthermore, representation \eqref{eq:Windowed Big Influence Diagonals} of the diagonal blocks of $\AWinBig(\regparamVecBig)$ and the similarity invariance of the trace operation allow us to write
+\[\trace\left(\Sigma^{(r)}\AWin^{(r)}\left(\regparamVecBig\right)\right) = \noiseSD_r^2 \trace\left(\AWin^{(r)}\left(\regparamVecBig\right)\right) = \noiseSD_r^2 \trace\left(\Delta^{(r)}\sum_{p=1}^{P}W^{(r,p)}\Phi^{(r)}\left(\regparamBig^{(p)}\right)\pinv{\left(\Delta^{(r)}\right)}\right).\]
+Using $k_r = \min\{0,n_r - m_r\}$, we have
+\[\noiseSD_r^2 \trace\left(\Delta^{(r)}\sum_{p=1}^{P}W^{(r,p)}\Phi^{(r)}\left(\regparamBig^{(p)}\right)\pinv{\left(\Delta^{(r)}\right)}\right) = \noiseSD_r^2 \sum_{j = k_r + 1}^{n_r} \left[\sum_{p=1}^{P} w_j^{(r,p)} \Phi_j^{(r)}\left(\regparamBig^{(p)}\right)\right].\]
 Therefore,
-\[\trace\left(\widetilde{\Sigma}\AWinBig(\regparamVecBig)\right) = \sum_{r=1}^{R} \left( \noiseSD_r^2 \sum_{j = k+1}^{n} \left[\sum_{p=1}^{P} w_j^{(p)} \Phi_j^{(r)}\left(\regparamBig^{(p)}\right)\right] \right).\]
+\[\trace\left(\widetilde{\Sigma}\AWinBig(\regparamVecBig)\right) = \sum_{r=1}^{R} \left( \noiseSD_r^2 \sum_{j = k_r + 1}^{n_r} \left[\sum_{p=1}^{P} w_j^{(r,p)} \Phi_j^{(r)}\left(\regparamBig^{(p)}\right)\right] \right).\]
+\end{proof}
+
+In contrast to Proposition \ref{prop:Non-overlapping windows}, non-overlapping windows are not required to decompose the trace term into traces for each window. The window decomposition of the trace is described in Proposition \ref{prop:Window Trace}.
+
+\begin{proposition}
+\label{prop:Window Trace}
+Under Assumptions \ref{Assumption_System} through \ref{Assumption_Rows}, for all $r = 1,\ldots,R$ the trace of \\ $\Sigma^{(r)}\AWin^{(r)}\left(\regparamVecBig\right)$ can be written as
+\[\trace\left(\Sigma^{(r)}\AWin^{(r)}\left(\regparamVecBig\right)\right) = \noiseSD_r^2 \sum_{p=1}^P \trace\left(\AWin^{(r,p)}\left(\regparamBig^{(p)}\right)\right)\]
+where
+\[\AWin^{(r,p)}\left(\regparamBig^{(p)}\right) = U^{(r)}\Delta^{(r)}W^{(r,p)}\Phi^{(r)}\left(\regparamBig^{(p)}\right)\pinv{\left(\Delta^{(r)}\right)}\trans{\left(U^{(r)}\right)}.\]
+\end{proposition}
+\begin{proof}
+From Theorem \ref{thm:Trace}, we can write $\trace\left(\Sigma^{(r)}\AWin^{(r)}\left(\regparamVecBig\right)\right)$ as
+\[\trace\left(\Sigma^{(r)}\AWin^{(r)}\left(\regparamVecBig\right)\right) = \noiseSD_r^2 \sum_{j = k_r + 1}^{n_r} \left[\sum_{p=1}^{P} w_j^{(r,p)} \Phi_j^{(r)}\left(\regparamBig^{(p)}\right)\right]\]
+with $k_r = \min\{0,n_r - m_r\}$ for each $r = 1,\ldots,R$. Changing the order of summation then gives
+\begin{align*}
+\noiseSD_r^2 \sum_{j = k_r + 1}^{n_r} \left[\sum_{p=1}^{P} w_j^{(r,p)} \Phi_j^{(r)}\left(\regparamBig^{(p)}\right)\right] &= \noiseSD_r^2 \sum_{p=1}^{P} \left[\sum_{j = k_r + 1}^{n_r} w_j^{(r,p)} \Phi_j^{(r)}\left(\regparamBig^{(p)}\right)\right] \\
+&= \noiseSD_r^2 \sum_{p=1}^{P} \trace\left(\AWin^{(r,p)}\left(\regparamBig^{(p)}\right)\right).
+\end{align*}
+where $\AWin^{(r,p)}\left(\regparamBig^{(p)}\right) = U^{(r)}\Delta^{(r)}W^{(r,p)}\Phi^{(r)}\left(\regparamBig^{(p)}\right)\pinv{\left(\Delta^{(r)}\right)}\trans{\left(U^{(r)}\right)}$.
 \end{proof}
 
 % To this end, we will use the version of the GSVD outlined in Section \ref{sec:GSVD} (which uses the assumption that the system matrix in \eqref{eq:TikSol3} has full column rank). Specifically, we use \eqref{eq:Mulitple GSVD} to define the generalized filter functions to be
