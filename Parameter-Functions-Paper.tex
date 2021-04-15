@@ -678,13 +678,9 @@ We will show that $\left\|\rWinAvg(\regparamVec)\right\|_2^2 \leq \frac{1}{R}\le
 \end{align*}
 However, we also have that
 \[\left(\hat{\overline{d}}_j\right)^2 = \left(\frac{1}{R} \sum_{r=1}^R \hat{d}_j^{(r)}\right)^2 \leq \frac{1}{R^2} \sum_{r=1}^R \left(\hat{d}_j^{(r)}\right)^2, \quad j = 1,\ldots,m.\]
-
-
-
-Theorem \ref{thm:Regularized residual}, in conjunction with Assumption \ref{Assumption_Windows}, states that
-\[\frac{1}{R}\left\|\rWinBig(\regparamVec)\right\|_2^2 = \frac{1}{R^2}\sum_{r=1}^R \left(\sum_{j=1}^{m} \left(\left[\sum_{p=1}^{P} w_{j+k}^{(p)}\Psi_{j+k}\left(\regparam^{(p)}\right)\right] \hat{d}_j^{(r)}\right)^2\right)\]
-for all $r = 1,\ldots,R$ with $k = n - m$.
-
+Thus through a change of summation
+\[\left\|\rWinAvg(\regparamVec)\right\|_2^2 \leq \frac{1}{R^2}\sum_{r=1}^R \left(\sum_{j=1}^{m} \left(\left[\sum_{p=1}^{P} w_{j+k}^{(p)}\Psi_{j+k}\left(\regparam^{(p)}\right)\right] \hat{d}_j^{(r)}\right)^2\right) = \frac{1}{R}\left\|\rWinBig(\regparamVec)\right\|_2^2\]
+where the last equality follows from Theorem \ref{thm:Regularized residual} in conjunction with Assumption \ref{Assumption_Windows}.
 \end{proof}
 
 Proposition \ref{prop:Non-overlapping windows} describes how $\|\rWinBig(\regparamVecBig)\|_2^2$ can be decomposed when working with non-overlapping windows.
