@@ -512,13 +512,19 @@ For $r = 1,\ldots,R$, assume that $A^{(r)} = A \in \mathbb{R}^{\mA \times n}$ an
 \end{assumption}  
 
 \noindent It should be noted that Assumption \ref{Assumption_Noise} could be relaxed so that $\Sigma^{(r)}$ is any diagonal matrix $D^{(r)}$, in which case a whitening transformation $C^{(r)}$ could applied so that $\xi^{(r)} = C^{(r)}\noiseVec^{(r)} \sim \mathcal{N}(\zeroVec_{\mA \times 1},I_{\mA})$. For example, one could use the zero-phase component analysis (ZCA) transformation $C^{(r)} = \left(\Sigma^{(r)}\right)^{-1/2}$ \cite{BellSejnowski}. \par
-The strength of the assumptions presented increase in accordance with their numbering. Assumption \ref{Assumption_System} describes the most general situation involving multiple data sets considered in this paper, where the size of each problem and the covariance of each zero-centered multivariate Gaussian noise vector are potentially distinct. Assumption \ref{Assumption_Noise} then requires that the covariance matrices be constant diagonal matrices, though the sizes of the problems remain unrestricted. In contrast, Assumption \ref{Assumption_Rows} specifies that each data set much be the same size $m$; however, the size of the solutions may still be district ($n_r$ can differ for different values of $r$). A consequence of Assumption \ref{Assumption_Decomposition} is that the pairs $(A^{(r)},L^{(r)})$ all have the same generalized singular values. Though Assumption \ref{Assumption_Decomposition} is strong, it is implied by Assumption \ref{Assumption_Matrices}. Assumption \ref{Assumption_Matrices} is the strongest, in that it not only implies Assumptions \ref{Assumption_Rows} and \ref{Assumption_Decomposition} but demands the solution size be the same and the system and penalty matrices be the same for all problems. 
+The strength of the assumptions presented increase in accordance with their numbering. Assumption \ref{Assumption_System} describes the most general situation involving multiple data sets considered in this paper, where the size of each problem and the covariance of each zero-centered multivariate Gaussian noise vector are potentially distinct. Assumption \ref{Assumption_Noise} then requires that the covariance matrices be constant diagonal matrices, though the sizes of the problems remain unrestricted. In contrast, Assumption \ref{Assumption_Rows} specifies that each data set much be the same size $m$; however, the size of the solutions may still be district ($n_r$ can differ for different values of $r$). A consequence of Assumption \ref{Assumption_Decomposition} is that the pairs $(A^{(r)},L^{(r)})$ all have the same generalized singular values. Though Assumption \ref{Assumption_Decomposition} is strong, it is implied by Assumption \ref{Assumption_Matrices}. Assumption \ref{Assumption_Matrices} is the strongest, in that it not only implies Assumptions \ref{Assumption_Rows} and \ref{Assumption_Decomposition} but demands the solution size be the same and the system and penalty matrices be the same for all problems. A useful consequence of Assumption \ref{Assumption_Matrices} is that $\Phi^{(r)}(\regparam) = \Phi(\regparam)$ and $\Psi^{(r)}(\regparam) = \Psi(\regparam)$ for all $r = 1,\ldots,R$ and $\regparam > 0$.
 
 \subsection{Multiparameter regularization for multiple data sets} \label{sec:Adapted regularization}
 
 The ultimate situation we consider is the case where multiparameter regularization is applied to multiple data sets. Letting $\regparamVec^{(r)} = [\regparam^{(r,1)},\regparam^{(r,2)},\ldots,\regparam^{(r,P_r)}]$ be the $P_r$ regularization parameters used for multiparameter regularization applied to the $r$th system described by \eqref{eq:Big vectors}, we can independently construct regularized solutions
 \[\xWin^{(r)}\left(\regparamVec^{(r)}\right) = \sum_{p=1}^{P_r} Y^{(r)}\inv{\left[\trans{\left(\Delta^{(r)}\right)}\Delta^{(r)} + \left(\regparam^{(r,p)}\right)^2 \trans{\left(\Lambda^{(r)}\right)}\Lambda^{(r)}\right]}W^{(r,p)}\trans{\left(\Delta^{(r)}\right)}\dft{\dVec}^{(r)}\]
-where $W^{(r,p)}$ is the $p$th window for the $r$th system. Each system can have its own set of windows, meaning that there are a total of $\sum_{r=1}^{R} P_r$ regularization parameters. However, the primary assumption we make moving forward is that the number of windows $W^{(r,p)}$ for each system is the same, i.e $P_r = P$ for all $r = 1,\ldots,R$. This implies that $\regparamVec^{(r)}$ are all vectors of length $P$ and there are a total of $RP$ parameters. \par
+where $W^{(r,p)}$ is the $p$th window for the $r$th system. Each system can have its own set of windows, meaning that there are a total of $\sum_{r=1}^{R} P_r$ regularization parameters. However, the primary assumption we make moving forward is that the number of windows $W^{(r,p)}$ for each system is the same, i.e $P_r = P$ for all $r = 1,\ldots,R$. This implies that $\regparamVec^{(r)}$ are all vectors of length $P$ and there are a total of $RP$ parameters. A stronger assumption would that the windows are all the same, which is described by Assumption \ref{Assumption_Windows} and used in Section \ref{sec:Methods}.
+
+\begin{assumption}
+\label{Assumption_Windows}
+For all $r = 1,\ldots,R$ and $p = 1,\ldots,P$, assume that $W^{(r,p)} = W^{(p)}$.
+\end{assumption}
+
 Analogous to the uniparameter case for multiple data sets, we define $\xWinBig(\regparamVecBig)$ as the vertical concatenation of the $\xWin^{(r)}\left(\regparamVecBig\right)$ for $r = 1,\ldots,R$, where $\regparamVecBig \in \mathbb{R}^P$ is a single vector of parameters. Using the constructions from Table \ref{tab:Block GSVD Matrices}, we have
 \begin{equation}
 \label{eq:Big Windowed Solution}
@@ -648,16 +654,38 @@ Thus the norm becomes
 \end{align*}
 \end{proof}
 
-We can also develop an analog of windowed regularized residual as applied to the average $\dAvg = \frac{1}{R}\sum_{r=1}^R \dVec^{(r)}$ under Assumptions \ref{Assumption_Rows} and \ref{Assumption_Matrices}. Define the windowed regularized residual applied to $\dAvg$ as
+We can also develop an analog of windowed regularized residual as applied to the average $\dAvg = \frac{1}{R}\sum_{r=1}^R \dVec^{(r)}$ under Assumptions \ref{Assumption_Matrices} and \ref{Assumption_Windows}. Define the windowed regularized residual applied to $\dAvg$ as
 \begin{equation}
 \label{eq:Average residual}
-\rWinAvg(\regparamVec) = A\xWinAvg(\regparamBig) - \dAvg.
+\rWinAvg(\regparamVec) = A\xWinAvg(\regparamBig) - \dAvg
 \end{equation}
+where the windowed regularized solution $\xWinAvg(\regparamBig)$ is
+\begin{equation}
+\label{eq:Windowed Averaged Regularized Solution}
+\xWinAvg(\regparamBig) = Y\sum_{p=1}^{P} W^{(p)}\Phi\left(\widetilde{\regparam}^{(p)}\right)\pinv{\Delta}\svd{\dAvg}.
+\end{equation}
+with $\svd{\dAvg} = \trans{U}\dAvg$.
 
 \begin{corollary}
-Under Assumptions \ref{Assumption_System} through \ref{Assumption_Matrices} and using the construction in Table \ref{tab:Block GSVD Matrices}, the norm of $\rWinBig(\regparamVecBig)$ is where $\aVec = \sum_{r=1}^R \dVec^{(r)}$
+Under Assumptions \ref{Assumption_System} through \ref{Assumption_Windows} and using the construction in Table \ref{tab:Block GSVD Matrices}, for all $\regparamVec \in \mathbb{R}_{+}^P$ we have that
+\[R\left\|\rWinAvg(\regparamVec)\right\|_2^2 \leq \left\|\rWinBig(\regparamVec)\right\|_2^2.\]
 \end{corollary}
+\begin{proof}
+We will show that $\left\|\rWinAvg(\regparamVec)\right\|_2^2 \leq \frac{1}{R}\left\|\rWinBig(\regparamVec)\right\|_2^2$. Under Assumption \ref{Assumption_Matrices}, $m_r = m$, $n_r = n$, and $(A^{(r)},L^{(r)}) = (A,L)$ for all $r = 1,\ldots,R$. Without loss of generality, suppose that $m \leq n$ and let $k = n - m$. Then using \eqref{eq:Average residual} and \eqref{eq:Windowed Averaged Regularized Solution}, we have
+\begin{align*}
+\left\|\rWinAvg(\regparamVec)\right\|_2^2 &= \left\|U\left[\Delta\sum_{p=1}^{P} W^{(p)}\Phi\left(\regparam^{(p)}\right)\pinv{\Delta} - I_m\right]\svd{\dAvg}\right\|_2^2 \\
+&= \sum_{j=1}^{m} \left[\sum_{p=1}^{P} w_{j+k}^{(p)}\Psi_{j+k}\left(\regparam^{(p)}\right)\right]^2 \left(\hat{\overline{d}}_j\right)^2.
+\end{align*}
+However, we also have that
+\[\left(\hat{\overline{d}}_j\right)^2 = \left(\frac{1}{R} \sum_{r=1}^R \hat{d}_j^{(r)}\right)^2 \leq \frac{1}{R^2} \sum_{r=1}^R \left(\hat{d}_j^{(r)}\right)^2, \quad j = 1,\ldots,m.\]
 
+
+
+Theorem \ref{thm:Regularized residual}, in conjunction with Assumption \ref{Assumption_Windows}, states that
+\[\frac{1}{R}\left\|\rWinBig(\regparamVec)\right\|_2^2 = \frac{1}{R^2}\sum_{r=1}^R \left(\sum_{j=1}^{m} \left(\left[\sum_{p=1}^{P} w_{j+k}^{(p)}\Psi_{j+k}\left(\regparam^{(p)}\right)\right] \hat{d}_j^{(r)}\right)^2\right)\]
+for all $r = 1,\ldots,R$ with $k = n - m$.
+
+\end{proof}
 
 Proposition \ref{prop:Non-overlapping windows} describes how $\|\rWinBig(\regparamVecBig)\|_2^2$ can be decomposed when working with non-overlapping windows.
 
