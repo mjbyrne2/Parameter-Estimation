@@ -139,19 +139,22 @@
 
 % UPRE derivation notation:
 \newcommand{\regres}{\mathbf{r}_{\regparam}}	% Regularized residual
-\newcommand{\A}{A_{\regparam}}	% Influence matrix
-\newcommand{\U}{U}	% UPRE function
+\newcommand{\A}{A(\regparam)}	% Influence matrix
+\newcommand{\U}{F_{\text{UPRE}}}	% UPRE function
+\newcommand{\UDown}[1]{{}_{#1}\U}	% Downsampled UPRE function
 \newcommand{\avgU}{\overline{U}}	% UPRE function
 \newcommand{\UPRE}{\text{UPRE}}	% Text of UPRE for use in math mode
 \newcommand{\Uwin}{\U_{\text{win}}}	% Windowed UPRE function
 
 % GCV derivation notation:
-\newcommand{\G}{G}	% GCV function
+\newcommand{\G}{F_{\text{GCV}}}	% GCV function
+\newcommand{\GDown}[1]{{}_{#1}\G}	% Downsampled GCV function
 \newcommand{\GCV}{\text{GCV}}	% Text of GCV for use in math mode
 \newcommand{\Gwin}{\G_{\text{win}}}	% Windowed GCV function
 
 % Discrepancy principle derivation notation:
-\newcommand{\D}{D}	% Discrepancy principle function
+\newcommand{\D}{F_{\text{MDP}}}	% Discrepancy principle function
+\newcommand{\DDown}[1]{{}_{#1}\D}	% Downsampled MDP function
 \newcommand{\MDP}{\text{MDP}}	% Text of MDP for use in math mode
 \newcommand{\safeparam}{\epsilon}	% Safety parameter for the MDP method
 \newcommand{\Dwin}{\D_{\text{win}}}	% Windowed GCV function

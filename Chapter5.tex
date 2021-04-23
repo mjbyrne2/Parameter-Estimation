@@ -273,8 +273,6 @@ g(0,1) &= \int_{\frac{1}{2}}^{\frac{3}{2}} \int_{-\frac{1}{2}}^{\frac{1}{2}} k(-
 \end{align*}
 From these equations, the domain of definition of $f(s,t)$ needed for the existence of the integrals is $[-\frac{1}{2},\frac{3}{2}] \times [-\frac{1}{2},\frac{3}{2}]$. Thus if information about $f(s,t)$ is only required in $[0,1] \times [0,1]$, boundary conditions must be imposed.
 
-\section{DCT Results} \label{sec:DCT}
-
 %\section{Resolution Analysis} \label{ch:Resolution Analysis}
 %Our goal is to determine the efficacy of downsampling for regularization parameter estimation, the effects of downsampling on the parameter estimation methods must be carefully examined. The parameter estimation methods are considered from the perspective of the DFT, and so downsampling must be viewed from the same perspective. \par 
 %One of the most powerful results pertaining to sampling a signal for use in Fourier analysis is the Shannon-Whittaker Sampling Theorem, which is given here without proof. The version of the theorem pertains to the Fourier transform, defined for a function $f \in L^1(\mathbb{R})$ by
@@ -322,3 +320,12 @@ From these equations, the domain of definition of $f(s,t)$ needed for the existe
 %\label{eq:DFT-Matrix}
 %\end{equation}
 %The matrix representing the inverse DFT is then $\trans{F}$, where $\trans{}$ denotes conjugate transposition. A property of $F$ is that $\trans{F}F = F\trans{F} = (1/n)\diag(n) = I$, and so splitting the factor of $1/n$ as $(1/\sqrt{n})(1/\sqrt{n})$ for the definition of the DFT provides the benefit of $F$ being a unitary matrix. A direct consequence of the DFT being unitary is Parseval's theorem: $\|\mathbf{f}\| = \|F\mathbf{f}\|$ for any $\mathbf{f} \in \mathbb{C}^n$. Another useful property of $F$ is that if $C$ is a circulant matrix, then $C = \trans{F}\Delta{F}$ where $\Delta = \diag(\sqrt{n}\dft{\mathbf{c}})$ and $\mathbf{c}$ is the first column of $C$.
+
+\section{DCT Results} \label{sec:DCT}
+
+\section{Results of adapted methods} \label{sec:Adapted Results}
+
+
+
+
+
