@@ -62,8 +62,13 @@ Since $\noiseVec \sim \mathcal{N}(0,\noiseSD^2)$, the expected values of $\noise
 %\end{proof}
 
 \noindent Applying the Trace Lemma to the expression for predictive risk yields
-\[\E\left(\frac{1}{n}\|\pVec(\regparam)\|^2\right) = \frac{1}{n}\E\left(\|(\A-I)\kMat\fVec + \A\noiseVec\|^2\right) = \frac{1}{n}\|(\A-I)\kMat\fVec\|^2 + \frac{\noiseSD^2}{n}\trace({\trans{\A}}\A).\]
-If Tikhonov regularization is used, then the influence matrix $\A$ is $\kMat(\ctrans{\kMat}\kMat + \regparam{\ctrans{D}}D)^{-1}\ctrans{\kMat}$. The matrix $(\ctrans{\kMat}\kMat + \regparam{\ctrans{D}}D)^{-1}$ is symmetric as a result of $\ctrans{\kMat}\kMat$ and $\regparam\ctrans{D}D$ being individually symmetric, and thus the corresponding influence matrix $\A$ is symmetric.  With a symmetric matrix $\A$, the expected value of predictive risk is simplified to
+\begin{align*}
+    \E\left(\frac{1}{n}\|\pVec(\regparam)\|^2\right) &= \frac{1}{n}\E\left(\|(\A-I)\kMat\fVec + \A\noiseVec\|^2\right) \\
+    &= \frac{1}{n}\|(\A-I)\kMat\fVec\|^2 + \frac{\noiseSD^2}{n}\trace({\trans{\A}}\A).
+\end{align*}
+If Tikhonov regularization is used, then the influence matrix $\A$ is
+\[\A = \kMat(\ctrans{\kMat}\kMat + \regparam{\ctrans{D}}D)^{-1}\ctrans{\kMat}.\]
+The matrix $(\ctrans{\kMat}\kMat + \regparam{\ctrans{D}}D)^{-1}$ is symmetric as a result of $\ctrans{\kMat}\kMat$ and $\regparam\ctrans{D}D$ being individually symmetric, and thus the corresponding influence matrix $\A$ is symmetric.  With a symmetric matrix $\A$, the expected value of predictive risk is simplified to
 \begin{equation}
 \label{eq:PR}
 \E\left(\frac{1}{n}\|\pVec(\regparam)\|^2\right) = \frac{1}{n}\|(\A-I)\kMat\fVec\|^2 + \frac{\noiseSD^2}{n}\trace(\A^2).
@@ -208,7 +213,8 @@ Using $F{\A}\ctrans{F}$, the expression for $\dft{\regres}$ can be rewritten as
 \[\dft{\regres} = F(\A - I){\ctrans{F}}\dft{\gnoiseVec} = F(\A - I){\ctrans{F}}(\Delta\dft{\fVec} + \dft{\noiseVec}) = [F(\A - I){\ctrans{F}}]\Delta\dft{\fVec} + [F(\A - I){\ctrans{F}}]\dft{\noiseVec}.\]
 Applying the DFT version of the Trace Lemma produces
 \begin{align*}
-\E\left(\frac{1}{n}\left\|\dft{\regres}\right\|^2\right) &= \frac{1}{n}\left\|[F(\A - I)\ctrans{F}]\Delta\dft{\fVec}\right\|^2 + \frac{\noiseSD^2}{n}\trace\left(F\ctrans{(\A - I)}(\A - I){\ctrans{F}}\right) \\
+&\E\left(\frac{1}{n}\left\|\dft{\regres}\right\|^2\right) \\
+&= \frac{1}{n}\left\|[F(\A - I)\ctrans{F}]\Delta\dft{\fVec}\right\|^2 + \frac{\noiseSD^2}{n}\trace\left(F\ctrans{(\A - I)}(\A - I){\ctrans{F}}\right) \\
 &= \frac{1}{n}\left\|[F(\A - I)\ctrans{F}]\Delta\dft{\fVec}\right\|^2 + \frac{\noiseSD^2}{n}\trace\left(F(\ctrans{\A}\A - (\ctrans{\A} + \A) + I){\ctrans{F}}\right) \\
 &= \frac{1}{n}\left\|[F(\A - I)\ctrans{F}]\Delta\dft{\fVec}\right\|^2 + \frac{\noiseSD^2}{n}\trace\left(\ctrans{\A}\A\right) - \frac{2\noiseSD^2}{n}\trace\left(\Re(\A)\right) + \noiseSD^2.
 \end{align*}
@@ -350,7 +356,10 @@ Analogous to \eqref{eq:SpectralUPREnModified}, the spectral form of the $\D_n(\r
 \D_n(\regparam) = \sum_{j = 0}^{n-1} |M_j\dft{\gnoiseVec}_j|^2\left(\frac{\mfilt(\regparam,|\dft{k}_j|}{M_j}\right)^2 - \noiseSD^2.
 \end{equation}
 As with the UPRE method, the rescaling of $|\dft{\gnoiseVec}_j|^2$ is justified by the fact that the discrepancy principle is based on prior knowledge of $\noiseSD^2$. The benefit of \eqref{eq:SpectralDPModified} is that the statistics of $\D_n(\regparam)$ can be analyzed using Corollary \ref{cor:gnoise Mean and Var}. By the properties of expected value,
-\[\E(\D_n(\regparam)) = \E\left(\sum_{j = 0}^{n-1} |M_j\dft{\gnoiseVec}_j|^2\left(\frac{\mfilt(\regparam,|\dft{k}_j|}{M_j}\right)^2 - \noiseSD^2\right) = \sum_{j = 0}^{n-1} \E\left(|M_j\dft{\gnoiseVec}_j|^2\right)\left(\frac{\mfilt(\regparam,|\dft{k}_j|)}{M_j}\right)^2 - \noiseSD^2.\]
+\begin{align*}
+    \E\left(\D_n(\regparam)\right) &= \E\left(\sum_{j = 0}^{n-1} |M_j\dft{\gnoiseVec}_j|^2\left(\frac{\mfilt(\regparam,|\dft{k}_j|}{M_j}\right)^2 - \noiseSD^2\right) \\
+    &= \sum_{j = 0}^{n-1} \E\left(|M_j\dft{\gnoiseVec}_j|^2\right)\left(\frac{\mfilt(\regparam,|\dft{k}_j|)}{M_j}\right)^2 - \noiseSD^2.
+\end{align*}
 Corollary \ref{cor:gnoise Mean and Var} then gives
 \begin{align*}
 \E(\D_n(\regparam)) &= \sum_{j = 0}^{n-1} \frac{\noiseSD^2}{2}\left(2 + \frac{|\dft{g}_j|^2}{\noiseSD^2}\right)(\mfilt(\regparam,|\dft{k}_j|))^2 - \noiseSD^2 \\

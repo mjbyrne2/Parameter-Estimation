@@ -1,4 +1,4 @@
-\chapter{The DFT approach} \label{ch:DFT}
+\chapter{Numerical results} \label{ch:Results}
 As with the DFT the DCT have diagonalization properties for specific types of matrices. These properties will be presented in the context of convolution and boundary conditions. Recall when the kernel $k(x,t)$ is of the form $k(x,t) = k(x-t)$, \eqref{eq:FIE} is specific case of the convolution
 \begin{equation}
 \label{eq:Inf. Cont. Conv.}
@@ -70,19 +70,19 @@ k_{m-1} & \cdots & k_{1} \\
  & & \\
 0 & & 
 \end{bmatrix},
-T = \begin{bmatrix}
-k_{0} & \cdots & k_{-m+1} & & 0 \\
-\vdots & \ddots & \ddots & \ddots &  \\
-k_{m-1} & \ddots & \ddots & \ddots & k_{-m+1} \\
- & \ddots & \ddots & \ddots & \vdots \\
-0 & & k_{m-1} & \cdots & k_{0} \\
-\end{bmatrix}
 T_{r} = \begin{bmatrix}
  & & 0 \\
  & & \\
 k_{-m+1} & & \\
 \vdots & \ddots &  \\
 k_{-1} & \cdots & k_{-m+1} \\
+\end{bmatrix},\]
+\[T = \begin{bmatrix}
+k_{0} & \cdots & k_{-m+1} & & 0 \\
+\vdots & \ddots & \ddots & \ddots &  \\
+k_{m-1} & \ddots & \ddots & \ddots & k_{-m+1} \\
+ & \ddots & \ddots & \ddots & \vdots \\
+0 & & k_{m-1} & \cdots & k_{0} \\
 \end{bmatrix}.\]
 The goal is to obtain a solution $\fVec = \trans{[f_0,\ldots,f_{n-1}]}$. However, it is clear that $\fVec$ depends not only upon the choice of kernel $k$ but on the boundaries of $\fVec$, i.e. the terms $f_j$ of $(f_n)$ where $j \not\in \{0,1,n-1\}$. There are a number of ways in which the boundaries can be handled; Dirichlet, periodic, and Neumann boundary conditions are considered in \cite{NeumannDCT}. The most-simplifying condition in terms of the result system is the Dirichlet condition, which assumed that $\fVec_l = \fVec_r = \zeroVec$. The resulting system \eqref{eq: Tf = g} is $T\fVec = \gVec$. The matrix $T$ is Toeplitz, and methods such as those presented in \cite{Vogel:2002} can be used to obtain solutions. The situation becomes more complicated in higher dimensions: for 2D problems, the system matrix is block-Toeplitz with Toeplitz blocks and solving such a system requires $O(n^4)$ operations \cite{KalouptsidisCarayannisManolakis}. \par 
 The DFT is well-suited for situations in which the boundary conditions are assumed to be periodic. For one-dimensional problem, the resulting kernel matrix $\kMat$ is circulant and is therefore diagonalized by the DFT. For two-dimensional problems, $\kMat$ is a block-circulant matrix with circulant blocks; adopting the notation from \cite[p.~71-72]{Vogel:2002}, such matrices will be referred to as BCCB matrices. Analogously, BCCB matrices can be diagonalized with two-dimensional DFTs. \par 
@@ -127,7 +127,7 @@ where $C$ is a circulant matrix. The diagonalization property \eqref{eq:CircDiag
 %and subtracting $c_j$ from both sides produces the desired result.
 %\end{proof}
 
-\section{Numerical results} \label{sec:Numerical results (DFT)}
+\section{DFT Results} \label{sec:DFT}
 For the numerical examples, three test functions are considered. While these functions vary in the extent of smoothness, it is assumed that the information about the measured function $g(x)$ is only known over the $[0,1]$; this will also be the initial domain of definition for $f(t)$. However, the interval $[0,1]$ can be mapped to any other interval using an affine transformation. In general, the transformation from $[a,b]$ to $[c,d]$ such that $a \mapsto c$ and $b \mapsto d$ has a point-slope representation
 \[y - c = \left(\frac{d-c}{b-a}\right)(x - a)\]
 where $y \in [c,d]$ is the image of $x \in [a,b]$. \par
@@ -213,8 +213,6 @@ In contrast to the UPRE method, the averaged version of the GCV method selected 
 % \label{fig:GCVplots}
 % \end{figure}
 
-\chapter{The DCT approach} \label{ch:DCT}
-
 The first boundary condition that will be considered is the Neumann boundary condition, defined by setting
 \[\begin{cases}
 f_{-1} = f_0 \\
@@ -274,6 +272,8 @@ g(1,1) &= \int_{\frac{1}{2}}^{\frac{3}{2}} \int_{\frac{1}{2}}^{\frac{3}{2}} k(1-
 g(0,1) &= \int_{\frac{1}{2}}^{\frac{3}{2}} \int_{-\frac{1}{2}}^{\frac{1}{2}} k(-s,1-t)f(s,t)~ds~dt.
 \end{align*}
 From these equations, the domain of definition of $f(s,t)$ needed for the existence of the integrals is $[-\frac{1}{2},\frac{3}{2}] \times [-\frac{1}{2},\frac{3}{2}]$. Thus if information about $f(s,t)$ is only required in $[0,1] \times [0,1]$, boundary conditions must be imposed.
+
+\section{DCT Results} \label{sec:DCT}
 
 %\section{Resolution Analysis} \label{ch:Resolution Analysis}
 %Our goal is to determine the efficacy of downsampling for regularization parameter estimation, the effects of downsampling on the parameter estimation methods must be carefully examined. The parameter estimation methods are considered from the perspective of the DFT, and so downsampling must be viewed from the same perspective. \par 

@@ -61,7 +61,9 @@ where
 \[s_1 = \sum_{\ell=0}^{n-1}\sin\left(\theta_{(k-j)\ell}\right), \quad s_2 = \sum_{\ell=0}^{n-1}\sin\left(\theta_{(j+k)\ell}\right).\]
 Both $s_1$ and $s_2$ are of the form $\sum_{\ell=0}^{n-1} \sin(\theta_{p\ell})$, where $p$ is an integer (either $k-j$ or $j+k$). This form can be written as
 \[\sum_{\ell=0}^{n-1} \sin\left(\theta_{p\ell}\right) = \Im\left(\sum_{\ell=0}^{n-1} \exp\left(i\theta_{p\ell}\right)\right).\] 
-If $p$ is a multiple of $n$, then $p = mn$ for some $m \in \mathbb{Z}$. Thus $\exp(i\theta_{p\ell}) = \exp(i2\pi{mn}\ell/n) = \exp(i2\pi{m\ell}) = 1$, and so
+If $p$ is a multiple of $n$, then $p = mn$ for some $m \in \mathbb{Z}$. Thus,
+\[\exp(i\theta_{p\ell}) = \exp(i2\pi{mn}\ell/n) = \exp(i2\pi{m\ell}) = 1,\]
+and so
 \[\Im\left(\sum_{\ell=0}^{n-1} \exp\left(i\theta_{p\ell}\right)\right) = \Im\left(\sum_{\ell=0}^{n-1} 1\right) = 0.\]
 If $p$ is not a multiple of $n$, then
 \[\Im\left(\sum_{\ell=0}^{n-1} \exp\left(i\theta_{p\ell}\right)\right) = \Im\left(\frac{1-\exp(i\theta_{np})}{1-\exp(i\theta_p)}\right).\]
@@ -80,7 +82,9 @@ c_1 = \sum_{\ell=0}^{n-1}\cos\left(\theta_{(j-k)\ell}\right), \quad c_2 = \sum_{
 \end{equation} 
 Both $c_1$ and $c_2$ are of the form $\sum_{\ell=0}^{n-1} \cos(\theta_{p\ell})$, where $p$ is an integer (either $j-k$ or $j+k$). This form can be written as
 \[\sum_{\ell=0}^{n-1} \cos\left(\theta_{p\ell}\right) = \Re\left(\sum_{\ell=0}^{n-1} \exp\left(i\theta_{p\ell}\right)\right).\] 
-If $p$ is a multiple of $n$, then $p = mn$ for some $m \in \mathbb{Z}$. Thus $\exp(i\theta_{p\ell}) = \exp(i2\pi{mn}\ell/n) = \exp(i2\pi{m\ell}) = 1$, and so
+If $p$ is a multiple of $n$, then $p = mn$ for some $m \in \mathbb{Z}$. Thus,
+\[\exp(i\theta_{p\ell}) = \exp(i2\pi{mn}\ell/n) = \exp(i2\pi{m\ell}) = 1,\]
+and so
 \[\Re\left(\sum_{\ell=0}^{n-1} \exp\left(i\theta_{p\ell}\right)\right) = \Re\left(\sum_{\ell=0}^{n-1} 1\right) = n.\]
 If $p$ is not a multiple of $n$, then
 \[\Re\left(\sum_{\ell=0}^{n-1} \exp\left(i\theta_{p\ell}\right)\right) = \Re\left(\frac{1-\exp(i\theta_{np})}{1-\exp(i\theta_p)}\right).\]
@@ -156,7 +160,7 @@ Instead of dealing with density functions of multivariate distributions, the dis
 
 \begin{theorem}[Lukacs \& King, 1954]
 \label{thm:Independence Theorem}
-Let $Z_1,\ldots,Z_n$ be $n$ independently distributed random variables, and assume that the $n$th moment of each $Z_{\ell}$ exists, i.e. $\E(Z_\ell^n)$ exists for each $\ell = 1,\ldots,n$. The necessary and sufficient conditions for the existence of two statistically independent linear forms $\sum_{\ell=1}^n a_{\ell}Z_{\ell}$ and $\sum_{\ell=1}^n b_{\ell}Z_{\ell}$ are:
+Let $Z_1,\ldots,Z_n$ be independently distributed random variables, and assume that the $n$th moment of each $Z_{\ell}$ exists, i.e. $\E(Z_\ell^n)$ exists for each $\ell = 1,\ldots,n$. The necessary and sufficient conditions for the existence of two statistically independent linear forms $\sum_{\ell=1}^n a_{\ell}Z_{\ell}$ and $\sum_{\ell=1}^n b_{\ell}Z_{\ell}$ are:
 \begin{enumerate}
 \item Each random variable which has a nonzero coefficient in both forms is normally distributed.
 \item $\sum_{\ell=1}^n a_{\ell}b_{\ell}\sigma_{\ell}^2 = 0$, where $\sigma_{\ell}^2$ denotes the variance of $Z_{\ell}$ $(\ell = 1,\ldots,n)$.
@@ -193,7 +197,11 @@ Let $X = \Re(\dft{\noiseVec})$ and $Y = \Im(\dft{\noiseVec})$, where $\noiseVec$
 Let $X$ and $Y$ be as required. Using \eqref{eq:Components Re(F) and Im(F)}, $X_j$ can be written as
 \[X_j = \sum_{k=0}^{n-1} \frac{1}{\sqrt{n}}\cos\left(\frac{-2\pi{jk}}{n}\right)\noise_k.\]
 Since the covariance matrix of $\noiseVec$ is $\noiseSD^2 I$, the components of $\noiseVec$ are independent and identically distributed $\mathcal{N}(0,\noiseSD^2)$. Thus by the properties of a sum of independent normal random variables \cite[p.~184]{CasellaBerger02},
-\[X_j \sim \mathcal{N}\left(0, \noiseSD^2\sum_{k=0}^{n-1} \left(\frac{1}{\sqrt{n}}\cos\left(\frac{-2\pi{jk}}{n}\right)\right)^2\right) = \mathcal{N}\left(0, \noiseSD^2 \langle A_{j\cdot},A_{j\cdot} \rangle\right) = \mathcal{N}\left(0, \noiseSD^2 (A\trans{A})_{jj}\right).\]
+\begin{align*}
+    X_j &\sim \mathcal{N}\left(0, \noiseSD^2\sum_{k=0}^{n-1} \left(\frac{1}{\sqrt{n}}\cos\left(\frac{-2\pi{jk}}{n}\right)\right)^2\right) \\
+    &= \mathcal{N}\left(0, \noiseSD^2 \langle A_{j\cdot},A_{j\cdot} \rangle\right) \\
+    &= \mathcal{N}\left(0, \noiseSD^2 (A\trans{A})_{jj}\right).
+\end{align*}
 Lemma \ref{lem:Inner products} then provides the cases for evaluation of the inner product. Determination of the distribution of $Y_k$ is similar.
 \end{proof}
 \end{lemma}
@@ -240,7 +248,7 @@ First consider the components of $\mathbf{X}^2$. Since $n$ is odd, the two cases
 \end{enumerate}
 Lastly the set $A_0$ is of no concern since $P(X_j \in A_0) = P(X_j = 0) = 0$. Then using the probability density function of the normal distribution, the density function of $U$ is
 \begin{align*}
-f_U(u) &= \frac{1}{\sqrt{2\pi\noiseSD^2}}\exp\left(\frac{-(g_1^{-1}(u))^2}{2\noiseSD^2}\right)\left|\frac{d}{du}g_1^{-1}(u)\right| + \frac{1}{\sqrt{2\pi\noiseSD^2}}\exp\left(\frac{-(g_2^{-1}(u))^2}{2\noiseSD^2}\right)\left|\frac{d}{du}g_2^{-1}(u)\right| \\
+f_U(u) &= \frac{1}{\sqrt{2\pi\noiseSD^2}}\left[\exp\left(\frac{-(g_1^{-1}(u))^2}{2\noiseSD^2}\right)\left|\frac{d}{du}g_1^{-1}(u)\right| + \exp\left(\frac{-(g_2^{-1}(u))^2}{2\noiseSD^2}\right)\left|\frac{d}{du}g_2^{-1}(u)\right|\right] \\
 &= \frac{1}{\sqrt{2\pi\noiseSD^2}}\exp\left(\frac{-u}{2\noiseSD^2}\right)\left|\frac{-1}{2\sqrt{u}}\right| + \frac{1}{\sqrt{2\pi\noiseSD^2}}\exp\left(\frac{-u}{2\noiseSD^2}\right)\left|\frac{1}{2\sqrt{u}}\right| \\
 &= \frac{1}{\sqrt{2\pi\noiseSD^2}} \frac{1}{\sqrt{u}} \exp\left(\frac{-u}{2\noiseSD^2}\right).
 \end{align*}
@@ -333,7 +341,7 @@ f_V(v) &= \frac{1}{2\sqrt{2\pi}} \frac{1}{\sqrt{v}} \left[\exp\left(\frac{-(\sqr
 &= \frac{1}{\sqrt{2\pi}} \frac{1}{\sqrt{v}}\exp\left(\frac{-v}{2}-\lambda\right) \left[\frac{\exp(-\sqrt{2\lambda{v}}) + \exp(\sqrt{2\lambda{v}})}{2}\right] \\ 
 &= \frac{1}{\sqrt{2\pi}} \frac{1}{\sqrt{v}}\exp\left(\frac{-v}{2}-\lambda\right)\cosh(\sqrt{2\lambda{v}}).
 \end{align*}
-Hyperbolic cosine is an entire function with Taylor expansion $\cosh(z) = \sum_{\ell=0}^{\infty} z^{2\ell}/(2\ell)!$. From \cite[p.~255]{AS}, 
+Hyperbolic cosine is an entire function with $\cosh(z) = \sum_{\ell=0}^{\infty} z^{2\ell}/(2\ell)!$ as its Taylor expansion.  From \cite[p.~255]{AS}, 
 \begin{equation}
 \label{eq:Gamma relation}
 \Gamma\left(\ell + \frac{1}{2}\right) = \frac{1\cdot3\cdot5\cdot7\cdot\ldots\cdot(2\ell-1)}{2^\ell}\Gamma\left(\frac{1}{2}\right) = \frac{(2\ell-1)!!}{2^\ell}\sqrt{\pi}
@@ -570,24 +578,25 @@ Then for $0 \leq j < k \leq n-1$,
 \begin{proof}
 By the linearity of covariance and rewriting the magnitudes squared in terms of real and imaginary parts,
 \begin{align*}
-\Cov\left(|M_j\dft{\gnoiseVec}_j|^2,|M_k\dft{\gnoiseVec}_k|^2\right) &= \Cov\left(\Re(M_j\dft{\gnoiseVec}_j)^2 + \Im(M_j\dft{\gnoiseVec}_j)^2, \Re(M_k\dft{\gnoiseVec}_k)^2 + \Im(M_k\dft{\gnoiseVec}_k)^2\right) \\
+&\Cov\left(|M_j\dft{\gnoiseVec}_j|^2,|M_k\dft{\gnoiseVec}_k|^2\right) \\
+&= \Cov\left(\Re(M_j\dft{\gnoiseVec}_j)^2 + \Im(M_j\dft{\gnoiseVec}_j)^2, \Re(M_k\dft{\gnoiseVec}_k)^2 + \Im(M_k\dft{\gnoiseVec}_k)^2\right) \\
 &= \Cov\left(\Re(M_j\dft{\gnoiseVec}_j)^2 ,\Re(M_k\dft{\gnoiseVec}_k)^2\right) + \Cov\left(\Re(M_j\dft{\gnoiseVec}_j)^2 ,\Im(M_k\dft{\gnoiseVec}_k)^2\right) \\
 &+ \Cov\left(\Im(M_j\dft{\gnoiseVec}_j)^2 ,\Re(M_k\dft{\gnoiseVec}_k)^2\right) + \Cov\left(\Im(M_j\dft{\gnoiseVec}_j)^2 ,\Im(M_k\dft{\gnoiseVec}_k)^2\right).
 \end{align*}
-By Lemma \ref{lem:App of Ind Thm 2}, $\Re(M_j\dft{\gnoiseVec}_j)^2$ and $\Im(M_k\dft{\gnoiseVec}_k)^2$ are independent for all $0 \leq j,k \leq n-1$, meaning that their covariance is zero. Thus the covariance simplifies to
-\[\Cov\left(|M_j\dft{\gnoiseVec}_j|^2,|M_k\dft{\gnoiseVec}_k|^2\right) = \Cov\left(\Re(M_j\dft{\gnoiseVec}_j)^2 ,\Re(M_k\dft{\gnoiseVec}_k)^2\right) + \Cov\left(\Im(M_j\dft{\gnoiseVec}_j)^2 ,\Im(M_k\dft{\gnoiseVec}_k)^2\right).\]
+By Lemma \ref{lem:App of Ind Thm 2}, $\Re(M_j\dft{\gnoiseVec}_j)^2$ and $\Im(M_k\dft{\gnoiseVec}_k)^2$ are independent for all $0 \leq j,k \leq n-1$, meaning that their covariance is zero. Thus, the covariance simplifies to
+\begin{align*}
+    \Cov\left(|M_j\dft{\gnoiseVec}_j|^2,|M_k\dft{\gnoiseVec}_k|^2\right) &= \Cov\left(\Re(M_j\dft{\gnoiseVec}_j)^2 ,\Re(M_k\dft{\gnoiseVec}_k)^2\right) \\
+    &+ \Cov\left(\Im(M_j\dft{\gnoiseVec}_j)^2 ,\Im(M_k\dft{\gnoiseVec}_k)^2\right).
+\end{align*}
 A further simplification can be made by using $\dft{\gnoiseVec} = \dft{\gVec} + \dft{\noiseVec}$ and expanding the squared terms:
 \begin{align*}
-\Cov\left(\Re(M_j\dft{\gnoiseVec}_j)^2 ,\Re(M_k\dft{\gnoiseVec}_k)^2\right) &= \Cov\left([\Re(M_j\dft{g}_j) + \Re(M_j\dft{\noise}_j)]^2,[\Re(M_k\dft{g}_k) + \Re(M_k\dft{\noise}_k)]^2\right) \\
-&= \Cov\left(\Re(M_j\dft{g}_j)^2,\Re(M_k\dft{g}_k)^2\right) \\
-&+ \Cov\left(\Re(M_j\dft{g}_j)^2, 2\Re(M_k\dft{g}_k)\Re(M_k\dft{\noise}_k)\right) \\
-&+ \Cov\left(\Re(M_j\dft{g}_j)^2, \Re(M_k\dft{\noise}_k)^2\right) \\
-&+ \Cov\left(2\Re(M_j\dft{g}_j)\Re(M_j\dft{\noise}_j), \Re(M_k\dft{g}_k)^2 )\right) \\
+&\Cov\left(\Re(M_j\dft{\gnoiseVec}_j)^2 ,\Re(M_k\dft{\gnoiseVec}_k)^2\right) \\
+&= \Cov\left([\Re(M_j\dft{g}_j) + \Re(M_j\dft{\noise}_j)]^2,[\Re(M_k\dft{g}_k) + \Re(M_k\dft{\noise}_k)]^2\right) \\
+&= \Cov\left(\Re(M_j\dft{g}_j)^2,\Re(M_k\dft{g}_k)^2\right) + \Cov\left(\Re(M_j\dft{g}_j)^2, 2\Re(M_k\dft{g}_k)\Re(M_k\dft{\noise}_k)\right) \\
+&+ \Cov\left(\Re(M_j\dft{g}_j)^2, \Re(M_k\dft{\noise}_k)^2\right) + \Cov\left(2\Re(M_j\dft{g}_j)\Re(M_j\dft{\noise}_j), \Re(M_k\dft{g}_k)^2 )\right) \\
 &+ \Cov\left(2\Re(M_j\dft{g}_j)\Re(M_j\dft{\noise}_j), 2\Re(M_k\dft{g}_k)\Re(M_k\dft{\noise}_k)\right) \\
-&+ \Cov\left(2\Re(M_j\dft{g}_j)\Re(M_j\dft{\noise}_j), \Re(M_k\dft{\noise}_k)^2 )\right) \\
-&+ \Cov\left(\Re(M_j\dft{\noise}_j)^2,\Re(M_k\dft{g}_k)^2\right) \\
-&+ \Cov\left(\Re(M_j\dft{\noise}_j)^2, 2\Re(M_k\dft{g}_k)\Re(M_k\dft{\noise}_k)\right) \\
-&+ \Cov\left(\Re(M_j\dft{\noise}_j)^2,\Re(M_k\dft{\noise}_k)^2\right).
+&+ \Cov\left(2\Re(M_j\dft{g}_j)\Re(M_j\dft{\noise}_j), \Re(M_k\dft{\noise}_k)^2 )\right) + \Cov\left(\Re(M_j\dft{\noise}_j)^2,\Re(M_k\dft{g}_k)^2\right) \\
+&+ \Cov\left(\Re(M_j\dft{\noise}_j)^2, 2\Re(M_k\dft{g}_k)\Re(M_k\dft{\noise}_k)\right) + \Cov\left(\Re(M_j\dft{\noise}_j)^2,\Re(M_k\dft{\noise}_k)^2\right).
 \end{align*}
 While this certainly appears to be the opposite of a simplification, any covariance term with an argument not containing $\dft{\noise}_j$ or $\dft{\noise}_k$ is zero. Five of the nine covariance terms are thus removed, leaving
 \begin{align*}
