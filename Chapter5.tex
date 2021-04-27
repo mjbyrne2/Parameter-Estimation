@@ -1,5 +1,5 @@
 \chapter{Numerical results} \label{ch:Results}
-As with the DFT the DCT have diagonalization properties for specific types of matrices. These properties will be presented in the context of convolution and boundary conditions. Recall when the kernel $k(x,t)$ is of the form $k(x,t) = k(x-t)$, \eqref{eq:FIE} is specific case of the convolution
+Both the DFT and DCT have diagonalization properties for specific types of matrices. These properties will be presented in the context of convolution and boundary conditions for problem in one dimension first. Recall when the kernel $k(x,t)$ is of the form $k(x,t) = k(x-t)$, \eqref{eq:FIE} is specific case of the convolution
 \begin{equation}
 \label{eq:Inf. Cont. Conv.}
 g(x) = \int_{-\infty}^{\infty} k(x-t)f(t) ~dt.
@@ -127,7 +127,8 @@ where $C$ is a circulant matrix. The diagonalization property \eqref{eq:CircDiag
 %and subtracting $c_j$ from both sides produces the desired result.
 %\end{proof}
 
-\section{DFT Results} \label{sec:DFT}
+\section{Results of downsampled methods} \label{sec:Downsampled Results}
+
 For the numerical examples, three test functions are considered. While these functions vary in the extent of smoothness, it is assumed that the information about the measured function $g(x)$ is only known over the $[0,1]$; this will also be the initial domain of definition for $f(t)$. However, the interval $[0,1]$ can be mapped to any other interval using an affine transformation. In general, the transformation from $[a,b]$ to $[c,d]$ such that $a \mapsto c$ and $b \mapsto d$ has a point-slope representation
 \[y - c = \left(\frac{d-c}{b-a}\right)(x - a)\]
 where $y \in [c,d]$ is the image of $x \in [a,b]$. \par
@@ -153,11 +154,12 @@ The interval $[0,1]$ is discretized as equispaced points $0, 1/N, 2/N, \ldots, (
 %\end{figure}
 
 With the discretizations $\fVec$ and $\kVec$ determined, the discretization $\gVec$ of $g(t)$ can be evaluation using either a circular convolution or a linear convolution with appropriate vector padding. Ultimately the vectors $\fVec$, $\kVec$, and $\gVec$ are vector discretizations of $f(t)$, $k(x-t)$, and $g(t)$, respectively. \par
-Overall, two selections for the width of the Gaussian kernel, two selections 5 and 25 for SNR value, and three test functions lead to a total of 12 configurations. For each configuration, 20 noise realizations were generated and tested. The full resolution problem was constructed using $N = 4096$ points. The downsamped resolutions were selected as $n \in \{16,32,\ldots,2048\}$ for a total of nine resolutions (eight values of $n$). \par 
+Overall, two selections for the width of the Gaussian kernel, two selections 5 and 25 for SNR value, and three test functions lead to a total of 12 configurations. For each configuration, 20 noise realizations were generated and tested. The full resolution problem was constructed using $N = 4096$ points. The downsampled resolutions were selected as $n \in \{16,32,\ldots,2048\}$ for a total of nine resolutions (eight values of $n$). \par 
 A primary challenge of using the UPRE method with downsampled signals is that for a course downsampling (in other words, a small number of sample points), the resulting UPRE graphs are shallow. This shallowness makes finding a minimum difficult, and sometime the selected parameter is too small. Figure \ref{fig:UPRElambdas} shows that there are often outlier parameters that are too small, even sometimes for downsamplings with a moderate number of points. At $n = 16$, the range of the parameter values is larger than for the other downsampling levels, which can also be attributed to the shallowness of the function graphs. \par 
 A consequence of choosing the regularization parameter to be too small is that the resulting relative errors are large; the outliers in Figure \ref{fig:UPREerrors} are the relative errors corresponding to the parameter outliers in Figure \ref{fig:UPRElambdas}. Unfortunately the error outliers can be significant, as even evidenced by the outlier at the full $N = 4096$ level. \par 
 Fortunately, the averaged UPRE method appears to overcome the effects of the outliers. Figure \ref{fig:UPRElambdas} shows that for each downsampling level, the parameter found using the average UPRE method was larger than the mean of the parameters found by applying the UPRE to the noise realizations individually. As a result, the corresponding relative errors are less than the means of the errors for each downsampling level, displayed in Figure \ref{fig:UPREerrors}. However, the benefit derived from using the averaged UPRE method might be a consequence of the outliers themselves. Following the approximate region of the minimums of the UPRE functions (shown in Figure \ref{fig:UPREfunctions}), the functions increase rapidly. Thus functions that are excessively shallow may have this region of rapid increase located before the region of the minimums of the other functions. It could be the case that when the average UPRE function is formed, these outlier regions of rapid increase might push the final minimum toward a location that is actually beyond the region of the minimums of the non-outlier functions, resulting in a parameter that is larger than the mean of the individual parameters. Of course, this analysis is not rigorous and perhaps worthy of further investigation. 
 
+% Original figure block from prospectus:
 % \begin{figure}
 % 	\centering
 % 	\begin{subfigure}[b]{0.45\textwidth}
@@ -179,6 +181,16 @@ Fortunately, the averaged UPRE method appears to overcome the effects of the out
 % \label{fig:UPREplots}
 % \end{figure} 
 
+% New figure block using subfloats:
+\begin{figure}
+	\centering
+	\subfloat[][]{\includegraphics[width = 0.45\textwidth]{Figures/UPRE_AvgPlot1D_F1_S15_W100_R20.eps} \label{fig:UPREfunctions}}
+    \subfloat[][]{\includegraphics[width = 0.45\textwidth]{Figures/UPRE_LamPlot1D_F1_S15_W100_R20.eps} \label{fig:UPRElambdas}} \\
+    \subfloat[][]{\includegraphics[width = 0.45\textwidth]{Figures/UPRE_ErrPlot1D_F1_S15_W100_R20.eps} \label{fig:UPREerrors}}
+    \caption[]{\doublespace Three plots showing the averaged UPRE results for the first test function with an SNR of 15 and  a Gaussian width parameter of 100. Figure \ref{fig:UPREfunctions} shows a zoomed-in portion of the averaged UPRE graph in comparison with graphs pertaining to the 20 noise realizations at a downsampling level of $n = 128$. Figure \ref{fig:UPRElambdas} shows that the resulting regularization parameter is typically greater than the average of the individual regularization parameters. Figure \ref{fig:UPREerrors} shows that the relative error corresponding to the parameter chosen from the average UPRE method is less than the average of the individual relative errors.}
+\label{fig:UPREplots}
+\end{figure} 
+
 The numerical results of the GCV method are similar to those of the UPRE method. At times the graphs of the GCV functions are shallow and thus difficult to minimize. This is apparent from the parameter outliers in Figure \ref{fig:GCVlambdas} and the corresponding error outliers in Figure \ref{fig:GCVerrors}. The range of the parameters selected at the $n = 16$ is again significant. Some of the parameters at this level were selected so small (quite near to zero) so that the relative errors were excessively large; the largest relative error was approximately 35, and as a result the vertical axis in Figure \ref{fig:GCVerrors} had to be scaled so that errors larger than 2 are simply grouped in a non-scaled region to produce a tractable plot. \par 
 In contrast to the UPRE method, the averaged version of the GCV method selected a regularization parameter that was worse than those selected by using individual noise realizations. The consequence of this is that the corresponding relative errors were larger than the mean of the individual relative errors. Thus the averaged GCV method does not appear to be a viable parameter selection approach.
 %As previously mentioned, for the minimization-based methods UPRE and GCV, the shallowness of some of the curves made finding a meaningful minimum difficult. The approach that might be worth considering is to find the location of maximum curvature, which follows the observations and analysis presented in \cite{HansenOLeary}. \par 
@@ -192,6 +204,7 @@ In contrast to the UPRE method, the averaged version of the GCV method selected 
 %for approximations of the derivatives. In MATLAB, the built-in function \texttt{diff} can be used to generate the derivative approximations. \par 
 %Once a discretization of curvature is obtained, the location of maximum curvature is determined and this location is taken to be the regularization parameter from the UPRE and GCV methods. While the approach of maximizing curvature is not the same as finding a minimum a function itself, this approach could avoid the numerical challenges of minimizing the shallow UPRE and GCV functions. 
 
+% Original figure block from prospectus:
 % \begin{figure}
 % 	\centering
 % 	\begin{subfigure}[b]{0.45\textwidth}
@@ -212,6 +225,16 @@ In contrast to the UPRE method, the averaged version of the GCV method selected 
 %     \caption{Three plots showing the averaged GCV results for the first test function with an SNR of 15 and a Gaussian width parameter of 100. Figure \ref{fig:GCVfunctions} shows a zoomed-in portion of the averaged GCV graph in comparison with graphs pertaining to the 20 noise realizations at a downsampling level of $n = 128$. Figure \ref{fig:GCVlambdas} shows that the resulting regularization parameter is typically less than the average of the individual regularization parameters. Figure \ref{fig:GCVerrors} shows that the relative error corresponding to the parameter chosen from the average GCV method is greater than the average of the individual relative errors.}
 % \label{fig:GCVplots}
 % \end{figure}
+
+% New figure block using subfloats:
+\begin{figure}
+	\centering
+	\subfloat[][]{\includegraphics[width = 0.45\textwidth]{Figures/GCV_AvgPlot1D_F1_S15_W100_R20.eps} \label{fig:GCVfunctions}}
+    \subfloat[][]{\includegraphics[width = 0.45\textwidth]{Figures/GCV_LamPlot1D_F1_S15_W100_R20.eps} \label{fig:GCVlambdas}} \\
+    \subfloat[][]{\includegraphics[width = 0.45\textwidth]{Figures/GCV_ErrPlot1D_F1_S15_W100_R20.eps} \label{fig:GCVerrors}}
+    \caption[]{\doublespace Three plots showing the averaged GCV results for the first test function with an SNR of 15 and a Gaussian width parameter of 100. Figure \ref{fig:GCVfunctions} shows a zoomed-in portion of the averaged GCV graph in comparison with graphs pertaining to the 20 noise realizations at a downsampling level of $n = 128$. Figure \ref{fig:GCVlambdas} shows that the resulting regularization parameter is typically less than the average of the individual regularization parameters. Figure \ref{fig:GCVerrors} shows that the relative error corresponding to the parameter chosen from the average GCV method is greater than the average of the individual relative errors.}
+\label{fig:GCVplots}
+\end{figure}
 
 The first boundary condition that will be considered is the Neumann boundary condition, defined by setting
 \[\begin{cases}
@@ -321,11 +344,9 @@ From these equations, the domain of definition of $f(s,t)$ needed for the existe
 %\end{equation}
 %The matrix representing the inverse DFT is then $\trans{F}$, where $\trans{}$ denotes conjugate transposition. A property of $F$ is that $\trans{F}F = F\trans{F} = (1/n)\diag(n) = I$, and so splitting the factor of $1/n$ as $(1/\sqrt{n})(1/\sqrt{n})$ for the definition of the DFT provides the benefit of $F$ being a unitary matrix. A direct consequence of the DFT being unitary is Parseval's theorem: $\|\mathbf{f}\| = \|F\mathbf{f}\|$ for any $\mathbf{f} \in \mathbb{C}^n$. Another useful property of $F$ is that if $C$ is a circulant matrix, then $C = \trans{F}\Delta{F}$ where $\Delta = \diag(\sqrt{n}\dft{\mathbf{c}})$ and $\mathbf{c}$ is the first column of $C$.
 
-\section{DCT Results} \label{sec:DCT}
-
 \section{Results of adapted methods} \label{sec:Adapted Results}
 
+\subsection{DCT Results} \label{sec:DCT}
 
-
-
+\subsection{DFT Results} \label{sec:DFT}
 
