@@ -351,9 +351,17 @@ To evaluate the usefulness of the adapted methods described in Chapter \ref{ch:P
     \label{eq:2D Gaussian kernel}
     k(x,y) = \frac{1}{2\pi\sigma_x\sigma_y}\exp\left(-\left[\frac{(x-\mu_x)^2}{2\sigma_x^2} + \frac{(y-\mu_y)^2}{2\sigma_y^2}\right]\right), \quad \sigma_x, \sigma_y > 0.
 \end{equation}
-The values $\sigma_x$ and $\sigma_y$ control the dispersion of the kernel in the $x$ and $y$ directions, respectively, while the center of the kernel is $(\mu_x,\mu_y)$. To allow for diagonalization of the system matrix using the DCT, we chose $c = \sigma_x = \sigma_y$ for all test problems. There are two reasons for using the notation $c$. The first is to avoid confusion with noise variance $\noiseSD^2$, and the second is that having $\sigma_x = \sigma_y$ means that the kernel has circular symmetry (although circular symmetry is often used in discussions of complex normal distributions). The effects of $c$ are identical to the effects of $\nu$ in \eqref{eq:Gaussian kernel}: increasing the value of $c$ increases the blurring effect of the convolution.
+The values $\sigma_x$ and $\sigma_y$ control the dispersion of the kernel in the $x$ and $y$ directions, respectively, while the center of the kernel is $(\mu_x,\mu_y)$. To allow for diagonalization of the system matrix using the DCT, we chose $c = \sigma_x = \sigma_y$ for all test problems. There are two reasons for using the notation $c$. The first is to avoid confusion with noise variance $\noiseSD^2$, and the second is that having $\sigma_x = \sigma_y$ means that the kernel has circular symmetry (although circular symmetry is often used in discussions of complex normal distributions). The effects of $c$ are identical to the effects of $\nu$ in \eqref{eq:Gaussian kernel}: increasing the value of $c$ increases the blurring effect of the convolution. \par
+The values of $c$ that were considered were 50 and 100, while the number of windows were chosen to be $p = 1,2,3$. As for the window types, we considered linear and linear Cosine windows to compare non-overlapping and overlapping windows. Noise was added to the blurred images with SNR's of 10, 25, and 40. Lastly, two penalty matrices were considered: the identity matrix (corresponding to standard Tikhonov regularization) and the negative discrete Laplacian.
 
 \subsection{DCT Results} \label{sec:DCT}
+
+\begin{figure}
+\label{fig:MESSENGER True}
+\includegraphics[scale=0.32]{Figures/MESSENGER}
+\caption[]{\doublespace Selected images used for MESSENGER two-dimensional test problem. Available courtesy of NASA/Johns  Hopkins  University  Applied  Physics  Laboratory/Carnegie Institution of Washington \cite{MESSENGER}.}
+\end{figure}
+
 
 \subsection{DFT Results} \label{sec:DFT}
 
