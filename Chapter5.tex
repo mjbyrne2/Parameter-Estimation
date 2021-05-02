@@ -368,6 +368,23 @@ However, the derivatives can be approximated by finite differences so that the f
 \end{equation}
 Vectorizing a $256 \times 256$ test image $X$ into some $x \in \mathbb{R}^{65536}$, we can use formulate discrete convolution as a matrix-vector product $Ax$ for a $65536 \times 65536$ matrix $A$. For storage reasons, forming this product is impractical but certain boundary conditions allow for alternative approaches. If periodic boundary conditions are imposed, which is explained in \citep{Vogel:2002} and \citep{HansenNagyOLeary}, then the system matrix $A$ is BCCB and thus can be diagonalized by the 2D DFT. If Neumann (reflective) boundaries are imposed and the PSF satisfies a double symmetry condition (see \citep{NeumannDCT} and \citep{HansenNagyOLeary}), then $A$ is BSSB and can be diagonalized by the 2D DCT. As noted in the start of Section \ref{sec:Adapted Results}, setting $\sigma_x = \sigma_y$ in \eqref{eq:2D Gaussian kernel} is a matter of convenience; the associated PSF can satisfy the double symmetry condition even if $\sigma_x \neq \sigma_y$. \par 
 The PSF associated with the identity operator and the PSF \eqref{eq:Discrete Laplacian Stencil} both satisfy the double symmetry condition, and thus $A$ and $L$ can be simultaneous diagonalized by the 2D DCT if Neumann boundary conditions are used. Similarly, simultaneous diagonalization by the 2D DFT is accomplished if periodic boundary conditions are imposed instead.
+\begin{align*}
+    C\rVec &= \left[\Delta\inv{\left(\trans{\Delta}\Delta + \regparam^2 \trans{\Lambda}\Lambda\right)}\trans{\Delta} - I_N\right]C\dVec \\
+\mathrm{dct2}(\mathrm{array}(\rVec)) &= \left[\mathrm{array}(\Delta)\inv{\left(\mathrm{array}(\Delta.^2) + \regparam^2\mathrm{array}(\Lambda.^2)\right)}\mathrm{array}(\Delta) - \mathrm{ones}(n) \right] \\
+&.*\mathrm{dct2}(\dVec)
+\end{align*}
+
+\begin{algorithm}
+\caption{Generate spectral weights for BCCB systems}
+Inputs: $\Gamma = (\ctrans{\Delta}\Delta)./(\ctrans{\Lambda}\Lambda) \in \mathbb{R}^{n_x \times n_y}$ and $P$ denoting the number of windows.
+\begin{enumerate}
+    \item Set $\gamma = \vectorize(\Gamma)$ and $N = n_x n_y$.
+    \item Record the permutation performed by permutation matrix $\Pi$ such that  $\Pi\gamma$ is either in ascending or descending order.
+    \item Generate the desired weights and store them in an $N \times P$ array $w$.
+    \item For $p = 1,\ldots,P$, form $W^{(p)} = \arr(w_{\cdot,p}) \in \mathbb{R}^{n_x \times n_y}$.
+\end{enumerate}
+\end{algorithm}
+
 
 \subsection{DCT Results} \label{sec:DCT}
 
