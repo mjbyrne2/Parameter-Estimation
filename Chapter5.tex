@@ -376,12 +376,12 @@ The PSF associated with the identity operator and the PSF \eqref{eq:Discrete Lap
 
 \begin{algorithm}
 \caption{Generate spectral weights for BCCB systems}
-Inputs: $\Gamma = (\ctrans{\Delta}\Delta)./(\ctrans{\Lambda}\Lambda) \in \mathbb{R}^{n_x \times n_y}$ and $P$ denoting the number of windows.
+Inputs: $\Gamma = \text{sqrt}((\ctrans{\Delta}\Delta)./(\ctrans{\Lambda}\Lambda)) \in \mathbb{R}^{n_x \times n_y}$ and $P$ denoting the number of windows.
 \begin{enumerate}
     \item Set $\gamma = \vectorize(\Gamma)$ and $N = n_x n_y$.
     \item Record the permutation performed by permutation matrix $\Pi$ such that  $\Pi\gamma$ is either in ascending or descending order.
-    \item Generate the desired weights and store them in an $N \times P$ array $w$.
-    \item For $p = 1,\ldots,P$, form $W^{(p)} = \arr(w_{\cdot,p}) \in \mathbb{R}^{n_x \times n_y}$.
+    \item Generate the desired weights using $\Pi\gamma$ and store them in an $N \times P$ array $w$.
+    \item For $p = 1,\ldots,P$, form $W^{(p)} = \arr(\trans{\Pi}w_{\cdot,p}) \in \mathbb{R}^{n_x \times n_y}$.
 \end{enumerate}
 \end{algorithm}
 

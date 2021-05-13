@@ -46,6 +46,8 @@
 \newcommand{\dft}[1]{\widehat{#1}}	% DFT of vector
 \DeclareMathOperator{\vcat}{vcat}	% Concatenation of vector
 \DeclareMathOperator{\shift}{\sigma}	% Shift operator
+\DeclareMathOperator{\vectorize}{vec}   % Vectorization operator
+\DeclareMathOperator{\arr}{array}   % Inverse operation of \vectorize
 
 % Regularization notation:
 \newcommand{\regparam}{\alpha}  % Regularization parameter
@@ -1095,6 +1097,19 @@ Figure \ref{fig:Errors 1D MRI} shows the relative errors of the regularized solu
 The one-dimensional test problem demonstrates that the adapted methods have potential for selecting viable regularization parameters that can be applied to multiple sets of data. The adapted UPRE and GCV performed competitively against the learning method, which relies on knowledge of the true training solutions. As stated previously, the success of the adapted methods is predicated on the similarity of the data sets being considered. However, this is not an unreasonable condition because data from a given experiment would hopefully vary little without significant change in the experimental set-up.
 
 \subsection{Two-dimensional problems} \label{sec:2D}
+
+To effectively discuss the set-up of the two-dimensional problems, we will adopt the notation used in \cite{Vogel:2002}. Specifically, we define $\vectorize : \mathbb{R}^{n_y \times n_x} \rightarrow \mathbb{R}^{n_y n_x}$ by
+\[\vectorize(x) = \vcat\left(x_{\cdot,1},x_{\cdot,2},\ldots,x_{\cdot,n_x}\right), \quad x \in \mathbb{R}^{n_y \times n_x}.\]
+The function $\arr : \mathbb{R}^{n_y n_x} \rightarrow \mathbb{R}^{n_y \times n_x}$ is defined as the inverse of $\vectorize$. Until now, the notation $\diag$ has been used denote the main diagonal of matrix; when used in conjunction with with $\vectorize$, however, $\diag$ will denote the formation of a diagonal matrix where the input is the main diagonal:
+\[\diag(\vectorize(x)) \in \mathbb{R}^{n_y n_x \times n_y n_x}, \quad x \in \mathbb{R}^{n_y \times n_x}.\]
+Lastly, we let $.*$ and $./$ denote element-wise multiplication and division, respectively.
+
+% For an $n_y \times n_x$ image $x$, we could form the blurred image $b$ by computing the matrix-vector product $A\xVec$ with $\xVec = \vectorize(x)$ but this would require an $n_y n_x \times n_y n_x$ matrix $A$. 
+
+The two-dimensional problems assume that the system matrix $A$ and penalty matrix $L$ can be simultaneously diagonalized by the 2D discrete cosine transform (DCT). The blurring process associated with the system matrix assumes reflective boundary conditions \cite{HansenNagyOLeary}, while periodic boundary conditions would correspond with diagonalization via the 2D DFT \cite{Vogel:2002}. The blurring of the images is accomplish through an entry-wise product of the images and an matrix containing the spectrum of $A$. We present the methodology in terms of the DFT for generality, though the results were generated using the DCT. We let $F_{n_x} \in \mathbb{C}^{n_x \times n_x}$ and $F_{n_y} \in \mathbb{C}^{n_y \times n_y}$ be the orthogonal DFT matrices and $F  = F_{n_x} \otimes F_{n_y}$. The 2D DFT of a matrix $x \in \mathbb{C}^{n_y \times n_x}$, denoted here as $\dft{x}$, can be computed as $\dft{x} = \arr(F\xVec)$ with $\xVec = \vectorize(x)$. In regards to numerical implementation, we let $\text{dft2}$ and $\text{idft2}$ denote the 2D DFT and inverse DFT operations, respectively, so that $\svd{x} = \text{dft2}(x)$. We now let $\Delta$ and $\Lambda$ be $n_y \times n_x$ matrices such that $A = \ctrans{F}\diag(\text{vec}(\Delta))F$ and $L = \ctrans{F}\diag(\text{vec}(\Lambda))F$. The windowed solution \eqref{eq:Windowed GSVD Solution} for a single data image $d \in \mathbb{R}^{n_y \times n_x}$ can be written as
+\[\xWin(\regparamVec) = \text{idft2}\left(\sum_{p=1}^P \arr\left(\wVec^{(p)}\right)\overline{\Delta}\dft{d}./\left[|\Delta|^2 + \left(\regparam^{(p)}\right)^2 |\Lambda|^2\right]\right).\]
+Here $|\cdot|$ represents element-wise modulus and the elements of $\overline{\Delta}$ are the complex conjugates of the elements of $\Delta$. In this formulation, $\sum_{p=1}^P \arr(\wVec^{(p)})$ is an $n_y \times n_x$ matrix of ones. 
+
 The two-dimensional test problem again uses the MRI data built into MATLAB. However, the data sets now consist of images of size $256 \times 256$. A total of 20 default MRI images were used and split into training and validation sets containing 10 images each. For each MRI image, seven more images were generate through the use of random rigid transformations (rotations and translations) so that the training set and validation set each contained 80 images. A rotation angle $\theta$ and a translation angle $\phi$ were selected randomly between 0 and $2\pi$. Another scalar $c$ was drawn randomly between 0 and 64 so that the translation vector $\tVec = \trans{[c\cos(\phi),c\sin(\phi)]}$ does not have a magnitude that exceeds 64 pixels. Figure \ref{fig:MRI Transformations} shows examples of true MRI images used in the training set. 
 
 \begin{figure}[ht]
