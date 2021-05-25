@@ -1,6 +1,6 @@
 \chapter{Statistical considerations} \label{ch:Stats}
 
-Since the parameter estimation methods in Chapter \ref{ch:Parameter estimation methods} involve DFT's and DCT's of the vector $\gnoiseVec = \gVec + \noiseVec$, some results regarding the distribution of the components of $\dft{\noiseVec}$ and $\dct{\noiseVec}$ will be presented. Since the DFT is a map from $\mathbb{C}^n$ to $\mathbb{C}^n$ and $\noiseVec$ is assumed to be a realization of a real random vector, some effort is necessary to carefully examine the distribution of the components of $\dft{\noiseVec}$. In contrast, the DCT (and DST) is a map from $\mathbb{R}^n$ to $\mathbb{R}^n$, so the statistics regarding the DCT of white noise are more straightforward.
+Since the parameter estimation methods in Chapter \ref{ch:Parameter estimation methods} involve DFT's and DCT's of the vector $\dVec = \bVec + \noiseVec$, some results regarding the distribution of the components of $\dft{\noiseVec}$ and $\dct{\noiseVec}$ will be presented. Since the DFT is a map from $\mathbb{C}^n$ to $\mathbb{C}^n$ and $\noiseVec$ is assumed to be a realization of a real random vector, some effort is necessary to carefully examine the distribution of the components of $\dft{\noiseVec}$. In contrast, the DCT (and DST) is a map from $\mathbb{R}^n$ to $\mathbb{R}^n$, so the statistics regarding the DCT of white noise are more straightforward.
 
 \section{DFT of white noise} \label{ch:DFT of white noise}
 The first results will be in regard to the real and imaginary parts of the $\dft{\noiseVec}$. Letting $A$ and $B$ be the real and imaginary parts, respectively, of the $n \times n$ DFT matrix, Euler's identity gives
@@ -268,11 +268,11 @@ This is the density function of the exponential distribution with scale paramete
 \end{proof}
 \end{theorem}
 
-The statistics of the DFT of white noise are now established, which allows the focus to be shifted towards analyzing the combination $\gVec + \noiseVec = \gnoiseVec$. By the properties of the multivariate normal distribution, if $\noiseVec \sim \mathcal{N}(\zeroVec,\noiseSD^2 I)$ then $\gnoiseVec \sim \mathcal{N}(\gVec,\noiseSD^2 I)$ because $\gVec$ is a constant vector. Thus the distribution of the components of $\Re(\dft{\gnoiseVec})$ and $\Im(\dft{\gnoiseVec})$ are readily obtained by extending previous results.
+The statistics of the DFT of white noise are now established, which allows the focus to be shifted towards analyzing the combination $\bVec + \noiseVec = \dVec$. By the properties of the multivariate normal distribution, if $\noiseVec \sim \mathcal{N}(\zeroVec,\noiseSD^2 I)$ then $\dVec \sim \mathcal{N}(\bVec,\noiseSD^2 I)$ because $\bVec$ is a constant vector. Thus the distribution of the components of $\Re(\dft{\dVec})$ and $\Im(\dft{\dVec})$ are readily obtained by extending previous results.
 
 \begin{lemma}[Extension of Lemma \ref{lem:Component distributions}]
 \label{lem:Component distributions ext.}
-Let $\mathbf{X} = \Re(\dft{\gnoiseVec})$ and $\mathbf{Y} = \Im(\dft{\gnoiseVec})$, where $\gnoiseVec$ is a random $n$-vector with $\gnoiseVec \sim \mathcal{N}(\gVec,\noiseSD^2 I)$. Also let $J = \{0,n/2\}$ if $n$ is even and $J = \{0\}$ if $n$ is odd. Then for $0 \leq j \leq n-1$, the distribution of $X_j$ and $Y_j$ is as follows.  
+Let $\mathbf{X} = \Re(\dft{\dVec})$ and $\mathbf{Y} = \Im(\dft{\dVec})$, where $\dVec$ is a random $n$-vector with $\dVec \sim \mathcal{N}(\bVec,\noiseSD^2 I)$. Also let $J = \{0,n/2\}$ if $n$ is even and $J = \{0\}$ if $n$ is odd. Then for $0 \leq j \leq n-1$, the distribution of $X_j$ and $Y_j$ is as follows.  
 \[X_j \sim \begin{cases}
 \mathcal{N}(\Re(\dft{g}_j),\noiseSD^2), & j \in J \\
 \mathcal{N}(\Re(\dft{g}_j),\noiseSD^2/2), & j \not\in J \end{cases}, \quad Y_j \sim \begin{cases}
@@ -281,8 +281,8 @@ Let $\mathbf{X} = \Re(\dft{\gnoiseVec})$ and $\mathbf{Y} = \Im(\dft{\gnoiseVec})
 \end{cases}.\]
 \begin{proof}
 Let $X$ and $Y$ be as required. Using \eqref{eq:Components Re(F) and Im(F)}, $X_j$ can be written as
-\[X_j = \sum_{k=0}^{n-1} \frac{1}{\sqrt{n}}\cos\left(\frac{-2\pi{jk}}{n}\right)\gnoiseVec_k.\]
-Since the covariance matrix of $\gnoiseVec$ is $\noiseSD^2 I$, the components $\gnoiseVec_k$ are independent and distributed $\mathcal{N}(\gVec_k,\noiseSD^2)$ for all $0 \leq k \leq n-1$. Thus by the properties of a sum of independent normal random variables \cite[p.~184]{CasellaBerger02},
+\[X_j = \sum_{k=0}^{n-1} \frac{1}{\sqrt{n}}\cos\left(\frac{-2\pi{jk}}{n}\right)\dVec_k.\]
+Since the covariance matrix of $\dVec$ is $\noiseSD^2 I$, the components $\dVec_k$ are independent and distributed $\mathcal{N}(\bVec_k,\noiseSD^2)$ for all $0 \leq k \leq n-1$. Thus by the properties of a sum of independent normal random variables \cite[p.~184]{CasellaBerger02},
 \begin{align*}
 X_j &\sim \mathcal{N}\left(\sum_{k=0}^{n-1} \frac{1}{\sqrt{n}}\cos\left(\frac{-2\pi{jk}}{n}\right)g_k, \noiseSD^2\sum_{k=0}^{n-1} \left(\frac{1}{\sqrt{n}}\cos\left(\frac{-2\pi{jk}}{n}\right)\right)^2\right) \\
 &= \mathcal{N}\left(\Re(\dft{g}_j), \noiseSD^2 \langle A_{j\cdot},A_{j\cdot} \rangle\right) \\
@@ -292,47 +292,47 @@ Lemma \ref{lem:Inner products} then provides the cases for evaluation of the inn
 \end{proof}
 \end{lemma}
 
-In contrast, however, to the results regarding the components of $|\dft{\noiseVec}|^2$, the distribution of the components of $|\dft{\gnoiseVec}|^2$ is somewhat  complicated. To illustrate this, consider $U = X_0^2$, where $\mathbf{X} = \Re(\dft{\gnoiseVec})$ for odd-length $\gnoiseVec$ distributed $\mathcal{N}(\gVec,\noiseSD^2 I)$. To simplify notation, let $\mathbf{\mu} = \Re(\dft{\gVec})$ so that by Lemma \ref{lem:Component distributions ext.}, $X_0 \sim \mathcal{N}(\mu_0,\noiseSD^2)$. Applying the same transformation technique from Theorem \ref{thm:Mag. squared theorem}, the probability density function of $U$ is 
+In contrast, however, to the results regarding the components of $|\dft{\noiseVec}|^2$, the distribution of the components of $|\dft{\dVec}|^2$ is somewhat  complicated. To illustrate this, consider $U = X_0^2$, where $\mathbf{X} = \Re(\dft{\dVec})$ for odd-length $\dVec$ distributed $\mathcal{N}(\bVec,\noiseSD^2 I)$. To simplify notation, let $\mathbf{\mu} = \Re(\dft{\bVec})$ so that by Lemma \ref{lem:Component distributions ext.}, $X_0 \sim \mathcal{N}(\mu_0,\noiseSD^2)$. Applying the same transformation technique from Theorem \ref{thm:Mag. squared theorem}, the probability density function of $U$ is 
 \begin{align*}
 f_U(u) &= \frac{1}{\sqrt{2\pi\noiseSD^2}}\exp\left(\frac{-(-\sqrt{u} - \mu_0)^2}{2\noiseSD^2}\right)\left|\frac{-1}{2\sqrt{u}}\right| + \frac{1}{\sqrt{2\pi\noiseSD^2}}\exp\left(\frac{-(\sqrt{u} - \mu_0)^2}{2\noiseSD^2}\right)\left|\frac{1}{2\sqrt{u}}\right| \\
 &= \frac{1}{2\sqrt{2\pi\noiseSD^2}} \frac{1}{\sqrt{u}} \left[\exp\left(\frac{-(\sqrt{u} + \mu_0)^2}{2\noiseSD^2}\right) + \exp\left(\frac{-(\sqrt{u} - \mu_0)^2}{2\noiseSD^2}\right)\right].
 \end{align*}
 Unfortunately this density function is not easily identified. However, rescaling $X_0$ as $X_0/\noiseSD$ before applying the square transformation results in a random variable that has a more tractable density function. The density function of $V = (X_0/\noiseSD)^2$ can be equated to that of the noncentered chi-squared distribution with 1 degree of freedom and noncentrality parameter $\lambda = (\mu_0/\noiseSD)^2/2$. \par 
-Before the distribution of the scaled components of $\dft{\gnoiseVec}$ is stated, Lemma \ref{lem:App of Ind Thm 2} establishes the independence of the (squared) real and imaginary parts.
+Before the distribution of the scaled components of $\dft{\dVec}$ is stated, Lemma \ref{lem:App of Ind Thm 2} establishes the independence of the (squared) real and imaginary parts.
 
 \begin{lemma}
 \label{lem:App of Ind Thm 2}
-Let $\gnoiseVec$ be a random $n$-vector with $\gnoiseVec \sim \mathcal{N}(\gVec,\noiseSD^2 I)$, $J = \{0,n/2\}$ if $n$ is even and $J = \{0\}$ if $n$ is odd. Define the diagonal matrix $M$ by
+Let $\dVec$ be a random $n$-vector with $\dVec \sim \mathcal{N}(\bVec,\noiseSD^2 I)$, $J = \{0,n/2\}$ if $n$ is even and $J = \{0\}$ if $n$ is odd. Define the diagonal matrix $M$ by
 \[M_{j,j} = \begin{cases}
 1/\noiseSD & j \in J \\
 \sqrt{2}/\noiseSD & j \not\in J
 \end{cases}.\]
-Then $\Re((M\dft{\gnoiseVec})_j)^2$ and $\Im((M\dft{\gnoiseVec})_k)^2$ are independent for all $0 \leq j,k \leq n-1$.
+Then $\Re((M\dft{\dVec})_j)^2$ and $\Im((M\dft{\dVec})_k)^2$ are independent for all $0 \leq j,k \leq n-1$.
 \end{lemma}
 \begin{proof}
-Let $\gnoiseVec \sim \mathcal{N}(\gVec,\noiseSD^2 I)$, $\mathbf{X} = \Re(M\dft{\gnoiseVec})$, and $\mathbf{Y} = \Im(M\dft{\gnoiseVec})$. Since $\dft{\gnoiseVec} = \dft{\gVec} + \dft{\noiseVec}$, $X_j^2$ and $Y_k^2$ can be expressed as 
+Let $\dVec \sim \mathcal{N}(\bVec,\noiseSD^2 I)$, $\mathbf{X} = \Re(M\dft{\dVec})$, and $\mathbf{Y} = \Im(M\dft{\dVec})$. Since $\dft{\dVec} = \dft{\bVec} + \dft{\noiseVec}$, $X_j^2$ and $Y_k^2$ can be expressed as 
 \[X_j^2 = [M_{j,j}(\Re(\dft{g}_j) + \Re(\dft{\noise}_j))]^2, \quad Y_k^2 = [M_{k,k}(\Im(\dft{g}_k) + \Im(\dft{\noise}_k))]^2.\]
-$X_j^2$ and $Y_k^2$ are thus functions of only the random variables $\Re(\dft{\noise}_j)$ and $\Im(\dft{\noise}_k)$, respectively. $\Re(\dft{\noise}_j)$ and $\Im(\dft{\noise}_k)$ are independent by Lemma \ref{lem:App of Ind Thm}, and therefore $X_j^2 = \Re((M\dft{\gnoiseVec})_j)^2$ and $Y_k^2 = \Im((M\dft{\gnoiseVec})_k)^2$ are independent as well.
+$X_j^2$ and $Y_k^2$ are thus functions of only the random variables $\Re(\dft{\noise}_j)$ and $\Im(\dft{\noise}_k)$, respectively. $\Re(\dft{\noise}_j)$ and $\Im(\dft{\noise}_k)$ are independent by Lemma \ref{lem:App of Ind Thm}, and therefore $X_j^2 = \Re((M\dft{\dVec})_j)^2$ and $Y_k^2 = \Im((M\dft{\dVec})_k)^2$ are independent as well.
 \end{proof}
 
-The distribution of the scaled components of $\dft{\gnoiseVec}$ can now be stated. 
+The distribution of the scaled components of $\dft{\dVec}$ can now be stated. 
 
 \begin{theorem}[Extension of Theorem \ref{thm:Mag. squared theorem}]
-Let $\gnoiseVec$ be a random $n$-vector with $\gnoiseVec \sim \mathcal{N}(\gVec,\noiseSD^2 I)$, $J = \{0,n/2\}$ if $n$ is even and $J = \{0\}$ if $n$ is odd. Define the diagonal matrix $M$ by
+Let $\dVec$ be a random $n$-vector with $\dVec \sim \mathcal{N}(\bVec,\noiseSD^2 I)$, $J = \{0,n/2\}$ if $n$ is even and $J = \{0\}$ if $n$ is odd. Define the diagonal matrix $M$ by
 \[M_{j,j} = \begin{cases}
 1/\noiseSD & j \in J \\
 \sqrt{2}/\noiseSD & j \not\in J
 \end{cases}.\]
-Then for $0 \leq j \leq n-1$, the distribution of $|(M\dft{\gnoiseVec})_j|^2 = \Re((M\dft{\gnoiseVec})_j)^2 + \Im((M\dft{\gnoiseVec})_j)^2$ is as follows.
-\[|(M\dft{\gnoiseVec})_j|^2 \sim \begin{cases}
+Then for $0 \leq j \leq n-1$, the distribution of $|(M\dft{\dVec})_j|^2 = \Re((M\dft{\dVec})_j)^2 + \Im((M\dft{\dVec})_j)^2$ is as follows.
+\[|(M\dft{\dVec})_j|^2 \sim \begin{cases}
 \NCchi^2\left(1,\dfrac{1}{2}\left(\dfrac{\Re(\dft{g}_j)}{\noiseSD}\right)^2\right), & j \in J \\
 \NCchi^2\left(2,\dfrac{|\dft{g}_j|^2}{\noiseSD^2}\right), & j \not\in J \end{cases},\]
 where $\NCchi^2(k,\lambda)$ denotes the noncentral chi-squared distribution with $k$ degrees of freedom and noncentrality parameter $\lambda$.
 \label{thm:Mag. squared theorem ext.}
 \end{theorem}
 \begin{proof}
-Let $\gnoiseVec \sim \mathcal{N}(\gVec,\noiseSD^2 I)$, $\mathbf{X} = \Re(M\dft{\gnoiseVec})$, and $\mathbf{Y} = \Im(M\dft{\gnoiseVec})$. Again without loss of generality, we assume that $n$ is odd so that the two cases to be considered are $j = 0$ and $j \neq 0$. \par
-First, the components of $\mathbf{X}^2$ will be determined. If $j = 0$, then $\Re(\dft{\gnoiseVec}_j) \sim \mathcal{N}(\mu_j,\noiseSD^2)$ from Lemma \ref{lem:Component distributions ext.}, where $\mathbf{\mu} = \Re(\dft{\gVec})$ for readability. Thus by the properties of the normal distribution \cite[p.~184]{CasellaBerger02}, $\Re(\dft{\gnoiseVec}_j/\noiseSD) = \Re((M\dft{\gnoiseVec})_j) = X_j \sim \mathcal{N}(\sqrt{2\lambda},1)$ where $\lambda = (\mu_j/\noiseSD)^2/2$. Applying the transformation technique used in Theorem \ref{thm:Mag. squared theorem}, the probability density function of $V = X_j^2$ is
+Let $\dVec \sim \mathcal{N}(\bVec,\noiseSD^2 I)$, $\mathbf{X} = \Re(M\dft{\dVec})$, and $\mathbf{Y} = \Im(M\dft{\dVec})$. Again without loss of generality, we assume that $n$ is odd so that the two cases to be considered are $j = 0$ and $j \neq 0$. \par
+First, the components of $\mathbf{X}^2$ will be determined. If $j = 0$, then $\Re(\dft{\dVec}_j) \sim \mathcal{N}(\mu_j,\noiseSD^2)$ from Lemma \ref{lem:Component distributions ext.}, where $\mathbf{\mu} = \Re(\dft{\bVec})$ for readability. Thus by the properties of the normal distribution \cite[p.~184]{CasellaBerger02}, $\Re(\dft{\dVec}_j/\noiseSD) = \Re((M\dft{\dVec})_j) = X_j \sim \mathcal{N}(\sqrt{2\lambda},1)$ where $\lambda = (\mu_j/\noiseSD)^2/2$. Applying the transformation technique used in Theorem \ref{thm:Mag. squared theorem}, the probability density function of $V = X_j^2$ is
 \[f_V(v) = \frac{1}{2\sqrt{2\pi}} \frac{1}{\sqrt{v}} \left[\exp\left(\frac{-(\sqrt{v} + \sqrt{2\lambda})^2}{2}\right) + \exp\left(\frac{-(\sqrt{v} - \sqrt{2\lambda})^2}{2}\right)\right].\]
 Expanding the arguments of the exponential terms allows for the function to be rewritten as
 \begin{align*}
@@ -367,23 +367,23 @@ f_V(v) &= \frac{1}{\sqrt{2\pi}} \frac{1}{\sqrt{v}}\exp\left(\frac{-v}{2}-\lambda
 &= \sum_{\ell=0}^{\infty} \frac{v^{\ell - 1/2}\exp(-v/2)\lambda^\ell\exp(-\lambda)}{\Gamma(\ell + 1/2)2^{\ell+1/2}\ell!},
 \end{align*}
 matching the probability density function \eqref{eq:NCchi^2 PDF} of the noncentral chi-squared distribution with 1 degree of freedom and noncentrality parameter $\lambda = (\mu_j/\noiseSD)^2/2 = (\Re(\dft{g}_j)/\noiseSD)^2/2$. \par
-If $j \neq 0$, then Lemma \ref{lem:Component distributions ext.} gives that $\Re(\dft{\gnoiseVec}_j) \sim \mathcal{N}(\Re(\dft{g}_j),\noiseSD^2/2)$. This implies that $\Re((\sqrt{2}\dft{\gnoiseVec}/\noiseSD)_j) = \Re((M\dft{\gnoiseVec})_j) = X_j \sim \mathcal{N}(\sqrt{2\lambda},1)$, now with $\lambda = (\mu_j/\noiseSD)^2$. Thus the same argument can be applied so that $X_j^2 \sim \NCchi^2(1,(\mu_j/\noiseSD)^2) = \NCchi^2(1,(\Re(\dft{g}_j)/\noiseSD)^2)$. \par 
-With the components of $\mathbf{X}^2$ examined, focus can directed towards the components of $\mathbf{Y}^2$. If $j = 0$, then Lemma \ref{lem:Component distributions ext.} gives that $\Im(\dft{\gnoiseVec}_j) = 0$ (a constant random variable). This implies that $\Im(\dft{\gnoiseVec}_j/\noiseSD) = \Im((M\dft{\gnoiseVec})_j) = Y_j = 0$, meaning $Y_j^2 = 0$ as well. If $j \neq 0$, then $\Im(\dft{\gnoiseVec}_j) \sim \mathcal{N}(\Im(\dft{g}_j),\noiseSD^2/2)$. Thus by the argument for $X_j$, $Y_j^2 \sim \NCchi^2(1,(\Im(\dft{g}_j)/\noiseSD)^2)$. \par 
+If $j \neq 0$, then Lemma \ref{lem:Component distributions ext.} gives that $\Re(\dft{\dVec}_j) \sim \mathcal{N}(\Re(\dft{g}_j),\noiseSD^2/2)$. This implies that $\Re((\sqrt{2}\dft{\dVec}/\noiseSD)_j) = \Re((M\dft{\dVec})_j) = X_j \sim \mathcal{N}(\sqrt{2\lambda},1)$, now with $\lambda = (\mu_j/\noiseSD)^2$. Thus the same argument can be applied so that $X_j^2 \sim \NCchi^2(1,(\mu_j/\noiseSD)^2) = \NCchi^2(1,(\Re(\dft{g}_j)/\noiseSD)^2)$. \par 
+With the components of $\mathbf{X}^2$ examined, focus can directed towards the components of $\mathbf{Y}^2$. If $j = 0$, then Lemma \ref{lem:Component distributions ext.} gives that $\Im(\dft{\dVec}_j) = 0$ (a constant random variable). This implies that $\Im(\dft{\dVec}_j/\noiseSD) = \Im((M\dft{\dVec})_j) = Y_j = 0$, meaning $Y_j^2 = 0$ as well. If $j \neq 0$, then $\Im(\dft{\dVec}_j) \sim \mathcal{N}(\Im(\dft{g}_j),\noiseSD^2/2)$. Thus by the argument for $X_j$, $Y_j^2 \sim \NCchi^2(1,(\Im(\dft{g}_j)/\noiseSD)^2)$. \par 
 The final part of the proof is to establish the distribution of $X_j^2 + Y_j^2$ for the two cases of $j$. If $j = 0$, then $Y_j^2 = 0$ and so $X_j^2 + Y_j^2$ has the same distribution of $X_j^2$, which is $\NCchi^2(1,(\Re(\dft{g}_j)/\noiseSD)^2/2)$. If $j \neq 0$, then $X_j^2$ and $Y_j^2$ are distributed $\NCchi^2(1,(\Re(\dft{g}_j)/\noiseSD)^2)$ and $\NCchi^2(1,(\Im(\dft{g}_j)/\noiseSD)^2)$, respectively. Their independence is given by Lemma \ref{lem:App of Ind Thm 2}, and so the reproductive property of the noncentral chi-squared distribution \cite[p.~182]{Rao1973} produces
 \[X_j^2 + Y_j^2 \sim \NCchi^2\left(1 + 1,\left(\frac{\Re(\dft{g}_j)}{\noiseSD}\right)^2 + \left(\frac{\Im(\dft{g}_j)}{\noiseSD}\right)^2\right) = \NCchi^2\left(2,\frac{|\dft{g}_j|^2}{\noiseSD^2}\right).\]
 \end{proof}
 
-From Theorem \ref{thm:Mag. squared theorem ext.}, there are conditions which simplify the distribution of $|(M\dft{\gnoiseVec})_j|^2$. If $j = 0$ (or $n/2$ when $n$ is even), the noncentrality parameter of the noncentral chi-squared distribution is $(\Re(\dft{g}_0))^2/2\noiseSD^2$. By the definition of the DFT,
+From Theorem \ref{thm:Mag. squared theorem ext.}, there are conditions which simplify the distribution of $|(M\dft{\dVec})_j|^2$. If $j = 0$ (or $n/2$ when $n$ is even), the noncentrality parameter of the noncentral chi-squared distribution is $(\Re(\dft{g}_0))^2/2\noiseSD^2$. By the definition of the DFT,
 \[\Re(\dft{g}_0) = \frac{1}{\sqrt{n}}\sum_{\ell=0}^{n-1} \cos\left(\frac{-2\pi(0)\ell}{n}\right)g_\ell = \frac{1}{\sqrt{n}}\sum_{\ell=0}^{n-1} g_\ell.\]
 It is certainly possible that $\sum_{\ell=0}^{n-1} g_\ell = 0$. A situation that would lend itself to this possibility would be a function $g(t)$ whose integral over the interval being considered is zero, e.g. $\sin(2\pi{t})$ defined on the interval $[0,1]$. Even if $\Re(\dft{g}_0)$ is nonzero, $\lambda = (\Re(\dft{g}_0))^2/2\noiseSD^2$ can be near zero when $\Re(\dft{g}_0)$ is small or the variance $\noiseSD^2$ is large. Extending these observations for general indices $j$, a zero noncentrality parameter means
 \begin{equation}
 \label{eq:Central chi}
-|(M\dft{\gnoiseVec})_j|^2 \sim \begin{cases}
+|(M\dft{\dVec})_j|^2 \sim \begin{cases}
 \NCchi^2\left(1,0\right) = \chi^2(1), & j = 0 \\
 \NCchi^2\left(2,0\right) = \chi^2(2), & \text{otherwise} \end{cases},
 \end{equation}
 again for $n$ being even; the same holds for odd $n$, with the inclusion of the $n/2$ case.  Recalling that $M$ in Theorem \ref{thm:Mag. squared theorem ext.} is a diagonal matrix, \eqref{eq:Central chi} can be restated as
-\[|(M\dft{\gnoiseVec})_j|^2 = \begin{cases}
+\[|(M\dft{\dVec})_j|^2 = \begin{cases}
 |\dft{\tilde{g}}_j|^2/\noiseSD^2 \sim \chi^2(1), & j = 0 \\
 2|\dft{\tilde{g}}_j|^2/\noiseSD^2 \sim \chi^2(2), & \text{otherwise} \end{cases}.\]
 Fortunately, this result agrees with Theorem \ref{thm:Mag. squared theorem}. The connection can be stated as a lemma.
@@ -400,7 +400,7 @@ which is the density function of the $\text{gamma}(1/2,2\noiseSD^2)$ distributio
 which is the density function of the $\text{exponential}(\noiseSD^2)$ distribution. An alternative method for showing $V_2 \sim \text{exponential}(\noiseSD^2)$ would be to note that the $\chi^2(2)$ distribution is the same as the $\text{exponential}(1/2)$ distribution and then perform the scalar transformation.
 \end{proof}
 
-Ultimately there is a trade-off between the frequency content of the function $g(t)$ and the variance in the added noise. If the function $g(t)$ has a small amount of high frequency content (relative to the variance of the noise), then the statistics of corresponding terms $|(M\dft{\gnoiseVec})_j|^2$ will resemble those of chi-squared random variables. \par 
+Ultimately there is a trade-off between the frequency content of the function $g(t)$ and the variance in the added noise. If the function $g(t)$ has a small amount of high frequency content (relative to the variance of the noise), then the statistics of corresponding terms $|(M\dft{\dVec})_j|^2$ will resemble those of chi-squared random variables. \par 
 Since Theorem \ref{thm:Mag. squared theorem ext.} will be used in Sections \ref{sec:Unbiased Predictive Risk Estimator} and \ref{sec:Discrepancy Principle}, some statistics regarding the noncentral chi-squared distribution will be stated for later convenience. 
 \begin{theorem}
 \label{thm:NCchi Mean and Var}
@@ -420,25 +420,25 @@ The variance of $X$ is calculated in a similar way:
 \noindent Using the results from Theorem \ref{thm:Mag. squared theorem ext.}, Theorem \ref{thm:NCchi Mean and Var} has the following corollary. 
 \begin{corollary}
 \label{cor:gnoise Mean and Var}
-Let $\gnoiseVec$ be a random $n$-vector with $\gnoiseVec \sim \mathcal{N}(\gVec,\noiseSD^2 I)$, $J = \{0,n/2\}$ if $n$ is even and $J = \{0\}$ if $n$ is odd. Define the diagonal matrix $M$ by
+Let $\dVec$ be a random $n$-vector with $\dVec \sim \mathcal{N}(\bVec,\noiseSD^2 I)$, $J = \{0,n/2\}$ if $n$ is even and $J = \{0\}$ if $n$ is odd. Define the diagonal matrix $M$ by
 \[M_{j,j} = \begin{cases}
 1/\noiseSD & j \in J \\
 \sqrt{2}/\noiseSD & j \not\in J
 \end{cases}.\]
 Then 
-\[\E\left(|(M\dft{\gnoiseVec})_j|^2\right) = \begin{cases}
+\[\E\left(|(M\dft{\dVec})_j|^2\right) = \begin{cases}
 \dfrac{1}{2}\left(2 + \dfrac{|\dft{g}_j|^2}{\noiseSD^2}\right), & j \in J \\
 2 + \dfrac{|\dft{g}_j|^2}{\noiseSD^2}, & j \not\in J \end{cases}\]
 and
-\[\Var\left(|(M\dft{\gnoiseVec})_j|^2\right) = \begin{cases}
+\[\Var\left(|(M\dft{\dVec})_j|^2\right) = \begin{cases}
 2\left(1 + \dfrac{|\dft{g}_j|^2}{\noiseSD^2}\right), & j \in J \\
 4\left(1 + \dfrac{|\dft{g}_j|^2}{\noiseSD^2}\right), & j \not\in J \end{cases}.\]
 \end{corollary}
 
-The final statistical result presented here is the covariance of $|M_j\dft{\gnoiseVec}_j|^2$ and $|M_k\dft{\gnoiseVec}_k|^2$, which will be used in Chapter \ref{ch:Parameter estimation methods}.  
+The final statistical result presented here is the covariance of $|M_j\dft{\dVec}_j|^2$ and $|M_k\dft{\dVec}_k|^2$, which will be used in Chapter \ref{ch:Parameter estimation methods}.  
 
 % Here is the univariate approach
-A step in Theorem \ref{thm:Cov of mag squared} is to determine covariances between components of $M\dft{\gnoiseVec} = M\dft{\gVec} + M\dft{\noiseVec}$. Lemma \ref{lem:App of Ind Thm 2} establishes that the real and imaginary parts of $M\dft{\noiseVec}$ are independent, but Lemma \ref{lem:App of Ind Thm 3} establishes the relationship between any two real or imaginary components of $M\dft{\noiseVec}$.
+A step in Theorem \ref{thm:Cov of mag squared} is to determine covariances between components of $M\dft{\dVec} = M\dft{\bVec} + M\dft{\noiseVec}$. Lemma \ref{lem:App of Ind Thm 2} establishes that the real and imaginary parts of $M\dft{\noiseVec}$ are independent, but Lemma \ref{lem:App of Ind Thm 3} establishes the relationship between any two real or imaginary components of $M\dft{\noiseVec}$.
 
 \begin{lemma}
 \label{lem:App of Ind Thm 3}
@@ -560,17 +560,17 @@ where the last equality is given by Lemma \ref{lem:Inner products}. The proof of
 %and $\pdet(\noiseSD^2 MB^2M) = \pdet(\noiseSD^2 MA^2M)$ for $n \geq 3$.
 %\end{corollary}
 
-The covariance of $|M_j\dft{\gnoiseVec}_j|^2$ and $|M_k\dft{\gnoiseVec}_k|^2$ for $0 \leq j < k \leq n-1$ can now be determined.
+The covariance of $|M_j\dft{\dVec}_j|^2$ and $|M_k\dft{\dVec}_k|^2$ for $0 \leq j < k \leq n-1$ can now be determined.
 
 \begin{theorem}
 \label{thm:Cov of mag squared}
-Let $\gnoiseVec$ be a random $n$-vector with $\gnoiseVec \sim \mathcal{N}(\gVec,\noiseSD^2 I)$, $J = \{0,n/2\}$ if $n$ is even and $J = \{0\}$ if $n$ is odd. Define the diagonal matrix $M$ by
+Let $\dVec$ be a random $n$-vector with $\dVec \sim \mathcal{N}(\bVec,\noiseSD^2 I)$, $J = \{0,n/2\}$ if $n$ is even and $J = \{0\}$ if $n$ is odd. Define the diagonal matrix $M$ by
 \[M_{j,j} = \begin{cases}
 1/\noiseSD & j \in J \\
 \sqrt{2}/\noiseSD & j \not\in J
 \end{cases}.\]
 Then for $0 \leq j < k \leq n-1$,
-\[\Cov\left(|M_j\dft{\gnoiseVec}_j|^2,|M_k\dft{\gnoiseVec}_k|^2\right) = \begin{cases}
+\[\Cov\left(|M_j\dft{\dVec}_j|^2,|M_k\dft{\dVec}_k|^2\right) = \begin{cases}
 4\left(1 + \dfrac{|\dft{g}_j|^2}{\noiseSD^2}\right), & j + k = n \\
 0, & j + k \neq 0
 \end{cases}.\]
@@ -578,19 +578,19 @@ Then for $0 \leq j < k \leq n-1$,
 \begin{proof}
 By the linearity of covariance and rewriting the magnitudes squared in terms of real and imaginary parts,
 \begin{align*}
-&\Cov\left(|M_j\dft{\gnoiseVec}_j|^2,|M_k\dft{\gnoiseVec}_k|^2\right) \\
-&= \Cov\left(\Re(M_j\dft{\gnoiseVec}_j)^2 + \Im(M_j\dft{\gnoiseVec}_j)^2, \Re(M_k\dft{\gnoiseVec}_k)^2 + \Im(M_k\dft{\gnoiseVec}_k)^2\right) \\
-&= \Cov\left(\Re(M_j\dft{\gnoiseVec}_j)^2 ,\Re(M_k\dft{\gnoiseVec}_k)^2\right) + \Cov\left(\Re(M_j\dft{\gnoiseVec}_j)^2 ,\Im(M_k\dft{\gnoiseVec}_k)^2\right) \\
-&+ \Cov\left(\Im(M_j\dft{\gnoiseVec}_j)^2 ,\Re(M_k\dft{\gnoiseVec}_k)^2\right) + \Cov\left(\Im(M_j\dft{\gnoiseVec}_j)^2 ,\Im(M_k\dft{\gnoiseVec}_k)^2\right).
+&\Cov\left(|M_j\dft{\dVec}_j|^2,|M_k\dft{\dVec}_k|^2\right) \\
+&= \Cov\left(\Re(M_j\dft{\dVec}_j)^2 + \Im(M_j\dft{\dVec}_j)^2, \Re(M_k\dft{\dVec}_k)^2 + \Im(M_k\dft{\dVec}_k)^2\right) \\
+&= \Cov\left(\Re(M_j\dft{\dVec}_j)^2 ,\Re(M_k\dft{\dVec}_k)^2\right) + \Cov\left(\Re(M_j\dft{\dVec}_j)^2 ,\Im(M_k\dft{\dVec}_k)^2\right) \\
+&+ \Cov\left(\Im(M_j\dft{\dVec}_j)^2 ,\Re(M_k\dft{\dVec}_k)^2\right) + \Cov\left(\Im(M_j\dft{\dVec}_j)^2 ,\Im(M_k\dft{\dVec}_k)^2\right).
 \end{align*}
-By Lemma \ref{lem:App of Ind Thm 2}, $\Re(M_j\dft{\gnoiseVec}_j)^2$ and $\Im(M_k\dft{\gnoiseVec}_k)^2$ are independent for all $0 \leq j,k \leq n-1$, meaning that their covariance is zero. Thus, the covariance simplifies to
+By Lemma \ref{lem:App of Ind Thm 2}, $\Re(M_j\dft{\dVec}_j)^2$ and $\Im(M_k\dft{\dVec}_k)^2$ are independent for all $0 \leq j,k \leq n-1$, meaning that their covariance is zero. Thus, the covariance simplifies to
 \begin{align*}
-    \Cov\left(|M_j\dft{\gnoiseVec}_j|^2,|M_k\dft{\gnoiseVec}_k|^2\right) &= \Cov\left(\Re(M_j\dft{\gnoiseVec}_j)^2 ,\Re(M_k\dft{\gnoiseVec}_k)^2\right) \\
-    &+ \Cov\left(\Im(M_j\dft{\gnoiseVec}_j)^2 ,\Im(M_k\dft{\gnoiseVec}_k)^2\right).
+    \Cov\left(|M_j\dft{\dVec}_j|^2,|M_k\dft{\dVec}_k|^2\right) &= \Cov\left(\Re(M_j\dft{\dVec}_j)^2 ,\Re(M_k\dft{\dVec}_k)^2\right) \\
+    &+ \Cov\left(\Im(M_j\dft{\dVec}_j)^2 ,\Im(M_k\dft{\dVec}_k)^2\right).
 \end{align*}
-A further simplification can be made by using $\dft{\gnoiseVec} = \dft{\gVec} + \dft{\noiseVec}$ and expanding the squared terms:
+A further simplification can be made by using $\dft{\dVec} = \dft{\bVec} + \dft{\noiseVec}$ and expanding the squared terms:
 \begin{align*}
-&\Cov\left(\Re(M_j\dft{\gnoiseVec}_j)^2 ,\Re(M_k\dft{\gnoiseVec}_k)^2\right) \\
+&\Cov\left(\Re(M_j\dft{\dVec}_j)^2 ,\Re(M_k\dft{\dVec}_k)^2\right) \\
 &= \Cov\left([\Re(M_j\dft{g}_j) + \Re(M_j\dft{\noise}_j)]^2,[\Re(M_k\dft{g}_k) + \Re(M_k\dft{\noise}_k)]^2\right) \\
 &= \Cov\left(\Re(M_j\dft{g}_j)^2,\Re(M_k\dft{g}_k)^2\right) + \Cov\left(\Re(M_j\dft{g}_j)^2, 2\Re(M_k\dft{g}_k)\Re(M_k\dft{\noise}_k)\right) \\
 &+ \Cov\left(\Re(M_j\dft{g}_j)^2, \Re(M_k\dft{\noise}_k)^2\right) + \Cov\left(2\Re(M_j\dft{g}_j)\Re(M_j\dft{\noise}_j), \Re(M_k\dft{g}_k)^2 )\right) \\
@@ -600,7 +600,7 @@ A further simplification can be made by using $\dft{\gnoiseVec} = \dft{\gVec} + 
 \end{align*}
 While this certainly appears to be the opposite of a simplification, any covariance term with an argument not containing $\dft{\noise}_j$ or $\dft{\noise}_k$ is zero. Five of the nine covariance terms are thus removed, leaving
 \begin{align*}
-\Cov\left(\Re(M_j\dft{\gnoiseVec}_j)^2 ,\Re(M_k\dft{\gnoiseVec}_k)^2\right) 
+\Cov\left(\Re(M_j\dft{\dVec}_j)^2 ,\Re(M_k\dft{\dVec}_k)^2\right) 
 &= \Cov\left(2\Re(M_j\dft{g}_j)\Re(M_j\dft{\noise}_j), 2\Re(M_k\dft{g}_k)\Re(M_k\dft{\noise}_k)\right) \\
 &+ \Cov\left(2\Re(M_j\dft{g}_j)\Re(M_j\dft{\noise}_j), \Re(M_k\dft{\noise}_k)^2 )\right) \\
 &+ \Cov\left(\Re(M_j\dft{\noise}_j)^2, 2\Re(M_k\dft{g}_k)\Re(M_k\dft{\noise}_k)\right) \\
@@ -608,14 +608,14 @@ While this certainly appears to be the opposite of a simplification, any covaria
 \end{align*}
 The constant coefficients can be factored and combined so that
 \begin{align*}
-\Cov\left(\Re(M_j\dft{\gnoiseVec}_j)^2 ,\Re(M_k\dft{\gnoiseVec}_k)^2\right) 
+\Cov\left(\Re(M_j\dft{\dVec}_j)^2 ,\Re(M_k\dft{\dVec}_k)^2\right) 
 &= [4\Re(M_j\dft{g}_j)\Re(M_k\dft{g}_k)]\Cov\left(\Re(M_j\dft{\noise}_j), \Re(M_k\dft{\noise}_k)\right) \\
 &+ [2\Re(M_j\dft{g}_j)]\Cov\left(\Re(M_j\dft{\noise}_j), \Re(M_k\dft{\noise}_k)^2 )\right) \\
 &+ [2\Re(M_k\dft{g}_k)]\Cov\left(\Re(M_j\dft{\noise}_j)^2, \Re(M_k\dft{\noise}_k)\right) \\
 &+ \Cov\left(\Re(M_j\dft{\noise}_j)^2,\Re(M_k\dft{\noise}_k)^2\right).
 \end{align*}
 Let $A$ be the real part of the Fourier matrix \eqref{eq:DFT-Matrix}. Then $\Re(M_j\dft{\noise}_j) = (MA\noiseVec)_j$ for all $0 \leq j \leq n-1$. Lemma \ref{lem:App of Ind Thm 2} states that $(MA\noiseVec)_j$ and $(MA\noiseVec)_k$ are independent for all $0 \leq j < k \leq n-1$ with $j+k \neq n$ and $(MA\noiseVec)_j = (MA\noiseVec)_k$ when $j+k = n$. Thus all of the covariance terms above are zero when $j + k \neq n$. As for the $j + k = n$ case, Theorem \ref{thm:Mag. squared theorem ext.} yields the final result:
-\[\Cov\left(|M_j\dft{\gnoiseVec}_j|^2,|M_k\dft{\gnoiseVec}_k|^2\right) = \Var\left(|M_j\dft{\gnoiseVec}_j|^2\right) = 4\left(1 + \frac{|\dft{g}_j|^2}{\noiseSD^2}\right), \qquad j+k = n.\]
+\[\Cov\left(|M_j\dft{\dVec}_j|^2,|M_k\dft{\dVec}_k|^2\right) = \Var\left(|M_j\dft{\dVec}_j|^2\right) = 4\left(1 + \frac{|\dft{g}_j|^2}{\noiseSD^2}\right), \qquad j+k = n.\]
 
 % Looking at the joint distributions:
 
@@ -654,18 +654,18 @@ Let $A$ be the real part of the Fourier matrix \eqref{eq:DFT-Matrix}. Then $\Re(
 
 \section{DCT of white noise} \label{ch:DCT of white noise}
 
-The primary challenge in dealing with statistics of the DFT applied to white noise is that the covariance matrices of $A\gnoiseVec$ and $B\gnoiseVec$ ($A$ and $B$ representing the real and imaginary parts of the DFT matrix $F$, respectively) are singular. Fortunately, this is not the case for the DCT. \par 
+The primary challenge in dealing with statistics of the DFT applied to white noise is that the covariance matrices of $A\dVec$ and $B\dVec$ ($A$ and $B$ representing the real and imaginary parts of the DFT matrix $F$, respectively) are singular. Fortunately, this is not the case for the DCT. \par 
 Let $C$ be the $n \times n$ DCT matrix defined by \eqref{eq:DCT matrix}, $\noiseVec \sim \mathcal{N}(\mathbf{0},\noiseSD^2 I)$, and $\dct{\noiseVec} = C\noiseVec$. By the orthogonality of $C$ and properties of the multivariate normal distribution, 
 \begin{equation}
 \dct{\noiseVec} \sim \mathcal{N}(C\mathbf{0},\noiseSD^2 \trans{C}C) = \mathcal{N}\left(\mathbf{0},\noiseSD^2 I\right).
 \label{eq:DCT Noise}
 \end{equation}
 Thus the distribution of $\noiseVec$ is preserved under the DCT. More generally,
-\[\dct{\gnoiseVec} \sim \mathcal{N}\left(\dct{\gnoiseVec},\noiseSD^2 I\right)\]
-where $\gnoiseVec = \gVec + \noiseVec$. Therefore the DCT-version of Theorem \ref{thm:Mag. squared theorem ext.} is more simple.
+\[\dct{\dVec} \sim \mathcal{N}\left(\dct{\dVec},\noiseSD^2 I\right)\]
+where $\dVec = \bVec + \noiseVec$. Therefore the DCT-version of Theorem \ref{thm:Mag. squared theorem ext.} is more simple.
 \begin{theorem}
-Let $\gnoiseVec$ be a random $n$-vector with $\gnoiseVec \sim \mathcal{N}(\gVec,\noiseSD^2 I)$ and let $\dct{\gnoiseVec}$ denote the DCT of $\gnoiseVec$. Then for all $0 \leq j \leq n-1$,
-\[\frac{1}{\noiseSD^2}\left|\dct{\gnoiseVec}_j\right|^2 \sim \NCchi\left(1,\frac{1}{2\noiseSD^2}\left(\dct{g}_j\right)^2\right)\]
+Let $\dVec$ be a random $n$-vector with $\dVec \sim \mathcal{N}(\bVec,\noiseSD^2 I)$ and let $\dct{\dVec}$ denote the DCT of $\dVec$. Then for all $0 \leq j \leq n-1$,
+\[\frac{1}{\noiseSD^2}\left|\dct{\dVec}_j\right|^2 \sim \NCchi\left(1,\frac{1}{2\noiseSD^2}\left(\dct{g}_j\right)^2\right)\]
 where $\NCchi^2(k,\lambda)$ denotes the noncentral chi-squared distribution with $k$ degrees of freedom and noncentrality parameter $\lambda$.
 \label{thm:DCT Dist}
 \end{theorem}
@@ -679,7 +679,7 @@ The techniques utilized in the proof of Theorem \ref{thm:Mag. squared theorem} c
 The expected value and variance then follow directly from Theorem \ref{thm:NCchi Mean and Var}.
 
 \begin{lemma}
-Let $\gnoiseVec$ be a random $n$-vector with $\gnoiseVec \sim \mathcal{N}(\gVec,\noiseSD^2 I)$ and let $\dct{\gnoiseVec}$ denote the DCT of $\gnoiseVec$. Then for all $0 \leq j \leq n-1$,
+Let $\dVec$ be a random $n$-vector with $\dVec \sim \mathcal{N}(\bVec,\noiseSD^2 I)$ and let $\dct{\dVec}$ denote the DCT of $\dVec$. Then for all $0 \leq j \leq n-1$,
 \[\E\left(\frac{1}{\noiseSD^2}\left(\dct{g}_j\right)^2\right) = 1 + \frac{1}{2\noiseSD^2}\left(\dct{g}_j\right)^2, \quad \Var\left(\frac{1}{\noiseSD^2}\left(\dct{g}_j\right)^2\right) = 2 + \frac{2}{\noiseSD^2}\left(\dct{g}_j\right)^2.\]
 \label{lem:DCT Exp and Var}
 \end{lemma}

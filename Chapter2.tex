@@ -4,19 +4,19 @@ A number of analytic tools will be utilized. The singular value decomposition an
 
 \section{The Singular Value Decomposition} \label{sec:SVD}
 
-Direct matrix inversion is not always practical, and not even possible when $\kMat$ can be singular. Fortunately, the singular value decomposition (SVD) of $\kMat$ can used instead if the system is not too large. Even for problems resulting in large discrete systems, the SVD is useful for analyzing solution methods.  Assuming $\kMat$ is a real $m \times n$ matrix, the SVD of $\kMat$ is
+Direct matrix inversion is not always practical, and not even possible when $A$ can be singular. Fortunately, the singular value decomposition (SVD) of $A$ can used instead if the system is not too large. Even for problems resulting in large discrete systems, the SVD is useful for analyzing solution methods.  Assuming $A$ is a real $m \times n$ matrix, the SVD of $A$ is
 \begin{equation}
-\kMat = U\Sigma\trans{V}
+A = U\Sigma\trans{V}
 \label{eq:SVD}
 \end{equation}
-where the $m \times m$ matrix $U$ and the $n \times n$ matrix $V$ have orthogonal columns and $\Sigma$ is a $m \times n$ diagonal matrix. The diagonal elements of $\Sigma$ are the singular values of $\kMat$, denoted $\singular_\ell$ and satisfying $\singular_0 \geq \singular_1 \geq \ldots \geq \singular_{n-1} \geq 0$. The columns of $U$ and $V$ will be denoted $U_{\cdot,\ell}$ and $V_{\cdot,\ell}$, respectively; these vectors are known as the left and right singular vectors of $\kMat$, respectively. A matrix of complex values has a SVD as well, the only difference being that the transpose is replaced with conjugate transpose. \par
-Let $r$ denote the rank of $\kMat$. Then $\singular_0 \geq \ldots \geq \singular_{r-1} > 0$, i.e. the number of nonzero singular values of $\kMat$ is equal to the rank of $\kMat$.  A common variation of the SVD is the compact SVD (or economy SVD \cite{GolubVanLoan2013}), in which $\Sigma = \diag(\singular_0,\ldots,\singular_{r-1})$, $U$ is an $m \times r$ matrix and $\trans{V}$ is an $r \times n$ matrix. The matrices $U$ and $V$ are no longer orthogonal in the traditional sense because they are not square (unless $\kMat$ is nonsingular). Instead, $U$ and $V$ are column orthonormal. \par 
-By using $\kMat^{-1} = V\Sigma^{-1}\trans{U}$ when $\kMat$ is nonsingular, the product $\kMat^{-1}\gnoiseVec$ is
+where the $m \times m$ matrix $U$ and the $n \times n$ matrix $V$ have orthogonal columns and $\Sigma$ is a $m \times n$ diagonal matrix. The diagonal elements of $\Sigma$ are the singular values of $A$, denoted $\singular_\ell$ and satisfying $\singular_0 \geq \singular_1 \geq \ldots \geq \singular_{n-1} \geq 0$. The columns of $U$ and $V$ will be denoted $U_{\cdot,\ell}$ and $V_{\cdot,\ell}$, respectively; these vectors are known as the left and right singular vectors of $A$, respectively. A matrix of complex values has a SVD as well, the only difference being that the transpose is replaced with conjugate transpose. \par
+Let $r$ denote the rank of $A$. Then $\singular_0 \geq \ldots \geq \singular_{r-1} > 0$, i.e. the number of nonzero singular values of $A$ is equal to the rank of $A$.  A common variation of the SVD is the compact SVD (or economy SVD \cite{GolubVanLoan2013}), in which $\Sigma = \diag(\singular_0,\ldots,\singular_{r-1})$, $U$ is an $m \times r$ matrix and $\trans{V}$ is an $r \times n$ matrix. The matrices $U$ and $V$ are no longer orthogonal in the traditional sense because they are not square (unless $A$ is nonsingular). Instead, $U$ and $V$ are column orthonormal. \par 
+By using $\inv{A} = V\inv{\Sigma}\trans{U}$ when $A$ is nonsingular, the product $\inv{A}\dVec$ is
 \begin{equation}
-\kMat^{-1}\gnoiseVec = \kMat^{-1}\left(\kMat\fVec + \noiseVec\right) = \fVec + \kMat^{-1}\noiseVec = \fVec + V\Sigma^{-1}\trans{U}\noiseVec = \fVec + \sum_{\ell = 0}^{n-1} \frac{\trans{U}_\ell\noiseVec}{\singular_\ell}V_{\cdot,\ell}. 
+\inv{A}\dVec = \inv{A}\left(A\xVec + \noiseVec\right) = \xVec + \inv{A}\noiseVec = \xVec + V\inv{\Sigma}\trans{U}\noiseVec = \xVec + \sum_{\ell = 0}^{n-1} \frac{\trans{U}_\ell\noiseVec}{\singular_\ell}V_{\cdot,\ell}. 
 \label{eq:InvProd}
 \end{equation}
-Even if $\kMat$ is singular, a solution can still be obtained by using the pseudoinverse $\kMat^\dagger = V{\Sigma^\dagger}\trans{U}$, where $\Sigma^\dagger = \diag(1/\singular_0,\ldots,1/\singular_{r-1})$, and the upper bound of summation in \eqref{eq:InvProd} becomes $r-1$. 
+Even if $A$ is singular, a solution can still be obtained by using the pseudoinverse $\pinv{A} = V\pinv{\Sigma}\trans{U}$, where $\pinv{\Sigma} = \diag(1/\singular_0,\ldots,1/\singular_{r-1})$, and the upper bound of summation in \eqref{eq:InvProd} becomes $r-1$. 
 % The pseudoinverse, also called the Moore-Penrose generalized inverse \cite{Penrose1955}, is the unique matrix $\pinv{A} \in \mathbb{R}^{n \times \mA}$ that satisfies the following Moore-Penrose conditions \cite[p.~290]{GolubVanLoan2013}:
 % \begin{enumerate}[label={(\Roman*)}]
 %     \begin{minipage}{0.45\linewidth}
@@ -127,10 +127,10 @@ Even if $\kMat$ is singular, a solution can still be obtained by using the pseud
 %   \end{center}
 % \end{table}
 % Table \ref{tab:Cases for A} summarizes the situations involving $\pinv{\xVec}$ as a solution to $A\xVec = \dVec$.
-In either the nonsingular or singular case for $\kMat$, however, the summands in \eqref{eq:InvProd} are numerically unstable for small $\singular_\ell$. For a visual representation of this instability, a Picard plot can be constructed. A Picard plot is a graph showing the terms $|\trans{U}_{\cdot,\ell}\noiseVec|/\singular_\ell$ in decreasing order with respect to the singular values. If the terms $|\trans{U}_{\cdot,\ell}\noiseVec|$ decay faster than $\singular_\ell$ as $\ell$ increases, then the terms $|\trans{U}_{\cdot,\ell}\noiseVec|/\singular_\ell$ do not become excessively large; this is the discrete Picard condition \cite{ABT}. The discrete Picard condition is thus a measure of instability. If the discrete Picard condition is not met, then the terms $|\trans{U}_{\cdot,\ell}\noiseVec|/\singular_\ell$ blow up as $\ell$ increases, often resulting in worthless solutions. In this report, the discrete Fourier and cosine transforms will be used to obtain solutions analogous to those obtained by \eqref{eq:InvProd}. Figure \ref{PicardPlot} in Chapter \ref{ch:Results} is an example of a Picard plot is provided that demonstrates the relationship between the noise, the width of the Gaussian blur, and the resulting numerical instabilities related to obtaining meaningful solutions. See \cite{Hansen1990} for more information on Picard plots and the associated discrete Picard condition. \par 
+In either the nonsingular or singular case for $A$, however, the summands in \eqref{eq:InvProd} are numerically unstable for small $\singular_\ell$. For a visual representation of this instability, a Picard plot can be constructed. A Picard plot is a graph showing the terms $|\trans{U}_{\cdot,\ell}\noiseVec|/\singular_\ell$ in decreasing order with respect to the singular values. If the terms $|\trans{U}_{\cdot,\ell}\noiseVec|$ decay faster than $\singular_\ell$ as $\ell$ increases, then the terms $|\trans{U}_{\cdot,\ell}\noiseVec|/\singular_\ell$ do not become excessively large; this is the discrete Picard condition \cite{ABT}. The discrete Picard condition is thus a measure of instability. If the discrete Picard condition is not met, then the terms $|\trans{U}_{\cdot,\ell}\noiseVec|/\singular_\ell$ blow up as $\ell$ increases, often resulting in worthless solutions. In this report, the discrete Fourier and cosine transforms will be used to obtain solutions analogous to those obtained by \eqref{eq:InvProd}. Figure \ref{PicardPlot} in Chapter \ref{ch:Results} is an example of a Picard plot is provided that demonstrates the relationship between the noise, the width of the Gaussian blur, and the resulting numerical instabilities related to obtaining meaningful solutions. See \cite{Hansen1990} for more information on Picard plots and the associated discrete Picard condition. \par 
 A common approach to overcome numerical instabilities is to multiply the summands in \eqref{eq:InvProd} by \textit{filter functions} $\filt$ that depend upon $\singular_\ell$ and a non-negative \textit{regularization parameter} $\regparam$. By doing so, an approximate solution is obtained:
 \begin{equation}
-\fVec_\regparam = \sum_{\ell = 0}^{n-1} V_{\cdot,\ell}\filt(\regparam,\singular_\ell)\left(\frac{{\trans{U}_\ell}\gnoiseVec}{\singular_\ell}\right) = V\Phi\Sigma^\dagger \trans{U}\gnoiseVec,
+\xVec_\regparam = \sum_{\ell = 0}^{n-1} V_{\cdot,\ell}\filt(\regparam,\singular_\ell)\left(\frac{{\trans{U}_\ell}\dVec}{\singular_\ell}\right) = V\Phi\Sigma^\dagger \trans{U}\dVec,
 \label{eq:ApproxSol}
 \end{equation}
 where the matrix $\Phi$ is diagonal with $\Phi_{\ell,\ell} = \filt(\regparam,\singular_\ell)$ for $\ell = 0,\ldots,{n-1}$. The most desired property of the filter functions is that $\filt(\singular_\ell)/\singular_\ell \approx 1$  for large values of $\singular_\ell$ and $\filt(\singular_\ell)/\singular_\ell \approx 0$ for small values of $\singular_\ell$.  Perhaps the simplest filter function is
@@ -139,8 +139,8 @@ where the matrix $\Phi$ is diagonal with $\Phi_{\ell,\ell} = \filt(\regparam,\si
 0, & \singular_\ell^2 \leq \regparam
 \end{cases}\]
 Using this function in (3) gives the approximate solution
-\[\fVec_\regparam = \sum_{\singular_\ell^2 > \regparam} \frac{{\trans{U}_\ell}\gnoiseVec}{\singular_\ell}V_{\cdot,\ell}\]
-which actually corresponds to the solution obtained using a truncated singular value decomposition (TSVD) of the matrix $\kMat$ \cite[p.~3-5]{Vogel:2002}. \par
+\[\xVec_\regparam = \sum_{\singular_\ell^2 > \regparam} \frac{{\trans{U}_\ell}\dVec}{\singular_\ell}V_{\cdot,\ell}\]
+which actually corresponds to the solution obtained using a truncated singular value decomposition (TSVD) of the matrix $A$ \cite[p.~3-5]{Vogel:2002}. \par
 
 \section{Tikhonov regularization} \label{sec:Tikhonov reg.}
 
@@ -164,35 +164,35 @@ to simplify notation. In contrast to \eqref{eq:TikFilt}, \eqref{eq:TikFiltPsi} i
 
 The use of the Tikhonov filter function to generate an approximate solution is known as \textit{Tikhonov regularization} \cite{Tikh1963}; in terms of an SVD, the obtained solution is
 \begin{equation}
-\fVec_\regparam = \sum_{\ell = 1}^n \filt(\regparam,\singular_\ell)\frac{{\trans{U}_\ell}\gnoiseVec}{\singular_\ell}V_{\cdot,\ell} = \sum_{\ell = 0}^{n-1} \frac{\singular_\ell{\trans{U}_\ell}\gnoiseVec}{\singular_\ell^2 + \regparam^2}V_{\cdot,\ell} = V\Phi\Sigma^\dagger \trans{U}\gnoiseVec.
+\xVec_\regparam = \sum_{\ell = 1}^n \filt(\regparam,\singular_\ell)\frac{{\trans{U}_\ell}\dVec}{\singular_\ell}V_{\cdot,\ell} = \sum_{\ell = 0}^{n-1} \frac{\singular_\ell{\trans{U}_\ell}\dVec}{\singular_\ell^2 + \regparam^2}V_{\cdot,\ell} = V\Phi\Sigma^\dagger \trans{U}\dVec.
 \label{eq:TikSol}
 \end{equation}
 An alternative (and more general) representation of the above Tikhonov solution is
 \begin{equation}
-\fVec_\regparam = \argmin_{\fVec \in \mathbb{R}^n} \left\{\|\kMat\fVec - \gnoiseVec\|^2 + \regparam^2\|D\fVec\|^2\right\},
+\xVec_\regparam = \argmin_{\xVec \in \mathbb{R}^n} \left\{\|A\xVec - \dVec\|^2 + \regparam^2\|D\xVec\|^2\right\},
 \label{eq:TikSol2}
 \end{equation}
-where $D$ is the matrix representation of a linear operator and $\|\cdot\|$ is the 2-norm. The term $\|D\fVec\|^2$ is commonly called the penalty function \cite{Vogel:2002}. The representation \eqref{eq:TikSol} follows from selecting $D$ to be $I$, the $n \times n$ identity matrix. The solution \eqref{eq:TikSol2} can also be expressed in block form as
+where $D$ is the matrix representation of a linear operator and $\|\cdot\|$ is the 2-norm. The term $\|D\xVec\|^2$ is commonly called the penalty function \cite{Vogel:2002}. The representation \eqref{eq:TikSol} follows from selecting $D$ to be $I$, the $n \times n$ identity matrix. The solution \eqref{eq:TikSol2} can also be expressed in block form as
 \begin{equation}
-\fVec_\regparam = \argmin_{\fVec \in \mathbb{R}^n} \left\| \begin{bmatrix}
-\kMat \\
+\xVec_\regparam = \argmin_{\xVec \in \mathbb{R}^n} \left\| \begin{bmatrix}
+A \\
 \regparam D
-\end{bmatrix}\fVec - \begin{bmatrix}
-\gnoiseVec \\
+\end{bmatrix}\xVec - \begin{bmatrix}
+\dVec \\
 \zeroVec
 \end{bmatrix} \right\|^2.
 \label{eq:TikSol3}
 \end{equation}
-If the matrix $D$ in \eqref{eq:TikSol2} is non-singular, then the substitutions $\mathbf{y} = D\fVec$, $A = \kMat{D}^{-1}$, and $\mathbf{b} = \gnoiseVec$ give
+If the matrix $D$ in \eqref{eq:TikSol2} is non-singular, then the substitutions $\mathbf{y} = D\xVec$, $B = A\inv{D}$, and $\mathbf{v} = \dVec$ give
 \begin{equation}
-\mathbf{y}(\regparam) = \argmin_{\mathbf{y} \in \mathbb{R}^n} \|A\mathbf{y} - \mathbf{b}\|^2 + \regparam^2\|\mathbf{y}\|^2.
+\mathbf{y}(\regparam) = \argmin_{\mathbf{y} \in \mathbb{R}^n} \|B\mathbf{y} - \mathbf{v}\|^2 + \regparam^2\|\mathbf{y}\|^2.
 \label{eq:TikSol Standard Form}
 \end{equation}
-This is known as standard form of the regularization problem. Once $\mathbf{y}$ is obtained from \eqref{eq:TikSol Standard Form}, the final solution is recovered by $\fVec = D^{-1}\mathbf{y}$.  \par 
-However, there are many examples of matrices $D$ that are singular, such as finite difference matrices that approximate derivative operators. In such cases, the regularization can still be recast in standard form, which can be accomplished in a convenient way using the generalized singular value decomposition (GSVD). To simplify the derivation of the GSVD, it will be assumed that the matrix $\trans{[\kMat, \regparam D]}$ in \eqref{eq:TikSol3} has full column rank, i.e. $\nullspace(\kMat) \cap \nullspace(D) = \varnothing$, which ensures that the solution $\fVec_\regparam$ is unique. Another simplifying assumption being that the $p \times n$ matrix $D$ with $p \leq n$ has full row rank. Under these assumptions \cite[p.~104]{ABT}, the matrices $\kMat$ and $D$ can be expressed as
+This is known as standard form of the regularization problem. Once $\mathbf{y}$ is obtained from \eqref{eq:TikSol Standard Form}, the final solution is recovered by $\xVec = \inv{D}\mathbf{y}$.  \par 
+However, there are many examples of matrices $D$ that are singular, such as finite difference matrices that approximate derivative operators. In such cases, the regularization can still be recast in standard form, which can be accomplished in a convenient way using the generalized singular value decomposition (GSVD). To simplify the derivation of the GSVD, it will be assumed that the matrix $\trans{[A, \regparam D]}$ in \eqref{eq:TikSol3} has full column rank, i.e. $\nullspace(A) \cap \nullspace(D) = \varnothing$, which ensures that the solution $\xVec_\regparam$ is unique. Another simplifying assumption being that the $p \times n$ matrix $D$ with $p \leq n$ has full row rank. Under these assumptions \cite[p.~104]{ABT}, the matrices $A$ and $D$ can be expressed as
 \begin{equation}
 \label{eq:GSVD matrices}
-\kMat = U\Lambda \trans{X}, \quad D = VM\trans{X}
+A = U\Lambda \trans{X}, \quad D = VM\trans{X}
 \end{equation}
 where the matrices $U$, $V$, $\Lambda$, $M$, and $X$ satisfy the following: 
 \begin{itemize}
@@ -205,7 +205,7 @@ where $k = 0$ if $m > n$ and $k = n-m$ otherwise.
 \item $\trans{M} M + \trans{\Lambda} \Lambda = I$ (the dimension of the identity matrix being $n \times n$).
 \item $X$ is a nonsingular $n \times n$ matrix.
 \end{itemize}
-The generalized singular values of $\kMat$ and $D$ are defined as $\gamma_\ell = \lambda_{\ell}/\mu_{\ell}$, where
+The generalized singular values of $A$ and $D$ are defined as $\gamma_\ell = \lambda_{\ell}/\mu_{\ell}$, where
 \begin{equation}
 \label{eq:GSVD lambda}
 \lambda_\ell = \sqrt{(\trans{\Lambda} \Lambda)_{\ell,\ell}}, \quad \mu_\ell = \sqrt{(\trans{M} M)_{\ell,\ell}}
@@ -213,7 +213,7 @@ The generalized singular values of $\kMat$ and $D$ are defined as $\gamma_\ell =
 for $\ell = 0,\ldots,{n-1}$. In contrast to the SVD, the generalized singular values are ordered $\gamma_0 \leq \ldots \leq \gamma_{n-1}$. It is also possible that $\mu_\ell = 0$ for some $\ell$, in which case $\gamma_\ell$ is not defined. Even when $\mu_\ell$ is small the resulting value of $\gamma_\ell$ can be excessively large, again emphasizing the need for regularization. By applying the orthogonality properties of the GSVD matrices \cite[p.~105-106]{ABT}, the regularized solution \eqref{eq:TikSol3} can be expressed as
 \begin{equation}
 \label{eq:TikSol GSVD}
-\fVec_\regparam = \sum_{\ell=0}^{n-1} \frac{\gamma_\ell^2}{\gamma_\ell^2 + \regparam^2} \frac{\trans{U}_{\cdot,\ell+k}\gnoiseVec}{\lambda_\ell}Y_{\cdot,\ell}
+\xVec_\regparam = \sum_{\ell=0}^{n-1} \frac{\gamma_\ell^2}{\gamma_\ell^2 + \regparam^2} \frac{\trans{U}_{\cdot,\ell+k}\dVec}{\lambda_\ell}Y_{\cdot,\ell}
 \end{equation}
 where $Y = \invTrans{X}$ (the inverse of $\trans{X}$). The terms $\gamma_\ell^2/(\gamma_\ell^2 + \regparam^2)$ are known as the GSVD filter factors, which are identical in form to the filter factors \eqref{eq:TikFilt}. \par 
 With the derivation of the GSVD established, an extension of the transformation that rendered \eqref{eq:TikSol Standard Form} is now stated \cite[p.~38]{Hansen:98}. 
@@ -257,32 +257,32 @@ With the derivation of the GSVD established, an extension of the transformation 
 % and so $\xVec_0 \in \nullspace(L)$.
 % \end{proof}
 First, a weighted version of the pseudoinverse $D^\dagger$ is defined as
-\[D_{\kMat}^\dagger = \left(I - \left(\kMat\left(I - D^\dagger D\right)\right)^\dagger \kMat\right)D^\dagger.\]
-If $p \geq n$, then $D_{\kMat}^\dagger$ is the same as $D^\dagger$. We must also consider
-\[\fVec_0 \equiv \left(\kMat\left(I - D^\dagger D\right)\right)^\dagger \gnoiseVec,\]
-which is the component of the solution contained in $\nullspace(D)$.  Using the GSVD matrices from \eqref{eq:GSVD matrices}, $D_{\kMat}^\dagger$ and $\fVec_0$ can be written as
+\[D_{A}^\dagger = \left(I - \left(A\left(I - D^\dagger D\right)\right)^\dagger A\right)D^\dagger.\]
+If $p \geq n$, then $D_{A}^\dagger$ is the same as $D^\dagger$. We must also consider
+\[\xVec_0 \equiv \left(A\left(I - D^\dagger D\right)\right)^\dagger \dVec,\]
+which is the component of the solution contained in $\nullspace(D)$.  Using the GSVD matrices from \eqref{eq:GSVD matrices}, $D_{A}^\dagger$ and $\xVec_0$ can be written as
 \begin{equation}
 \label{eq:Trans. 1}
-D_{\kMat}^\dagger = X \begin{bmatrix}
+D_{A}^\dagger = X \begin{bmatrix}
 M^{-1} \\
 \mathbf{0}
-\end{bmatrix}\trans{V}, \quad \fVec_0 = \sum_{\ell=m+1}^{n} \trans{U}_{\cdot,\ell}\gnoiseVec X_{\cdot,\ell}
+\end{bmatrix}\trans{V}, \quad \xVec_0 = \sum_{\ell=m+1}^{n} \trans{U}_{\cdot,\ell}\dVec X_{\cdot,\ell}
 \end{equation}
-where $\zeroVec$ is the zero matrix of appropriate dimension. The form of the regularized solution can be expressed as \eqref{eq:TikSol Standard Form} with substitutions $\mathbf{y} = D\fVec$, $A = \kMat{D_{\kMat}^\dagger}$, and $\mathbf{b} = \gnoiseVec - \kMat\fVec_0$. 
+where $\zeroVec$ is the zero matrix of appropriate dimension. The form of the regularized solution can be expressed as \eqref{eq:TikSol Standard Form} with substitutions $\mathbf{y} = D\xVec$, $A = A{D_{A}^\dagger}$, and $\mathbf{b} = \dVec - A\xVec_0$. 
 %This is shown by writing
 %\begin{align*}
-%\|A\mathbf{y} - \mathbf{b}\|^2 + \regparam^2\|\mathbf{y}\|^2 &= \|\kMat{D_{\kMat}^\dagger}D\fVec - (\gnoiseVec - \kMat\fVec_0)\|^2 + \regparam^2\|D\fVec\|^2 \\
-%&=  \|\kMat({D_{\kMat}^\dagger}D\fVec + \fVec_0) - \gnoiseVec\|^2 + \regparam^2\|D\fVec\|^2
+%\|A\mathbf{y} - \mathbf{b}\|^2 + \regparam^2\|\mathbf{y}\|^2 &= \|A{D_{A}^\dagger}D\xVec - (\dVec - A\xVec_0)\|^2 + \regparam^2\|D\xVec\|^2 \\
+%&=  \|A({D_{A}^\dagger}D\xVec + \xVec_0) - \dVec\|^2 + \regparam^2\|D\xVec\|^2
 %\end{align*}
 %as well as 
 %\ToDo{
 %\begin{align*}
-%{D_{\kMat}^\dagger}D\fVec + \fVec_0 &= \left(I - \left(\kMat\left(I - D^\dagger D\right)\right)^\dagger \kMat\right)D^\dagger D\fVec + \left(\kMat\left(I - D^\dagger D\right)\right)^\dagger \gnoiseVec \\
-%&= D^\dagger D\fVec - \left(\kMat\left(I - D^\dagger D\right)\right)^\dagger \kMat D^\dagger D\fVec + \left(\kMat\left(I - D^\dagger D\right)\right)^\dagger \gnoiseVec \\ 
-%&= D^\dagger D\fVec + \left(\kMat\left(I - D^\dagger D\right)\right)^\dagger \left[\gnoiseVec - \kMat D^\dagger D\fVec\right] \\
+%{D_{A}^\dagger}D\xVec + \xVec_0 &= \left(I - \left(A\left(I - D^\dagger D\right)\right)^\dagger A\right)D^\dagger D\xVec + \left(A\left(I - D^\dagger D\right)\right)^\dagger \dVec \\
+%&= D^\dagger D\xVec - \left(A\left(I - D^\dagger D\right)\right)^\dagger A D^\dagger D\xVec + \left(A\left(I - D^\dagger D\right)\right)^\dagger \dVec \\ 
+%&= D^\dagger D\xVec + \left(A\left(I - D^\dagger D\right)\right)^\dagger \left[\dVec - A D^\dagger D\xVec\right] \\
 %&= 
 %\end{align*}}
-The final solution is then recovered by $\fVec = D_{\kMat}^\dagger \mathbf{y} + \fVec_0$. 
+The final solution is then recovered by $\xVec = D_{A}^\dagger \mathbf{y} + \xVec_0$. 
 
 %\section{Discrete convolution} \label{sec:Discrete convolution}
 %As described in the Chapter \ref{ch:Introduction}, the operation of convolution arises in various settings pertaining to inverse problems. Discrete convolution will first be described  in a general setting, followed by specific instances and connections to appropriate numerical examples. \par
@@ -417,29 +417,29 @@ where $C$ is any $n \times n$ circulant matrix and $\dft{\mathbf{c}}$ is the DFT
 &= C_{j,k}.
 \end{align*}
 It should be noted that by defining the DFT with the factor of $1/n$ as part of the inverse transformation (while keeping the factor split as $(1/\sqrt{n})(1/\sqrt{n})$ in the matrix form) would allow the property to be stated simply as $C = \ctrans{F}\diag(\dft{\mathbf{c}})F$. \par 
-Now the properties of the DFT will be connected with the SVD of a circulant matrix, which will be the basis for the design of the numerical examples in \ref{sec:DFT}. Let $\fVec$ and $\kVec$ be the $N$-point discretizations of functions $f$ and $k$ on some interval $[a,b]$. Then the cyclic convolution $\gVec = \kVec * \fVec$ can be computed as a matrix-vector product by constructing an $N \times N$ circulant matrix $\kMat$ from $\kVec$. This construction is carried out by setting the first row of $\kMat$ to be $\kVec$, and each subsequent row to be a circular right shift of the preceding row (see \ref{sec:Classes of matrices}). In MATLAB, the command \texttt{toeplitz([k(1) fliplr(k(2:end))], k)} constructs the matrix $\kMat$. Then $\gVec = \kMat\fVec$, and after the addition of noise the equation \eqref{eq:DisNoise} is obtained. Then by using the property \eqref{eq:CircDiag} with the $N \times N$ unitary Fourier matrix $F$ and assuming that $\kMat$ is invertible, 
+Now the properties of the DFT will be connected with the SVD of a circulant matrix, which will be the basis for the design of the numerical examples in \ref{sec:DFT}. Let $\xVec$ and $\kVec$ be the $N$-point discretizations of functions $f$ and $k$ on some interval $[a,b]$. Then the cyclic convolution $\bVec = \kVec * \xVec$ can be computed as a matrix-vector product by constructing an $N \times N$ circulant matrix $A$ from $\kVec$. This construction is carried out by setting the first row of $A$ to be $\kVec$, and each subsequent row to be a circular right shift of the preceding row (see \ref{sec:Classes of matrices}). In MATLAB, the command \texttt{toeplitz([k(1) fliplr(k(2:end))], k)} constructs the matrix $A$. Then $\bVec = A\xVec$, and after the addition of noise the equation \eqref{eq:DisNoise} is obtained. Then by using the property \eqref{eq:CircDiag} with the $N \times N$ unitary Fourier matrix $F$ and assuming that $A$ is invertible, 
 \begin{equation}
-\kMat^{-1}\gnoiseVec = \fVec + (\ctrans{F}\diag(\dft{\kVec})F)^{-1}\noiseVec = \fVec + \ctrans{F}\diag(\dft{\kVec})^{-1}F\noiseVec = \fVec + \sum_{\ell = 0}^{n-1} \ctrans{F}_{\ell,\cdot}\left(\frac{\dft{\noise}_\ell}{\dft{k}_\ell}\right),
+\inv{A}\dVec = \xVec + (\ctrans{F}\diag(\dft{\kVec})F)^{-1}\noiseVec = \xVec + \ctrans{F}\diag(\dft{\kVec})^{-1}F\noiseVec = \xVec + \sum_{\ell = 0}^{n-1} \ctrans{F}_{\ell,\cdot}\left(\frac{\dft{\noise}_\ell}{\dft{k}_\ell}\right),
 \label{eq:InvProdDFT}
 \end{equation}
 where $\dft{\noise}_\ell$ and $\dft{k}_\ell$ are the $\ell$th Fourier coefficients of $\noiseVec$ and $\kVec$, respectively, and $\ctrans{F}_{\ell,\cdot}$ is the conjugate transpose of the $\ell$th row of $F$ (i.e. the $\ell$th column of the matrix $\ctrans{F}$). Analogous to \eqref{eq:InvProd}, instabilities can arise if $\dft{k}_\ell$ is small. By introducing filter factors to reduce possible instability, an approximate solution
 \begin{equation}
-\fVec_\regparam = \sum_{\ell = 0}^{n-1} \ctrans{F}_{\ell,\cdot}\left(\frac{\filt(\regparam,\dft{k}_\ell)\dft{\gnoiseVec}_\ell}{\dft{k}_\ell}\right) = \ctrans{F}\Phi\dft{\kMat}^\dagger F\gnoiseVec
+\xVec_\regparam = \sum_{\ell = 0}^{n-1} \ctrans{F}_{\ell,\cdot}\left(\frac{\filt(\regparam,\dft{k}_\ell)\dft{\dVec}_\ell}{\dft{k}_\ell}\right) = \ctrans{F}\Phi\dft{A}^\dagger F\dVec
 \label{eq:ApproxSolDFT}
 \end{equation}
-can be obtained analogous to \eqref{eq:ApproxSol}, where $\dft{\kMat}^\dagger = \diag(1/\dft{\kVec})$.
+can be obtained analogous to \eqref{eq:ApproxSol}, where $\dft{A}^\dagger = \diag(1/\dft{\kVec})$.
 Since $\ctrans{F}$ is a matrix representation of the inverse DFT, the approximate solution can be rewritten as
-\[\fVec_\regparam = \ctrans{F} \frac{\filt(\regparam,\dft{\kVec})\dft{\gnoiseVec}}{\dft{\kVec}}.\]
-Here $\filt(\regparam,\dft{\kVec})\dft{\gnoiseVec}/{\dft{\kVec}}$ is a vector where the operations of multiplication and division are performed component-wise. This representation is useful for making a connection with the MATLAB implementation. \par
-As mentioned in Chapter \ref{ch:Introduction}, a Picard plot is often useful in analyzing the numerical instabilities of solutions obtained from either or \eqref{eq:InvProd} or \eqref{eq:InvProdDFT}. Figure \ref{PicardPlot} shows an example of a Picard plot. The terms $|\dft{k}_\ell|$ decrease down to machine precision, though the $|\dft{\gnoiseVec}_\ell|$ decrease but then level off just above the variance in the noise. As a result, the terms $|\dft{\gnoiseVec}_\ell|/|\dft{k}_\ell|$ only decrease so far and then begin increasing. The steady increase can produce a blow up of the approximate solution. While illustrating these relationships, a Picard plot is also useful in determining how to truncate the sum in \eqref{eq:ApproxSolDFT} to avoid blow up in the solution. For the plot in Figure \ref{PicardPlot}, the sum in \eqref{eq:ApproxSolDFT} should be truncated around index 8 to obtain a meaningful solution. \par 
+\[\xVec_\regparam = \ctrans{F} \frac{\filt(\regparam,\dft{\kVec})\dft{\dVec}}{\dft{\kVec}}.\]
+Here $\filt(\regparam,\dft{\kVec})\dft{\dVec}/{\dft{\kVec}}$ is a vector where the operations of multiplication and division are performed component-wise. This representation is useful for making a connection with the MATLAB implementation. \par
+As mentioned in Chapter \ref{ch:Introduction}, a Picard plot is often useful in analyzing the numerical instabilities of solutions obtained from either or \eqref{eq:InvProd} or \eqref{eq:InvProdDFT}. Figure \ref{PicardPlot} shows an example of a Picard plot. The terms $|\dft{k}_\ell|$ decrease down to machine precision, though the $|\dft{\dVec}_\ell|$ decrease but then level off just above the variance in the noise. As a result, the terms $|\dft{\dVec}_\ell|/|\dft{k}_\ell|$ only decrease so far and then begin increasing. The steady increase can produce a blow up of the approximate solution. While illustrating these relationships, a Picard plot is also useful in determining how to truncate the sum in \eqref{eq:ApproxSolDFT} to avoid blow up in the solution. For the plot in Figure \ref{PicardPlot}, the sum in \eqref{eq:ApproxSolDFT} should be truncated around index 8 to obtain a meaningful solution. \par 
 
 \begin{figure}[htb]
 	\centerline{\includegraphics[scale = 0.45]{Figures/PicardPlot1D_F2_S15_W200.eps}}
-\caption{(Left) A Picard plot generated from the second test function, a Gaussian blur with a width of 200, and an SNR of 15. The terms $|\dft{\gnoiseVec}_\ell|/|\dft{k}_\ell|$ decrease until index 8, at which case the terms increase in magnitude. This is due to the fact that the $|\dft{k}_\ell|$ steadily decrease, while the $|\dft{\gnoiseVec}_\ell|$ level off just below the variance in the noise. (Right) A zoom-in of the Picard plot is provided, showing that elements of the DFT of $\gnoiseVec$ decay only slightly below the variance of the noise in $\gnoiseVec$.}
+\caption{(Left) A Picard plot generated from the second test function, a Gaussian blur with a width of 200, and an SNR of 15. The terms $|\dft{\dVec}_\ell|/|\dft{k}_\ell|$ decrease until index 8, at which case the terms increase in magnitude. This is due to the fact that the $|\dft{k}_\ell|$ steadily decrease, while the $|\dft{\dVec}_\ell|$ level off just below the variance in the noise. (Right) A zoom-in of the Picard plot is provided, showing that elements of the DFT of $\dVec$ decay only slightly below the variance of the noise in $\dVec$.}
 \label{PicardPlot}
 \end{figure}
 
-While the connection between lines \eqref{eq:InvProdDFT} and \eqref{eq:ApproxSolDFT} and the SVD have been noted in regard to the structure of the terms and equations, a complete connection can be made if another property about $\kMat$ is assumed. Until this point $\kMat$ is assumed to be an invertible $N \times N$ circulant matrix formed from a vector $\kVec$. If $\kMat$ is also assumed to be symmetric, then the SVD of $\kMat$ is the same as the diagonalization by the unitary DFT matrix $F$ and the singular values of $\kMat$ are also the eigenvalues. \par 
+While the connection between lines \eqref{eq:InvProdDFT} and \eqref{eq:ApproxSolDFT} and the SVD have been noted in regard to the structure of the terms and equations, a complete connection can be made if another property about $A$ is assumed. Until this point $A$ is assumed to be an invertible $N \times N$ circulant matrix formed from a vector $\kVec$. If $A$ is also assumed to be symmetric, then the SVD of $A$ is the same as the diagonalization by the unitary DFT matrix $F$ and the singular values of $A$ are also the eigenvalues. \par 
 Analogous to the DFT, the discrete cosine transform (DCT) can be introduced from the perspective of approximating the coefficients of a cosine series. Given a function $f(t)$ defined on the interval $[0,1]$, consider the even extension of $f_e(t)$ defined by
 \[f_e(t) = \begin{cases}
 f(t), & 0 \leq t \leq 1 \\
@@ -574,21 +574,21 @@ Each function in Chapter \ref{ch:Parameter estimation methods} uses the assumpti
 \label{eq:SNR}
 \text{SNR} = 10\log_{10}\left(\frac{P_{\text{signal}}}{P_{\text{noise}}}\right)
 \end{equation}
-where $P$ denotes average power. In the discrete setting, the average power of a signal $\mathbf{f}$ of length $N$ is defined as $\|\mathbf{f}\|^2/N$. Using this definition, $P_{\text{signal}} = \|\gVec\|^2/N$ and $P_{\text{noise}} = \|\noiseVec\|^2/N$ and so the quotient in the logarithm is $\|\gVec\|^2/\|\noiseVec\|^2$. The quotient can also be expressed as $(\|\gVec\|/\|\gnoiseVec - \gVec\|)^2$, which is the square of the multiplicative inverse of the relative error of $\gnoiseVec$. \par
+where $P$ denotes average power. In the discrete setting, the average power of a signal $\mathbf{f}$ of length $N$ is defined as $\|\mathbf{f}\|^2/N$. Using this definition, $P_{\text{signal}} = \|\bVec\|^2/N$ and $P_{\text{noise}} = \|\noiseVec\|^2/N$ and so the quotient in the logarithm is $\|\bVec\|^2/\|\noiseVec\|^2$. The quotient can also be expressed as $(\|\bVec\|/\|\dVec - \bVec\|)^2$, which is the square of the multiplicative inverse of the relative error of $\dVec$. \par
 In MATLAB, the noise vector $\noiseVec$ can be constructed by first taking an $N$-vector $\mathbf{e}$ drawn from the multivariate standard normal distribution and multiplying the vector by a constant $\noiseSD$. Doing so ensures that $\noiseVec$ has variance $\noiseSD^2$ because $\Var(\noise) = \Var(\noiseSD\:\mathbf{e}) = \noiseSD^2\:\Var(\mathbf{e})$ and $\mathbf{e}$ has unit variance. Thus it is useful to rearrange the equation defining SNR into an equation that provides a way of finding the necessary variance for a given SNR value. The rearrangement is shown below, with $\|\noiseVec\|^2$ replaced by $\E(\|\noiseVec\|^2)$.
-\[\E(\|\noiseVec\|^2) = \frac{\|\gVec\|^2}{10^{(\text{SNR}/10)}}\]
+\[\E(\|\noiseVec\|^2) = \frac{\|\bVec\|^2}{10^{(\text{SNR}/10)}}\]
 Using the properties of expected value and the fact that $\E(\|\noiseVec\|^2) = \E(\|\noiseSD \mathbf{e}\|^2)$, the term on the left hand side of the equation can be changed as
 \[\E(\|\noiseVec\|^2) = \noiseSD^2 \sum_{j=1}^N \E(\mathbf{e}_i^2) = \noiseSD^2 \sum_{j=1}^N \left(\E(\mathbf{e}_i)^2 + \Var(\mathbf{e}_i)\right) = \noiseSD^2 \sum_{j=1}^N \left(0^2 + 1\right) = \noiseSD^2\:N.\]
 Utilizing this change, the following equation for variance is obtained.
 \begin{equation}
 \label{eq:Var}
-\noiseSD^2 = \frac{\|\gVec\|^2}{N \cdot 10^{(\text{SNR}/10)}}
+\noiseSD^2 = \frac{\|\bVec\|^2}{N \cdot 10^{(\text{SNR}/10)}}
 \end{equation}
-This equation is used for the numerical construction of the noise vectors. SNR values of 5 and 25 are used to generate the white noise added to $\gVec$, and one such data realization is shown in Figure \ref{NoisePlot1D_F2_S05_W200}. \par
+This equation is used for the numerical construction of the noise vectors. SNR values of 5 and 25 are used to generate the white noise added to $\bVec$, and one such data realization is shown in Figure \ref{NoisePlot1D_F2_S05_W200}. \par
 
 \begin{figure}
 	\centerline{\includegraphics[scale = 0.45]{Figures/NoisePlot1D_F2_S05_W200.eps}}
-\caption{The plot shows one data realization of $\gVec$ with noise, where the original function $f$ was the second test function. The SNR value is 5 and the width of the Gaussian kernel is 200.}
+\caption{The plot shows one data realization of $\bVec$ with noise, where the original function $f$ was the second test function. The SNR value is 5 and the width of the Gaussian kernel is 200.}
 \label{NoisePlot1D_F2_S05_W200}
 \end{figure}
 

@@ -25,6 +25,7 @@
 \newcommand{\ctrans}[1]{{#1}^\mathsf{H}}	% Hermitian transpose
 \newcommand{\inv}[1]{{#1}^{-1}}	% Inverse of a matrix
 \newcommand{\pinv}[1]{{#1}^\dagger}	% Inverse of a matrix
+\newcommand{\invTrans}[1]{{#1}^{-\mathsf{T}}}	% Inverse of transposed matrix
 \newcommand{\partition}{\omega}  % Partition values
 \newcommand{\midpoint}{\partition_{\text{mid}}}   % Midpoint partition values
 \DeclareMathOperator{\trace}{trace}		% Trace
@@ -49,7 +50,6 @@
 \newcommand{\regparamBig}{\widetilde{\regparam}}   % Big regularization parameter
 \newcommand{\regparamVecBig}{\widetilde{\regparamVec}}   % Big regularization parameter
 \newcommand{\R}{R_{\regparam}}	% Regularization matrix
-\newcommand{\regf}{\fVec_{\regparam}}	% Regularized solution
 \newcommand{\xReg}{\xVec(\regparam)}	% Regularized solution
 \newcommand{\xWin}{\xVec_{\text{win}}}	% Windowed regularized solution
 \newcommand{\xSol}{\xVec}	% True solution
@@ -102,6 +102,7 @@
 \newcommand{\UWin}{F_{\substack{\text{UPRE} \\ \text{win}}}}	% Windowed UPRE function
 \newcommand{\UWinBig}{\widetilde{F}_{\substack{\text{UPRE} \\ \text{win}}}}	% Big windowed UPRE function
 \newcommand{\UWinAvg}{\overline{F}_{\substack{\text{UPRE} \\ \text{win}}}}	% Windowed UPRE function for average data
+\newcommand{\UDown}[1]{{}_{#1}\U}	% Downsampled UPRE function
 
 % GCV derivation notation:
 \newcommand{\G}{F_{\text{GCV}}}	% GCV function
@@ -110,6 +111,7 @@
 \newcommand{\GBig}{\widetilde{F}_{\text{GCV}}}	% Big GCV function
 \newcommand{\GWinBig}{\widetilde{F}_{\substack{\text{GCV} \\ \text{win}}}}	% Big windowed GCV function
 \newcommand{\GWinAvg}{\overline{F}_{\substack{\text{GCV} \\ \text{win}}}}	% Windowed GCV function for average data
+\newcommand{\GDown}[1]{{}_{#1}\G}	% Downsampled GCV function
 
 % Discrepancy principle derivation notation:
 \newcommand{\D}{F_{\text{MDP}}}	% Discrepancy principle function
@@ -119,3 +121,4 @@
 \newcommand{\DWin}{F_{\substack{\text{MDP} \\ \text{win}}}}	% Windowed MDP function
 \newcommand{\DWinBig}{\widetilde{F}_{\substack{\text{MDP} \\ \text{win}}}}	% Big windowed MDP function
 \newcommand{\DWinAvg}{\overline{F}_{\substack{\text{MDP} \\ \text{win}}}}	% Windowed MDP function for average data
+\newcommand{\DDown}[1]{{}_{#1}\D}	% Downsampled MDP function
