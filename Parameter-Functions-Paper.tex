@@ -917,15 +917,15 @@ Then for all $\regparamVec \in \mathbb{R}_{+}^{P}$,
 For a basis of comparison, parameters were selected as minimizers of the function
 \begin{equation}
 \label{eq:Learning function}
-\widetilde{F}_{\text{B}}(\regparam) = \frac{1}{R}\sum_{r=1}^R \left\|\xVec^{(r)}(\regparam) - \xVec^{(r)}\right\|_2^2 = \frac{1}{R}\left\|\xBig(\regparam) - \xBig\right\|_2^2,
+\widetilde{F}_{\text{Best}}(\regparam) = \frac{1}{R}\sum_{r=1}^R \left\|\xVec^{(r)}(\regparam) - \xVec^{(r)}\right\|_2^2 = \frac{1}{R}\left\|\xBig(\regparam) - \xBig\right\|_2^2,
 \end{equation} 
-which was considered in \cite{ChungEspanol2017}; here we use subscript ``B" to abbreviate ``best". A simpler way of selecting regularization parameters is to minimize
+which was considered in \cite{ChungEspanol2017}. A simpler way of selecting regularization parameters is to minimize
 \begin{equation}
 \label{eq:Best function}
-F_{\text{B}}^{(r)}(\regparam) = \left\|\xVec^{(r)}(\regparam) - \xVec^{(r)}\right\|_2^2, \quad r = 1,\ldots,R.
+F_{\text{Best}}^{(r)}(\regparam) = \left\|\xVec^{(r)}(\regparam) - \xVec^{(r)}\right\|_2^2, \quad r = 1,\ldots,R.
 \end{equation}
 It is clear that the relationship between \eqref{eq:Learning function} and \eqref{eq:Best function} is
-\[\widetilde{F}_{\text{B}}(\regparam) = \frac{1}{R}\sum_{r=1}^R F_{\text{B}}^{(r)}(\regparam).\]
+\[\widetilde{F}_{\text{Best}}(\regparam) = \frac{1}{R}\sum_{r=1}^R F_{\text{Best}}^{(r)}(\regparam).\]
 Both functions \eqref{eq:Learning function} and \eqref{eq:Best function} rely on knowledge of the true solutions $\{\xVec^{(r)}\}_{r=1}^R$. Parameters chosen as minimizers of \eqref{eq:Best function} are ``best" in the sense of minimizing the norm of the error of a single regularized solution. It is important to note that minimization of \eqref{eq:Learning function} results in a single parameter depending on all $R$ data vectors, while minimizing \eqref{eq:Best function} results in a single parameter for each of the $R$ data vectors. \par
 To evaluate the effectiveness of both the adapted single-parameter and multiparameter selection methods described in Section \ref{sec:Methods}, three test problems were considered. For all three problems, data vectors were considered as a set of training data and resulting parameters were then applied to validation data set. A one-dimensional problem serves as a proof of concept and uses MRI data that is built into MATLAB, which is shown in Figure \ref{fig:MRI 1D}. The other problems are two-dimensional; one is constructed from the MATLAB MRI data, while the other utilizes images of the planet Mercury obtained by the MESSENGER space probe. The MESSENGER images are available to the public courtesy of NASA, the Johns Hopkins University Applied Physics Laboratory, and the Carnegie Institution of Washington \cite{MESSENGER}. \par
 For both problems, the following definition of signal-to-noise ratio (SNR) is used as a measurement for noise content in the images:
