@@ -927,7 +927,23 @@ F_{\text{Best}}^{(r)}(\regparam) = \left\|\xVec^{(r)}(\regparam) - \xVec^{(r)}\r
 It is clear that the relationship between \eqref{eq:Learning function} and \eqref{eq:Best function} is
 \[\widetilde{F}_{\text{Best}}(\regparam) = \frac{1}{R}\sum_{r=1}^R F_{\text{Best}}^{(r)}(\regparam).\]
 Both functions \eqref{eq:Learning function} and \eqref{eq:Best function} rely on knowledge of the true solutions $\{\xVec^{(r)}\}_{r=1}^R$. Parameters chosen as minimizers of \eqref{eq:Best function} are ``best" in the sense of minimizing the norm of the error of a single regularized solution. It is important to note that minimization of \eqref{eq:Learning function} results in a single parameter depending on all $R$ data vectors, while minimizing \eqref{eq:Best function} results in a single parameter for each of the $R$ data vectors. \par
-To evaluate the effectiveness of both the adapted single-parameter and multiparameter selection methods described in Section \ref{sec:Methods}, three test problems were considered. For all three problems, data vectors were considered as a set of training data and resulting parameters were then applied to validation data set. A one-dimensional problem serves as a proof of concept and uses MRI data that is built into MATLAB, which is shown in Figure \ref{fig:MRI 1D}. The other problems are two-dimensional; one is constructed from the MATLAB MRI data, while the other utilizes images of the planet Mercury obtained by the MESSENGER space probe. The MESSENGER images are available to the public courtesy of NASA, the Johns Hopkins University Applied Physics Laboratory, and the Carnegie Institution of Washington \cite{MESSENGER}. \par
+To evaluate the effectiveness of both the adapted single-parameter and multiparameter selection methods described in Section \ref{sec:Methods}, two test problems were considered. For both problems, data vectors were considered as a set of training data and resulting parameters were then applied to validation data set. A one-dimensional problem serves as a proof of concept and uses MRI data that is built into MATLAB, which is shown in Figure \ref{fig:MRI 1D}. 
+
+\begin{figure}[ht]
+\includegraphics[scale=0.32]{Figures/Full_MRI_Data.eps}
+\caption{MRI data formed by reformatting the MATLAB built-in MRI data. Each vector was blurred using a Gaussian kernel and normal noise was added; the resulting vectors are shown at the bottom. The dimension of all three images is $256 \times 536$.}
+\label{fig:MRI 1D}
+\end{figure}
+
+\noindent The other problem is two-dimensional that utilizes the images in Figure \ref{fig:MESSENGER True} of the planet Mercury obtained by the MESSENGER space probe. 
+
+\begin{figure}[ht]
+\includegraphics[scale=0.36]{Figures/MESSENGER}
+\caption{Selected images used for MESSENGER two-dimensional test problem. Available courtesy of NASA/Johns  Hopkins  University  Applied  Physics  Laboratory/Carnegie Institution of Washington \cite{MESSENGER}.}
+\label{fig:MESSENGER True}
+\end{figure}
+
+\noindent The MESSENGER images are available to the public courtesy of NASA, the Johns Hopkins University Applied Physics Laboratory, and the Carnegie Institution of Washington \cite{MESSENGER}. \par
 For both problems, the following definition of signal-to-noise ratio (SNR) is used as a measurement for noise content in the images:
 \begin{equation}
 \label{eq:SNR}
@@ -936,14 +952,8 @@ For both problems, the following definition of signal-to-noise ratio (SNR) is us
 In the discrete setting, the average power $\mathcal{P}$ of a vector $\xVec$ of length $n$ is defined as $\frac{1}{\mA}\|\xVec\|^2_2$. Using this definition for vectors $\bVec$ and $\noiseVec$, $\mathcal{P}_{\text{signal}} = \frac{1}{\mA}\|\bVec\|^2_2$ and $\mathcal{P}_{\text{noise}} = \frac{1}{\mA}\|\noiseVec\|^2_2$ and so the quotient in the logarithm is $\|\bVec\|_2^2/\|\noiseVec\|_2^2$. If $\bVec$ is a matrix representing an image, in which case $\noiseVec$ is a realization of a random matrix, the 2-norms can be replaced by the Frobenius norm.
 
 \subsection{One-dimensional problem} \label{sec:1D}
-The one-dimensional test problem uses the MRI data built into MATLAB, which can be accessed by the command \texttt{load mri.mat}. Five horizontal slices were selected and reformatted as a single image (Figure \ref{fig:MRI 1D}) of dimensions $256 \times 536$. 
-\begin{figure}[ht]
-\includegraphics[scale=0.32]{Figures/Full_MRI_Data.eps}
-\caption{MRI data formed by reformatting the MATLAB built-in MRI data. Each vector was blurred using a Gaussian kernel and normal noise was added; the resulting vectors are shown at the bottom. The dimension of all three images is $256 \times 536$.}
-\label{fig:MRI 1D}
-\end{figure}
-The default dimension of each horizontal MRI slice accessible using \texttt{load mri.mat} is $128 \times 128$. Linear interpolation was used to double the number of rows; the number of columns of the concatenated MRI slices was trimmed to to eliminate leading and trailing zero columns. The columns of the image were then multiplied by a symmetric Toeplitz matrix, approximating a Fredholm integral equation of the first kind with a Gaussian kernel of mean 0 and variance 1 (each pixel representing a unit square in the continuous problem). The resulting MRI image is vertically blurred; see Figure \ref{fig:MRI 1D}. SNR values were selected randomly between 6 and 7 for each blurred column, and realizations of normal noise with the corresponding variances were added to blurred columns. The first $536/2 = 268$ columns of Figure \ref{fig:MRI 1D} served as the training set, while the remaining 268 columns serve as a validation set.  The following $255 \times 256$ penalty matrix $L_1$ was used, which represents an approximation of a first derivative operator:
-\[L_1 = \begin{bmatrix}
+The one-dimensional test problem uses the MRI data built into MATLAB, which can be accessed by the command \texttt{load mri.mat}. Five horizontal slices were selected and reformatted as a single image (Figure \ref{fig:MRI 1D}) of dimensions $256 \times 536$. The default dimension of each horizontal MRI slice accessible using \texttt{load mri.mat} is $128 \times 128$. Linear interpolation was used to double the number of rows; the number of columns of the concatenated MRI slices was trimmed to to eliminate leading and trailing zero columns. The columns of the image were then multiplied by a symmetric Toeplitz matrix, approximating a Fredholm integral equation of the first kind with a zero centered Gaussian kernel of variance 1 (each pixel representing a unit square in the continuous problem). The resulting MRI image is vertically blurred; see Figure \ref{fig:MRI 1D}. SNR values were selected randomly between 6 and 7 for each blurred column, and realizations of normal noise with the corresponding variances were added to blurred columns. The first $536/2 = 268$ columns of Figure \ref{fig:MRI 1D} served as the training set, while the remaining 268 columns serve as a validation set.  The following $255 \times 256$ penalty matrix $L$ was used, which represents an approximation of a first derivative operator:
+\[L = \begin{bmatrix}
 -1 & 1 & &  \\
  & \ddots &  \ddots & \\
  & & -1 & 1 \\
@@ -972,47 +982,18 @@ The one-dimensional test problem demonstrates that the adapted methods have pote
 
 \subsection{Two-dimensional problems} \label{sec:2D}
 
-To effectively discuss the set-up of the two-dimensional problems, we will adopt the notation used in \cite{Vogel:2002}. Specifically, we define $\vectorize : \mathbb{R}^{n_y \times n_x} \rightarrow \mathbb{R}^{n_y n_x}$ by
-\[\vectorize(x) = \vcat\left(x_{\cdot,1},x_{\cdot,2},\ldots,x_{\cdot,n_x}\right), \quad x \in \mathbb{R}^{n_y \times n_x}.\]
-The function $\arr : \mathbb{R}^{n_y n_x} \rightarrow \mathbb{R}^{n_y \times n_x}$ is defined as the inverse of $\vectorize$. Until now, the notation $\diag$ has been used denote the main diagonal of matrix; when used in conjunction with with $\vectorize$, however, $\diag$ will denote the formation of a diagonal matrix where the input is the main diagonal:
-\[\diag(\vectorize(x)) \in \mathbb{R}^{n_y n_x \times n_y n_x}, \quad x \in \mathbb{R}^{n_y \times n_x}.\]
-Lastly, we let $.*$ and $./$ denote element-wise multiplication and division, respectively.
-
-% For an $n_y \times n_x$ image $x$, we could form the blurred image $b$ by computing the matrix-vector product $A\xVec$ with $\xVec = \vectorize(x)$ but this would require an $n_y n_x \times n_y n_x$ matrix $A$. 
-
-The two-dimensional problems assume that the system matrix $A$ and penalty matrix $L$ can be simultaneously diagonalized by the 2D discrete cosine transform (DCT). The blurring process associated with the system matrix assumes reflective boundary conditions \cite{HansenNagyOLeary}, while periodic boundary conditions would correspond with diagonalization via the 2D DFT \cite{Vogel:2002}. The blurring of the images is accomplish through an entry-wise product of the images and an matrix containing the spectrum of $A$. We present the methodology in terms of the DFT for generality, though the results were generated using the DCT. We let $F_{n_x} \in \mathbb{C}^{n_x \times n_x}$ and $F_{n_y} \in \mathbb{C}^{n_y \times n_y}$ be the orthogonal DFT matrices and $F  = F_{n_x} \otimes F_{n_y}$. The 2D DFT of a matrix $x \in \mathbb{C}^{n_y \times n_x}$, denoted here as $\dft{x}$, can be computed as $\dft{x} = \arr(F\xVec)$ with $\xVec = \vectorize(x)$. In regards to numerical implementation, we let $\text{dft2}$ and $\text{idft2}$ denote the 2D DFT and inverse DFT operations, respectively, so that $\svd{x} = \text{dft2}(x)$. We now let $\Delta$ and $\Lambda$ be $n_y \times n_x$ matrices such that $A = \ctrans{F}\diag(\text{vec}(\Delta))F$ and $L = \ctrans{F}\diag(\text{vec}(\Lambda))F$. The windowed solution \eqref{eq:Windowed GSVD Solution} for a single data image $d \in \mathbb{R}^{n_y \times n_x}$ can be written as
-\[\xWin(\regparamVec) = \text{idft2}\left(\sum_{p=1}^P \arr\left(\wVec^{(p)}\right).*\dft{d}.*\overline{\Delta}./\left[|\Delta|^2 + \left(\regparam^{(p)}\right)^2 |\Lambda|^2\right]\right).\]
-Here $|\cdot|$ represents element-wise modulus and the elements of $\overline{\Delta}$ are the complex conjugates of the elements of $\Delta$. In this formulation, $\sum_{p=1}^P \arr(\wVec^{(p)})$ is an $n_y \times n_x$ matrix of ones. 
-
-The two-dimensional test problem again uses the MRI data built into MATLAB. However, the data sets now consist of images of size $256 \times 256$. A total of 20 default MRI images were used and split into training and validation sets containing 10 images each. For each MRI image, seven more images were generate through the use of random rigid transformations (rotations and translations) so that the training set and validation set each contained 80 images. A rotation angle $\theta$ and a translation angle $\phi$ were selected randomly between 0 and $2\pi$. Another scalar $c$ was drawn randomly between 0 and 64 so that the translation vector $\tVec = \trans{[c\cos(\phi),c\sin(\phi)]}$ does not have a magnitude that exceeds 64 pixels. Figure \ref{fig:MRI Transformations} shows examples of true MRI images used in the training set. 
+The data sets of the two-dimensional test problem consist of images of size $256 \times 256$. A total of 16 images were used and split into training and validation sets containing eight images each. To obtain the 16 images from the $512 \times 512$ Mercury images in Figure \ref{fig:MESSENGER True}, eight images were randomly chosen and two $256 \times 256$ subimages of each image were randomly selected. The 16 images were then shuffled and split into training and validation sets. Another validation set of images, shown in Figure , was used that consisted of built-in MATLAB images.
 
 \begin{figure}[ht]
-\includegraphics[scale=0.36]{Figures/MRI_Transformations}
-\caption{Eight examples of true versions of training MRI images, each of size $256 \times 256$. The top left image is a default MRI image, while the remaining seven were generated from random rigid transformations. Nearest-neighbor interpolation was used when transformed pixel locations did not align with the rectangular grid.}
-\label{fig:MRI Transformations}
+\includegraphics[scale=0.36]{Figures/Validation Set 2}
+\caption{The second validation set, consisting of built-in MATLAB images. From left to right starting in the top row, the images are: \texttt{rice.png}, \texttt{AT3\_1m4\_01.tif}, \texttt{circuit.tif}, \texttt{cameraman.tif}, \texttt{liftingbody.png}, \texttt{westconcordorthophoto.png}, \texttt{parkavenue.jpg}, and \texttt{llama.jpg}.}
+\label{fig:Validation Set 2}
 \end{figure}
 
-Circularly convolution of each image with a Gaussian kernel of mean 0 and variance 1 in each direction was then carried out to blur the images. Lastly, SNR values were randomly selected between 8 and 10 and realizations of normal noise with corresponding variance were added to the blurred images. \par 
-Since circular convolution was utilized, the DFT was the primary tool for this MRI test problem as opposed to the GSVD. To ensure simultaneous diagonalization of the block system matrices $A$ and $L$, periodic boundary conditions were assumed so that both $A$ and $L$ are block-circulant-with-circulant-blocks (BCCB); see \cite{NeumannDCT,Vogel:2002}. The penalty matrix $L$ was selected to be the BCCB version of the discrete negative Laplacian operator, which is an approximation of the continuous Laplacian operator \cite{DebnathMikusinski2005,LeVeque2007}. The BCCB structure of $A$ and $L$ allows for simultaneous diagonalization using two-dimensional DFT for numerical efficiency. \par 
-Figure \ref{fig:Parameters 2D} shows the parameters selected using each method. 
-\begin{figure}[ht]
-\includegraphics[scale=0.36]{Figures/Parameters2D_mri}
-\caption{hello}
-\label{fig:Parameters 2D}
-\end{figure}
-In contrast to the one-dimensional case, the adapted MDP method returned parameters closest to the parameters chosen based on the machine learning method. The adapted UPRE and GCV method selected similar parameters. Another observation from Figure \ref{fig:Parameters 2D} is that the parameter obtained from each method are stable with respect to the number of images considered. This suggest that only small subset of the training set is needed to obtain regularization parameters that can be then applied to a full validation set. Figure \ref{fig:Errors 2D} contains boxplots of the relative errors of the regularized solutions for the validation set using 10 training images. 
-\begin{figure}[ht]
-\includegraphics[scale=0.36]{Figures/Errors2D_mri}
-\caption{hello}
-\label{fig:Errors 2D}
-\end{figure}
-The errors of the regularized solutions obtained using the adapted MDP method are close to those of the machine learning method.
-
-\begin{figure}
-\label{fig:MESSENGER True}
-\includegraphics[scale=0.36]{Figures/MESSENGER}
-\caption{Selected images used for MESSENGER two-dimensional test problem. Available courtesy of NASA/Johns  Hopkins  University  Applied  Physics  Laboratory/Carnegie Institution of Washington \cite{MESSENGER}.}
-\end{figure}
+A $256 \times 256$ point spread function (PSF) was formed using a discretization of the zero centered, circularly symmetric Gaussian kernel
+\[k(x,y) = \exp\left(-\frac{(x^2 + y^2)}{2\nu}\right).\]
+The parameter $\nu$ controls the width of the Gaussian kernel. Choosing $k(x,y)$ to be circularly symmetric is for convenience; a Gaussian kernel with different width parameters for the $x$ and $y$ directions can still be used to construct a PSF that is doubly symmetric for diagonalization via the DCT \cite{HansenNagyOLeary}. The two values of $\nu$ considered were 100 and 200. The corresponding PSFs were discretely convolved with each image as a means of blurring. SNR values of 25 and 40 were used to construct realizations of normal noise that were added to the blurred images for create the data. \par 
+From this construction, the DCT was the primary tool for the 2D test problem as opposed to the GSVD. To ensure simultaneous diagonalization of the block system matrices $A$ and $L$, reflective boundary conditions were assumed so that both $A$ and $L$ have the same block structure. This special block structure is called BTTB + BTHB + BHTB + BHHB in \cite{HansenNagyOLeary}, with the ``T" and ``H" standing for Toeplitz and Hankel, respectively. One penalty matrix $L$ considered was the appropriately structured version of the discrete negative Laplacian operator, which is an approximation of the continuous Laplacian operator \cite{DebnathMikusinski2005,LeVeque2007}. The second penalty matrix was the identity. The structure of $A$ and $L$ allows for simultaneous diagonalization using two-dimensional DCT for numerical efficiency. \par 
 
 \subsection{Multiparameter regularization}
 
@@ -1020,7 +1001,7 @@ The errors of the regularized solutions obtained using the adapted MDP method ar
 
 \section{Conclusions and future work} \label{sec:Conclusion}
 In conclusion, this paper demonstrate a means by which UPRE, MDP, and GCV methods can be extended to accommodate multiple data sets. The most general forms of functions associate with these methods are \eqref{eq:UPRE 3}, \eqref{eq:Big MDP}, \eqref{eq:GCV Big}, and , respectively. The adapted UPRE and MDP methods are novel in that their corresponding functions can be written as an average of the individual functions associate with each data set. None of the three adapted methods require knowledge of true solutions unlike the machine learning approach defined by \eqref{eq:Learning function}, though the MRI test problems demonstrate that the adapted methods can perform competitively. \par
-There are various directions of future investigation. Perhaps the most significant results could be obtained through approaches of determining the necessary number of data sets for a stabilization of selected parameters. Figure \ref{fig:Parameters 1D MRI} and Figure \ref{fig:Parameters 2D} suggest that obtained parameters stabilize fairly fast in relation to the number of data sets incorporate into the method functions. Another direction of future work would be to use the adapted methods on data sets containing images of differing objects. The MRI images used here are all visualizations of a human brain; it would be interesting to see how these methods perform for drastically different data sets.
+There are various directions of future investigation. Perhaps the most significant results could be obtained through approaches of determining the necessary number of data sets for a stabilization of selected parameters. Figure \ref{fig:Parameters 1D MRI} suggests that obtained parameters stabilize fairly fast in relation to the number of data sets incorporate into the method functions. Another direction of future work would be to use the adapted methods on data sets containing images of differing objects. The MRI images used here are all visualizations of a human brain; it would be interesting to see how these methods perform for drastically different data sets.
 
 \bibliographystyle{siam}
 \bibliography{Parameter-Estimation}
