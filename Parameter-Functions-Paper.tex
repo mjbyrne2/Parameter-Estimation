@@ -414,18 +414,19 @@ Analogous to the single parameter case for multiple data sets, we define $\xWinB
     \xWinBig(\regparamVecBig) = \sum_{p=1}^{P} \widetilde{Y}\inv{\left[\trans{\widetilde{\Delta}}\widetilde{\Delta} + \left(\widetilde{\regparam}^{(p)}\right)^2 \trans{\widetilde{\Lambda}}\widetilde{\Lambda}\right]}\widetilde{W}^{(p)}\trans{\widetilde{\Delta}}\dft{\dBig},
 \end{equation}
 where $\widetilde{W}^{(p)} = \diag(W^{(1,p)},\ldots,W^{(R,p)})$ has $R$ diagonal blocks. As the final extension of notation from Section \ref{sec:Multiple data sets}, we define
-\begin{align*}
+\begin{align}
     \filt_j^{(r)}\left(\regparam^{(p)}\right) &= \begin{cases}
 0, & \delta_j^{(r)} = 0 \\
 1, & \lambda_j^{(r)} = 0 \\
 \dfrac{\left(\gamma_j^{(r)}\right)^2}{\left(\gamma_j^{(r)}\right)^2 + \left(\regparam^{(p)}\right)^2}, & \text{otherwise,}
-\end{cases} \\
+\end{cases} \nonumber \\
 \mfilt_j^{(r)}\left(\regparam^{(p)}\right) &= \begin{cases}
 1, & \delta_j^{(r)} = 0 \\
 0, & \lambda_j^{(r)} = 0 \\
 \dfrac{\left(\regparam^{(p)}\right)^2}{\left(\gamma_j^{(r)}\right)^2 + \left(\regparam^{(p)}\right)^2}, & \text{otherwise}
 \end{cases}
-\end{align*}
+\label{eq:Redefinition of Filter}
+\end{align}
 for $r = 1,\ldots,R$ and $p = 1,\ldots,P$. With the diagonal matrices
 \begin{align*}
     \Phi^{(r)}\left(\widetilde{\regparam}^{(p)}\right) &= \diag\left(\filt_1^{(r)}\left(\regparam^{(p)}\right),\ldots,\filt_n^{(r)}\left(\regparam^{(p)}\right)\right), \\ \Psi^{(r)}\left(\widetilde{\regparam}^{(p)}\right) &= \diag\left(\mfilt_1^{(r)}\left(\regparam^{(p)}\right),\ldots,\mfilt_n^{(r)}\left(\regparam^{(p)}\right)\right),
@@ -536,6 +537,38 @@ Thus, the norm becomes
 &= \sum_{j=1}^{n_r} \left(\left[\sum_{p=1}^{P} w_{j}^{(r,p)}\Psi_{j}^{(r)}\left(\regparamBig^{(p)}\right)\right] \hat{d}_j^{(r)}\right)^2 + \sum_{j ={n_r}+1}^{m_r} \left(\hat{d}_j^{(r)}\right)^2.
 \end{align*}
 \end{proof}
+
+As a function of $\regparamVec \in \mathbb{R}_+^P$, the limiting behavior of $\|\rWinBig(\regparamVec)\|_2^2$ provides insight into how best to deal with minimizing functions that involve $\|\rWinBig(\regparamVec)\|_2^2$. Lemma \ref{lem:Limit of Regularized Residual} shows that $\|\rWinBig(\regparamVec)\|_2^2$ can be bounded above by the (scaled) norm of the data.
+
+\begin{lemma}
+\label{lem:Limit of Regularized Residual}
+Given $P \in \{1,\ldots,N\}$ windows, 
+\[\lim_{\|\regparamVec\|_2 \rightarrow \infty} \left\|\rWin(\regparamVec)\right\|_2^2 \leq \left\|\dVec\right\|_2^2, \quad \regparamVec \in \mathbb{R}_+^P.\]
+\end{lemma}
+\begin{proof}
+From Theorem \ref{thm:Regularized residual} with $R = 1$ and $A \in \mathbb{R}^{m \times n}$, we have that
+\[\left\|\rWin(\regparamVec)\right\|_2^2 = \begin{cases}
+\sum_{j=1}^{m} \left(\left[\sum_{p=1}^{P} w_{j+k}^{(p)}\mfilt_{j+k}\left(\regparam^{(p)}\right)\right] \hat{d}_j\right)^2, & m \leq n, \\
+\sum_{j=1}^{n} \left(\left[\sum_{p=1}^{P} w_{j}^{(p)}\mfilt_{j}\left(\regparam^{(p)}\right)\right] \hat{d}_j\right)^2 + \sum_{j = n + 1}^{m} \left(\hat{d}_j\right)^2, & m > n.
+\end{cases}\]
+with $k = n - m$. Without loss of generality we assume that $m \leq n$, so
+\[\left\|\rWin(\regparamVec)\right\|_2^2 = 
+\sum_{j=1}^{m} \left(\left[\sum_{p=1}^{P} w_{j+k}^{(p)}\mfilt_{j+k}\left(\regparam^{(p)}\right)\right] \hat{d}_j\right)^2.\]
+From \eqref{eq:Redefinition of Filter}, we know that $0 \leq w_{j+k}^{(p)} \leq 1$ for all $p = 1,\ldots,P$ and $0 \leq \mfilt_{j+k}(\regparam^{(p)}) \leq 1$ for all $\regparam^{(p)} \in \mathbb{R}_+$.
+
+
+Writing $\frac{1}{\mA}\|\rVec(\regparam)\|_2^2$ in terms of filter functions \eqref{eq:Filter functions},
+\[\lim_{\regparam\rightarrow\infty} \frac{1}{\mA}\|\rVec(\regparam)\|_2^2 = \lim_{\regparam\rightarrow\infty} \frac{1}{\mA} \sum_{j=1}^{n} \left(\mfilt_j\right)^2\left(\dft{d}_j\right)^2 = \frac{1}{\mA} \sum_{j=1}^{n} \left(\lim_{\regparam\rightarrow\infty}\left(\mfilt_j\right)^2\right)\left(\dft{d}_j\right)^2.\]
+Expanding the denominator of $\left(\mfilt_j\right)^2$ makes the limit clear:
+\[\lim_{\regparam\rightarrow\infty} \left(\mfilt_j\right)^2 = \lim_{\regparam\rightarrow\infty}\frac{\regparam^4\bm{\lambda}_j}{\regparam^4\bm{\lambda}_j + 2\regparam^2\bm{\lambda}_j\bm{\delta}_j + \bm{\delta}_j^2} = \begin{cases}
+1, & \bm{\lambda}_j \neq 0 \\
+0, & \bm{\lambda}_j = 0
+\end{cases}.\]
+Therefore
+\[\lim_{\regparam\rightarrow\infty} \frac{1}{\mA}\|\rVec(\regparam)\|_2^2 = \frac{1}{\mA} \sum_{j=1}^{n} \left(\lim_{\regparam\rightarrow\infty}\left(\mfilt_j\right)^2\right)\left(\dft{d}_j\right)^2 \leq \frac{1}{\mA} \sum_{j=1}^{n} \left(\dft{d}_j\right)^2 = \frac{1}{\mA}\|\svd{\dVec}\|_2^2 = \frac{1}{\mA}\|\dVec\|_2^2,\]
+with the last equality following from $\svd{\dVec} = \trans{U}\dVec$ with orthogonal $U$.
+\end{proof}
+
 
 We can also develop an analog of windowed regularized residual as applied to the average $\dAvg = \frac{1}{R}\sum_{r=1}^R \dVec^{(r)}$ under Assumptions \ref{Assumption_Matrices} and \ref{Assumption_Windows}. Defining the windowed regularized residual applied to $\dAvg$ as
 \begin{equation}
@@ -985,7 +1018,7 @@ The one-dimensional test problem demonstrates that the adapted methods have pote
 The data sets of the two-dimensional test problem consist of images of size $256 \times 256$. A total of 16 images were used and split into training and validation sets containing eight images each. To obtain the 16 images from the $512 \times 512$ Mercury images in Figure \ref{fig:MESSENGER True}, eight images were randomly chosen and two $256 \times 256$ subimages of each image were randomly selected. The 16 images were then split into training and validation sets. Another validation set of images, shown in Figure , was used that consisted of built-in MATLAB images.
 
 \begin{figure}[ht]
-\includegraphics[scale=0.36]{Figures/Validation Set 2}
+\includegraphics[scale=0.32]{Figures/ValidationSet2}
 \caption{The second validation set, consisting of built-in MATLAB images. From left to right starting in the top row, the images are: \texttt{rice.png}, \texttt{AT3\_1m4\_01.tif}, \texttt{circuit.tif}, \texttt{cameraman.tif}, \texttt{liftingbody.png}, \texttt{westconcordorthophoto.png}, \texttt{parkavenue.jpg}, and \texttt{llama.jpg}.}
 \label{fig:Validation Set 2}
 \end{figure}
@@ -997,7 +1030,7 @@ From this construction, the DCT was the primary tool for the 2D test problem as 
 In regards to the spectral windowing, at most two windows were used and the types of window were logarithmic (non-overlapping) and logarithmic cosine (overlapping); the decision to use logarithmic spacing is supported by how the ordered spectral components decay, which is shown in Figure \ref{fig:Spectral Decay}. The use of three or more windows was not considered for the sake of computational savings and because the use of more than two windows was not advocated in \cite{ChungEasleyOLeary}.
 
 \begin{figure}[ht]
-\includegraphics[scale=0.36]{Figures/SpectralDecay}
+\includegraphics[scale=0.32]{Figures/SpectrumDecay}
 \caption{}
 \label{fig:Spectral Decay}
 \end{figure}
