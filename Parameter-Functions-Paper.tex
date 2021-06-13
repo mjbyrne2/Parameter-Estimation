@@ -543,7 +543,7 @@ As a function of $\regparamVec \in \mathbb{R}_+^P$, the limiting behavior of $\|
 \begin{lemma}
 \label{lem:Limit of Regularized Residual}
 Given $P \in \{1,\ldots,N\}$ windows, 
-\[\lim_{\|\regparamVec\|_2 \rightarrow \infty} \left\|\rWin(\regparamVec)\right\|_2^2 \leq \left\|\dVec\right\|_2^2, \quad \regparamVec \in \mathbb{R}_+^P.\]
+\[\lim_{\|\regparamVec\|_2 \rightarrow \infty} \left\|\rWin(\regparamVec)\right\|_2^2 \leq P^2\left\|\dVec\right\|_2^2, \quad \regparamVec \in \mathbb{R}_+^P.\]
 \end{lemma}
 \begin{proof}
 From Theorem \ref{thm:Regularized residual} with $R = 1$ and $A \in \mathbb{R}^{m \times n}$, we have that
@@ -554,22 +554,12 @@ From Theorem \ref{thm:Regularized residual} with $R = 1$ and $A \in \mathbb{R}^{
 with $k = n - m$. Without loss of generality we assume that $m \leq n$, so
 \[\left\|\rWin(\regparamVec)\right\|_2^2 = 
 \sum_{j=1}^{m} \left(\left[\sum_{p=1}^{P} w_{j+k}^{(p)}\mfilt_{j+k}\left(\regparam^{(p)}\right)\right] \hat{d}_j\right)^2.\]
-From \eqref{eq:Redefinition of Filter}, we know that $0 \leq w_{j+k}^{(p)} \leq 1$ for all $p = 1,\ldots,P$ and $0 \leq \mfilt_{j+k}(\regparam^{(p)}) \leq 1$ for all $\regparam^{(p)} \in \mathbb{R}_+$.
-
-
-Writing $\frac{1}{\mA}\|\rVec(\regparam)\|_2^2$ in terms of filter functions \eqref{eq:Filter functions},
-\[\lim_{\regparam\rightarrow\infty} \frac{1}{\mA}\|\rVec(\regparam)\|_2^2 = \lim_{\regparam\rightarrow\infty} \frac{1}{\mA} \sum_{j=1}^{n} \left(\mfilt_j\right)^2\left(\dft{d}_j\right)^2 = \frac{1}{\mA} \sum_{j=1}^{n} \left(\lim_{\regparam\rightarrow\infty}\left(\mfilt_j\right)^2\right)\left(\dft{d}_j\right)^2.\]
-Expanding the denominator of $\left(\mfilt_j\right)^2$ makes the limit clear:
-\[\lim_{\regparam\rightarrow\infty} \left(\mfilt_j\right)^2 = \lim_{\regparam\rightarrow\infty}\frac{\regparam^4\bm{\lambda}_j}{\regparam^4\bm{\lambda}_j + 2\regparam^2\bm{\lambda}_j\bm{\delta}_j + \bm{\delta}_j^2} = \begin{cases}
-1, & \bm{\lambda}_j \neq 0 \\
-0, & \bm{\lambda}_j = 0
-\end{cases}.\]
-Therefore
-\[\lim_{\regparam\rightarrow\infty} \frac{1}{\mA}\|\rVec(\regparam)\|_2^2 = \frac{1}{\mA} \sum_{j=1}^{n} \left(\lim_{\regparam\rightarrow\infty}\left(\mfilt_j\right)^2\right)\left(\dft{d}_j\right)^2 \leq \frac{1}{\mA} \sum_{j=1}^{n} \left(\dft{d}_j\right)^2 = \frac{1}{\mA}\|\svd{\dVec}\|_2^2 = \frac{1}{\mA}\|\dVec\|_2^2,\]
+From \eqref{eq:Redefinition of Filter}, we know that $0 \leq \mfilt_{j+k}(\regparam^{(p)}) \leq 1$ for all $\regparam^{(p)} \in \mathbb{R}_+$. Additionally, $0 \leq w_{j+k}^{(p)} \leq 1$ for all $p = 1,\ldots,P$. Therefore we have
+\[\left\|\rWin(\regparamVec)\right\|_2^2 = 
+\sum_{j=1}^{m} \left(\left[\sum_{p=1}^{P} w_{j+k}^{(p)}\mfilt_{j+k}\left(\regparam^{(p)}\right)\right] \hat{d}_j\right)^2 \leq \sum_{j=1}^{m} \left(P\hat{d}_j\right)^2 = P^2\left\|\dVec\right\|_2^2,\]
 with the last equality following from $\svd{\dVec} = \trans{U}\dVec$ with orthogonal $U$.
 \end{proof}
-
-
+\noindent In practice, Lemma \ref{lem:Limit of Regularized Residual} does not provide a tight bound since many of the terms in the sum over $p$ are quite smaller than one. If non-overlapping windows are used, then a tighter bound could be obtained by noting that many of the summands are identically zero. However, Lemma Lemma \ref{lem:Limit of Regularized Residual} does provide some insight into the numerical behavior of the functions using $\|\rWin(\regparamVec)\|_2^2$, which will be discussed in Section \ref{sec:Validation}. \par
 We can also develop an analog of windowed regularized residual as applied to the average $\dAvg = \frac{1}{R}\sum_{r=1}^R \dVec^{(r)}$ under Assumptions \ref{Assumption_Matrices} and \ref{Assumption_Windows}. Defining the windowed regularized residual applied to $\dAvg$ as
 \begin{equation}
 \label{eq:Average residual}
