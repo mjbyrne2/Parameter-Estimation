@@ -1008,7 +1008,7 @@ The one-dimensional test problem demonstrates that the adapted methods have pote
 The data sets of the two-dimensional test problem consist of images of size $256 \times 256$. A total of 16 images were used and split into training and validation sets containing eight images each. To obtain the 16 images from the $512 \times 512$ Mercury images in Figure \ref{fig:MESSENGER True}, eight images were randomly chosen and two $256 \times 256$ subimages of each image were randomly selected. The 16 images were then split into training and validation sets. Another validation set of images, shown in Figure , was used that consisted of built-in MATLAB images.
 
 \begin{figure}[ht]
-\includegraphics[width=1.0\textwidth]{Figures/ValidationSet2}
+\includegraphics[width=1.0\textwidth]{Figures/ValidationSet2.pdf}
 \caption{The second validation set, consisting of built-in MATLAB images. From left to right starting in the top row, the images are: \texttt{rice.png}, \texttt{AT3\_1m4\_01.tif}, \texttt{circuit.tif}, \texttt{cameraman.tif}, \texttt{liftingbody.png}, \texttt{westconcordorthophoto.png}, \texttt{parkavenue.jpg}, and \texttt{llama.jpg}.}
 \label{fig:Validation Set 2}
 \end{figure}
@@ -1020,8 +1020,7 @@ From this construction, the DCT was the primary tool for the 2D test problem as 
 In regards to the spectral windowing, at most two windows were used and the types of window were logarithmic (non-overlapping) and logarithmic cosine (overlapping); the decision to use logarithmic spacing is supported by how the ordered spectral components decay, which is shown in Figure \ref{fig:Spectral Decay}. The use of three or more windows was not considered for the sake of computational savings and because the use of more than two windows was not advocated in \cite{ChungEasleyOLeary}.
 
 \begin{figure}[ht]
-\centering
-\includegraphics[width=1.0\textwidth]{Figures/SpectrumDecay}
+\includegraphics[width=1.0\textwidth]{Figures/SpectrumDecay.pdf}
 \caption{Decay of the ordered operator spectrum in relation to width of the Gaussian kernel and choice of penalty function. The vertical lines indicate the partition points of using two (linear or logarithmic) windows. Due to how the spectrums decay, logarithmic rather than linear windows were selected for the numerical tests.}
 \label{fig:Spectral Decay}
 \end{figure}
