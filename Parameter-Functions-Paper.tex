@@ -1015,7 +1015,7 @@ The data sets of the two-dimensional test problem consist of images of size $256
 
 A $256 \times 256$ point spread function (PSF) was formed using a discretization of the zero centered, circularly symmetric Gaussian kernel
 \[k(x,y) = \exp\left(-\frac{(x^2 + y^2)}{2\nu}\right).\]
-The parameter $\nu$ controls the width of the Gaussian kernel. Choosing $k(x,y)$ to be circularly symmetric is for convenience; a Gaussian kernel with different width parameters for the $x$ and $y$ directions can still be used to construct a PSF that is doubly symmetric for diagonalization via the DCT \cite{HansenNagyOLeary}. The two values of $\nu$ considered were 100 and 200. The corresponding PSFs were discretely convolved with each image as a means of blurring. SNR values of 25 and 40 were used to construct realizations of normal noise that were added to the blurred images for create the data. \par 
+The parameter $\nu$ controls the width of the Gaussian kernel. Choosing $k(x,y)$ to be circularly symmetric is for convenience; a Gaussian kernel with different width parameters for the $x$ and $y$ directions can still be used to construct a PSF that is doubly symmetric for diagonalization via the DCT \cite{HansenNagyOLeary}. The two values of $\nu$ considered were 100 and 200. The corresponding PSFs were discretely convolved with each image as a means of blurring. SNR values of 10 and 25 were used to construct realizations of normal noise that were added to the blurred images for create the data. \par 
 From this construction, the DCT was the primary tool for the 2D test problem as opposed to the GSVD. To ensure simultaneous diagonalization of the block system matrices $A$ and $L$, reflective boundary conditions were assumed so that both $A$ and $L$ have the same block structure. This special block structure is called BTTB + BTHB + BHTB + BHHB in \cite{HansenNagyOLeary}, with the ``T" and ``H" standing for Toeplitz and Hankel, respectively. One penalty matrix $L$ considered was the appropriately structured version of the discrete negative Laplacian operator, which is an approximation of the continuous Laplacian operator \cite{DebnathMikusinski2005,LeVeque2007}. The second penalty matrix was the identity. The structure of $A$ and $L$ allows for simultaneous diagonalization using two-dimensional DCT for numerical efficiency. \par
 In regards to the spectral windowing, at most two windows were used and the types of window were logarithmic (non-overlapping) and logarithmic cosine (overlapping); the decision to use logarithmic spacing is supported by how the ordered spectral components decay, which is shown in Figure \ref{fig:Spectral Decay}. The use of three or more windows was not considered for the sake of computational savings and because the use of more than two windows was not advocated in \cite{ChungEasleyOLeary}.
 
@@ -1026,8 +1026,28 @@ In regards to the spectral windowing, at most two windows were used and the type
 \label{fig:Spectral Decay}
 \end{figure}
 
-Lastly, results for the adapted MDP method as applied to the 2D problem have been omitted since results depend upon the tuning of the safety parameter $\safeparam$. 
+Lastly, results for the adapted MDP method as applied to the 2D problem have been omitted since results depend upon the tuning of the safety parameter $\safeparam$.
 
+\begin{figure}[ht]
+\centering
+\includegraphics[width=1.0\textwidth]{Figures/Convergence_v100_SNR10_logCos2_L.pdf}
+\caption{Adapted parameters obtained from using two log cosine windows as the number of data sets changes from one to 16. For all three methods, $\regparam$}
+\label{fig:Convergence of Adapted Parameters}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=1.0\textwidth]{Figures/Boxplot_v100_SNR10_log2_L.pdf}
+\caption{}
+\label{fig:Boxplot_v100_SNR10_log2_L}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=1.0\textwidth]{Figures/Boxplot_v100_SNR10_logCos2_L.pdf}
+\caption{}
+\label{fig:Boxplot_v100_SNR10_logCos2_L}
+\end{figure}
 
 \section{Conclusions and future work} \label{sec:Conclusion}
 In conclusion, this paper demonstrate a means by which UPRE, MDP, and GCV methods can be extended to accommodate multiple data sets. The most general forms of functions associate with these methods are \eqref{eq:UPRE 3}, \eqref{eq:Big MDP}, \eqref{eq:GCV Big}, and , respectively. The adapted UPRE and MDP methods are novel in that their corresponding functions can be written as an average of the individual functions associate with each data set. None of the three adapted methods require knowledge of true solutions unlike the machine learning approach defined by \eqref{eq:Learning function}, though the MRI test problems demonstrate that the adapted methods can perform competitively. \par
