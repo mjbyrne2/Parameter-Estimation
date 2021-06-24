@@ -1017,7 +1017,7 @@ A $256 \times 256$ point spread function (PSF) was formed using a discretization
 \[k(x,y) = \exp\left(-\frac{(x^2 + y^2)}{2\nu}\right).\]
 The parameter $\nu$ controls the width of the Gaussian kernel. Choosing $k(x,y)$ to be circularly symmetric is for convenience; a Gaussian kernel with different width parameters for the $x$ and $y$ directions can still be used to construct a PSF that is doubly symmetric for diagonalization via the DCT \cite{HansenNagyOLeary}. The two values of $\nu$ considered were 100 and 200. The corresponding PSFs were discretely convolved with each image as a means of blurring. SNR values of 10 and 25 were used to construct realizations of normal noise that were added to the blurred images for create the data. \par 
 From this construction, the DCT was the primary tool for the 2D test problem as opposed to the GSVD. To ensure simultaneous diagonalization of the block system matrices $A$ and $L$, reflective boundary conditions were assumed so that both $A$ and $L$ have the same block structure. This special block structure is called BTTB + BTHB + BHTB + BHHB in \cite{HansenNagyOLeary}, with the ``T" and ``H" standing for Toeplitz and Hankel, respectively. One penalty matrix $L$ considered was the appropriately structured version of the discrete negative Laplacian operator, which is an approximation of the continuous Laplacian operator \cite{DebnathMikusinski2005,LeVeque2007}. The second penalty matrix was the identity. The structure of $A$ and $L$ allows for simultaneous diagonalization using two-dimensional DCT for numerical efficiency. \par
-In regards to the spectral windowing, at most two windows were used and the types of window were logarithmic (non-overlapping) and logarithmic cosine (overlapping); the decision to use logarithmic spacing is supported by how the ordered spectral components decay, which is shown in Figure \ref{fig:Spectral Decay}. The use of three or more windows was not considered for the sake of computational savings and because the use of more than two windows was not advocated in \cite{ChungEasleyOLeary}.
+In regards to the spectral windowing, at most two windows were used and the types of window were logarithmic (non-overlapping) and logarithmic cosine (overlapping); the decision to use logarithmic spacing is supported by how the ordered spectral components decay, which is shown in Figure \ref{fig:Spectral Decay}. The use of three or more windows was not considered for the sake of computational savings and because the use of more than two windows was not advocated in \cite{ChungEasleyOLeary}. The use of three windows did not produce noticeable benefits in our test problems as well. Lastly, results for the adapted MDP method as applied to the 2D problem have been omitted since results depend upon the tuning of the safety parameter $\safeparam$.
 
 \begin{figure}[ht]
 \includegraphics[width=1.0\textwidth]{Figures/SpectrumDecay.pdf}
@@ -1025,27 +1025,60 @@ In regards to the spectral windowing, at most two windows were used and the type
 \label{fig:Spectral Decay}
 \end{figure}
 
-Lastly, results for the adapted MDP method as applied to the 2D problem have been omitted since results depend upon the tuning of the safety parameter $\safeparam$.
+For all of the numerical set-ups involving two parameters, the relationship between the parameters mostly depended upon the choice of penalty matrix. When the penalty matrix was chosen as the identity, the first parameter $\regparam^{(1)}$ dominated the resulting regularized solutions though the magnitude of $\regparam^{(1)}$ remained small (less than 0.2 in Figure \ref{fig:Boxplot_v200_SNR10_logCos2_I}). The second parameter $\regparam^{(2)}$ tended to be a few orders of magnitude larger than $\regparam^{(1)}$ but was localized; Figure \ref{fig:Boxplot_v200_SNR10_logCos2_I} shows $\regparam^{(2)}$ bounded between 9.9 and 10.4 for all three methods. Figure \ref{fig:Boxplot_v200_SNR10_logCos2_L} shows the contrast in parameter behavior when the operator was selected to be the Laplacian. The magnitude of $\regparam^{(1)}$ increased while the magnitude of $\regparam^{(2)}$ decreased. For all three methods, the range of both parameters increased as well. However, the relative errors of the associated regularized solutions were consistent between the identity and Laplacian cases. \par
+The use of overlapping or -non-overlapping windows influenced the degree of  interdependence between the two parameters. Figures \ref{fig:Boxplot_v200_SNR10_logCos2_L} and \ref{fig:Boxplot_v200_SNR10_log2_L} present the results of using overlapping and non-overlapping logarithmic windows. When using overlapping windows (Figure \ref{fig:Boxplot_v200_SNR10_logCos2_L}), the ranges of both parameters were smaller than those for non-overlapping windows (Figure \ref{fig:Boxplot_v200_SNR10_log2_L}). The exception is the behavior of $\regparam^{(2)}$ exhibited by the use of $F_{\substack{\text{Best} \\ \text{win}}}(\regparamVec)$ in Figure \ref{fig:Boxplot_v200_SNR10_log2_L}, which shows all of the second parameters grouping near 10. This grouping of the second parameter was also exhibited in other numerical set-ups involving non-overlapping windows. The grouping behavior can be explained by the choice of an upper bound during the minimization process; in the case of Figure \ref{fig:Boxplot_v200_SNR10_log2_L}, the upper bound was chosen near 10. The calculated gradient of the $F_{\substack{\text{Best} \\ \text{win}}}(\regparamVec)$ is too small to resolve a minimum in the direction of $\regparam^{(2)}$ and thus the minimization process determines the minimizers near the specified boundary. \par 
+In regards to the adapted methods, which select $P$ parameters using $R$ data sets, the trend of the parameter as $R$ increased was similar to that displayed by the 1D case (Figure \ref{fig:Parameters 1D MRI}) for the first parameter only. Figure \ref{fig:Convergence of Adapted Parameters} shows that $\regparam^{(1)}$ stabilizes using four data sets or more for all three methods. While the adapted UPRE and GCV methods produced stable values of $\regparam^{(1)}$ near the same value of $R$, the learning method produced values that oscillated between the specified upper bound (20 in this case) and values similar to the other two methods. This failure to stabilize can most likely be attributed to the difficulties described earlier regarding minimization in the direction of $\regparam^{(1)}$. Since the value of the second parameter often has little effect on the evaluations of the functions, the oscillatory nature of $\regparam^{(1)}$ does not negatively effect the relative errors of the regularized solutions. Table \ref{tab:Relative Errors v200_SNR10_logCos2_L} shows examples of mean percent relative errors of solutions obtain using parameters from each adapted method. Even for the limit number of training sets (two through eight), the errors decrease as $R$ increases. \par 
+It is interesting to note that the relative errors of solutions obtained for parameters applied to the second validation set (Figure \ref{fig:Validation Set 2}) were less than those of either the training or first validation set. The similarity of error between the training and first validation set is to be expected since both sets consist of images from the same parent set (subimages selected from Figure \ref{fig:MESSENGER True}). 
+
+\begin{table}[ht!]
+  \begin{center}
+    \caption{Percent relative errors of regularized solutions for $\nu = 200$ and an SNR of 10 with two log cosine windows and a Laplacian penalty matrix.}
+    \label{tab:Relative Errors v200_SNR10_logCos2_L}
+    \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|}
+    \hline
+    \multirow{2}{*}{$R$} & \multicolumn{3}{|c|}{Training} & \multicolumn{3}{|c|}{Validation} & \multicolumn{3}{|c|}{Validation 2} \\
+    \cline{2-10}
+     & Learned & UPRE & GCV & Learned & UPRE & GCV & Learned & UPRE & GCV \\
+    \hline
+    2 & 24.806 & 24.859 & 24.862 & 26.933 & 26.968 & 26.971 & 18.532 & 18.587 & 18.590 \\
+    \hline
+    4 & 24.669 & 24.523 & 24.523 & 27.009 & 26.796 & 26.796 & 18.724 & 18.361 & 18.360\\
+    \hline
+    6 & 24.573 & 24.546 & 24.547 & 26.894 & 26.787 & 26.788 & 18.537 & 18.332 & 18.332 \\
+    \hline
+    8 & 24.546 & 24.552 & 24.553 & 26.851 & 26.789 & 26.789 & 18.464 & 18.332 & 18.332\\
+    \hline
+    \end{tabular}
+  \end{center}
+\end{table}
+
 
 \begin{figure}[ht]
 \centering
-\includegraphics[width=1.0\textwidth]{Figures/Convergence_v100_SNR10_logCos2_L.pdf}
+\includegraphics[width=1.0\textwidth]{Figures/Boxplot_v200_SNR10_logCos2_I.pdf}
+\caption{}
+\label{fig:Boxplot_v200_SNR10_logCos2_I}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=1.0\textwidth]{Figures/Boxplot_v200_SNR10_logCos2_L.pdf}
+\caption{}
+\label{fig:Boxplot_v200_SNR10_logCos2_L}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=1.0\textwidth]{Figures/Boxplot_v200_SNR10_log2_L.pdf}
+\caption{}
+\label{fig:Boxplot_v200_SNR10_log2_L}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=1.0\textwidth]{Figures/Convergence_v200_SNR10_logCos2_L.pdf}
 \caption{Adapted parameters obtained from using two log cosine windows as the number of data sets changes from one to 16. For all three methods, $\regparam$}
 \label{fig:Convergence of Adapted Parameters}
-\end{figure}
-
-\begin{figure}[ht]
-\centering
-\includegraphics[width=1.0\textwidth]{Figures/Boxplot_v100_SNR10_log2_L.pdf}
-\caption{}
-\label{fig:Boxplot_v100_SNR10_log2_L}
-\end{figure}
-
-\begin{figure}[ht]
-\centering
-\includegraphics[width=1.0\textwidth]{Figures/Boxplot_v100_SNR10_logCos2_L.pdf}
-\caption{}
-\label{fig:Boxplot_v100_SNR10_logCos2_L}
 \end{figure}
 
 \section{Conclusions and future work} \label{sec:Conclusion}
