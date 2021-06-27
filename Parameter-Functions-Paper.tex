@@ -4,6 +4,7 @@
 \geometry{margin = 1 in}
 \usepackage{color}
 \usepackage{hyperref}
+\usepackage{url}
 
 \input{Parameter-Estimation-Notation.tex}	% Load commands for notation
 \renewcommand{\arraystretch}{1.5}	% Change of table scale factor
@@ -950,15 +951,15 @@ F_{\text{Best}}^{(r)}(\regparam) = \left\|\xVec^{(r)}(\regparam) - \xVec^{(r)}\r
 It is clear that the relationship between \eqref{eq:Learning function} and \eqref{eq:Best function} is
 \[\widetilde{F}_{\text{Best}}(\regparam) = \frac{1}{R}\sum_{r=1}^R F_{\text{Best}}^{(r)}(\regparam).\]
 Both functions \eqref{eq:Learning function} and \eqref{eq:Best function} rely on knowledge of the true solutions $\{\xVec^{(r)}\}_{r=1}^R$. Parameters chosen as minimizers of \eqref{eq:Best function} are ``best" in the sense of minimizing the norm of the error of a single regularized solution. It is important to note that minimization of \eqref{eq:Learning function} results in a single parameter depending on all $R$ data vectors, while minimizing \eqref{eq:Best function} results in a single parameter for each of the $R$ data vectors. \par
-To evaluate the effectiveness of both the adapted single-parameter and multiparameter selection methods described in Section \ref{sec:Methods}, two test problems were considered. For both problems, data vectors were considered as a set of training data and resulting parameters were then applied to validation data set. A one-dimensional problem serves as a proof of concept and uses MRI data that is built into MATLAB, which is shown in Figure \ref{fig:MRI 1D}. 
+To evaluate the effectiveness of both the adapted single-parameter and multiparameter selection methods described in Section \ref{sec:Methods}, two test problems were considered. For both problems, data vectors were considered as a set of training data and resulting parameters were then applied to validation data set. A one-dimensional problem serves as a proof of concept and uses MRI data that is built into MATLAB, which is shown in Figure \ref{fig:MRI 1D}.  The second problem is two-dimensional and  utilizes the images in Figure \ref{fig:MESSENGER True} of the planet Mercury obtained by the MESSENGER space probe\footnote{  The MESSENGER images are available to the public courtesy of NASA, the Johns Hopkins University Applied Physics Laboratory, and the Carnegie Institution of Washington \cite{MESSENGER}}
 
-\begin{figure}[ht]
+\begin{figure}[!ht]%[htb!]
 \includegraphics[scale=0.32]{Figures/Full_MRI_Data.eps}
 \caption{MRI data formed by reformatting the MATLAB built-in MRI data. Each vector was blurred using a Gaussian kernel and normal noise was added; the resulting vectors are shown at the bottom. The dimension of all three images is $256 \times 536$.}
 \label{fig:MRI 1D}
 \end{figure}
 
-\noindent The other problem is two-dimensional that utilizes the images in Figure \ref{fig:MESSENGER True} of the planet Mercury obtained by the MESSENGER space probe. 
+
 
 \begin{figure}[ht]
 \includegraphics[width=1.0\textwidth]{Figures/MESSENGER.pdf}
@@ -966,7 +967,7 @@ To evaluate the effectiveness of both the adapted single-parameter and multipara
 \label{fig:MESSENGER True}
 \end{figure}
 
-\noindent The MESSENGER images are available to the public courtesy of NASA, the Johns Hopkins University Applied Physics Laboratory, and the Carnegie Institution of Washington \cite{MESSENGER}. \par
+
 For both problems, the following definition of signal-to-noise ratio (SNR) is used as a measurement for noise content in the images:
 \begin{equation}
 \label{eq:SNR}
@@ -986,7 +987,7 @@ Figure \ref{fig:Parameters 1D MRI} illustrates a comparison of the methods in te
 
 \begin{figure}[ht]
 \includegraphics[width=1.0\textwidth]{Figures/Parameters1D_mri.pdf}
-\caption{Trend of parameters selected by each adapted method as the number of training vectors increases. Note that the parameters essentially stabilize by about 40 training vectors out of the possible 268.}
+\caption{Trend of parameters selected by each adapted method as the number of training vectors ($R$) increases. The parameters stabilize as the number of training vectors increases.}
 \label{fig:Parameters 1D MRI}
 \end{figure}
 
@@ -996,7 +997,7 @@ Figure \ref{fig:Errors 1D MRI} shows the relative errors of the regularized solu
 
 \begin{figure}[ht]
 \includegraphics[width=1.0\textwidth]{Figures/Errors1D_mri.pdf}
-\caption{Boxplots of the relative errors of each regularized solution versus the validation set. A parameter was selected using the full training set for each method, and the parameters of each method were used to generate regularized solutions from the validation set.}
+\caption{Boxplots of the errors of the regularized solutions constructed from parameters selected by each method. The effectiveness of the adapted MDP method is affected by the choice of safety parameter $\epsilon$.}
 \label{fig:Errors 1D MRI}
 \end{figure}
 
@@ -1056,21 +1057,21 @@ It is interesting to note that the averaged relative errors of solutions obtaine
 \begin{figure}[ht]
 \centering
 \includegraphics[width=1.0\textwidth]{Figures/Boxplot_v200_SNR10_logCos2_I.pdf}
-\caption{}
+\caption{Boxplots of the parameters $\regparam^{(1)}$ and $\regparam^{(2)}$, as well as the relative errors of the corresponding regularized solutions. The UPRE and GCV methods selected similar values of $\regparam^{(1)}$; all three methods selected similar values for $\regparam^{(2)}$. The distributions of the errors are similar for all three methods, with UPRE and GCV methods producing errors slightly greater than the best case.}
 \label{fig:Boxplot_v200_SNR10_logCos2_I}
 \end{figure}
 
 \begin{figure}[ht]
 \centering
 \includegraphics[width=1.0\textwidth]{Figures/Boxplot_v200_SNR10_logCos2_L.pdf}
-\caption{}
+\caption{Boxplots of the parameters $\regparam^{(1)}$ and $\regparam^{(2)}$, as well as the relative errors of the corresponding regularized solutions. In contrast to choosing an identity penalty matrix (Figure \ref{fig:Boxplot_v200_SNR10_logCos2_I}), the choice of the Laplacian produced larger values of $\regparam^{(1)}$ instead of $\regparam^{(2)}$. The distributions of the errors are similar for all three methods.}
 \label{fig:Boxplot_v200_SNR10_logCos2_L}
 \end{figure}
 
 \begin{figure}[ht]
 \centering
 \includegraphics[width=1.0\textwidth]{Figures/Boxplot_v200_SNR10_log2_L.pdf}
-\caption{}
+\caption{Boxplots of the parameters $\regparam^{(1)}$ and $\regparam^{(2)}$, as well as the relative errors of the corresponding regularized solutions. By choosing non-overlapping logarithmic windows, the best function selected $\regparam^{(2)}$ at the upper limit set during the minimization process while the UPRE and GCV methods selected values having a greater distribution.}
 \label{fig:Boxplot_v200_SNR10_log2_L}
 \end{figure}
 
