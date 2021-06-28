@@ -941,17 +941,15 @@ Then for all $\regparamVec \in \mathbb{R}_{+}^{P}$,
 For a basis of comparison, parameters were selected as minimizers of the function
 \begin{equation}
 \label{eq:Learning function}
-\widetilde{F}_{\text{Best}}(\regparam) = \frac{1}{R}\sum_{r=1}^R \left\|\xVec^{(r)}(\regparam) - \xVec^{(r)}\right\|_2^2 = \frac{1}{R}\left\|\xBig(\regparam) - \xBig\right\|_2^2,
+\BWinBig(\regparamVec) = \frac{1}{R}\left\|\xWinBig(\regparamVec) - \xBig\right\|_2^2 = \frac{1}{R}\sum_{r=1}^R \BWin^{(r)}(\regparamVec),
 \end{equation} 
-which was considered in \cite{ChungEspanol2017}. A simpler way of selecting regularization parameters is to minimize
+where
 \begin{equation}
-\label{eq:Best function}
-F_{\text{Best}}^{(r)}(\regparam) = \left\|\xVec^{(r)}(\regparam) - \xVec^{(r)}\right\|_2^2, \quad r = 1,\ldots,R.
+\label{eq:Individial Best Function}
+    \BWin^{(r)}(\regparamVec) = \left\|\xWin^{(r)}(\regparamVec) - \xVec^{(r)}\right\|_2^2.
 \end{equation}
-It is clear that the relationship between \eqref{eq:Learning function} and \eqref{eq:Best function} is
-\[\widetilde{F}_{\text{Best}}(\regparam) = \frac{1}{R}\sum_{r=1}^R F_{\text{Best}}^{(r)}(\regparam).\]
-Both functions \eqref{eq:Learning function} and \eqref{eq:Best function} rely on knowledge of the true solutions $\{\xVec^{(r)}\}_{r=1}^R$. Parameters chosen as minimizers of \eqref{eq:Best function} are ``best" in the sense of minimizing the norm of the error of a single regularized solution. It is important to note that minimization of \eqref{eq:Learning function} results in a single parameter depending on all $R$ data vectors, while minimizing \eqref{eq:Best function} results in a single parameter for each of the $R$ data vectors. \par
-To evaluate the effectiveness of both the adapted single-parameter and multiparameter selection methods described in Section \ref{sec:Methods}, two test problems were considered. For both problems, data vectors were considered as a set of training data and resulting parameters were then applied to validation data set. A one-dimensional problem serves as a proof of concept and uses MRI data that is built into MATLAB, which is shown in Figure \ref{fig:MRI 1D}.  The second problem is two-dimensional and  utilizes the images in Figure \ref{fig:MESSENGER True} of the planet Mercury obtained by the MESSENGER space probe\footnote{  The MESSENGER images are available to the public courtesy of NASA, the Johns Hopkins University Applied Physics Laboratory, and the Carnegie Institution of Washington \cite{MESSENGER}}
+Regularization parameters chosen as minimizers of \eqref{eq:Learning function} are ``best" in the sense of minimizing the mean squared errors of the regularized solutions $\xWin^{(r)}(\regparamVec)$; the use of \eqref{eq:Learning function} was considered in \cite{ChungEspanol2017}. It is important to note that determining minimizers of \eqref{eq:Learning function} relies on knowledge of the true solutions $\{\xVec^{(r)}\}_{r=1}^R$. One could also find minimizers $\regparamVec^{(r)}$ of \eqref{eq:Individial Best Function} for each $r = 1,\ldots,R$, which would produce parameters that are ``best" for their own data set. \par
+To evaluate the effectiveness of both the adapted single-parameter and multiparameter selection methods described in Section \ref{sec:Methods}, two test problems were considered. For both problems, data vectors were considered as a set of training data and resulting parameters were then applied to validation data set. A one-dimensional problem serves as a proof of concept and uses MRI data that is built into MATLAB, which is shown in Figure \ref{fig:MRI 1D}.  The second problem is two-dimensional and  utilizes the images in Figure \ref{fig:MESSENGER True} of the planet Mercury obtained by the MESSENGER space probe\footnote{The MESSENGER images are available to the public courtesy of NASA, the Johns Hopkins University Applied Physics Laboratory, and the Carnegie Institution of Washington \cite{MESSENGER}}.
 
 \begin{figure}[!ht]%[htb!]
 \includegraphics[scale=0.32]{Figures/Full_MRI_Data.eps}
@@ -959,14 +957,11 @@ To evaluate the effectiveness of both the adapted single-parameter and multipara
 \label{fig:MRI 1D}
 \end{figure}
 
-
-
 \begin{figure}[ht]
 \includegraphics[width=1.0\textwidth]{Figures/MESSENGER.pdf}
 \caption{Selected images used for MESSENGER two-dimensional test problem. Available courtesy of NASA/Johns  Hopkins  University  Applied  Physics  Laboratory/Carnegie Institution of Washington \cite{MESSENGER}.}
 \label{fig:MESSENGER True}
 \end{figure}
-
 
 For both problems, the following definition of signal-to-noise ratio (SNR) is used as a measurement for noise content in the images:
 \begin{equation}
@@ -983,24 +978,20 @@ The one-dimensional test problem uses the MRI data built into MATLAB, which can 
  & & -1 & 1 \\
 \end{bmatrix}.\]
 The resulting system matrix in \eqref{eq:TikSol3} has full column rank, and so applying the normal equations in terms of the GSVD results in unique solutions. \par 
-Figure \ref{fig:Parameters 1D MRI} illustrates a comparison of the methods in terms of the regularization parameters $\regparam$ selected as the number of training vectors increases. 
-
+Figure \ref{fig:Parameters 1D MRI} illustrates a comparison of the methods in terms of the regularization parameters $\regparam$ selected as the number of training vectors increases.
 \begin{figure}[ht]
 \includegraphics[width=1.0\textwidth]{Figures/Parameters1D_mri.pdf}
 \caption{Trend of parameters selected by each adapted method as the number of training vectors ($R$) increases. The parameters stabilize as the number of training vectors increases.}
 \label{fig:Parameters 1D MRI}
 \end{figure}
-
-\noindent When the number of training vectors is small (e.g. between 1 and 10 from Figure \ref{fig:Parameters 1D MRI}), the parameters selected by all four methods change significantly. This can be attributed to the fact that all of the methods select a parameter that is either a root or a minimum of an average of functions. For a small amount of training vectors, each additional vector has more influence over the behavior of the adapted function. The parameters do seem to stabilize as the number of training vectors reach a certain point; in the problem being considered here, the parameters stabilize by about 40 training sets. The stabilization of the parameter most likely follows from the fact that each vector is part of the same type of image (MRI). It would seem unreasonable to expect the same stabilization when using vectors pulled from dissimilar images. \par 
+\noindent When the number of training vectors is small (e.g. between 1 and 10 from Figure \ref{fig:Parameters 1D MRI}), the parameters selected by all four methods change significantly. This can be attributed to the fact that all of the methods select a parameter that is either a root or a minimum of an average of functions. For a small amount of training vectors, each additional vector has more influence over the behavior of the adapted function. The parameters stabilize as the number of training vectors reach a certain point; in the problem being considered here, the parameters stabilize by about 40 training sets. \par 
 Before looking at the relative errors of the regularized solutions, another observation regarding Figure \ref{fig:Parameters 1D MRI} can be made. While the parameters selected using the learning function \eqref{eq:Learning function} and the adapted UPRE and GCV methods are close (the maximum difference in the parameters does not exceed 0.5), the adapted MDP method consistently selected significantly larger parameters. A direct consequence is that the regularized solutions have higher relative errors. \par
 Figure \ref{fig:Errors 1D MRI} shows the relative errors of the regularized solutions corresponding to the parameters from each method. 
-
 \begin{figure}[ht]
 \includegraphics[width=1.0\textwidth]{Figures/Errors1D_mri.pdf}
 \caption{Boxplots of the errors of the regularized solutions constructed from parameters selected by each method. The effectiveness of the adapted MDP method is affected by the choice of safety parameter $\epsilon$.}
 \label{fig:Errors 1D MRI}
 \end{figure}
-
 \noindent Instead of using a relatively small amount of training vectors, like 40 out of 268 in Figure \ref{fig:Parameters 1D MRI}, the full training set was used to select a parameter from each method. These four parameters were then used to generate a regularized solution for each vector in the validation set, and the relative errors were computed against the true solutions. First, the relative errors obtained by the learning method and adapted UPRE and GCV methods are quite similar; the means of the relative errors are close, and there is a collection of upper outliers. In contrast, the adapted MDP method has a slightly larger mean relative error. However, the most striking visual characteristic from Figure \ref{fig:Errors 1D MRI} is the number of outliers in the MDP relative errors. The largest relative error obtained using the adapted MDP method is about twice the largest relative error of the other three methods. \par 
 The one-dimensional test problem demonstrates that the adapted methods have potential for selecting viable regularization parameters that can be applied to multiple sets of data. The adapted UPRE and GCV performed competitively against the learning method, which relies on knowledge of the true training solutions. As stated previously, the success of the adapted methods is predicated on the similarity of the data sets being considered. However, this is not an unreasonable condition because data from a given experiment would hopefully vary little without significant change in the experimental set-up.
 
