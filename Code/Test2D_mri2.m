@@ -20,6 +20,11 @@ pind = randperm(2*R);
 X = X(:,:,pind);
 B = B(:,:,pind);
 
+
+
+
+
+
 % Split data into training and validation sets:
 Xt = X(:,:,1:R);   % Take the first R columns as the training set
 Xv = X(:,:,R+1:2*R);   % Take next R columns as validation set
@@ -98,7 +103,7 @@ dpsi = @(alpha) (2*(abs(Delta).^2).*(abs(Lambda).^2)*alpha)./...
 
 % Select method (UPRE = 1, GCV = 2, MDP = 3):
 method = 2;
-safeparam = 1;  % Only for MDP 
+safeParam = 1;  % Only for MDP 
 
 % Parameter methods:
 switch method
@@ -127,9 +132,9 @@ switch method
 %             (1/numel(d_hat))*sum(sum((psi(alpha).^2).*(d_hat.^2))).*sum(-dpsi(alpha));
     case 3  % MDP
 %         F = @(alpha,d_hat,eta) (1/n)*(norm(psi(alpha).*d_hat,'fro')^2) - eta;
-        F = @(alpha,d_hat,eta) (1/n)*(norm(psi(alpha).*d_hat,'fro')^2) - safeparam*eta*n;
+        F = @(alpha,d_hat,eta) (1/n)*(norm(psi(alpha).*d_hat,'fro')^2) - safeParam*eta*n;
 %         bigF = @(alpha,D_hat,Eta) (1/numel(D_hat))*sum(arrayNorm(psi(alpha).*D_hat).^2) - mean(Eta);
-        bigF = @(alpha,D_hat,Eta) (1/numel(D_hat))*sum(arrayNorm(psi(alpha).*D_hat).^2) - safeparam*(n*mean(Eta));
+        bigF = @(alpha,D_hat,Eta) (1/numel(D_hat))*sum(arrayNorm(psi(alpha).*D_hat).^2) - safeParam*(n*mean(Eta));
 end
 
 %% Find individual regularization parameters

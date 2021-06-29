@@ -4,7 +4,7 @@
 
 % User inputs:
 v = 0; % Dispersion parameter of circularly symmetric Gaussian kernel
-lSNR = 10;   % Lower bound of SNR
+lSNR = 25;   % Lower bound of SNR
 penalty = 'Laplacian';  % Penalty matrix (Identity or Laplacian)
 type = 'logCosine';    % Type of windows for regularization (see weights2.m)
 P = 1;  % Number of windows

@@ -11,8 +11,8 @@ switch nargin
     case 0
         images = 1:15;   % Default surface slices
         % Default kernel variances:
-        vx = 10;
-        vy = 10;
+        vx = 1;
+        vy = 1;
     case 1
         % Default kernel variances:
         vx = 1;

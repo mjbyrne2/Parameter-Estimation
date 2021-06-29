@@ -17,7 +17,7 @@ for i = 1:iter
     
     % Construct the cell containing the individual domain discretizations:
     for d = 1:n
-    %     D = logspace(log10(x0(d,1)),log10(x0(d,2)),nx);   % Log discretization
+%         D = logspace(log10(x0(d,1)),log10(x0(d,2)),nx);   % Log discretization
         D = linspace(x0(d,1),x0(d,2),nx);  % Linear discetization
         D(1) = x0(d,1);    % Correct first value
         D(end) = x0(d,2);  % Correct last value
@@ -37,17 +37,24 @@ for i = 1:iter
 
     % Find the minimizer:
     indMin = find(F == min(F)); % Row index of the minimizer
+    if length(indMin) > 1
+        indMin = indMin(1);
+    end
     xMin = X(indMin,:);
 
     % Redefine x0 for use in any further iterations:
-    for d = 1:n       
-        % Check if minimum occurs on the boundary:
-        if sum(x0(d,:) == xMin(d)) > 0
-            disp('Minimum detected on the boundary. Minimization has ceased.')
-            return
+    if i < iter
+        for d = 1:n       
+            % Check if minimum occurs on the boundary for later iterations:
+            if sum(x0(d,:) == xMin(d)) > 0
+                disp(['Minimum detected on the boundary during iteration '...
+                    num2str(i) ' (boundary value: ' num2str(xMin(d))...
+                    '). Minimization has ceased.'])
+                return
+            end
+            L = min(abs(x0 - repmat(xMin(:),1,2)),[],'all');    % Find the minimum distance to the boundary
+            x0 = repmat(xMin(:),1,2) + repmat([-L,L],n,1);  % Redefine x0    
         end
-        L = min(abs(x0 - repmat(xMin(:),1,2)),[],'all');    % Find the minimum distance to the boundary
-        x0 = repmat(xMin(:),1,2) + repmat([-L,L],n,1);  % Redefine x0    
     end
     
     % Clear G and X for any further iterations:

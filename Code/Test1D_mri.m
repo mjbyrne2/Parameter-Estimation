@@ -27,7 +27,7 @@ Xv = I(:,R+1:2*R);   % Take next R columns as validation set
 
 % Set-up system matrix A:
 t = linspace(-n,n,(2*n)-1); % Discretization of the interval [-n,n]
-nu = 1;  % Variance of Gaussian kernel
+nu = 10;  % Variance of Gaussian kernel
 K = exp(-(t.^2)/(2*nu));    % Gaussian kernel centered at the origin
 K = K/sum(K);   % Scale kernel
 A = toeplitz(K(n:end)); % Form Toeplitz matrix
@@ -35,6 +35,7 @@ A = toeplitz(K(n:end)); % Form Toeplitz matrix
 % Blur the images:
 Bt = A*Xt;   % Blurred training data
 Bv = A*Xv;   % Blurred validation data
+origB = A*origI;    % Original blurred image for plotting
 
 % Noise constuction:
 lSNR = 6;   % Lower bound of SNR
@@ -54,8 +55,8 @@ Dv = Bv + NoiseV;   % Noisy validation data
 
 % Set-up penalty matrix L:
 % L = eye(n); % Identity matrix
-% L = [-eye(n-1),zeros(n-1,1)] + [zeros(n-1,1),eye(n-1)]; % Stencil
-L = [eye(n);zeros(1,n)] + [zeros(1,n);-eye(n)]; % Stencil (Chung-Espanol)
+L = [-eye(n-1),zeros(n-1,1)] + [zeros(n-1,1),eye(n-1)]; % Stencil
+% L = [eye(n);zeros(1,n)] + [zeros(1,n);-eye(n)]; % Stencil (Chung-Espanol)
 
 % GSVD of block system matrix:
 [U,V,X,C,S] = gsvd(A,L);
@@ -207,7 +208,7 @@ end
 
 %% Boxplot comparing all four adaptive methods using all data vectors:
 
-errorsBig = [err_learned;err_UPREBig;err_GCVBig;err_mdp;err_mdp2]';
+errorsBig = [err_learned;err_UPREBig;err_GCVBig;err_MDPBig;err_MDPBig]';
 errorsLabels = [repmat({'Learned'},R,1);...
     repmat({'UPRE-Big'},R,1);...
     repmat({'GCV-Big'},R,1);...
