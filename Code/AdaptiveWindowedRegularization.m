@@ -3,11 +3,11 @@
 % purpose of investigating windowed spectral Tikhonov regularization.
 
 % User inputs:
-v = 0; % Dispersion parameter of circularly symmetric Gaussian kernel
-lSNR = 25;   % Lower bound of SNR
+v = 200; % Dispersion parameter of circularly symmetric Gaussian kernel
+lSNR = 10;   % Lower bound of SNR
 penalty = 'Laplacian';  % Penalty matrix (Identity or Laplacian)
 type = 'logCosine';    % Type of windows for regularization (see weights2.m)
-P = 1;  % Number of windows
+P = 2;  % Number of windows
 rangeSNR = 0; % Range of SNR (uSNR - lSNR)
 config = ['(\nu = ' num2str(v) ', SNR: ' num2str(lSNR) ', Penalty: ' penalty(1) ', Windows: ' type ')'];
 
@@ -318,11 +318,11 @@ SNR = [SNR_best,SNR_UPRE,SNR_GCV];  % All SNR's of the reg. solutions
 WS = 'maximized';    % Window state
 LW = 1.5; % Line width
 MS = 12; % Marker size
-CB_FS = 20;    % Font size of colorbar labels
-Ax_FS = 16;     % Font size of axis tickmarks
-AxL_FS = 20;    % Font size of x and y axes labels
-L_FS = 20;  % Font size of legends
-Title_FS = 22;
+CB_FS = 20;    % Font size of colorbar labels (Good)
+Ax_FS = 20;     % Font size of axis tickmarks
+AxL_FS = 22;    % Font size of x and y axes labels
+L_FS = 22;  % Font size of legends
+Title_FS = 22;  % Good
 
 %% Plotting parameters and errors/SNR:
 
@@ -365,11 +365,11 @@ end
 
 %% Find adapted regularization parameters
 
-Rvec = 2:2:Rt;   % Vector containing the number of data sets
+% Rvec = 2:2:Rt;   % Vector containing the number of data sets
 % Rvec = 1:Rt;   % Vector containing the number of data sets
-% Rvec = 1:R;   % Vector containing the number of data sets
+Rvec = 1:R;   % Vector containing the number of data sets
 r = length(Rvec);   % Number of different data sets considered in adapted methods
-% Eta = [etaT,etaV];
+Eta = [etaT,etaV];
 
 % "Learned" storage:
 alpha_learned = NaN(r,P);
@@ -415,12 +415,12 @@ flag_BigGCV = zeros(r,1);
 for l = 1:r
     
     % Specific true solutions and data vectors:
-    x = Xt(:,:,1:Rvec(l));
-    d_hat = Dt_hat(:,:,1:Rvec(l));
-    eta = etaT(1:Rvec(l));
-%     x = X(:,:,1:Rvec(l));
-%     d_hat = D_hat(:,:,1:Rvec(l));
-%     eta = Eta(1:Rvec(l));
+%     x = Xt(:,:,1:Rvec(l));
+%     d_hat = Dt_hat(:,:,1:Rvec(l));
+%     eta = etaT(1:Rvec(l));
+    x = X(:,:,1:Rvec(l));
+    d_hat = D_hat(:,:,1:Rvec(l));
+    eta = Eta(1:Rvec(l));
     
     % "Learned" parameter:    
     F = @(alpha) BigMSE(alpha,W,d_hat,delta,delta2,lambda,x);  % FIX p to W
@@ -597,9 +597,9 @@ T = table(Training,Validation,Validation2,'RowNames',RN)
 %% Plot some solutions:
 
 x5 = Xv2(:,:,5); b5 = Bv2(:,:,5); d5 = Dv2(:,:,5); 
-xReg5 = xWinBig(alpha_BigUPRE(4,:),W,Dv2_hat(:,:,5),delta,delta2,lambda);
+xReg5 = xWinBig(alpha_learned(4,:),W,Dv2_hat(:,:,5),delta,delta2,lambda);
 x6 = Xv2(:,:,6); b6 = Bv2(:,:,6); d6 = Dv2(:,:,6); 
-xReg6 = xWinBig(alpha_BigUPRE(4,:),W,Dv2_hat(:,:,6),delta,delta2,lambda);
+xReg6 = xWinBig(alpha_learned(4,:),W,Dv2_hat(:,:,6),delta,delta2,lambda);
 
 fig = figure;
 fig.WindowState = WS;
@@ -608,13 +608,13 @@ imshow([x5,b5,d5,xReg5])
 c = colorbar;
 c.FontSize = CB_FS;
 title(['Relative error of regularized solution: ',...
-    num2str(100*errBig_V2(4,5,2)),'%'],'FontSize',Title_FS)
+    num2str(100*errBig_V2(4,5,2),'%.2f'),'%'],'FontSize',Title_FS)
 subplot(2,1,2)
 imshow([x6,b6,d6,xReg6])
 c = colorbar;
 c.FontSize = CB_FS;
 title(['Relative error of regularized solution: ',...
-    num2str(100*errBig_V2(4,6,2)),'%'],'FontSize',Title_FS)
+    num2str(100*errBig_V2(4,6,2),'%.2f'),'%'],'FontSize',Title_FS)
 
 %% Save data
 
