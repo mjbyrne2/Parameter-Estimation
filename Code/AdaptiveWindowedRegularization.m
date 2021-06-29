@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 %% Two-dimensional Windowed Spectral Tikhonov Regularization
 % The code contained in this script generates numerical examples for the
 % purpose of investigating windowed spectral Tikhonov regularization.
@@ -690,7 +689,7 @@ legend('\nu = 100, I','\nu = 200, I', '\nu = 100, L',...
     '\nu = 200, L','FontSize',L_FS)
 fig.WindowState = WS;
 xlabel('Sorted index','FontSize',AxL_FS)
-=======
+
 %% Two-dimensional Windowed Spectral Tikhonov Regularization
 % The code contained in this script generates numerical examples for the
 % purpose of investigating windowed spectral Tikhonov regularization.
@@ -1382,4 +1381,3 @@ legend('\nu = 100, I','\nu = 200, I', '\nu = 100, L',...
     '\nu = 200, L','FontSize',L_FS)
 fig.WindowState = WS;
 xlabel('Sorted index','FontSize',AxL_FS)
->>>>>>> master
