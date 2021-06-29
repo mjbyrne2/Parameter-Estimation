@@ -19,7 +19,6 @@
 \date{\today}
 
 \begin{document}
-
 \maketitle
 
 %\begin{abstract}
@@ -36,6 +35,8 @@ In this paper, we seek solutions of
 \label{eq:Ax = b}
 A\xVec = \dVec,
 \end{equation}
+
+
 where $A \in \mathbb{R}^{\mA \times n}$ and $\dVec$ is known. Specifically we consider the situation where the data available to us is $\dVec = \bVec + \noiseVec$, with $\noiseVec$ being a realization of a random vector and $\bVec = A\xTrue$. Even for invertible matrices $A$, direct matrix inversion is not recommended due to the noise in the data and the possibility of $A$ begin ill-conditioned. An alternative approach is regularization, which aims to mathematically describe desired characteristics of a solution to produce a more well-posed problem. \par
 A common regularization technique is Tikhonov regularization \cite{Tikh1963}, in which the regularized solution $\xReg$ is defined as
 \begin{equation}
@@ -1032,13 +1033,13 @@ It is interesting to note that the averaged relative errors of solutions obtaine
     \cline{2-10}
      & Learned & UPRE & GCV & Learned & UPRE & GCV & Learned & UPRE & GCV \\
     \hline
-    2 & 24.806 & 24.859 & 24.862 & 26.933 & 26.968 & 26.971 & 18.532 & 18.587 & 18.590 \\
+    2 & 24.81\% & 24.86\% & 24.86\% & 26.93\% & 26.97\% & 26.97\% & 18.53\% & 18.59\% & 18.59\% \\
     \hline
-    4 & 24.669 & 24.523 & 24.523 & 27.009 & 26.796 & 26.796 & 18.724 & 18.361 & 18.360\\
+    4 & 24.67\% & 24.52\% & 24.52\% & 27.01\% & 26.80\% & 26.80\% & 18.72\% & 18.36\% & 18.36\% \\
     \hline
-    6 & 24.573 & 24.546 & 24.547 & 26.894 & 26.787 & 26.788 & 18.537 & 18.332 & 18.332 \\
+    6 & 24.57\% & 24.55\% & 24.55\% & 26.90\% & 26.79\% & 26.79\% & 18.54\% & 18.33\% & 18.33\% \\
     \hline
-    8 & 24.546 & 24.552 & 24.553 & 26.851 & 26.789 & 26.789 & 18.464 & 18.332 & 18.332\\
+    8 & 24.55\% & 24.55\% & 24.55\% & 26.85\% & 26.79\% & 26.79\% & 18.46\% & 18.33\% & 18.33\% \\
     \hline
     \end{tabular}
   \end{center}
@@ -1086,5 +1087,6 @@ There are various directions of future investigation. Perhaps the most significa
 
 \bibliographystyle{siam}
 \bibliography{Parameter-Estimation}
+
 
 \end{document}
