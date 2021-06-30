@@ -3,8 +3,9 @@ function W = weights2(S,p,type)
 % Tikhonov regularization.
 % - S is a matrix containing the (non-negative) spectra of an operator A
 % - p is the an integer specifying the number of weight vectors
-% - type specifies the type of weight vectors. Possibilites for type are
-% 'linear', 'log', 'linearCosine', and 'logCosine'.
+% - type is a string that specifies the type of weight vectors. 
+% Possibilites for type are "linear", "log", "linearCosine", and 
+% "logCosine".
 
 % Check number of input arguments:
 switch nargin
@@ -20,7 +21,7 @@ switch nargin
             W = ones(m,n);
             return
         else
-            type = 'linear';    % Default weight vectors are linear partitions
+            type = "linear";    % Default weight vectors are linear partitions
         end
         
     case 3
@@ -45,7 +46,7 @@ sMin = max(min(S(:)),eps);   % Smallest value in spectrum (or eps)
 
 % Check type of windows:
 switch type
-    case 'linear'
+    case "linear"
         omega = linspace(sMax,sMin,p+1);  % Generate linear partitions
         omega(1) = sMax;    % Ensure the first partition value is sMax
         omega(end) = -eps; % Set last partition value below zero
@@ -53,7 +54,7 @@ switch type
             W(:,:,k) = (omega(k) >= S) & (S > omega(k+1));
         end   
         
-    case 'log'
+    case "log"
         omega = logspace(log10(sMax),log10(sMin),p+1);  % Generate linear partitions
         omega(1) = sMax;    % Correct of numerical errors of using log10 with logspace
         omega(end) = -eps; % Set last partition value below zero
@@ -61,7 +62,7 @@ switch type
             W(:,:,k) = (omega(k) >= S) & (S > omega(k+1));
         end     
         
-    case 'linearCosine'
+    case "linearCosine"
         omega = linspace(sMax,sMin,p+1);  % Generate linear partitions
         omega(1) = sMax;    % Ensure the first partition value is sMax
         mid = (omega(1:end-1) + omega(2:end))/2;    % Determine midpoints
@@ -100,7 +101,7 @@ switch type
             end 
         end
         
-    case 'logCosine'
+    case "logCosine"
         omega = logspace(log10(sMax),log10(sMin),p+1);  % Generate log partitions
         omega(1) = sMax;    % Correct of numerical errors of using log10 with logspace
 %         mid = (omega(1:end-1) + omega(2:end))/2;    % Determine (linear) midpoints

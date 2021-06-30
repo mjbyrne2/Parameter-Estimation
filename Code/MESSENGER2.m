@@ -1,4 +1,4 @@
-function [Delta,B,X,I] = MESSENGER2(images,vx,vy)
+function [Delta,B,X,I,K] = MESSENGER2(images,vx,vy)
 % Loads 15 images of the surface of Mercury taken by the MESSENGER space
 % probe and blurs them using the DCT. This function calls the dctshift.m
 % function defined in "Deblurring Images - Matrices, Spectra, and 
