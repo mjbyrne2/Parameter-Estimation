@@ -33,17 +33,37 @@
 % and 256/(2^2) = 64. If the field userInputs.resolutions is non-existent,
 % no downsampling will occur and the full problem size will be the only
 % size considered.
+%
+% See the default user inputs for an example of input syntax.
 
-userInputsFields = {'SNR';'blur';'penalty';'resolutions';'windows'};
+% Default user inputs:
+defaultUserInputs.blur = 16;    % Medium blur
+defaultUserInputs.SNR = 25;
+defaultUserInputs.penalty = "Identity";
+defaultUserInputs.windows = {2,"linear"}; % Two linearly spaced windows
+defaultUserInputs.resolutions = 0; % Full problem (256 x 256)
+% <-- Can add more fields if necessary
+
+% Get field names from default inputs:
+userInputsFields = fieldnames(defaultUserInputs);
 
 % Check if user inputs have not been specified:
+inputInstructions = 'Enter ''1'' for default inputs, ''2'' for user specified inputs, or ''0'' to cancel: ';
 if ~exist('userInputs','var')
-    userResponse = input('No user inputs have been specified for AdaptiveWindowedRegularization.m. Do you want to specify inputs and continue? (Y/N) \n','s');
-    if strcmp(userResponse,'Y')
-        run('prompt_userInputs.m')
-    else
-        disp('AdaptiveWindowedRegularization.m has been halted.')
-        return
+    userResponse = input(['No user inputs have been specified for AdaptiveWindowedRegularization.m.',...
+        newline,inputInstructions]);
+    switch userResponse
+        case 0
+            disp('AdaptiveWindowedRegularization.m has been halted.')
+            return
+        case 1
+            userInputs = defaultUserInputs;
+            disp('The fields of userInputs have been set to default:')
+            disp(struct2table(userInputs,'AsArray',true))
+        case 2
+            run('prompt_userInputs.m')
+        otherwise
+            disp('Invalid response. AdaptiveWindowedRegularization.m has been halted.')
     end
 elseif ~isa(userInputs,'struct')    % Check if userInput is not of type struct
     userResponse = input('The variable userInputs exists but is not of type struct. Do you want to redefine userInputs and continue? (Y/N) \n','s');
@@ -54,7 +74,7 @@ elseif ~isa(userInputs,'struct')    % Check if userInput is not of type struct
         disp('AdaptiveWindowedRegularization.m has been halted.')
         return
     end
-elseif ~isempty(setdiff(userInputsFields,fieldnames(orderfields(userInputs))))
+elseif ~isempty(setdiff(userInputsFields,fieldnames(userInputs)))
     missingFields = setdiff(userInputsFields,fieldnames(userInputs));
     str = sprintf('%s, ',missingFields{:});
     str = str(1:end-2); % Trim last comma and space for readability
@@ -65,14 +85,26 @@ end
 %% Assign variables from userInputs
 
 % User inputs:
-v = 200; % Dispersion parameter of circularly symmetric Gaussian kernel
-lSNR = 10;   % Lower bound of SNR
-penalty = "Laplacian";  % Penalty matrix (Identity or Laplacian)
+v = userInputs.blur; % Dispersion parameter of circularly symmetric Gaussian kernel
+if numel(userInputs.SNR) == 2
+    userInputs.SNR = sort(userInputs.SNR,'ascend');
+    lSNR = userInputs.SNR(1);   % Lower bound of SNR
+    rangeSNR = userInputs.SNR(2) - userInputs.SNR(1);   % Range of SNR (uSNR - lSNR)
+else
+    lSNR = userInputs.SNR;
+    rangeSNR = 0;
+end
+penalty = userInputs.penalty;  % Penalty matrix (Identity or Laplacian)
 penaltyChar = convertStringsToChars(penalty);   % Create char array for penalty name
-type = "logCosine";    % Type of windows for regularization (see weights2.m)
+if numel(userInputs.windows) == 2
+    P = userInputs.windows{1};  % Number of windows
+    type = userInputs.windows{2};    % Type of windows for regularization (see weights2.m)
+else
+    P = 1;
+    type = [];  % Type can be empty only for P = 1
+end
 typeChar = convertStringsToChars(type);   % Create char array for window type
-P = 2;  % Number of windows
-rangeSNR = 0; % Range of SNR (uSNR - lSNR)
+
 config = ['(\nu = ' num2str(v) ', SNR: ' num2str(lSNR) ', Penalty: ' penaltyChar(1) ', Windows: ' typeChar ')'];
 
 % Problem set-up:
@@ -172,7 +204,13 @@ end
 delta = sqrt(conj(Delta).*Delta);
 lambda = sqrt(conj(Lambda).*Lambda);
 gamma = delta./lambda;
-W = weights2(gamma,P,type);  % Generate weights
+
+% Generate weights:
+if P == 1
+    W = weights2(gamma);
+else
+    W = weights2(gamma,P,type);
+end
 
 % Adjust spectral components based on specified tolerance:
 tol = 1e-14;
