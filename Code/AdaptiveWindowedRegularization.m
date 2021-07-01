@@ -1,19 +1,83 @@
 %% Two-dimensional Windowed Spectral Tikhonov Regularization
 % The code contained in this script generates numerical examples for the
 % purpose of investigating windowed spectral Tikhonov regularization.
+%
+% User must specify the inputs either as a struct "userInputs" with the
+% following syntax:
+% - userInputs.blur: Blur amount (non-negative real number). The amount of
+% blur is the variance v of the symmetric Gaussian kernel 
+% exp(-(x^2 + y^2)/2v) used to generate the point spread function (PSF)
+% array.
+% - userInputs.SNR: SNR of the data to be generated (non-negative real 
+% number or vector [lSNR,uSNR] of non-negative real numbers). If a vector 
+% is used, SNR values are determined from the continuous uniform 
+% distribution for the interval [lSNR,uSNR] (lSNR must be less than uSNR).
+% - userInputs.penalty: Penalty matrix (string). The options for the 
+% penalty matrix are 'Identity' and 'Laplacian' (Laplacian refers to a 
+% discretization of the negative Laplacian operator; see "Computation 
+% Methods for Inverse Problems" by Curtis R. Vogel).
+% - userInputs.windows: Number and type of spectral windows (1 x 2 cell
+% array, where the first cell contains an integer between 1 and 256^2 and
+% the second cell contains a string). The recommended number of windows is
+% between 1 and 3. The options for window type are are 'linear', 
+% 'linearCosine', 'log', and 'logCosine'. See weights2.m for more 
+% information about window type. If the desired number of windows is one, 
+% then userInputs.windows can be set to 1 and not a cell array. Cell arrays
+% whose first cell contains 1 will have the second cell ignored. The one 
+% window case corresponds with standard Tikhonov regularization.
+% - userInputs.resolutions: Downsampling resolutions (vector containing
+% integers from 0 to 6). The integers correspond with powers of two for
+% which the full problem size (256 x 256) will be downsampled. For example,
+% setting userInputs.resolutions = [0,1,2] means that the problems sizes
+% considered will be 256/(2^0) = 256 (full problem size), 256/(2^1) = 128,
+% and 256/(2^2) = 64. If the field userInputs.resolutions is non-existent,
+% no downsampling will occur and the full problem size will be the only
+% size considered.
+
+userInputsFields = {'SNR';'blur';'penalty';'resolutions';'windows'};
+
+% Check if user inputs have not been specified:
+if ~exist('userInputs','var')
+    userResponse = input('No user inputs have been specified for AdaptiveWindowedRegularization.m. Do you want to specify inputs and continue? (Y/N) \n','s');
+    if strcmp(userResponse,'Y')
+        run('prompt_userInputs.m')
+    else
+        disp('AdaptiveWindowedRegularization.m has been halted.')
+        return
+    end
+elseif ~isa(userInputs,'struct')    % Check if userInput is not of type struct
+    userResponse = input('The variable userInputs exists but is not of type struct. Do you want to redefine userInputs and continue? (Y/N) \n','s');
+    if strcmp(userResponse,'Y')
+        clear userInputs
+        run('prompt_userInputs.m')
+    else
+        disp('AdaptiveWindowedRegularization.m has been halted.')
+        return
+    end
+elseif ~isempty(setdiff(userInputsFields,fieldnames(orderfields(userInputs))))
+    missingFields = setdiff(userInputsFields,fieldnames(userInputs));
+    str = sprintf('%s, ',missingFields{:});
+    str = str(1:end-2); % Trim last comma and space for readability
+    disp(['Error: The following fields are missing from userInputs: ',...
+        str,newline,'The missing fields must be added before AdaptiveWindowedRegularization.m will run.'])
+end
+
+%% Assign variables from userInputs
 
 % User inputs:
 v = 200; % Dispersion parameter of circularly symmetric Gaussian kernel
 lSNR = 10;   % Lower bound of SNR
-penalty = 'Laplacian';  % Penalty matrix (Identity or Laplacian)
-type = 'logCosine';    % Type of windows for regularization (see weights2.m)
+penalty = "Laplacian";  % Penalty matrix (Identity or Laplacian)
+penaltyChar = convertStringsToChars(penalty);   % Create char array for penalty name
+type = "logCosine";    % Type of windows for regularization (see weights2.m)
+typeChar = convertStringsToChars(type);   % Create char array for window type
 P = 2;  % Number of windows
 rangeSNR = 0; % Range of SNR (uSNR - lSNR)
-config = ['(\nu = ' num2str(v) ', SNR: ' num2str(lSNR) ', Penalty: ' penalty(1) ', Windows: ' type ')'];
+config = ['(\nu = ' num2str(v) ', SNR: ' num2str(lSNR) ', Penalty: ' penaltyChar(1) ', Windows: ' typeChar ')'];
 
 % Problem set-up:
 images = 1:8;   % Images chosen manually
-[Delta,B,X,I] = MESSENGER2(images,v,v);
+[Delta,B,X,I,K] = MESSENGER2(images,v,v);
 [n,~,R] = size(X(:,:,:));   % Extract dimension and number of images (n = 256)
 N = n^2;    % Number of total pixels in each image (N = 65536)
 
@@ -86,9 +150,9 @@ for l = 1:8
 end
 
 % Penalty matrices:
-if isequal(penalty,'Identity')
+if strcmp(penalty,"Identity")
     Lambda = ones(n);  % DCT of l where L = I (Identity matrix)
-elseif isequal(penalty,'Laplacian') % Negative discrete Laplacian matrix
+elseif strcmp(penalty,"Laplacian") % Negative discrete Laplacian matrix
     L = zeros(n);
     cy = n/2;  % Row index of stencil center
     cx = n/2;  % Column index of stencil center
@@ -494,25 +558,25 @@ SNRBig_V2(:,:,3) = SNR_BigGCV_V2;
 %% Save data
 
 if rangeSNR == 0 && P ~= 1
-    save(['v',num2str(v),'_','SNR',num2str(lSNR),'_',type,num2str(P),...
-        '_',penalty],'alpha','alphaBig','err','errBig_T','errBig_V',...
+    save(['v',num2str(v),'_','SNR',num2str(lSNR),'_',typeChar,num2str(P),...
+        '_',penaltyChar],'alpha','alphaBig','err','errBig_T','errBig_V',...
         'errBig_V2','SNR','SNRBig_T','SNRBig_V','SNRBig_V2','Xt','Dt',...
         'Xv','Dv','Dv2','x0','lb','ub','W','delta','delta2','lambda',...
         'Rvec','Rt','Rv')
 elseif rangeSNR == 0 && P == 1
-    save(['v',num2str(v),'_','SNR',num2str(lSNR),'_',penalty],'alpha',...
+    save(['v',num2str(v),'_','SNR',num2str(lSNR),'_',penaltyChar],'alpha',...
         'alphaBig','err','errBig_T','errBig_V','errBig_V2','SNR',...
         'SNRBig_T','SNRBig_V','SNRBig_V2','Xt','Dt','Xv','Dv','Dv2',...
         'x0','lb','ub','W','delta','delta2','lambda','Rvec','Rt','Rv')
 elseif rangeSNR ~= 0 && P == 1
     save(['v',num2str(v),'_','SNR',num2str(lSNR),'-',num2str(uSNR),'_',...
-        penalty],'alpha','alphaBig','err','errBig_T','errBig_V',...
+        penaltyChar],'alpha','alphaBig','err','errBig_T','errBig_V',...
         'errBig_V2','SNR','SNRBig_T','SNRBig_V','SNRBig_V2','Xt','Dt',...
         'Xv','Dv','Dv2','x0','lb','ub','W','delta','delta2','lambda',...
         'Rvec','Rt','Rv')
 else
     save(['v',num2str(v),'_','SNR',num2str(lSNR),'-',num2str(uSNR),'_',...
-        type,num2str(P),'_',penalty],'alpha','alphaBig','err',...
+        typeChar,num2str(P),'_',penaltyChar],'alpha','alphaBig','err',...
         'errBig_T','errBig_V','errBig_V2','SNR','SNRBig_T','SNRBig_V',...
         'SNRBig_V2','Xt','Dt','Xv','Dv','Dv2','x0','lb','ub','W',...
         'delta','delta2','lambda','Rvec','Rt','Rv')
