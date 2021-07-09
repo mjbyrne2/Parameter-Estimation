@@ -84,8 +84,10 @@ end
 
 %% Assign variables from userInputs
 
-% User inputs:
+% Assign Gaussian blur:
 v = userInputs.blur; % Dispersion parameter of circularly symmetric Gaussian kernel
+
+% Assign SNR of generated data:
 if numel(userInputs.SNR) == 2
     userInputs.SNR = sort(userInputs.SNR,'ascend');
     lSNR = userInputs.SNR(1);   % Lower bound of SNR
@@ -94,11 +96,35 @@ else
     lSNR = userInputs.SNR;
     rangeSNR = 0;
 end
+
+% Assign penalty matrix:
 penalty = userInputs.penalty;  % Penalty matrix (Identity or Laplacian)
+if strcmp(penalty,"Identity")
+    Lambda = ones(n);  % DCT of l where L = I (Identity matrix)
+elseif strcmp(penalty,"Laplacian") % Negative discrete Laplacian matrix
+    L = zeros(n);
+    cy = n/2;  % Row index of stencil center
+    cx = n/2;  % Column index of stencil center
+    L((cy-1):(cy+1),(cx-1):(cx+1)) = [0,-1,0;-1,4,-1;...
+        0,-1,0];  % Place stencil within L
+    e1 = zeros(n);
+    e1(1,1) = 1;
+    Lambda = dct2(dctshift(L,[cy,cx]))./dct2(e1);
+else
+    disp('Error: Invalid penalty matrix selected.')
+    return
+end
 penaltyChar = convertStringsToChars(penalty);   % Create char array for penalty name
+
+% Assign window number and type:
 if numel(userInputs.windows) == 2
     P = userInputs.windows{1};  % Number of windows
     type = userInputs.windows{2};    % Type of windows for regularization (see weights2.m)
+    windowTypes = ["linear","linearCosine","log","logCosine"];  % Valid window types
+    if sum(type == windowTypes) ~= 1    % Check if the window type is valid (is there a cleaner way?)
+        disp(strcat("Error: Invalid window type. Supported window types: ",strjoin(windowTypes)))
+        return
+    end
 else
     P = 1;
     type = [];  % Type can be empty only for P = 1
@@ -120,12 +146,9 @@ N = n^2;    % Number of total pixels in each image (N = 65536)
 
 % Noise constuction:
 uSNR = lSNR + rangeSNR;   % Upper bound of SNR
-% Randomly select SNR values between lSNR and uSNR:
-s = lSNR + rangeSNR.*rand(1,R);
-% Convert SNR to noise variance:
-eta = (1./(N*(10.^(s./10)))).*(arrayNorm(B).^2);
-% Initialization of noise matrices:
-Noise = zeros(n,n,R);
+s = lSNR + rangeSNR.*rand(1,R); % Randomly select SNR values between lSNR and uSNR
+eta = (1./(N*(10.^(s./10)))).*(arrayNorm(B).^2);    % Convert SNR to noise variance
+Noise = zeros(n,n,R);   % Initialization of noise matrices
 % Generate and add noise:
 for l = 1:R
     Noise(:,:,l) = sqrt(eta(l))*randn(n);
@@ -179,23 +202,6 @@ Dv2 = Bv2 + NoiseV2;
 Dv2_hat = 0*Dv2;    % Initialize Dv2_hat
 for l = 1:8
     Dv2_hat(:,:,l) = dct2(Dv2(:,:,l));  % 2D DCT of D (applied to the first two dimensions of the 3D array)
-end
-
-% Penalty matrices:
-if strcmp(penalty,"Identity")
-    Lambda = ones(n);  % DCT of l where L = I (Identity matrix)
-elseif strcmp(penalty,"Laplacian") % Negative discrete Laplacian matrix
-    L = zeros(n);
-    cy = n/2;  % Row index of stencil center
-    cx = n/2;  % Column index of stencil center
-    L((cy-1):(cy+1),(cx-1):(cx+1)) = [0,-1,0;-1,4,-1;...
-        0,-1,0];  % Place stencil within L
-    e1 = zeros(n);
-    e1(1,1) = 1;
-    Lambda = dct2(dctshift(L,[cy,cx]))./dct2(e1);
-else
-    disp('Invalid penalty matrix selected.')
-    return
 end
 
 %% Regularization set-up
@@ -543,6 +549,8 @@ for l = 1:r
 end
 
 disp('All grouped data sets completed.')    % Completion message
+
+%% Reassign data for later processing
 
 % alphaBig = zeros(r,P,3); % 4 methods being consider; in order: MSE,UPRE,GCV,MDP
 alphaBig = zeros(r,P,3); % 3 methods being consider; in order: MSE,UPRE,GCV

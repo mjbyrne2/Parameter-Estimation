@@ -18,7 +18,7 @@ LW = 1.5; % Line width
 MS = 12; % Marker size
 CB_FS = 20;    % Font size of colorbar labels (Good)
 Ax_FS = 20;     % Font size of axis tickmarks
-AxL_FS = 6;    % Font size of x and y axes labels
+AxL_FS = 20;    % Font size of x and y axes labels
 L_FS = 22;  % Font size of legends
 Title_FS = 22;  % Good
 
