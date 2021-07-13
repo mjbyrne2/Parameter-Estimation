@@ -10,6 +10,7 @@ defaultUserInputs.penalty = "Identity";
 defaultUserInputs.windows = {2,"linear"}; % Two linearly spaced windows
 defaultUserInputs.resolutions = 0; % Full problem (256 x 256)
 defaultUserInputs.methods = ["Best","UPRE","GCV"]; % Parameter selection methods
+defaultUserInputs.shuffle = []; % Shuffle images
 % <-- Can add more fields if necessary
 
 % Get field names from default inputs:

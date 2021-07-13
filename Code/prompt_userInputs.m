@@ -26,6 +26,7 @@ userInputs.penalty = [];
 userInputs.windows = [];
 userInputs.resolutions = [];
 userInputs.methods = [];
+userInputs.shuffle = [];
 
 % Set the amount of image blur:
 blurClasses = {'numeric'};
@@ -184,6 +185,15 @@ if ~isempty(userInputs.resolutions)
     end
     userInputs.resolutions = resolutions2;
     clear resolutionsClasses resolutionsAttributes resolutions2
+end
+
+% Shuffle images in data sets:
+userInputs.shuffle = input('Do you want the images to be shuffled? (Y/N) \n','s');
+if ~strcmp(userInputs.shuffle,'Y') && ~strcmp(userInputs.shuffle,'N')
+    disp('Error: Invalid response. The images will not be shuffled.')
+    userInputs.shuffle = [];    % Empty response means no shuffling
+elseif strcmp(userInputs.shuffle,'N')
+    userInputs.shuffle = [];
 end
 
 % Display completion message and display contents userInputs:

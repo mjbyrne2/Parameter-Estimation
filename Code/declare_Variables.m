@@ -4,6 +4,12 @@
 % Assign Gaussian blur:
 v = userInputs.blur; % Dispersion parameter of circularly symmetric Gaussian kernel
 
+% Problem set-up:
+images = 1:8;   % Images chosen manually
+[Delta,B,X,I,K] = MESSENGER2(images,v,v);
+[n,~,R] = size(X(:,:,:));   % Extract dimension and number of images (n = 256)
+N = n^2;    % Number of total pixels in each image (N = 65536)
+
 % Assign SNR of generated data:
 if numel(userInputs.SNR) == 2
     userInputs.SNR = sort(userInputs.SNR,'ascend');
@@ -45,16 +51,12 @@ methods = userInputs.methods;
 
 config = ['(\nu = ' num2str(v) ', SNR: ' num2str(lSNR) ', Penalty: ' penaltyChar(1) ', Windows: ' typeChar ')'];
 
-% Problem set-up:
-images = 1:8;   % Images chosen manually
-[Delta,B,X,I,K] = MESSENGER2(images,v,v);
-[n,~,R] = size(X(:,:,:));   % Extract dimension and number of images (n = 256)
-N = n^2;    % Number of total pixels in each image (N = 65536)
-
-% Shuffle images if desired:
-% ind = randperm(R);    % Vector of shuffled indices
-% X = X(:,:,ind); % Shuffle true images
-% B = B(:,:,ind); % Shuffle blurred images
+% Shuffle images if specified:
+if strcmp(userInputs.shuffle,'Y')
+    ind = randperm(R);    % Vector of shuffled indices
+    X = X(:,:,ind); % Shuffle true images
+    B = B(:,:,ind); % Shuffle blurred images 
+end
 
 % Noise constuction:
 uSNR = lSNR + rangeSNR;   % Upper bound of SNR
