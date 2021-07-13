@@ -25,6 +25,7 @@ userInputs.SNR = [];
 userInputs.penalty = [];
 userInputs.windows = [];
 userInputs.resolutions = [];
+userInputs.methods = [];
 
 % Set the amount of image blur:
 blurClasses = {'numeric'};
@@ -149,6 +150,20 @@ if ~isempty(userInputs.windows)
     end
     clear windowsClasses windowsAttributes
 end
+
+% Set parameter selection methods:
+methodsClasses = {'string'};
+methodsAttributes = {'vector','nonempty'};
+while isempty(userInputs.methods)
+    userInputs.methods = input('Parameter selection method(s) (string or array of strings): ');
+    try
+        validateattributes(userInputs.methods,methodsClasses,methodsAttributes)
+    catch
+        disp('Error: The method(s) must be input as a string or array of strings.')
+        userInputs.methods = [];
+    end 
+end
+clear methodsClasses methodsAttributes
 
 % Set the downsampling resolutions:
 userInputs.resolutions = input('Downsampling resolutions (array of non-negative integers): ');
