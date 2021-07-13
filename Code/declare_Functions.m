@@ -1,5 +1,6 @@
 %% declare_Functions.m
-%
+% Declares the parameter estimation functions based on the variables
+% defined in declare_Variables.m.
 
 switch P
    
@@ -10,6 +11,39 @@ switch P
         xWin = @(alpha,d_hat) real(idct2(Phi(alpha).*d_hat./delta2));  % Single regularized solution
         rWin = @(alpha,d_hat) real(idct2(Delta.*dct2(xWin(alpha,d_hat))) - ...
             idct2(d_hat));  % Single regularized residual
+        
+        % Mean squared error ("best"):
+        if ismember("Best",userInputs.methods)
+            MSE = @(alpha,d_hat,x) norm(xWin(alpha,d_hat)-x,'fro')^2;
+            BigMSE = @(alpha,W,D_hat,delta,delta2,lambda,X) sum((arrayNorm(X - ...
+            xWinBig(alpha,W,D_hat,delta,delta2,lambda))./arrayNorm(X)).^2);
+            % BigMSE is still a scalar-valued function
+        end
+
+        % UPRE:
+        if ismember("UPRE",userInputs.methods)
+            UPRE = @(alpha,d_hat,eta) (1/N)*(norm(Psi(alpha).*d_hat,'fro')^2) + ...
+                (2/N)*(eta)*sum(Phi(alpha),'all') - (eta);
+            BigUPRE = @(alpha,d_hat,Eta) (1/numel(d_hat))*sum(arrayNorm(Psi(alpha).*d_hat).^2) + ...
+                (2/N)*(mean(Eta))*sum(Phi(alpha),'all') - (mean(Eta));
+        end
+
+        % GCV (no eta needed):
+        if ismember("GCV",userInputs.methods)
+            GCV = @(alpha,d_hat) (1/N)*(norm(Psi(alpha).*d_hat,'fro')^2)./...
+                ((1 - (1/N)*sum(Phi(alpha),'all')).^2);
+            BigGCV = @(alpha,d_hat) (1/numel(d_hat))*sum(arrayNorm(Psi(alpha).*d_hat).^2)./...
+                ((1 - (1/N)*sum(Phi(alpha),'all')).^2);
+        end
+
+        % MDP:
+        if ismember("MDP",userInputs.methods)
+            safeParam = 1;  % Only for MDP 
+            MDP = @(alpha,d_hat,eta) abs((1/N)*(norm(Psi(alpha).*d_hat,'fro')^2) - ...
+                safeParam*eta); % Absolute zero for minimization
+            BigMDP = @(alpha,d_hat,Eta) abs((1/numel(d_hat))*sum(arrayNorm(Psi(alpha).*d_hat).^2) - ...
+                safeParam*(mean(Eta)));  % Absolute value for minimization
+        end
         
     otherwise  % P > 1 (Windowed spectral regularization)
 
@@ -25,60 +59,38 @@ switch P
         rWin = @(alpha,d_hat) real(idct2(Delta.*dct2(xWin(alpha,d_hat))) - ...
             idct2(d_hat));  % Windowed regularized residual
         
-end
-
-switch P
-    
-    case 1  % P = 1
         % Mean squared error ("best"):
-        MSE = @(alpha,d_hat,x) norm(xWin(alpha,d_hat)-x,'fro')^2;
-        BigMSE = @(alpha,W,D_hat,delta,delta2,lambda,X) sum((arrayNorm(X - ...
-            xWinBig(alpha,W,D_hat,delta,delta2,lambda))./arrayNorm(X)).^2);
-        % BigMSE is still a scalar-valued function
+        if ismember("Best",userInputs.methods)
+            MSE = @(alpha,d_hat,x) (norm(xWin(alpha,d_hat)-x,'fro')/norm(x))^2;
+            BigMSE = @(alpha,W,D_hat,delta,delta2,lambda,X) sum((arrayNorm(X - ...
+                xWinBig(alpha,W,D_hat,delta,delta2,lambda))./arrayNorm(X)).^2);
+            % BigMSE is the same for all values of p by construction of
+            % xWinBig.m
+        end
 
         % UPRE:
-        UPRE = @(alpha,d_hat,eta) (1/N)*(norm(Psi(alpha).*d_hat,'fro')^2) + ...
-            (2/N)*(eta)*sum(Phi(alpha),'all') - (eta);
-        BigUPRE = @(alpha,d_hat,Eta) (1/numel(d_hat))*sum(arrayNorm(Psi(alpha).*d_hat).^2) + ...
-            (2/N)*(mean(Eta))*sum(Phi(alpha),'all') - (mean(Eta));
-
-        % GCV (no eta needed):
-        GCV = @(alpha,d_hat) (1/N)*(norm(Psi(alpha).*d_hat,'fro')^2)./...
-            ((1 - (1/N)*sum(Phi(alpha),'all')).^2);
-        BigGCV = @(alpha,d_hat) (1/numel(d_hat))*sum(arrayNorm(Psi(alpha).*d_hat).^2)./...
-            ((1 - (1/N)*sum(Phi(alpha),'all')).^2);
-
-%         % MDP:
-%         safeParam = 1;  % Only for MDP 
-%         MDP = @(alpha,d_hat,eta) abs((1/N)*(norm(Psi(alpha).*d_hat,'fro')^2) - ...
-%             safeParam*eta); % Absolute zero for minimization
-%         BigMDP = @(alpha,d_hat,Eta) abs((1/numel(d_hat))*sum(arrayNorm(Psi(alpha).*d_hat).^2) - ...
-%             safeParam*(mean(Eta)));  % Absolute value for minimization
-        
-    otherwise  % P > 1 (Windowed spectral regularization)
-        % Mean squared error ("best"):
-        MSE = @(alpha,d_hat,x) (norm(xWin(alpha,d_hat)-x,'fro')/norm(x))^2;
-        BigMSE = @(alpha,W,D_hat,delta,delta2,lambda,X) sum((arrayNorm(X - ...
-            xWinBig(alpha,W,D_hat,delta,delta2,lambda))./arrayNorm(X)).^2);
-        % BigMSE is the same for all values of p by construction of
-        % xWinBig.m
-
-        % UPRE:
-        UPRE = @(alpha,d_hat,eta) (1/N)*(norm(sum(Psi(alpha).*W.*d_hat,3),'fro')^2) + ...
-            (2/N)*(eta)*sum(Phi(alpha).*W,'all') - (eta);   % New
-        BigUPRE = @(alpha,d_hat,Eta) (1/numel(d_hat))*sum(arrayNorm(sum(Psi(alpha).*W,3).*d_hat).^2) + ...
-            (2/N)*(mean(Eta))*sum(Phi(alpha).*W,'all') - (mean(Eta));       
+        if ismember("UPRE",userInputs.methods)
+            UPRE = @(alpha,d_hat,eta) (1/N)*(norm(sum(Psi(alpha).*W.*d_hat,3),'fro')^2) + ...
+                (2/N)*(eta)*sum(Phi(alpha).*W,'all') - (eta);   % New
+            BigUPRE = @(alpha,d_hat,Eta) (1/numel(d_hat))*sum(arrayNorm(sum(Psi(alpha).*W,3).*d_hat).^2) + ...
+                (2/N)*(mean(Eta))*sum(Phi(alpha).*W,'all') - (mean(Eta));   
+        end
         
         % GCV (no eta needed):
-        GCV = @(alpha,d_hat) (1/N)*(norm(sum(Psi(alpha).*W,3).*d_hat,'fro')^2)./...
-            ((1 - (1/N)*sum(Phi(alpha).*W,'all')).^2);
-        BigGCV = @(alpha,d_hat) (1/numel(d_hat))*sum(arrayNorm(sum(Psi(alpha).*W,3).*d_hat).^2)./...
-            ((1 - (1/N)*sum(Phi(alpha).*W,'all')).^2);
+        if ismember("GCV",userInputs.methods)
+            GCV = @(alpha,d_hat) (1/N)*(norm(sum(Psi(alpha).*W,3).*d_hat,'fro')^2)./...
+                ((1 - (1/N)*sum(Phi(alpha).*W,'all')).^2);
+            BigGCV = @(alpha,d_hat) (1/numel(d_hat))*sum(arrayNorm(sum(Psi(alpha).*W,3).*d_hat).^2)./...
+                ((1 - (1/N)*sum(Phi(alpha).*W,'all')).^2);
+        end
 
-%         % MDP:
-%         safeParam = 1;  % Only for MDP 
-%         MDP = @(alpha,d_hat,eta) abs((1/N)*(norm(sum(Psi(alpha).*W,3).*d_hat,'fro')^2) - ...
-%             safeParam*eta); % Absolute value for minimization
-%         BigMDP = @(alpha,d_hat,Eta) abs((1/numel(d_hat))*sum(arrayNorm(sum(Psi(alpha).*W,3).*d_hat).^2) - ...
-%             safeParam*(mean(Eta)));   % Absolute value for minimization
+        % MDP:
+        if ismember("MDP",userInputs.methods)
+            safeParam = 1;  % Only for MDP 
+            MDP = @(alpha,d_hat,eta) abs((1/N)*(norm(sum(Psi(alpha).*W,3).*d_hat,'fro')^2) - ...
+                safeParam*eta); % Absolute value for minimization
+            BigMDP = @(alpha,d_hat,Eta) abs((1/numel(d_hat))*sum(arrayNorm(sum(Psi(alpha).*W,3).*d_hat).^2) - ...
+                safeParam*(mean(Eta)));   % Absolute value for minimization
+        end
+        
 end

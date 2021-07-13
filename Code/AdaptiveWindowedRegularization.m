@@ -48,16 +48,6 @@ run declare_Functions.m
 
 %% Find individual regularization parameters for all data
 
-clc
-% % Set-up of minimization:
-% if P == 1
-%     x0 = repmat([1e-3,2],P,1);  % Initial bounds on the parameters
-% else
-%     x0 = [0.01,2;repmat([1,15],P-1,1)];
-% end
-% pts = 100;  % Maximum number of points considered during minimization
-% iter = 2;   % Number of minimization iterations
-
 % Constraints for parameter search:
 x0 = 0.01*ones(1,P);                     % Initial guess of parameters
 % x0 = linspace(0.1,0.5,p);                     % Initial guess of parameters
@@ -155,10 +145,7 @@ SNR = [SNR_best,SNR_UPRE,SNR_GCV];  % All SNR's of the reg. solutions
 %% Find adapted regularization parameters
 
 Rvec = 2:2:Rt;   % Vector containing the number of data sets
-% Rvec = 1:Rt;   % Vector containing the number of data sets
-% Rvec = 1:R;   % Vector containing the number of data sets
 r = length(Rvec);   % Number of different data sets considered in adapted methods
-% Eta = [etaT,etaV];
 
 % "Learned" storage:
 alpha_learned = NaN(r,P);
@@ -207,9 +194,6 @@ for l = 1:r
     x = Xt(:,:,1:Rvec(l));
     d_hat = Dt_hat(:,:,1:Rvec(l));
     eta = etaT(1:Rvec(l));
-%     x = X(:,:,1:Rvec(l));
-%     d_hat = D_hat(:,:,1:Rvec(l));
-%     eta = Eta(1:Rvec(l));
     
     % "Learned" parameter:    
     F = @(alpha) BigMSE(alpha,W,d_hat,delta,delta2,lambda,x);  % FIX p to W
