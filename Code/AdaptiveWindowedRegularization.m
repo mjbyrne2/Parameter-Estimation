@@ -50,97 +50,89 @@ run declare_Functions.m
 
 % Constraints for parameter search:
 x0 = 0.01*ones(1,P);                     % Initial guess of parameters
-% x0 = linspace(0.1,0.5,p);                     % Initial guess of parameters
 lb = (10^-6)*ones(1,P);                % Lower bound (all parameter must be positive)
 ub = 50*ones(1,P);    % Upper bound on parameters
-options = optimoptions(@fmincon,'Display','off');    % Suppression of optimization output
+minOptions = optimoptions(@fmincon,'Display','off');    % Suppression of optimization output
 
-% "Best" storage:
-alpha_best = NaN(R,P);
-X_best = 0*X;
-err_best = zeros(R,1);
-SNR_best = zeros(R,1);
-flag_best = zeros(R,1);
-
-% UPRE storage:
-alpha_UPRE = NaN(R,P);
-X_UPRE = 0*X;
-err_UPRE = zeros(R,1);
-SNR_UPRE = zeros(R,1);
-flag_UPRE = zeros(R,1);
-
-% GCV storage:
-alpha_GCV = NaN(R,P);
-X_GCV = 0*X;
-err_GCV = zeros(R,1);
-SNR_GCV = zeros(R,1);
-flag_GCV = zeros(R,1);
-
-% % MDP storage:
-% alpha_MDP = NaN(R,P);
-% X_MDP = 0*X;
-% err_MDP = zeros(R,1);
-% SNR_MDP = zeros(R,1);
-% flag_MDP = zeros(R,1);
-
-% Loop over all MESSENGER data:
-for l = 1:R
-    
-    % Specific true solution and data vector:
-    x = X(:,:,l);
-    d_hat = D_hat(:,:,l);
-    
-    % "Best":
-    f = @(alpha) MSE(alpha,d_hat,x);
-    [alpha_best(l,:),~,flag_best(l)] = fmincon(f,x0,[],[],[],[],lb,...
-        ub,[],options);
-%     alpha_best(l,:) = fmingrid(f,x0,pts,iter);
-    X_best(:,:,l) = xWin(alpha_best(l,:),d_hat);
-    err_best(l) = norm(X_best(:,:,l)-x,'fro')/norm(x,'fro');    % Relative error
-    SNR_best(l) = mySNR(X_best(:,:,l),x);   % Calculate SNR of solution
-
-    % UPRE:
-    f = @(alpha) UPRE(alpha,d_hat,eta(l));
-    [alpha_UPRE(l,:),~,flag_UPRE(l)] = fmincon(f,x0,[],[],[],[],lb,...
-        ub,[],options);
-%     alpha_UPRE(l,:) = fmingrid(f,x0,pts,iter);
-    X_UPRE(:,:,l) = xWin(alpha_UPRE(l,:),d_hat);
-    err_UPRE(l) = norm(X_UPRE(:,:,l)-x,'fro')/norm(x,'fro');    % Relative error
-    SNR_UPRE(l) = mySNR(X_UPRE(:,:,l),x);   % Calculate SNR of solution
-    
-    % GCV:
-    f = @(alpha) GCV(alpha,d_hat);
-    [alpha_GCV(l,:),~,flag_GCV(l)] = fmincon(f,x0,[],[],[],[],lb,...
-        ub,[],options);
-%     alpha_GCV(l,:) = fmingrid(f,x0,pts,iter);
-    X_GCV(:,:,l) = xWin(alpha_GCV(l,:),d_hat);
-    err_GCV(l) = norm(X_GCV(:,:,l)-x,'fro')/norm(x,'fro');    % Relative error
-    SNR_GCV(l) = mySNR(X_GCV(:,:,l),x);   % Calculate SNR of solution
-    
-%     % MDP:
-%     f = @(alpha) MDP(alpha,d_hat,eta(l));
-%     [alpha_MDP(l,:),~,flag_MDP(l)] = fmincon(f,x0,[],[],[],[],lb,...
-%         ub,[],options);
-%     X_MDP(:,:,l) = xWin(alpha_MDP(l,:),d_hat);
-%     err_MDP(l) = (norm(X_MDP(:,:,l)-x,'fro')/norm(x,'fro'))^2;    % Relative error
-%     SNR_MDP(l) = mySNR(X_MDP(:,:,l),x);   % Calculate SNR of solution
-    
-    % Completion messages:
-    if l <= Rt
-        disp(['Training set ' num2str(l) ' completed.'])
-    else
-        disp(['Validation set ' num2str(l-Rt) ' completed.'])
+% Use Best method if specified:
+if ismember("Best",userInputs.methods)
+    indBest = find(strcmp("Best",userInputs.methods));
+    indStartBest = (indBest-1)*P + 1;   % Index of first alpha_Best in alpha
+    indEndBest = indStartBest + (P-1);  % Index of last alpha_Best in alpha
+    % Loop over all data:
+    for l = 1:R
+        x = X(:,:,l);
+        d_hat = D_hat(:,:,l);
+        f = @(alpha) MSE(alpha,d_hat,x);
+        [alpha(l,indStartBest:indEndBest),~,flags(l,indBest)] = fmincon(f,x0,[],[],[],[],lb,...
+            ub,[],minOptions);
+%     alpha(l,indStartBest:indEndBest) = fmingrid(f,x0,pts,iter);
+        X_Best = xWin(alpha(l,indStartBest:indEndBest),d_hat);
+        err(l,indBest) = norm(X_Best-x,'fro')/norm(x,'fro');    % Relative error
+        SNR(l,indBest) = mySNR(X_Best,x);   % Calculate SNR of solution
     end
-
+    disp('Standard best method completed for all data sets.')
 end
 
-disp('All individual data sets completed.') % Completion message
-alpha = [alpha_best,alpha_UPRE,alpha_GCV];    % All parameters
-% alpha = alpha(1:Rt,:);  % Trim the last Rv rows
-err = [err_best,err_UPRE,err_GCV];              % All errors
-% err = err(1:Rt,:);  % Trim the last Rv rows
-SNR = [SNR_best,SNR_UPRE,SNR_GCV];  % All SNR's of the reg. solutions
-% SNR = SNR(1:Rt,:);  % Trim the last Rv rows
+% Use UPRE method if specified:
+if ismember("UPRE",userInputs.methods)
+    indUPRE = find(strcmp("UPRE",userInputs.methods));
+    indStartUPRE = (indUPRE-1)*P + 1;   % Index of first alpha_UPRE in alpha
+    indEndUPRE = indStartUPRE + (P-1);  % Index of last alpha_UPRE in alpha
+    % Loop over all data:
+    for l = 1:R
+        x = X(:,:,l);
+        d_hat = D_hat(:,:,l);
+        f = @(alpha) UPRE(alpha,d_hat,eta(l));
+        [alpha(l,indStartUPRE:indEndUPRE),~,flags(l,indUPRE)] = fmincon(f,x0,[],[],[],[],lb,...
+            ub,[],minOptions);
+%     alpha(l,indStartUPRE:indEndUPRE) = fmingrid(f,x0,pts,iter);
+        X_UPRE = xWin(alpha(l,:),d_hat);
+        err(l,indUPRE) = norm(X_UPRE-x,'fro')/norm(x,'fro');    % Relative error
+        SNR(l,indUPRE) = mySNR(X_UPRE,x);   % Calculate SNR of solution
+    end
+    disp('Standard UPRE method completed for all data sets.')
+end
+
+% Use GCV method if specified:
+if ismember("GCV",userInputs.methods)
+    indGCV = find(strcmp("GCV",userInputs.methods));
+    indStartGCV = (indGCV-1)*P + 1;   % Index of first alpha_GCV in alpha
+    indEndGCV = indStartGCV + (P-1);  % Index of last alpha_GCV in alpha
+    % Loop over all data:
+    for l = 1:R
+        x = X(:,:,l);
+        d_hat = D_hat(:,:,l);
+        f = @(alpha) GCV(alpha,d_hat);
+        [alpha(l,indStartGCV:indEndGCV),~,flags(l,indGCV)] = fmincon(f,x0,[],[],[],[],lb,...
+            ub,[],minOptions);
+%     alpha(l,indStartGCV:indEndGCV) = fmingrid(f,x0,pts,iter);
+        X_GCV = xWin(alpha(l,indStartGCV:indEndGCV),d_hat);
+        err(l,indGCV) = norm(X_GCV-x,'fro')/norm(x,'fro');    % Relative error
+        SNR(l,indGCV) = mySNR(X_GCV,x);   % Calculate SNR of solution
+    end
+    disp('Standard GCV method completed for all data sets.')
+end
+
+% Use MDP method if specified:
+if ismember("MDP",userInputs.methods)
+    indMDP = find(strcmp("MDP",userInputs.methods));
+    indStartMDP = (indMDP-1)*P + 1;   % Index of first alpha_MDP in alpha
+    indEndMDP = indStartMDP + (P-1);  % Index of last alpha_MDP in alpha
+    % Loop over all data:
+    for l = 1:R
+        x = X(:,:,l);
+        d_hat = D_hat(:,:,l);
+        f = @(alpha) MDP(alpha,d_hat);
+        [alpha(l,indStartMDP:indEndMDP),~,flags(l,indMDP)] = fmincon(f,x0,[],[],[],[],lb,...
+            ub,[],minOptions);
+%     alpha(l,indStartMDP:indEndMDP) = fmingrid(f,x0,pts,iter);
+        X_MDP = xWin(alpha(l,indStartMDP:indEndMDP),d_hat);
+        err(l,indMDP) = norm(X_MDP-x,'fro')/norm(x,'fro');    % Relative error
+        SNR(l,indMDP) = mySNR(X_MDP,x);   % Calculate SNR of solution
+    end
+    disp('Standard MDP method completed for all data sets.')
+end
 
 %% Find adapted regularization parameters
 
@@ -197,7 +189,7 @@ for l = 1:r
     
     % "Learned" parameter:    
     F = @(alpha) BigMSE(alpha,W,d_hat,delta,delta2,lambda,x);  % FIX p to W
-    [alpha_learned(l,:),~,flag_learned(l)] = fmincon(F,x0,[],[],[],[],lb,ub,[],options);
+    [alpha_learned(l,:),~,flag_learned(l)] = fmincon(F,x0,[],[],[],[],lb,ub,[],minOptions);
     err_learned_T(l,:) = arrayNorm(Xt - xWinBig(alpha_learned(l,:),W,Dt_hat,delta,delta2,lambda))./...
         arrayNorm(Xt);    % Relative error using entire training set
     err_learned_V(l,:) = arrayNorm(Xv - xWinBig(alpha_learned(l,:),W,Dv_hat,delta,delta2,lambda))./...
@@ -213,7 +205,7 @@ for l = 1:r
 
     % Adapted UPRE:    
     U = @(alpha) BigUPRE(alpha,d_hat,eta);
-    [alpha_BigUPRE(l,:),~,flag_BigUPRE(l)] = fmincon(U,x0,[],[],[],[],lb,ub,[],options);
+    [alpha_BigUPRE(l,:),~,flag_BigUPRE(l)] = fmincon(U,x0,[],[],[],[],lb,ub,[],minOptions);
     err_BigUPRE_T(l,:) = arrayNorm(Xt - xWinBig(alpha_BigUPRE(l,:),W,Dt_hat,delta,delta2,lambda))./...
         arrayNorm(Xt);    % Relative error
     err_BigUPRE_V(l,:) = arrayNorm(Xv - xWinBig(alpha_BigUPRE(l,:),W,Dv_hat,delta,delta2,lambda))./...
@@ -229,7 +221,7 @@ for l = 1:r
     
     % Adapted GCV:    
     G = @(alpha) BigGCV(alpha,d_hat);
-    [alpha_BigGCV(l,:),~,flag_BigGCV(l)] = fmincon(G,x0,[],[],[],[],lb,ub,[],options);
+    [alpha_BigGCV(l,:),~,flag_BigGCV(l)] = fmincon(G,x0,[],[],[],[],lb,ub,[],minOptions);
     err_BigGCV_T(l,:) = arrayNorm(Xt - xWinBig(alpha_BigGCV(l,:),W,Dt_hat,delta,delta2,lambda))./...
         arrayNorm(Xt);    % Relative error using entire training set
     err_BigGCV_V(l,:) = arrayNorm(Xv - xWinBig(alpha_BigGCV(l,:),W,Dv_hat,delta,delta2,lambda))./...
@@ -268,54 +260,40 @@ disp('All grouped data sets completed.')    % Completion message
 
 %% Reassign data for later processing
 
-% alphaBig = zeros(r,P,3); % 4 methods being consider; in order: MSE,UPRE,GCV,MDP
 alphaBig = zeros(r,P,3); % 3 methods being consider; in order: MSE,UPRE,GCV
 alphaBig(:,:,1) = alpha_learned;
 alphaBig(:,:,2) = alpha_BigUPRE;
 alphaBig(:,:,3) = alpha_BigGCV;
-% alphaBig(:,:,4) = alpha_BigMDP;
 
-% errBig_T = zeros(r,Rv,4); % 4 methods being consider; in order: MSE,UPRE,GCV,MDP
 errBig_T = zeros(r,Rt,3); % 3 methods being consider; in order: MSE,UPRE,GCV
 errBig_T(:,:,1) = err_learned_T;
 errBig_T(:,:,2) = err_BigUPRE_T;
 errBig_T(:,:,3) = err_BigGCV_T;
-% errBig_T(:,:,4) = err_BigMDP_T;
 
-% errBig_V = zeros(r,Rv,4); % 4 methods being consider; in order: MSE,UPRE,GCV,MDP
 errBig_V = zeros(r,Rv,3); % 3 methods being consider; in order: MSE,UPRE,GCV
 errBig_V(:,:,1) = err_learned_V;
 errBig_V(:,:,2) = err_BigUPRE_V;
 errBig_V(:,:,3) = err_BigGCV_V;
-% errBig_V(:,:,4) = err_BigMDP_V;
 
-% errBig_V2 = zeros(r,8,4); % 4 methods being consider; in order: MSE,UPRE,GCV,MDP
 errBig_V2 = zeros(r,8,3); % 3 methods being consider; in order: MSE,UPRE,GCV
 errBig_V2(:,:,1) = err_learned_V2;
 errBig_V2(:,:,2) = err_BigUPRE_V2;
 errBig_V2(:,:,3) = err_BigGCV_V2;
-% errBig_V2(:,:,4) = err_BigMDP_V2;
 
-% SNRBig_T = zeros(r,Rv,4); % 4 methods being consider; in order: MSE,UPRE,GCV,MDP
 SNRBig_T = zeros(r,Rt,3); % 3 methods being consider; in order: MSE,UPRE,GCV
 SNRBig_T(:,:,1) = SNR_learned_T;
 SNRBig_T(:,:,2) = SNR_BigUPRE_T;
 SNRBig_T(:,:,3) = SNR_BigGCV_T;
-% SNRBig_T(:,:,4) = SNR_BigMDP_T;
 
-% SNRBig_V = zeros(r,Rv,4); % 4 methods being consider; in order: MSE,UPRE,GCV,MDP
 SNRBig_V = zeros(r,Rv,3); % 3 methods being consider; in order: MSE,UPRE,GCV
 SNRBig_V(:,:,1) = SNR_learned_V;
 SNRBig_V(:,:,2) = SNR_BigUPRE_V;
 SNRBig_V(:,:,3) = SNR_BigGCV_V;
-% SNRBig_V(:,:,4) = SNR_BigMDP_V;
 
-% SNRBig_V2 = zeros(r,8,4); % 4 methods being consider; in order: MSE,UPRE,GCV,MDP
 SNRBig_V2 = zeros(r,8,3); % 3 methods being consider; in order: MSE,UPRE,GCV
 SNRBig_V2(:,:,1) = SNR_learned_V2;
 SNRBig_V2(:,:,2) = SNR_BigUPRE_V2;
 SNRBig_V2(:,:,3) = SNR_BigGCV_V2;
-% SNRBig_V2(:,:,4) = SNR_BigMDP_V2;
 
 %% Save data
 
