@@ -142,26 +142,21 @@ indZeros = (delta < gammaTol) & (gamma < gammaTol);    % Location of terms to ze
 delta2 = delta;
 delta2(indZeros) = 1;    % Adjust delta2 to avoid division by zero
 
+Rvec = 2:2:Rt;   % Vector containing the number of data sets
+r = length(Rvec);   % Number of different data sets considered in adapted methods
+
 %% Declare variables that store results of each specified method
 
 % Storage for single data sets:
 methodNumber = numel(userInputs.methods);   % Number of specified methods
-alpha = NaN(R,P*methodNumber);
+alpha = NaN(R,P,methodNumber);
 err = zeros(R,methodNumber);
 SNR = zeros(R,methodNumber);
 flags = zeros(R,methodNumber);
 
 % Storage for parameters from adapted methods:
-alphaBig = zeros(r,P,methodNumber);
-
-% Storage for error from adapted methods:
-errBig_T = zeros(r,Rt,methodNumber);
-errBig_V = zeros(r,Rv,methodNumber);
-errBig_V2 = zeros(r,8,methodNumber);    % There are 8 images in the second validation set
-
-% Storage for SNR's from adapted methods:
-SNRBig_T = zeros(r,Rt,methodNumber);
-SNRBig_V = zeros(r,Rv,methodNumber);
-SNRBig_V2 = zeros(r,8,methodNumber);    % There are 8 images in the second validation set
-
+alphaBig = NaN(r,P,methodNumber);
+errBig = zeros(r,Rt+Rv+8,methodNumber);
+SNRBig = zeros(r,Rt+Rv+8,methodNumber);
+flagsBig = zeros(r,methodNumber);
 
