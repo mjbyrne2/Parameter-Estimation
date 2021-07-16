@@ -57,17 +57,15 @@ minOptions = optimoptions(@fmincon,'Display','off');    % Suppression of optimiz
 % Use Best method if specified:
 if ismember("Best",userInputs.methods)
     indBest = find(strcmp("Best",userInputs.methods));
-    indStartBest = (indBest-1)*P + 1;   % Index of first alpha_Best in alpha
-    indEndBest = indStartBest + (P-1);  % Index of last alpha_Best in alpha
     % Loop over all data:
     for l = 1:R
         x = X(:,:,l);
         d_hat = D_hat(:,:,l);
         f = @(alpha) MSE(alpha,d_hat,x);
-        [alpha(l,indStartBest:indEndBest),~,flags(l,indBest)] = fmincon(f,x0,[],[],[],[],lb,...
+        [alpha(l,:,indBest),~,flags(l,indBest)] = fmincon(f,x0,[],[],[],[],lb,...
             ub,[],minOptions);
 %     alpha(l,indStartBest:indEndBest) = fmingrid(f,x0,pts,iter);
-        X_Best = xWin(alpha(l,indStartBest:indEndBest),d_hat);
+        X_Best = xWin(alpha(l,:,indBest),d_hat);
         err(l,indBest) = norm(X_Best-x,'fro')/norm(x,'fro');    % Relative error
         SNR(l,indBest) = mySNR(X_Best,x);   % Calculate SNR of solution
     end
@@ -77,17 +75,15 @@ end
 % Use UPRE method if specified:
 if ismember("UPRE",userInputs.methods)
     indUPRE = find(strcmp("UPRE",userInputs.methods));
-    indStartUPRE = (indUPRE-1)*P + 1;   % Index of first alpha_UPRE in alpha
-    indEndUPRE = indStartUPRE + (P-1);  % Index of last alpha_UPRE in alpha
     % Loop over all data:
     for l = 1:R
         x = X(:,:,l);
         d_hat = D_hat(:,:,l);
         f = @(alpha) UPRE(alpha,d_hat,eta(l));
-        [alpha(l,indStartUPRE:indEndUPRE),~,flags(l,indUPRE)] = fmincon(f,x0,[],[],[],[],lb,...
+        [alpha(l,:,indUPRE),~,flags(l,indUPRE)] = fmincon(f,x0,[],[],[],[],lb,...
             ub,[],minOptions);
 %     alpha(l,indStartUPRE:indEndUPRE) = fmingrid(f,x0,pts,iter);
-        X_UPRE = xWin(alpha(l,:),d_hat);
+        X_UPRE = xWin(alpha(l,:,indUPRE),d_hat);
         err(l,indUPRE) = norm(X_UPRE-x,'fro')/norm(x,'fro');    % Relative error
         SNR(l,indUPRE) = mySNR(X_UPRE,x);   % Calculate SNR of solution
     end
@@ -97,17 +93,15 @@ end
 % Use GCV method if specified:
 if ismember("GCV",userInputs.methods)
     indGCV = find(strcmp("GCV",userInputs.methods));
-    indStartGCV = (indGCV-1)*P + 1;   % Index of first alpha_GCV in alpha
-    indEndGCV = indStartGCV + (P-1);  % Index of last alpha_GCV in alpha
     % Loop over all data:
     for l = 1:R
         x = X(:,:,l);
         d_hat = D_hat(:,:,l);
         f = @(alpha) GCV(alpha,d_hat);
-        [alpha(l,indStartGCV:indEndGCV),~,flags(l,indGCV)] = fmincon(f,x0,[],[],[],[],lb,...
+        [alpha(l,:,indGCV),~,flags(l,indGCV)] = fmincon(f,x0,[],[],[],[],lb,...
             ub,[],minOptions);
 %     alpha(l,indStartGCV:indEndGCV) = fmingrid(f,x0,pts,iter);
-        X_GCV = xWin(alpha(l,indStartGCV:indEndGCV),d_hat);
+        X_GCV = xWin(alpha(l,:,indGCV),d_hat);
         err(l,indGCV) = norm(X_GCV-x,'fro')/norm(x,'fro');    % Relative error
         SNR(l,indGCV) = mySNR(X_GCV,x);   % Calculate SNR of solution
     end
@@ -117,17 +111,15 @@ end
 % Use MDP method if specified:
 if ismember("MDP",userInputs.methods)
     indMDP = find(strcmp("MDP",userInputs.methods));
-    indStartMDP = (indMDP-1)*P + 1;   % Index of first alpha_MDP in alpha
-    indEndMDP = indStartMDP + (P-1);  % Index of last alpha_MDP in alpha
     % Loop over all data:
     for l = 1:R
         x = X(:,:,l);
         d_hat = D_hat(:,:,l);
         f = @(alpha) MDP(alpha,d_hat);
-        [alpha(l,indStartMDP:indEndMDP),~,flags(l,indMDP)] = fmincon(f,x0,[],[],[],[],lb,...
+        [alpha(l,:,indMDP),~,flags(l,indMDP)] = fmincon(f,x0,[],[],[],[],lb,...
             ub,[],minOptions);
 %     alpha(l,indStartMDP:indEndMDP) = fmingrid(f,x0,pts,iter);
-        X_MDP = xWin(alpha(l,indStartMDP:indEndMDP),d_hat);
+        X_MDP = xWin(alpha(l,:,indMDP),d_hat);
         err(l,indMDP) = norm(X_MDP-x,'fro')/norm(x,'fro');    % Relative error
         SNR(l,indMDP) = mySNR(X_MDP,x);   % Calculate SNR of solution
     end
@@ -136,189 +128,130 @@ end
 
 %% Find adapted regularization parameters
 
-Rvec = 2:2:Rt;   % Vector containing the number of data sets
-r = length(Rvec);   % Number of different data sets considered in adapted methods
-
-% "Learned" storage:
-alpha_learned = NaN(r,P);
-err_learned_T = zeros(r,Rt);    % Error using training data
-err_learned_V = zeros(r,Rv);    % Error using first (MESSENGER) validation set
-err_learned_V2 = zeros(r,8);    % Error using second validation set
-SNR_learned_T = zeros(r,Rt);    % SNR using training data
-SNR_learned_V = zeros(r,Rv);    % SNR using first (MESSENGER) validation set
-SNR_learned_V2 = zeros(r,8);    % SNR using second validation set
-flag_learned = zeros(r,1);
-
-% Adapted UPRE storage:
-alpha_BigUPRE = NaN(r,P);
-err_BigUPRE_T = zeros(r,Rt);    % Error using training data
-err_BigUPRE_V = zeros(r,Rv);    % Error using first (MESSENGER) validation set
-err_BigUPRE_V2 = zeros(r,8);    % Error using second validation set
-SNR_BigUPRE_T = zeros(r,Rt);    % SNR using training data
-SNR_BigUPRE_V = zeros(r,Rv);    % SNR using first (MESSENGER) validation set
-SNR_BigUPRE_V2 = zeros(r,8);    % SNR using second validation set
-flag_BigUPRE = zeros(r,1);
-
-% Adapted GCV storage:
-alpha_BigGCV = NaN(r,P);
-err_BigGCV_T = zeros(r,Rt);     % Error using training data
-err_BigGCV_V = zeros(r,Rv);     % Error using first (MESSENGER) validation set
-err_BigGCV_V2 = zeros(r,8);     % Error using second validation set
-SNR_BigGCV_T = zeros(r,Rt);    % SNR using training data
-SNR_BigGCV_V = zeros(r,Rv);    % SNR using first (MESSENGER) validation set
-SNR_BigGCV_V2 = zeros(r,8);    % SNR using second validation set
-flag_BigGCV = zeros(r,1);
-
-% % Adapted MDP storage:
-% alpha_BigMDP = NaN(r,P);
-% err_BigMDP_T = zeros(r,Rt);   % Error using training data
-% err_BigMDP_V = zeros(r,Rv);   % Error using first (MESSENGER) validation set
-% err_BigMDP_V2 = zeros(r,8);   % Error using second validation set
-% SNR_BigMDP_T = zeros(r,Rt);    % SNR using training data
-% SNR_BigMDP_V = zeros(r,Rv);    % SNR using first (MESSENGER) validation set
-% SNR_BigMDP_V2 = zeros(r,8);    % SNR using second validation set
-% flag_BigMDP = zeros(r,1);
-
-% Find the "learned" parameters and parameters from adapted systems:
-for l = 1:r
-    
-    % Specific true solutions and data vectors:
-    x = Xt(:,:,1:Rvec(l));
-    d_hat = Dt_hat(:,:,1:Rvec(l));
-    eta = etaT(1:Rvec(l));
-    
-    % "Learned" parameter:    
-    F = @(alpha) BigMSE(alpha,W,d_hat,delta,delta2,lambda,x);  % FIX p to W
-    [alpha_learned(l,:),~,flag_learned(l)] = fmincon(F,x0,[],[],[],[],lb,ub,[],minOptions);
-    err_learned_T(l,:) = arrayNorm(Xt - xWinBig(alpha_learned(l,:),W,Dt_hat,delta,delta2,lambda))./...
-        arrayNorm(Xt);    % Relative error using entire training set
-    err_learned_V(l,:) = arrayNorm(Xv - xWinBig(alpha_learned(l,:),W,Dv_hat,delta,delta2,lambda))./...
-        arrayNorm(Xv);    % Relative error using first validation set
-    err_learned_V2(l,:) = arrayNorm(Xv2 - xWinBig(alpha_learned(l,:),W,Dv2_hat,delta,delta2,lambda))./...
-        arrayNorm(Xv2);    % Relative error using second validation set
-    SNR_learned_T(l,:) = mySNR(xWinBig(alpha_learned(l,:),W,Dt_hat,delta,delta2,lambda),...
-        Xt);    % SNR using entire training set
-    SNR_learned_V(l,:) = mySNR(xWinBig(alpha_learned(l,:),W,Dv_hat,delta,delta2,lambda),...
-        Xv);    % SNR using first training set
-    SNR_learned_V2(l,:) = mySNR(xWinBig(alpha_learned(l,:),W,Dv2_hat,delta,delta2,lambda),...
-        Xv2);    % SNR using second training set
-
-    % Adapted UPRE:    
-    U = @(alpha) BigUPRE(alpha,d_hat,eta);
-    [alpha_BigUPRE(l,:),~,flag_BigUPRE(l)] = fmincon(U,x0,[],[],[],[],lb,ub,[],minOptions);
-    err_BigUPRE_T(l,:) = arrayNorm(Xt - xWinBig(alpha_BigUPRE(l,:),W,Dt_hat,delta,delta2,lambda))./...
-        arrayNorm(Xt);    % Relative error
-    err_BigUPRE_V(l,:) = arrayNorm(Xv - xWinBig(alpha_BigUPRE(l,:),W,Dv_hat,delta,delta2,lambda))./...
-        arrayNorm(Xv);    % Relative error using first validation set
-    err_BigUPRE_V2(l,:) = arrayNorm(Xv2 - xWinBig(alpha_BigUPRE(l,:),W,Dv2_hat,delta,delta2,lambda))./...
-        arrayNorm(Xv2);    % Relative error using second validation set
-    SNR_BigUPRE_T(l,:) = mySNR(xWinBig(alpha_BigUPRE(l,:),W,Dt_hat,delta,delta2,lambda),...
-        Xt);    % SNR using entire training set
-    SNR_BigUPRE_V(l,:) = mySNR(xWinBig(alpha_BigUPRE(l,:),W,Dv_hat,delta,delta2,lambda),...
-        Xv);    % SNR using first training set
-    SNR_BigUPRE_V2(l,:) = mySNR(xWinBig(alpha_BigUPRE(l,:),W,Dv2_hat,delta,delta2,lambda),...
-        Xv2);    % SNR using second training set
-    
-    % Adapted GCV:    
-    G = @(alpha) BigGCV(alpha,d_hat);
-    [alpha_BigGCV(l,:),~,flag_BigGCV(l)] = fmincon(G,x0,[],[],[],[],lb,ub,[],minOptions);
-    err_BigGCV_T(l,:) = arrayNorm(Xt - xWinBig(alpha_BigGCV(l,:),W,Dt_hat,delta,delta2,lambda))./...
-        arrayNorm(Xt);    % Relative error using entire training set
-    err_BigGCV_V(l,:) = arrayNorm(Xv - xWinBig(alpha_BigGCV(l,:),W,Dv_hat,delta,delta2,lambda))./...
-        arrayNorm(Xv);    % Relative error using first validation set
-    err_BigGCV_V2(l,:) = arrayNorm(Xv2 - xWinBig(alpha_BigGCV(l,:),W,Dv2_hat,delta,delta2,lambda))./...
-        arrayNorm(Xv2);    % Relative error using second validation set
-    SNR_BigGCV_T(l,:) = mySNR(xWinBig(alpha_BigGCV(l,:),W,Dt_hat,delta,delta2,lambda),...
-        Xt);    % SNR using entire training set
-    SNR_BigGCV_V(l,:) = mySNR(xWinBig(alpha_BigGCV(l,:),W,Dv_hat,delta,delta2,lambda),...
-        Xv);    % SNR using first training set
-    SNR_BigGCV_V2(l,:) = mySNR(xWinBig(alpha_BigGCV(l,:),W,Dv2_hat,delta,delta2,lambda),...
-        Xv2);    % SNR using second training set
-    
-%     % Adapted MDP:    
-%     M = @(alpha) BigMDP(alpha,d_hat,eta);
-%     [alpha_BigMDP(l,:),~,flag_BigMDP(l)] = fmincon(M,x0,[],[],[],[],lb,ub,[],options);
-%     err_BigMDP_T(l,:) = arrayNorm(Xt - xWinBig(alpha_BigMDP(l,:),W,Dt_hat,delta,delta2,lambda))./...
-%         arrayNorm(Xt);    % Relative error using entire training set
-%     err_BigMDP_V(l,:) = arrayNorm(Xv - xWinBig(alpha_BigMDP(l,:),W,Dv_hat,delta,delta2,lambda))./...
-%         arrayNorm(Xv);    % Relative error using first validation set
-%     err_BigMDP_V2(l,:) = arrayNorm(Xv2 - xWinBig(alpha_BigMDP(l,:),W,Dv2_hat,delta,delta2,lambda))./...
-%         arrayNorm(Xv2);    % Relative error using second validation set
-%     SNR_BigMDP_T(l,:) = mySNR(xWinBig(alpha_BigMDP(l,:),W,Dt_hat,delta,delta2,lambda),...
-%         Xt);    % SNR using entire training set
-%     SNR_BigMDP_V(l,:) = mySNR(xWinBig(alpha_BigMDP(l,:),W,Dv_hat,delta,delta2,lambda),...
-%         Xv);    % SNR using first training set
-%     SNR_BigMDP_V2(l,:) = mySNR(xWinBig(alpha_BigMDP(l,:),W,Dv2_hat,delta,delta2,lambda),...
-%         Xv2);    % SNR using second training set
-
-    disp(['P = ' num2str(P) ' parameter(s) determined using ' ...
-        num2str(Rvec(l)) ' data sets.'])
-
+% Use adapted Best method if specified:
+if ismember("Best",userInputs.methods)
+    % Loop over training data:
+    for l = 1:r
+        x = Xt(:,:,1:Rvec(l));
+        d_hat = Dt_hat(:,:,1:Rvec(l));
+        eta = etaT(1:Rvec(l));
+        F = @(alpha) BigMSE(alpha,W,d_hat,delta,delta2,lambda,x);
+        [alphaBig(l,:,indBest),~,flagsBig(l,indBest)] = ...
+            fmincon(F,x0,[],[],[],[],lb,ub,[],minOptions);
+        errBig(l,1:Rt,indBest) = arrayNorm(Xt - xWinBig(alphaBig(l,...
+            :,indBest),W,Dt_hat,delta,delta2,lambda))./...
+            arrayNorm(Xt);  % Relative error using entire training set
+        errBig(l,Rt+1:R,indBest) = arrayNorm(Xv - xWinBig(alphaBig(l,...
+            :,indBest),W,Dv_hat,delta,delta2,lambda))./...
+            arrayNorm(Xv);  % Relative error using first validation set
+        errBig(l,R+1:end,indBest) = arrayNorm(Xv2 - xWinBig(alphaBig(l,...
+            :,indBest),W,Dv2_hat,delta,delta2,lambda))./...
+            arrayNorm(Xv2); % Relative error using second validation set
+        SNRBig(l,1:Rt,indBest) = mySNR(xWinBig(alphaBig(l,:,...
+            indBest),W,Dt_hat,delta,delta2,lambda),Xt);    % SNR using entire training set
+        SNRBig(l,Rt+1:R,indBest) = mySNR(xWinBig(alphaBig(l,:,...
+            indBest),W,Dv_hat,delta,delta2,lambda),Xv);    % SNR using first training set
+        SNRBig(l,R+1:end,indBest) = mySNR(xWinBig(alphaBig(l,:,...
+            indBest),W,Dv2_hat,delta,delta2,lambda),Xv2);    % SNR using second training set
+    end
+    disp('Adapted best method completed for all data sets.')
 end
 
-disp('All grouped data sets completed.')    % Completion message
+% Use adapted Best method if specified:
+if ismember("UPRE",userInputs.methods)
+    % Loop over training data:
+    for l = 1:r
+        x = Xt(:,:,1:Rvec(l));
+        d_hat = Dt_hat(:,:,1:Rvec(l));
+        eta = etaT(1:Rvec(l));
+        U = @(alpha) BigUPRE(alpha,d_hat,eta);
+        [alphaBig(l,:,indUPRE),~,flagsBig(l,indUPRE)] = ...
+            fmincon(U,x0,[],[],[],[],lb,ub,[],minOptions);
+        errBig(l,1:Rt,indUPRE) = arrayNorm(Xt - xWinBig(alphaBig(l,...
+            :,indUPRE),W,Dt_hat,delta,delta2,lambda))./...
+            arrayNorm(Xt);  % Relative error using entire training set
+        errBig(l,Rt+1:R,indUPRE) = arrayNorm(Xv - xWinBig(alphaBig(l,...
+            :,indUPRE),W,Dv_hat,delta,delta2,lambda))./...
+            arrayNorm(Xv);  % Relative error using first validation set
+        errBig(l,R+1:end,indUPRE) = arrayNorm(Xv2 - xWinBig(alphaBig(l,...
+            :,indUPRE),W,Dv2_hat,delta,delta2,lambda))./...
+            arrayNorm(Xv2); % Relative error using second validation set
+        SNRBig(l,1:Rt,indUPRE) = mySNR(xWinBig(alphaBig(l,:,...
+            indUPRE),W,Dt_hat,delta,delta2,lambda),Xt);    % SNR using entire training set
+        SNRBig(l,Rt+1:R,indUPRE) = mySNR(xWinBig(alphaBig(l,:,...
+            indUPRE),W,Dv_hat,delta,delta2,lambda),Xv);    % SNR using first training set
+        SNRBig(l,R+1:end,indUPRE) = mySNR(xWinBig(alphaBig(l,:,...
+            indUPRE),W,Dv2_hat,delta,delta2,lambda),Xv2);    % SNR using second training set
+    end
+    disp('Adapted UPRE method completed for all data sets.')
+end
 
-%% Reassign data for later processing
 
-alphaBig = zeros(r,P,3); % 3 methods being consider; in order: MSE,UPRE,GCV
-alphaBig(:,:,1) = alpha_learned;
-alphaBig(:,:,2) = alpha_BigUPRE;
-alphaBig(:,:,3) = alpha_BigGCV;
+% Use adapted GCV method if specified:
+if ismember("GCV",userInputs.methods)
+    % Loop over training data:
+    for l = 1:r
+        x = Xt(:,:,1:Rvec(l));
+        d_hat = Dt_hat(:,:,1:Rvec(l));
+        eta = etaT(1:Rvec(l));
+        G = @(alpha) BigGCV(alpha,d_hat);
+        [alphaBig(l,:,indGCV),~,flagsBig(l,indGCV)] = ...
+            fmincon(G,x0,[],[],[],[],lb,ub,[],minOptions);
+        errBig(l,1:Rt,indGCV) = arrayNorm(Xt - xWinBig(alphaBig(l,...
+            :,indGCV),W,Dt_hat,delta,delta2,lambda))./...
+            arrayNorm(Xt);  % Relative error using entire training set
+        errBig(l,Rt+1:R,indGCV) = arrayNorm(Xv - xWinBig(alphaBig(l,...
+            :,indGCV),W,Dv_hat,delta,delta2,lambda))./...
+            arrayNorm(Xv);  % Relative error using first validation set
+        errBig(l,R+1:end,indGCV) = arrayNorm(Xv2 - xWinBig(alphaBig(l,...
+            :,indGCV),W,Dv2_hat,delta,delta2,lambda))./...
+            arrayNorm(Xv2); % Relative error using second validation set
+        SNRBig(l,1:Rt,indGCV) = mySNR(xWinBig(alphaBig(l,:,...
+            indGCV),W,Dt_hat,delta,delta2,lambda),Xt);    % SNR using entire training set
+        SNRBig(l,Rt+1:R,indGCV) = mySNR(xWinBig(alphaBig(l,:,...
+            indGCV),W,Dv_hat,delta,delta2,lambda),Xv);    % SNR using first training set
+        SNRBig(l,R+1:end,indGCV) = mySNR(xWinBig(alphaBig(l,:,...
+            indGCV),W,Dv2_hat,delta,delta2,lambda),Xv2);    % SNR using second training set
+    end
+    disp('Adapted GCV method completed for all data sets.')
+end
 
-errBig_T = zeros(r,Rt,3); % 3 methods being consider; in order: MSE,UPRE,GCV
-errBig_T(:,:,1) = err_learned_T;
-errBig_T(:,:,2) = err_BigUPRE_T;
-errBig_T(:,:,3) = err_BigGCV_T;
+% Use adapted MDP method if specified:
+if ismember("MDP",userInputs.methods)
+    % Loop over training data:
+    for l = 1:r
+        x = Xt(:,:,1:Rvec(l));
+        d_hat = Dt_hat(:,:,1:Rvec(l));
+        eta = etaT(1:Rvec(l));
+        M = @(alpha) BigMDP(alpha,d_hat,eta);
+        [alphaBig(l,:,indMDP),~,flagsBig(l,indMDP)] = ...
+            fmincon(M,x0,[],[],[],[],lb,ub,[],minOptions);
+        errBig(l,1:Rt,indMDP) = arrayNorm(Xt - xWinBig(alphaBig(l,...
+            :,indMDP),W,Dt_hat,delta,delta2,lambda))./...
+            arrayNorm(Xt);  % Relative error using entire training set
+        errBig(l,Rt+1:R,indMDP) = arrayNorm(Xv - xWinBig(alphaBig(l,...
+            :,indMDP),W,Dv_hat,delta,delta2,lambda))./...
+            arrayNorm(Xv);  % Relative error using first validation set
+        errBig(l,R+1:end,indMDP) = arrayNorm(Xv2 - xWinBig(alphaBig(l,...
+            :,indMDP),W,Dv2_hat,delta,delta2,lambda))./...
+            arrayNorm(Xv2); % Relative error using second validation set
+        SNRBig(l,1:Rt,indMDP) = mySNR(xWinBig(alphaBig(l,:,...
+            indMDP),W,Dt_hat,delta,delta2,lambda),Xt);    % SNR using entire training set
+        SNRBig(l,Rt+1:R,indMDP) = mySNR(xWinBig(alphaBig(l,:,...
+            indMDP),W,Dv_hat,delta,delta2,lambda),Xv);    % SNR using first training set
+        SNRBig(l,R+1:end,indMDP) = mySNR(xWinBig(alphaBig(l,:,...
+            indMDP),W,Dv2_hat,delta,delta2,lambda),Xv2);    % SNR using second training set
+    end
+    disp('Adapted MDP method completed for all data sets.')
+end
 
-errBig_V = zeros(r,Rv,3); % 3 methods being consider; in order: MSE,UPRE,GCV
-errBig_V(:,:,1) = err_learned_V;
-errBig_V(:,:,2) = err_BigUPRE_V;
-errBig_V(:,:,3) = err_BigGCV_V;
-
-errBig_V2 = zeros(r,8,3); % 3 methods being consider; in order: MSE,UPRE,GCV
-errBig_V2(:,:,1) = err_learned_V2;
-errBig_V2(:,:,2) = err_BigUPRE_V2;
-errBig_V2(:,:,3) = err_BigGCV_V2;
-
-SNRBig_T = zeros(r,Rt,3); % 3 methods being consider; in order: MSE,UPRE,GCV
-SNRBig_T(:,:,1) = SNR_learned_T;
-SNRBig_T(:,:,2) = SNR_BigUPRE_T;
-SNRBig_T(:,:,3) = SNR_BigGCV_T;
-
-SNRBig_V = zeros(r,Rv,3); % 3 methods being consider; in order: MSE,UPRE,GCV
-SNRBig_V(:,:,1) = SNR_learned_V;
-SNRBig_V(:,:,2) = SNR_BigUPRE_V;
-SNRBig_V(:,:,3) = SNR_BigGCV_V;
-
-SNRBig_V2 = zeros(r,8,3); % 3 methods being consider; in order: MSE,UPRE,GCV
-SNRBig_V2(:,:,1) = SNR_learned_V2;
-SNRBig_V2(:,:,2) = SNR_BigUPRE_V2;
-SNRBig_V2(:,:,3) = SNR_BigGCV_V2;
+disp('All adapted methods completed.')    % Completion message
 
 %% Save data
 
-if rangeSNR == 0 && P ~= 1
-    save(['v',num2str(v),'_','SNR',num2str(lSNR),'_',typeChar,num2str(P),...
-        '_',penaltyChar],'alpha','alphaBig','err','errBig_T','errBig_V',...
-        'errBig_V2','SNR','SNRBig_T','SNRBig_V','SNRBig_V2','Xt','Dt',...
-        'Xv','Dv','Dv2','x0','lb','ub','W','delta','delta2','lambda',...
-        'Rvec','Rt','Rv')
-elseif rangeSNR == 0 && P == 1
-    save(['v',num2str(v),'_','SNR',num2str(lSNR),'_',penaltyChar],'alpha',...
-        'alphaBig','err','errBig_T','errBig_V','errBig_V2','SNR',...
-        'SNRBig_T','SNRBig_V','SNRBig_V2','Xt','Dt','Xv','Dv','Dv2',...
-        'x0','lb','ub','W','delta','delta2','lambda','Rvec','Rt','Rv')
-elseif rangeSNR ~= 0 && P == 1
-    save(['v',num2str(v),'_','SNR',num2str(lSNR),'-',num2str(uSNR),'_',...
-        penaltyChar],'alpha','alphaBig','err','errBig_T','errBig_V',...
-        'errBig_V2','SNR','SNRBig_T','SNRBig_V','SNRBig_V2','Xt','Dt',...
-        'Xv','Dv','Dv2','x0','lb','ub','W','delta','delta2','lambda',...
-        'Rvec','Rt','Rv')
-else
-    save(['v',num2str(v),'_','SNR',num2str(lSNR),'-',num2str(uSNR),'_',...
-        typeChar,num2str(P),'_',penaltyChar],'alpha','alphaBig','err',...
-        'errBig_T','errBig_V','errBig_V2','SNR','SNRBig_T','SNRBig_V',...
-        'SNRBig_V2','Xt','Dt','Xv','Dv','Dv2','x0','lb','ub','W',...
-        'delta','delta2','lambda','Rvec','Rt','Rv')
-end
-clear,clc
+run save_Data.m
+
+
+
+
+
