@@ -2,15 +2,6 @@
 % First do the plot of the data, and then run this, and then do titles and
 % so forth
 
-% WS = 'maximized';    % Window state
-% LW = 1.5; % Line width
-% MS = 12; % Marker size
-% CB_FS = 20;    % Font size of colorbar labels (Good)
-% Ax_FS = 20;     % Font size of axis tickmarks
-% AxL_FS = 22;    % Font size of x and y axes labels
-% L_FS = 22;  % Font size of legends
-% Title_FS = 22;  % Good
-
 % Can set font sizes of "empty" objects like XLabels
 
 WS = 'maximized';    % Window state
@@ -18,7 +9,7 @@ LW = 1.5; % Line width
 MS = 12; % Marker size
 CB_FS = 20;    % Font size of colorbar labels (Good)
 Ax_FS = 20;     % Font size of axis tickmarks
-AxL_FS = 20;    % Font size of x and y axes labels
+AxL_FS = 22;    % Font size of x and y axes labels
 L_FS = 22;  % Font size of legends
 Title_FS = 22;  % Good
 
