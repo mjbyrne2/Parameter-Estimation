@@ -22,4 +22,5 @@ else
         'errBig','SNR','SNRBig','Xt','Dt','Xv','Dv','Dv2','x0','lb',...
         'ub','W','delta','delta2','lambda','Rvec','Rt','Rv')
 end
-clear,clc
+
+
