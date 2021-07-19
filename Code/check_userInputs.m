@@ -13,6 +13,12 @@ defaultUserInputs.methods = ["Best","UPRE","GCV"]; % Parameter selection methods
 defaultUserInputs.shuffle = []; % Shuffle images
 % <-- Can add more fields if necessary
 
+% Valid options:
+validPenalties = ["Identity","Laplacian"];
+validWindows = ["linear","linearCosine","log","logCosine"];
+validMethods = ["Best","UPRE","GCV","MDP"];
+validResolutions = [0,1,2,3,4,5];
+
 % Get field names from default inputs:
 userInputsFields = string(fieldnames(defaultUserInputs));
 
@@ -52,26 +58,22 @@ end
 %% Check the certain fields of userInputs are valid for later use
 
 % Check penalty matrix:
-validPenalties = ["Identity","Laplacian"];
 if isempty(userInputs.penalty) || ~ismember(userInputs.penalty,validPenalties)
     error('Error: The input penalty matrix is invalid.')
 end
 
 % Check windows:
-validWindows = ["linear","linearCosine","log","logCosine"];  % Valid window types
 if numel(userInputs.windows) == 2 && ~ismember(userInputs.windows{2},validWindows)
     error(strcat("Error: Invalid window type. Supported window types: ",strjoin(validWindows)))
 end
 
 % Check methods:
-validMethods = ["Best","UPRE","GCV","MDP"];
 if ~all(ismember(userInputs.methods,validMethods))
     error(strcat("Error: Invalid parameter selection method(s) detected: ",...
         strjoin(setdiff(userInputs.methods,validMethods)),". Supported methods: ",strjoin(validMethods)))
 end
 
 % Check downsampling resolutions:
-validResolutions = [0,1,2,3,4,5];
 if ~all(ismember(userInputs.resolutions,validResolutions))
     error(strcat("Error: Invalid downsampling resolution(s) detected: ",...
         strjoin(string(setdiff(userInputs.resolutions,validResolutions))),". Supported resolutions: ",strjoin(string(validResolutions))))
