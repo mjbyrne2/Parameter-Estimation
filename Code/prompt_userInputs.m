@@ -188,7 +188,7 @@ if ~isempty(userInputs.resolutions)
 end
 
 % Shuffle images in data sets:
-userInputs.shuffle = input('Do you want the images to be shuffled? (Y/N) \n','s');
+userInputs.shuffle = input('Do you want the images to be shuffled? (Y/N): ','s');
 if ~strcmp(userInputs.shuffle,'Y') && ~strcmp(userInputs.shuffle,'N')
     disp('Error: Invalid response. The images will not be shuffled.')
     userInputs.shuffle = [];    % Empty response means no shuffling

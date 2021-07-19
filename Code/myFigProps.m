@@ -22,8 +22,8 @@ set(findobj(fig,'Type','line'),'LineWidth',LW)   % Change the width of the lines
 ax = findobj(fig,'Type','axes');  % List of axes
 for j = 1:numel(ax)
     set(ax(j).Title,'FontSize',Title_FS)
-    set(ax(j).Xlabel,'FontSize',AxL_FS)
-    set(ax(j).Ylabel,'FontSize',AxL_FS)
+    set(ax(j).XLabel,'FontSize',AxL_FS)
+    set(ax(j).YLabel,'FontSize',AxL_FS)
     set(ax(j).Legend,'FontSize',L_FS)
     currentXticks = get(gca,'XTickLabel');
     set(ax(j),'XTickLabel',currentXticks,'FontSize',Ax_FS)
