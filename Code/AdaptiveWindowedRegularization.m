@@ -249,6 +249,18 @@ end
 
 disp('All adapted methods completed.')    % Completion message
 
-%% Save data
+%% Save and process data
 
+% Save the data:
 run save_Data.m
+
+% Prompt the user to process data immediately:
+userResponse = input('Do you want to process the data immediately? (Y/N): ');
+switch userResponse
+    case 'Y'
+        run process_Data.m
+    case 'N'
+        disp('The data will not be immediately processed.')
+    otherwise
+        disp('Error: Invalid response. The data will not be immediately processed.')
+end
