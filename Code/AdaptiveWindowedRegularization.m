@@ -37,6 +37,8 @@
 % See the default user inputs in check_userInputs.m for an example of input 
 % syntax.
 
+addpath('BasicFunctions/')
+
 % Check if user inputs have not been specified:
 run check_userInputs.m
 
@@ -250,8 +252,3 @@ disp('All adapted methods completed.')    % Completion message
 %% Save data
 
 run save_Data.m
-
-
-
-
-
