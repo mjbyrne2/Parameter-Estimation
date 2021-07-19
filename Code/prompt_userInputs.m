@@ -32,7 +32,8 @@ userInputs.shuffle = [];
 blurClasses = {'numeric'};
 blurAttributes = {'nonnegative','scalar','nonempty'};
 while isempty(userInputs.blur)
-    userInputs.blur = input('Amount of image blur (non-negative number): ');
+    userInputs.blur = input(['Specify amount of image blur (non-negative number).',...
+        newline,'(Enter 9 for low blur, 16 for medium blur, and 25 for severe blur): ']);
     try
         validateattributes(userInputs.blur,blurClasses,blurAttributes)
     catch
@@ -46,7 +47,8 @@ clear blurClasses blurAttributes
 SNRClasses = {'numeric'};
 SNRAttributes = {'nonnegative','vector','nonempty'};
 while isempty(userInputs.SNR)
-    userInputs.SNR = input('SNR of data to be generated (non-negative number or interval): ');
+    userInputs.SNR = input(['Specify SNR of data to be generated (non-negative number or interval).',...
+        newline,'(Enter 10 for high noise, 25 for medium noise, and 40 for low noise): ']);
     try
         validateattributes(userInputs.SNR,SNRClasses,SNRAttributes)
     catch
@@ -76,7 +78,10 @@ clear SNRClasses SNRAttributes
 penaltyClasses = {'string'};
 penaltyAttributes = {'scalartext','nonempty'};
 while isempty(userInputs.penalty)
-    userInputs.penalty = input('Penalty matrix (string): ');
+    userInputs.penalty = input(['Specify penalty matrix (string).',newline,...
+        '(Supported penalty matrices are ',...
+        convertStringsToChars(strcat("""",join(validPenalties,""", """),"""")),...
+        '): ']);
     try
         validateattributes(userInputs.penalty,penaltyClasses,penaltyAttributes)
     catch
@@ -89,7 +94,8 @@ clear penaltyClasses penaltyAttributes
 % Set the number and type of spectral windows:
 % Example: {2,"logCosine"}
 % 0 and 1 are treated the same (empty)
-userInputs.windows = input('Number and type of spectral windows (cell array {non-negative integer, non-empty string}): ');
+userInputs.windows = input(['Specify number and type of spectral windows (cell array {non-negative integer, non-empty string}).',...
+    newline,'(Enter {2,"logCos"} for two overlapping log cosine windows): ']);
 % Check if input was non-empty:
 if ~isempty(userInputs.windows)
     windowsClasses = {'cell'};
@@ -156,7 +162,10 @@ end
 methodsClasses = {'string'};
 methodsAttributes = {'vector','nonempty'};
 while isempty(userInputs.methods)
-    userInputs.methods = input('Parameter selection method(s) (string or array of strings): ');
+    userInputs.methods = input(['Specify parameter selection method(s) (string or array of strings).',...
+        newline,'(Supported methods are ',...
+        convertStringsToChars(strcat("""",join(validMethods,""", """),"""")),...
+        '): ']);
     try
         validateattributes(userInputs.methods,methodsClasses,methodsAttributes)
     catch
@@ -167,7 +176,9 @@ end
 clear methodsClasses methodsAttributes
 
 % Set the downsampling resolutions:
-userInputs.resolutions = input('Downsampling resolutions (array of non-negative integers): ');
+userInputs.resolutions = input(['Specify downsampling resolutions (array of non-negative integers).',...
+    newline,'(Supported resolutions are ',...
+    convertStringsToChars(join(string(validResolutions),', ')),', or empty for full problem): ']);
 if ~isempty(userInputs.resolutions)
     resolutionsClasses = {'numeric'};
     resolutionsAttributes = {'vector','integer','>=',0};
