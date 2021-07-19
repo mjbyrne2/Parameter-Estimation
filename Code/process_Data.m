@@ -3,16 +3,18 @@
 % create plots/tables. The plots use myFigProps.m. Data must be loaded
 % prior to running this script.
 
+P = size(W,3);  % Get the number of windows from W
+
 %% Plot errors and parameters:
 
-fig = figure('Regularization parameters and relative errors');
+fig = figure('Name','Parameters and relative errors');
 for j = 1:P
     subplot(P+1,1,j)
-    boxplot(alpha(:,j:2:end),methods)
+    boxplot(alpha(:,j:2:end),userInputs.methods)
     ylabel(['\alpha^{(',num2str(j),')}'])
 end
 subplot(P+1,1,P+1)
-boxplot(err,methods)
+boxplot(err,userInputs.methods)
 ylabel('Relative error')
 if P == 1
     sgtitle(['Parameters and resulting errors ',config(1:31),')'])
@@ -42,16 +44,16 @@ MDP.lineType = 's:g';
 
 methodNumber = numel(userInputs.methods);   % Number of specified methods
 
-fig = figure('Trend of adapted regularization parameters');
+fig = figure('Name','Trend of adapted parameters');
 for j = 1:P
     subplot(P,1,j)
     hold on
     for k = 1:methodNumber
-        plot(Rvec,alphaBig(:,j,k),eval(strcat(methods(k),".lineType")))
+        plot(Rvec,alphaBig(:,j,k),eval(strcat(userInputs.methods(k),".lineType")))
     end
     hold off
     xlim([1,Rvec(end)])
-    legend(methods)
+    legend(userInputs.methods)
     ylabel(['\alpha^{(',num2str(j),')}'])
     xlabel('Number of data sets (R)')
 end
@@ -67,10 +69,10 @@ myFigProps(fig)
 % data sets).
 
 desiredMethod = input(strcat("From which method do you want to generate images? (String options: ",...
-    """",join(methods,""", "),"""","): "));
+    """",join(userInputs.methods,""", "),"""","): "));
 if ~ismember(userMethods,userInputs.methods)
     disp(strcat("Error: Specified method not found. Using method ",...
-        methods(1),"instead."))
+        userInputs.methods(1),"instead."))
     methodIndex = 1;
 else
     methodIndex = find(strcmp(desiredMethod,userInputs.methods));
@@ -78,7 +80,7 @@ end
 
 % Loop over all images from the second validation set (8):
 for j = 1:8
-    fig = figure(['Validation image ' num2str(j)]);
+    fig = figure('Name',['Validation image ',num2str(j)]);
     xReg = xWinBig(alphaBig(end,:,methodIndex),W,Dv2_hat(:,:,j),delta,...
         delta2,lambda);
     imshow([Xv2(:,:,j),Bv2(:,:,j),Dv2(:,:,j),xReg])
@@ -93,16 +95,16 @@ end
 
 % Fix tables:
 
-f = '%.5f'; % Format of strings
-RN = arrayfun(@num2str,Rvec,'UniformOutput',0); % Cell array version of Rvec used as row names
-VN = {'Learned','UPRE','GCV'}; % Variable names
-Training = table(num2str(squeeze(sum(errBig_T(:,:,1),2))/Rt,f),...
-    num2str(squeeze(sum(errBig_T(:,:,2),2))/Rt,f),...
-    num2str(squeeze(sum(errBig_T(:,:,3),2))/Rt,f),'VariableNames',VN);
-Validation = table(num2str(squeeze(sum(errBig_V(:,:,1),2))/Rv,f),...
-    num2str(squeeze(sum(errBig_V(:,:,2),2))/Rv,f),...
-    num2str(squeeze(sum(errBig_V(:,:,3),2))/Rv,f),'VariableNames',VN);
-Validation2 = table(num2str(squeeze(sum(errBig_V2(:,:,1),2))/8,f),...
-    num2str(squeeze(sum(errBig_V2(:,:,2),2))/8,f),...
-    num2str(squeeze(sum(errBig_V2(:,:,3),2))/8,f),'VariableNames',VN);
-T = table(Training,Validation,Validation2,'RowNames',RN);
+% f = '%.5f'; % Format of strings
+% RN = arrayfun(@num2str,Rvec,'UniformOutput',0); % Cell array version of Rvec used as row names
+% VN = {'Learned','UPRE','GCV'}; % Variable names
+% Training = table(num2str(squeeze(sum(errBig_T(:,:,1),2))/Rt,f),...
+%     num2str(squeeze(sum(errBig_T(:,:,2),2))/Rt,f),...
+%     num2str(squeeze(sum(errBig_T(:,:,3),2))/Rt,f),'VariableNames',VN);
+% Validation = table(num2str(squeeze(sum(errBig_V(:,:,1),2))/Rv,f),...
+%     num2str(squeeze(sum(errBig_V(:,:,2),2))/Rv,f),...
+%     num2str(squeeze(sum(errBig_V(:,:,3),2))/Rv,f),'VariableNames',VN);
+% Validation2 = table(num2str(squeeze(sum(errBig_V2(:,:,1),2))/8,f),...
+%     num2str(squeeze(sum(errBig_V2(:,:,2),2))/8,f),...
+%     num2str(squeeze(sum(errBig_V2(:,:,3),2))/8,f),'VariableNames',VN);
+% T = table(Training,Validation,Validation2,'RowNames',RN);
