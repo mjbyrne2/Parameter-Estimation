@@ -36,11 +36,11 @@ BigDv2 = [Dv2(:,:,1),Dv2(:,:,2),Dv2(:,:,3),Dv2(:,:,4);...
 % of the array "methods" is not. This fixed ordering is done for 
 % consistency betweens runs.
 
-Best.lineType = 'o:k';
-UPRE.lineType = 'd:r';
-GCV.lineType = '*:b';
-MDP.lineType = 's:g';
-% <- Add more methods here 
+lineTypes.Best = 'o:k';
+lineTypes.UPRE = 'd:r';
+lineTypes.GCV = '*:b';
+lineTypes.MDP = 's:g';
+% <- Add more methods here
 
 methodNumber = numel(userInputs.methods);   % Number of specified methods
 
@@ -49,7 +49,7 @@ for j = 1:P
     subplot(P,1,j)
     hold on
     for k = 1:methodNumber
-        plot(Rvec,alphaBig(:,j,k),eval(strcat(userInputs.methods(k),".lineType")))
+        plot(Rvec,alphaBig(:,j,k),eval("lineTypes.",strcat(userInputs.methods(k))))
     end
     hold off
     xlim([1,Rvec(end)])
@@ -70,7 +70,7 @@ myFigProps(fig)
 
 desiredMethod = input(strcat("From which method do you want to generate images? (String options: ",...
     """",join(userInputs.methods,""", "),"""","): "));
-if ~ismember(userMethods,userInputs.methods)
+if ~ismember(desiredMethod,userInputs.methods)
     disp(strcat("Error: Specified method not found. Using method ",...
         userInputs.methods(1),"instead."))
     methodIndex = 1;
