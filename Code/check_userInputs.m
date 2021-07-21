@@ -2,6 +2,9 @@
 % Checks the inputs specified for use in AdaptiveWindowedRegularization.m.
 % This script can call prompt_userInputs.m if no inputs have been 
 % specified.
+%
+% check_userInputs.m uses penaltyMatrix.m to generate the list of valid
+% penalty matrices.
 
 % Default user inputs:
 defaultUserInputs.blur = 16;    % Medium blur
@@ -14,7 +17,7 @@ defaultUserInputs.shuffle = []; % Shuffle images
 % <-- Can add more fields if necessary
 
 % Valid options:
-validPenalties = ["Identity","Laplacian"];
+validPenalties = penaltyMatrix();   % Get valid penalty matrices
 validWindows = ["linear","linearCosine","log","logCosine"];
 validMethods = ["Best","UPRE","GCV","MDP"];
 validResolutions = [0,1,2,3,4,5];

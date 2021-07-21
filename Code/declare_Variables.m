@@ -21,19 +21,7 @@ else
 end
 
 % Assign penalty matrix:
-switch userInputs.penalty
-    case "Identity"
-        Lambda = ones(n);  % DCT of l where L = I (Identity matrix)
-    case "Laplacian" % Negative discrete Laplacian matrix
-        L = zeros(n);
-        cy = n/2;  % Row index of stencil center
-        cx = n/2;  % Column index of stencil center
-        L((cy-1):(cy+1),(cx-1):(cx+1)) = [0,-1,0;-1,4,-1;...
-            0,-1,0];  % Place stencil within L
-        e1 = zeros(n);
-        e1(1,1) = 1;
-        Lambda = dct2(dctshift(L,[cy,cx]))./dct2(e1);
-end
+Lambda = penaltyMatrix(userInputs.penalty);
 penaltyChar = convertStringsToChars(userInputs.penalty);   % Create char array for penalty name
 
 % Assign window number and type:
