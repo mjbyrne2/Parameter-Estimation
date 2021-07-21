@@ -5,16 +5,22 @@ function W = weights2(S,p,type)
 % - p is the an integer specifying the number of weight vectors
 % - type is a string that specifies the type of weight vectors. 
 % Possibilites for type are "linear", "log", "linearCosine", and 
-% "logCosine".
+% "logCosine". If only S is used as an input , then W is an array of ones
+% having the same dimension as S. If no inputs are used, then W is an array
+% of the possible window types (as strings). If no type is specified, then
+% the default type is "linear".
+
+validWindows = ["linear","linearCosine","log","logCosine"];
 
 % Check number of input arguments:
 switch nargin
-    
+    case 0
+        W = validWindows;   % Return list of valid window types
+        return
     case 1  % Input is only S
         [m,n] = size(S);
         W = ones(m,n);
-        return
-        
+        return      
     case 2  % No type specified
         if p == 1
             [m,n] = size(S);
@@ -22,15 +28,15 @@ switch nargin
             return
         else
             type = "linear";    % Default weight vectors are linear partitions
-        end
-        
+        end      
     case 3
         if p == 1
             [m,n] = size(S);
             W = ones(m,n);
             return
+        elseif ~ismember(type,validWindows)
+            error('The input window type is invalid.')
         end
-    
 end
 
 [m,n] = size(S);    % Dimension of S

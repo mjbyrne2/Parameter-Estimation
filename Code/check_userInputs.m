@@ -3,8 +3,8 @@
 % This script can call prompt_userInputs.m if no inputs have been 
 % specified.
 %
-% check_userInputs.m uses penaltyMatrix.m to generate the list of valid
-% penalty matrices.
+% check_userInputs.m uses penaltyMatrix.m and weights2.m to generate lists 
+% of valid penalty matrices and window types, respectively.
 
 % Default user inputs:
 defaultUserInputs.blur = 16;    % Medium blur
@@ -18,7 +18,7 @@ defaultUserInputs.shuffle = []; % Shuffle images
 
 % Valid options:
 validPenalties = penaltyMatrix();   % Get valid penalty matrices
-validWindows = ["linear","linearCosine","log","logCosine"];
+validWindows = weights2();  % Get valid window types
 validMethods = ["Best","UPRE","GCV","MDP"];
 validResolutions = [0,1,2,3,4,5];
 
