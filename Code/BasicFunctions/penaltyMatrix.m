@@ -1,6 +1,6 @@
 function Lambda = penaltyMatrix(name,n)
 % penaltyMatrix.m returns spectrum Lambda of the penalty matrix specified 
-% by the input name. Lambda is an n x n array computed using the 2D DCT
+% by the string name. Lambda is an n x n array computed using the 2D DCT
 % which is used to blur an image through element-wise multiplication. If no
 % value of n is given, the default value is 256. If no inputs are given,
 % then Lambda is set to an array containing the names (as strings) of the
