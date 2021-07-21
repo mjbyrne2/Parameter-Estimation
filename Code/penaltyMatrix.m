@@ -5,6 +5,10 @@ function Lambda = penaltyMatrix(name,n)
 % value of n is given, the default value is 256. If no inputs are given,
 % then Lambda is set to an array containing the names (as strings) of the
 % possible penalty matrices.
+%
+% penaltyMatrix.m relies on the function dctshift.m; see Chapter 4, 
+% "Deblurring Images - Matrices, Spectra, and Filtering" by P. C. Hansen, 
+% J. G. Nagy, and D. P. O’Leary, SIAM, Philadelphia, 2006.
 
 validPenalties = ["Identity","Laplacian"];
 nDefault = 256;
@@ -16,16 +20,16 @@ switch nargin
         return
     case 1
         if ~ismember(name,validPenalties)
-            error('Error: The input penalty matrix is invalid.')
+            error('The input penalty matrix is invalid.')
         else
             n = nDefault;   % Set default n
         end
     case 2
         if ~ismember(name,validPenalties)
-            error('Error: The input penalty matrix is invalid.')
+            error('The input penalty matrix is invalid.')
         end
     otherwise
-        error('Error: Too many inputs in penaltyMatrix.m')
+        error('Too many inputs in penaltyMatrix.m')
 end
 
 % Assign penalty matrix:
@@ -42,9 +46,5 @@ switch name
         e1(1,1) = 1;
         Lambda = dct2(dctshift(L,[cy,cx]))./dct2(e1);
 end
-        
-
-
-
 
 end
